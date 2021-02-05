@@ -39,7 +39,7 @@
 #define ticks_portador 5000000
 #define ticks_enfermo 5000000
 //Cantidad de personas a generar
-#define cant_personas 1000
+#define cant_personas 1
 
 
 __FLAME_GPU_FUNC__ int getNewExitLocation(RNG_rand48* rand48){
@@ -191,6 +191,9 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
 	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 
+	printf("%d, ",x);
+	printf("%d\n",y);
+
 	//lookup single message
     xmachine_message_navmap_cell* current_message = get_first_navmap_cell_message<CONTINUOUS>(navmap_cell_messages, x, y);
   
@@ -209,7 +212,7 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
 	{
 		goal_force = glm::vec2(current_message->exit0_x, current_message->exit0_y);
 		if (exit_location == 1)
-		{
+		{printf("%f\n",agent->y);
 			if (EXIT1_STATE)
 				kill_agent = 1;
 			else
@@ -278,7 +281,7 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
 	agent->steer_y += collision_force.y + goal_force.y;
 
 	//update height
-	agent->height = current_message->height;
+	//agent->height = current_message->height;
 
     return kill_agent;
 }
@@ -293,7 +296,8 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 
 	glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
 	glm::vec2 agent_vel = glm::vec2(agent->velx, agent->vely);
-	glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
+	//glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
+	glm::vec2 agent_steer = glm::vec2(-30, 1);
 
 	float current_speed = length(agent_vel)+0.025f;//(powf(length(agent_vel), 1.75f)*0.01f)+0.025f;
 
@@ -352,9 +356,11 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 			//printf("Me cure");
 		}
 	}
+	//Por cada tick, informo mi posición en Y
+	//printf("%f\n",agent->y);
 	
 	//Por cada tick, informo mi estado
-	printf("%d\n",agent->estado);
+	//printf("%d\n",agent->estado);
 	
 	return 0;
 }
