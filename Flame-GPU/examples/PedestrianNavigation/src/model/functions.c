@@ -45,42 +45,6 @@
 #define ir_y 150
 
 
-__FLAME_GPU_FUNC__ int getNewExitLocation(RNG_rand48* rand48){
-
-	int exit1_compare = EXIT1_PROBABILITY;
-	int exit2_compare = EXIT2_PROBABILITY + exit1_compare;
-	int exit3_compare = EXIT3_PROBABILITY + exit2_compare;
-	int exit4_compare = EXIT4_PROBABILITY + exit3_compare;
-	int exit5_compare = EXIT5_PROBABILITY + exit4_compare;
-	int exit6_compare = EXIT6_PROBABILITY + exit5_compare;
-
-	float range = (float) (EXIT1_PROBABILITY +
-				  EXIT2_PROBABILITY +
-				  EXIT3_PROBABILITY +
-				  EXIT4_PROBABILITY +
-				  EXIT5_PROBABILITY +
-				  EXIT6_PROBABILITY +
-				  EXIT7_PROBABILITY);
-
-	float rand = rnd<DISCRETE_2D>(rand48)*range;
-
-	if (rand<exit1_compare)
-		return 1;
-	else if (rand<exit2_compare)
-		return 2;
-	else if (rand<exit3_compare)
-		return 3;
-	else if (rand<exit4_compare)
-		return 4;
-	else if (rand<exit5_compare)
-		return 5;
-	else if (rand<exit6_compare)
-		return 6;
-	else
-		return 7;
-
-}
-
 /**
  * output_location FLAMEGPU Agent Function
  * Automatically generated using functions.xslt
@@ -89,7 +53,6 @@ __FLAME_GPU_FUNC__ int getNewExitLocation(RNG_rand48* rand48){
  */
 __FLAME_GPU_FUNC__ int output_pedestrian_location(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages){
 
-    
 	add_pedestrian_location_message(pedestrian_location_messages, agent->x, agent->y, 0.0,agent->estado);
   
     return 0;
@@ -179,112 +142,6 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 	agent->steer_y = steer_velocity.y;
 
     return 0;
-}
-
-
-/**
- * force_flow FLAMEGPU Agent Function
- * Automatically generated using functions.xslt
- * @param agent Pointer to an agent structre of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param navmap_cell_messages  navmap_cell_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_navmap_cell_message and get_next_navmap_cell_message functions.
- */
-__FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message_navmap_cell_list* navmap_cell_messages, RNG_rand48* rand48){
-
-    //map agent position into 2d grid
-	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-
-	//lookup single message
-    xmachine_message_navmap_cell* current_message = get_first_navmap_cell_message<CONTINUOUS>(navmap_cell_messages, x, y);
-  
-	glm::vec2 collision_force = glm::vec2(current_message->collision_x, current_message->collision_y);
-	collision_force *= COLLISION_WEIGHT;
-
-	//exit location of cell
-	int exit_location = current_message->exit_no;
-
-	//agent death flag
-	int kill_agent = 0;
-
-	//goal force
-	glm::vec2 goal_force;
-	if (agent->exit_no == 1)
-	{
-		goal_force = glm::vec2(current_message->exit0_x, current_message->exit0_y);
-		if (exit_location == 1)
-		{
-			//printf("%f\n",agent->y);
-			if (EXIT1_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-		}
-	}
-	else if (agent->exit_no == 2)
-	{
-		goal_force = glm::vec2(current_message->exit1_x, current_message->exit1_y);
-		if (exit_location == 2)
-			if (EXIT2_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-	}
-	else if (agent->exit_no == 3)
-	{
-		goal_force = glm::vec2(current_message->exit2_x, current_message->exit2_y);
-		if (exit_location == 3)
-			if (EXIT3_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-	}
-	else if (agent->exit_no == 4)
-	{
-		goal_force = glm::vec2(current_message->exit3_x, current_message->exit3_y);
-		if (exit_location == 4)
-			if (EXIT4_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-	}
-	else if (agent->exit_no == 5)
-	{
-		goal_force = glm::vec2(current_message->exit4_x, current_message->exit4_y);
-		if (exit_location == 5)
-			if (EXIT5_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-	}
-	else if (agent->exit_no == 6)
-	{
-		goal_force = glm::vec2(current_message->exit5_x, current_message->exit5_y);
-		if (exit_location == 6)
-			if (EXIT6_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-	}
-	else if (agent->exit_no == 7)
-	{
-		goal_force = glm::vec2(current_message->exit6_x, current_message->exit6_y);
-		if (exit_location == 7)
-			if (EXIT7_STATE)
-				kill_agent = 1;
-			else
-				agent->exit_no = getNewExitLocation(rand48);
-	}
-
-	//scale goal force
-	goal_force *= GOAL_WEIGHT;
-
-	agent->steer_x += collision_force.x + goal_force.x;
-	agent->steer_y += collision_force.y + goal_force.y;
-
-	//update height (se lo saco para que no falle más)
-	//agent->height = current_message->height;
-
-    return kill_agent;
 }
 
 __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, int igriega){
@@ -421,7 +278,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 			if (emit_agent){
 				float x = ((agent->x+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				float y = ((agent->y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-				int exit = getNewExitLocation(rand48);
+				//int exit = getNewExitLocation(rand48);
 				float animate = rnd<DISCRETE_2D>(rand48);
 				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;
 				
@@ -436,7 +293,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 
-				add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, exit, speed, 1, animate, 1, estado, 0);
+				add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
 				//Imprimo que se creo un paciente
 				//printf("Creado\n");
 				agent->cant_generados++;

@@ -1253,63 +1253,6 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 /**
  *
  */
-__global__ void GPUFLAME_force_flow(xmachine_memory_agent_list* agents, xmachine_message_navmap_cell_list* navmap_cell_messages, RNG_rand48* rand48){
-	
-	//continuous agent: index is agent position in 1D agent list
-	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-  
-    //For agents not using non partitioned message input check the agent bounds
-    if (index >= d_xmachine_memory_agent_count)
-        return;
-    
-
-	//SoA to AoS - xmachine_memory_force_flow Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_agent agent;
-    
-    // Thread bounds already checked, but the agent function will still execute. load default values?
-	
-	agent.x = agents->x[index];
-	agent.y = agents->y[index];
-	agent.velx = agents->velx[index];
-	agent.vely = agents->vely[index];
-	agent.steer_x = agents->steer_x[index];
-	agent.steer_y = agents->steer_y[index];
-	agent.height = agents->height[index];
-	agent.exit_no = agents->exit_no[index];
-	agent.speed = agents->speed[index];
-	agent.lod = agents->lod[index];
-	agent.animate = agents->animate[index];
-	agent.animate_dir = agents->animate_dir[index];
-	agent.estado = agents->estado[index];
-	agent.tick = agents->tick[index];
-
-	//FLAME function call
-	int dead = !force_flow(&agent, navmap_cell_messages, rand48);
-	
-
-	//continuous agent: set reallocation flag
-	agents->_scan_input[index]  = dead; 
-
-	//AoS to SoA - xmachine_memory_force_flow Coalesced memory write (ignore arrays)
-	agents->x[index] = agent.x;
-	agents->y[index] = agent.y;
-	agents->velx[index] = agent.velx;
-	agents->vely[index] = agent.vely;
-	agents->steer_x[index] = agent.steer_x;
-	agents->steer_y[index] = agent.steer_y;
-	agents->height[index] = agent.height;
-	agents->exit_no[index] = agent.exit_no;
-	agents->speed[index] = agent.speed;
-	agents->lod[index] = agent.lod;
-	agents->animate[index] = agent.animate;
-	agents->animate_dir[index] = agent.animate_dir;
-	agents->estado[index] = agent.estado;
-	agents->tick[index] = agent.tick;
-}
-
-/**
- *
- */
 __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents){
 	
 	//continuous agent: index is agent position in 1D agent list

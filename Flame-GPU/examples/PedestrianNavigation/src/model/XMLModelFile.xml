@@ -231,18 +231,6 @@
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
         <gpu:function>
-          <name>force_flow</name>
-          <currentState>default</currentState>
-          <nextState>default</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>navmap_cell</messageName>
-            </gpu:input>
-          </inputs>
-          <gpu:reallocate>true</gpu:reallocate>
-          <gpu:RNG>true</gpu:RNG>
-        </gpu:function>
-        <gpu:function>
           <name>move</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
@@ -531,11 +519,6 @@
     <layer>
       <gpu:layerFunction>
         <name>avoid_pedestrians</name>
-      </gpu:layerFunction>
-    </layer>
-    <layer>
-      <gpu:layerFunction>
-        <name>force_flow</name>
       </gpu:layerFunction>
     </layer>
     <layer>
