@@ -41,6 +41,9 @@
 //Cantidad de personas a generar
 #define cant_personas 1
 
+#define ir_x 180
+#define ir_y 150
+
 
 __FLAME_GPU_FUNC__ int getNewExitLocation(RNG_rand48* rand48){
 
@@ -178,7 +181,7 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
     return 0;
 }
 
-  
+
 /**
  * force_flow FLAMEGPU Agent Function
  * Automatically generated using functions.xslt
@@ -190,9 +193,6 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
     //map agent position into 2d grid
 	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-
-	printf("%d, ",x);
-	printf("%d\n",y);
 
 	//lookup single message
     xmachine_message_navmap_cell* current_message = get_first_navmap_cell_message<CONTINUOUS>(navmap_cell_messages, x, y);
@@ -212,7 +212,8 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
 	{
 		goal_force = glm::vec2(current_message->exit0_x, current_message->exit0_y);
 		if (exit_location == 1)
-		{printf("%f\n",agent->y);
+		{
+			//printf("%f\n",agent->y);
 			if (EXIT1_STATE)
 				kill_agent = 1;
 			else
@@ -280,10 +281,62 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
 	agent->steer_x += collision_force.x + goal_force.x;
 	agent->steer_y += collision_force.y + goal_force.y;
 
-	//update height
+	//update height (se lo saco para que no falle más)
 	//agent->height = current_message->height;
 
     return kill_agent;
+}
+
+__FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, int igriega){
+
+		glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
+		glm::vec2 agent_vel = glm::vec2(agent->velx, agent->vely);
+		
+		printf("%d, %d\n",equis,igriega);
+		
+		glm::vec2 agent_steer = glm::vec2(equis, igriega);
+
+		float current_speed = length(agent_vel)+0.025f;//(powf(length(agent_vel), 1.75f)*0.01f)+0.025f;
+
+		//apply more steer if speed is greater
+		agent_vel += current_speed*agent_steer;
+		float speed = length(agent_vel);
+		//limit speed
+		if (speed >= agent->speed){
+			agent_vel = normalize(agent_vel)*agent->speed;
+			speed = agent->speed;
+		}
+
+		//update position
+		agent_pos += agent_vel*TIME_SCALER;
+
+		
+		//animation
+		agent->animate += (agent->animate_dir * powf(speed,2.0f)*TIME_SCALER*100.0f);
+		if (agent->animate >= 1)
+			agent->animate_dir = -1;
+		if (agent->animate <= 0)
+			agent->animate_dir = 1;
+		//lod
+		agent->lod = 1;
+
+		//update
+		agent->x = agent_pos.x;
+		agent->y = agent_pos.y;
+		agent->velx = agent_vel.x;
+		agent->vely = agent_vel.y;
+
+		//bound by wrapping
+		if (agent->x < -1.0f)
+			agent->x+=2.0f;
+		if (agent->x > 1.0f)
+			agent->x-=2.0f;
+		if (agent->y < -1.0f)
+			agent->y+=2.0f;
+		if (agent->y > 1.0f)
+			agent->y-=2.0f;
+		
+	return 0;
 }
 
 /**
@@ -294,50 +347,20 @@ __FLAME_GPU_FUNC__ int force_flow(xmachine_memory_agent* agent, xmachine_message
  */
 __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 
-	glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
-	glm::vec2 agent_vel = glm::vec2(agent->velx, agent->vely);
 	//glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
-	glm::vec2 agent_steer = glm::vec2(-30, 1);
 
-	float current_speed = length(agent_vel)+0.025f;//(powf(length(agent_vel), 1.75f)*0.01f)+0.025f;
+	//Pruebas de movimiento
+	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+	
+	int equis = ir_x-x;
+	int igriega = ir_y-y;
 
-    //apply more steer if speed is greater
-	agent_vel += current_speed*agent_steer;
-	float speed = length(agent_vel);
-	//limit speed
-	if (speed >= agent->speed){
-		agent_vel = normalize(agent_vel)*agent->speed;
-		speed = agent->speed;
+	if(equis!=0 || igriega!=0){
+		mover_a_destino(agent,equis,igriega);
+	}else{
+		printf("No me muevo mas che");
 	}
-
-	//update position
-	agent_pos += agent_vel*TIME_SCALER;
-
-    
-	//animation
-	agent->animate += (agent->animate_dir * powf(speed,2.0f)*TIME_SCALER*100.0f);
-	if (agent->animate >= 1)
-		agent->animate_dir = -1;
-	if (agent->animate <= 0)
-		agent->animate_dir = 1;
-	//lod
-	agent->lod = 1;
-
-	//update
-	agent->x = agent_pos.x;
-	agent->y = agent_pos.y;
-	agent->velx = agent_vel.x;
-	agent->vely = agent_vel.y;
-
-	//bound by wrapping
-	if (agent->x < -1.0f)
-		agent->x+=2.0f;
-	if (agent->x > 1.0f)
-		agent->x-=2.0f;
-	if (agent->y < -1.0f)
-		agent->y+=2.0f;
-	if (agent->y > 1.0f)
-		agent->y-=2.0f;
 
     //Como el movimiento se hace cada un tick, se incrementa aca el tick del paciente
 	if(agent->estado==1){//Si el agente es portador
