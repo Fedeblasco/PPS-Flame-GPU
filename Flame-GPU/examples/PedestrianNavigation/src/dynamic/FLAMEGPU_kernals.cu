@@ -90,21 +90,7 @@ __constant__ int d_tex_xmachine_message_navmap_cell_y_offset;texture<int, 1, cud
 __constant__ int d_tex_xmachine_message_navmap_cell_exit_no_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_height;
 __constant__ int d_tex_xmachine_message_navmap_cell_height_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_x;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_collision_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit0_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit0_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit0_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit0_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit1_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit1_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit1_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit1_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit2_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit2_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit2_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit2_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit3_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit3_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit3_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit3_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit4_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit4_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit4_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit4_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit5_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit5_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit5_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit5_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit6_x;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit6_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_exit6_y;
-__constant__ int d_tex_xmachine_message_navmap_cell_exit6_y_offset;
+__constant__ int d_tex_xmachine_message_navmap_cell_collision_y_offset;
 
     
 #define WRAP(x,m) (((x)<m)?(x):(x%m)) /**< Simple wrap */
@@ -773,7 +759,7 @@ __device__ xmachine_message_pedestrian_location* get_next_pedestrian_location_me
 /* Message functions */
 
 template <int AGENT_TYPE>
-__device__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* messages, int x, int y, int exit_no, float height, float collision_x, float collision_y, float exit0_x, float exit0_y, float exit1_x, float exit1_y, float exit2_x, float exit2_y, float exit3_x, float exit3_y, float exit4_x, float exit4_y, float exit5_x, float exit5_y, float exit6_x, float exit6_y){
+__device__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* messages, int x, int y, int exit_no, float height, float collision_x, float collision_y){
 	if (AGENT_TYPE == DISCRETE_2D){
 		int width = (blockDim.x * gridDim.x);
 		glm::ivec2 global_position;
@@ -789,20 +775,6 @@ __device__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* messa
 		messages->height[index] = height;			
 		messages->collision_x[index] = collision_x;			
 		messages->collision_y[index] = collision_y;			
-		messages->exit0_x[index] = exit0_x;			
-		messages->exit0_y[index] = exit0_y;			
-		messages->exit1_x[index] = exit1_x;			
-		messages->exit1_y[index] = exit1_y;			
-		messages->exit2_x[index] = exit2_x;			
-		messages->exit2_y[index] = exit2_y;			
-		messages->exit3_x[index] = exit3_x;			
-		messages->exit3_y[index] = exit3_y;			
-		messages->exit4_x[index] = exit4_x;			
-		messages->exit4_y[index] = exit4_y;			
-		messages->exit5_x[index] = exit5_x;			
-		messages->exit5_y[index] = exit5_y;			
-		messages->exit6_x[index] = exit6_x;			
-		messages->exit6_y[index] = exit6_y;			
 	}
 	//else CONTINUOUS agents can not write to discrete space
 }
@@ -829,7 +801,7 @@ __device__ xmachine_message_navmap_cell* get_first_navmap_cell_message_continuou
 	temp_message._position = glm::ivec2(agent_x, agent_y);
 	temp_message._relative = glm::ivec2(-range, -range);
 
-	temp_message.x = tex1Dfetch(tex_xmachine_message_navmap_cell_x, index + d_tex_xmachine_message_navmap_cell_x_offset);temp_message.y = tex1Dfetch(tex_xmachine_message_navmap_cell_y, index + d_tex_xmachine_message_navmap_cell_y_offset);temp_message.exit_no = tex1Dfetch(tex_xmachine_message_navmap_cell_exit_no, index + d_tex_xmachine_message_navmap_cell_exit_no_offset);temp_message.height = tex1Dfetch(tex_xmachine_message_navmap_cell_height, index + d_tex_xmachine_message_navmap_cell_height_offset);temp_message.collision_x = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_x, index + d_tex_xmachine_message_navmap_cell_collision_x_offset);temp_message.collision_y = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_y, index + d_tex_xmachine_message_navmap_cell_collision_y_offset);temp_message.exit0_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit0_x, index + d_tex_xmachine_message_navmap_cell_exit0_x_offset);temp_message.exit0_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit0_y, index + d_tex_xmachine_message_navmap_cell_exit0_y_offset);temp_message.exit1_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit1_x, index + d_tex_xmachine_message_navmap_cell_exit1_x_offset);temp_message.exit1_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit1_y, index + d_tex_xmachine_message_navmap_cell_exit1_y_offset);temp_message.exit2_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit2_x, index + d_tex_xmachine_message_navmap_cell_exit2_x_offset);temp_message.exit2_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit2_y, index + d_tex_xmachine_message_navmap_cell_exit2_y_offset);temp_message.exit3_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit3_x, index + d_tex_xmachine_message_navmap_cell_exit3_x_offset);temp_message.exit3_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit3_y, index + d_tex_xmachine_message_navmap_cell_exit3_y_offset);temp_message.exit4_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit4_x, index + d_tex_xmachine_message_navmap_cell_exit4_x_offset);temp_message.exit4_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit4_y, index + d_tex_xmachine_message_navmap_cell_exit4_y_offset);temp_message.exit5_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit5_x, index + d_tex_xmachine_message_navmap_cell_exit5_x_offset);temp_message.exit5_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit5_y, index + d_tex_xmachine_message_navmap_cell_exit5_y_offset);temp_message.exit6_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit6_x, index + d_tex_xmachine_message_navmap_cell_exit6_x_offset);temp_message.exit6_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit6_y, index + d_tex_xmachine_message_navmap_cell_exit6_y_offset);
+	temp_message.x = tex1Dfetch(tex_xmachine_message_navmap_cell_x, index + d_tex_xmachine_message_navmap_cell_x_offset);temp_message.y = tex1Dfetch(tex_xmachine_message_navmap_cell_y, index + d_tex_xmachine_message_navmap_cell_y_offset);temp_message.exit_no = tex1Dfetch(tex_xmachine_message_navmap_cell_exit_no, index + d_tex_xmachine_message_navmap_cell_exit_no_offset);temp_message.height = tex1Dfetch(tex_xmachine_message_navmap_cell_height, index + d_tex_xmachine_message_navmap_cell_height_offset);temp_message.collision_x = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_x, index + d_tex_xmachine_message_navmap_cell_collision_x_offset);temp_message.collision_y = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_y, index + d_tex_xmachine_message_navmap_cell_collision_y_offset);
 	
 	message_share[threadIdx.x] = temp_message;
 
@@ -880,7 +852,7 @@ __device__ xmachine_message_navmap_cell* get_next_navmap_cell_message_continuous
 	temp_message._position = message->_position;
 	temp_message._relative = next_relative;
 
-	temp_message.x = tex1Dfetch(tex_xmachine_message_navmap_cell_x, index + d_tex_xmachine_message_navmap_cell_x_offset);	temp_message.y = tex1Dfetch(tex_xmachine_message_navmap_cell_y, index + d_tex_xmachine_message_navmap_cell_y_offset);	temp_message.exit_no = tex1Dfetch(tex_xmachine_message_navmap_cell_exit_no, index + d_tex_xmachine_message_navmap_cell_exit_no_offset);	temp_message.height = tex1Dfetch(tex_xmachine_message_navmap_cell_height, index + d_tex_xmachine_message_navmap_cell_height_offset);	temp_message.collision_x = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_x, index + d_tex_xmachine_message_navmap_cell_collision_x_offset);	temp_message.collision_y = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_y, index + d_tex_xmachine_message_navmap_cell_collision_y_offset);	temp_message.exit0_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit0_x, index + d_tex_xmachine_message_navmap_cell_exit0_x_offset);	temp_message.exit0_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit0_y, index + d_tex_xmachine_message_navmap_cell_exit0_y_offset);	temp_message.exit1_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit1_x, index + d_tex_xmachine_message_navmap_cell_exit1_x_offset);	temp_message.exit1_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit1_y, index + d_tex_xmachine_message_navmap_cell_exit1_y_offset);	temp_message.exit2_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit2_x, index + d_tex_xmachine_message_navmap_cell_exit2_x_offset);	temp_message.exit2_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit2_y, index + d_tex_xmachine_message_navmap_cell_exit2_y_offset);	temp_message.exit3_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit3_x, index + d_tex_xmachine_message_navmap_cell_exit3_x_offset);	temp_message.exit3_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit3_y, index + d_tex_xmachine_message_navmap_cell_exit3_y_offset);	temp_message.exit4_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit4_x, index + d_tex_xmachine_message_navmap_cell_exit4_x_offset);	temp_message.exit4_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit4_y, index + d_tex_xmachine_message_navmap_cell_exit4_y_offset);	temp_message.exit5_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit5_x, index + d_tex_xmachine_message_navmap_cell_exit5_x_offset);	temp_message.exit5_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit5_y, index + d_tex_xmachine_message_navmap_cell_exit5_y_offset);	temp_message.exit6_x = tex1Dfetch(tex_xmachine_message_navmap_cell_exit6_x, index + d_tex_xmachine_message_navmap_cell_exit6_x_offset);	temp_message.exit6_y = tex1Dfetch(tex_xmachine_message_navmap_cell_exit6_y, index + d_tex_xmachine_message_navmap_cell_exit6_y_offset);	
+	temp_message.x = tex1Dfetch(tex_xmachine_message_navmap_cell_x, index + d_tex_xmachine_message_navmap_cell_x_offset);	temp_message.y = tex1Dfetch(tex_xmachine_message_navmap_cell_y, index + d_tex_xmachine_message_navmap_cell_y_offset);	temp_message.exit_no = tex1Dfetch(tex_xmachine_message_navmap_cell_exit_no, index + d_tex_xmachine_message_navmap_cell_exit_no_offset);	temp_message.height = tex1Dfetch(tex_xmachine_message_navmap_cell_height, index + d_tex_xmachine_message_navmap_cell_height_offset);	temp_message.collision_x = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_x, index + d_tex_xmachine_message_navmap_cell_collision_x_offset);	temp_message.collision_y = tex1Dfetch(tex_xmachine_message_navmap_cell_collision_y, index + d_tex_xmachine_message_navmap_cell_collision_y_offset);	
 
 	message_share[threadIdx.x] = temp_message;
 
@@ -897,20 +869,6 @@ __device__ void navmap_cell_message_to_sm(xmachine_message_navmap_cell_list* mes
 		temp_message.height = messages->height[global_index];		
 		temp_message.collision_x = messages->collision_x[global_index];		
 		temp_message.collision_y = messages->collision_y[global_index];		
-		temp_message.exit0_x = messages->exit0_x[global_index];		
-		temp_message.exit0_y = messages->exit0_y[global_index];		
-		temp_message.exit1_x = messages->exit1_x[global_index];		
-		temp_message.exit1_y = messages->exit1_y[global_index];		
-		temp_message.exit2_x = messages->exit2_x[global_index];		
-		temp_message.exit2_y = messages->exit2_y[global_index];		
-		temp_message.exit3_x = messages->exit3_x[global_index];		
-		temp_message.exit3_y = messages->exit3_y[global_index];		
-		temp_message.exit4_x = messages->exit4_x[global_index];		
-		temp_message.exit4_y = messages->exit4_y[global_index];		
-		temp_message.exit5_x = messages->exit5_x[global_index];		
-		temp_message.exit5_y = messages->exit5_y[global_index];		
-		temp_message.exit6_x = messages->exit6_x[global_index];		
-		temp_message.exit6_y = messages->exit6_y[global_index];		
 
 	  int message_index = SHARE_INDEX(sm_index, sizeof(xmachine_message_navmap_cell));
 	  xmachine_message_navmap_cell* sm_message = ((xmachine_message_navmap_cell*)&message_share[message_index]);
@@ -1336,16 +1294,6 @@ __global__ void GPUFLAME_output_navmap_cells(xmachine_memory_navmap_list* agents
 	agent.exit0_y = agents->exit0_y[index];
 	agent.exit1_x = agents->exit1_x[index];
 	agent.exit1_y = agents->exit1_y[index];
-	agent.exit2_x = agents->exit2_x[index];
-	agent.exit2_y = agents->exit2_y[index];
-	agent.exit3_x = agents->exit3_x[index];
-	agent.exit3_y = agents->exit3_y[index];
-	agent.exit4_x = agents->exit4_x[index];
-	agent.exit4_y = agents->exit4_y[index];
-	agent.exit5_x = agents->exit5_x[index];
-	agent.exit5_y = agents->exit5_y[index];
-	agent.exit6_x = agents->exit6_x[index];
-	agent.exit6_y = agents->exit6_y[index];
 	agent.cant_generados = agents->cant_generados[index];
 
 	//FLAME function call
@@ -1365,16 +1313,6 @@ __global__ void GPUFLAME_output_navmap_cells(xmachine_memory_navmap_list* agents
 	agents->exit0_y[index] = agent.exit0_y;
 	agents->exit1_x[index] = agent.exit1_x;
 	agents->exit1_y[index] = agent.exit1_y;
-	agents->exit2_x[index] = agent.exit2_x;
-	agents->exit2_y[index] = agent.exit2_y;
-	agents->exit3_x[index] = agent.exit3_x;
-	agents->exit3_y[index] = agent.exit3_y;
-	agents->exit4_x[index] = agent.exit4_x;
-	agents->exit4_y[index] = agent.exit4_y;
-	agents->exit5_x[index] = agent.exit5_x;
-	agents->exit5_y[index] = agent.exit5_y;
-	agents->exit6_x[index] = agent.exit6_x;
-	agents->exit6_y[index] = agent.exit6_y;
 	agents->cant_generados[index] = agent.cant_generados;
 }
 
@@ -1407,16 +1345,6 @@ __global__ void GPUFLAME_generate_pedestrians(xmachine_memory_navmap_list* agent
 	agent.exit0_y = agents->exit0_y[index];
 	agent.exit1_x = agents->exit1_x[index];
 	agent.exit1_y = agents->exit1_y[index];
-	agent.exit2_x = agents->exit2_x[index];
-	agent.exit2_y = agents->exit2_y[index];
-	agent.exit3_x = agents->exit3_x[index];
-	agent.exit3_y = agents->exit3_y[index];
-	agent.exit4_x = agents->exit4_x[index];
-	agent.exit4_y = agents->exit4_y[index];
-	agent.exit5_x = agents->exit5_x[index];
-	agent.exit5_y = agents->exit5_y[index];
-	agent.exit6_x = agents->exit6_x[index];
-	agent.exit6_y = agents->exit6_y[index];
 	agent.cant_generados = agents->cant_generados[index];
 
 	//FLAME function call
@@ -1436,16 +1364,6 @@ __global__ void GPUFLAME_generate_pedestrians(xmachine_memory_navmap_list* agent
 	agents->exit0_y[index] = agent.exit0_y;
 	agents->exit1_x[index] = agent.exit1_x;
 	agents->exit1_y[index] = agent.exit1_y;
-	agents->exit2_x[index] = agent.exit2_x;
-	agents->exit2_y[index] = agent.exit2_y;
-	agents->exit3_x[index] = agent.exit3_x;
-	agents->exit3_y[index] = agent.exit3_y;
-	agents->exit4_x[index] = agent.exit4_x;
-	agents->exit4_y[index] = agent.exit4_y;
-	agents->exit5_x[index] = agent.exit5_x;
-	agents->exit5_y[index] = agent.exit5_y;
-	agents->exit6_x[index] = agent.exit6_x;
-	agents->exit6_y[index] = agent.exit6_y;
 	agents->cant_generados[index] = agent.cant_generados;
 }
 

@@ -586,56 +586,6 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</exit1_y>\n", file);
         
-		fputs("<exit2_x>", file);
-        sprintf(data, "%f", h_navmaps_static->exit2_x[i]);
-		fputs(data, file);
-		fputs("</exit2_x>\n", file);
-        
-		fputs("<exit2_y>", file);
-        sprintf(data, "%f", h_navmaps_static->exit2_y[i]);
-		fputs(data, file);
-		fputs("</exit2_y>\n", file);
-        
-		fputs("<exit3_x>", file);
-        sprintf(data, "%f", h_navmaps_static->exit3_x[i]);
-		fputs(data, file);
-		fputs("</exit3_x>\n", file);
-        
-		fputs("<exit3_y>", file);
-        sprintf(data, "%f", h_navmaps_static->exit3_y[i]);
-		fputs(data, file);
-		fputs("</exit3_y>\n", file);
-        
-		fputs("<exit4_x>", file);
-        sprintf(data, "%f", h_navmaps_static->exit4_x[i]);
-		fputs(data, file);
-		fputs("</exit4_x>\n", file);
-        
-		fputs("<exit4_y>", file);
-        sprintf(data, "%f", h_navmaps_static->exit4_y[i]);
-		fputs(data, file);
-		fputs("</exit4_y>\n", file);
-        
-		fputs("<exit5_x>", file);
-        sprintf(data, "%f", h_navmaps_static->exit5_x[i]);
-		fputs(data, file);
-		fputs("</exit5_x>\n", file);
-        
-		fputs("<exit5_y>", file);
-        sprintf(data, "%f", h_navmaps_static->exit5_y[i]);
-		fputs(data, file);
-		fputs("</exit5_y>\n", file);
-        
-		fputs("<exit6_x>", file);
-        sprintf(data, "%f", h_navmaps_static->exit6_x[i]);
-		fputs(data, file);
-		fputs("</exit6_x>\n", file);
-        
-		fputs("<exit6_y>", file);
-        sprintf(data, "%f", h_navmaps_static->exit6_y[i]);
-		fputs(data, file);
-		fputs("</exit6_y>\n", file);
-        
 		fputs("<cant_generados>", file);
         sprintf(data, "%d", h_navmaps_static->cant_generados[i]);
 		fputs(data, file);
@@ -697,16 +647,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_navmap_exit0_y;
     int in_navmap_exit1_x;
     int in_navmap_exit1_y;
-    int in_navmap_exit2_x;
-    int in_navmap_exit2_y;
-    int in_navmap_exit3_x;
-    int in_navmap_exit3_y;
-    int in_navmap_exit4_x;
-    int in_navmap_exit4_y;
-    int in_navmap_exit5_x;
-    int in_navmap_exit5_y;
-    int in_navmap_exit6_x;
-    int in_navmap_exit6_y;
     int in_navmap_cant_generados;
     
     /* tags for environment global variables */
@@ -806,16 +746,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	float navmap_exit0_y;
 	float navmap_exit1_x;
 	float navmap_exit1_y;
-	float navmap_exit2_x;
-	float navmap_exit2_y;
-	float navmap_exit3_x;
-	float navmap_exit3_y;
-	float navmap_exit4_x;
-	float navmap_exit4_y;
-	float navmap_exit5_x;
-	float navmap_exit5_y;
-	float navmap_exit6_x;
-	float navmap_exit6_y;
 	int navmap_cant_generados;
 
     /* Variables for environment variables */
@@ -893,16 +823,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_navmap_exit0_y = 0;
 	in_navmap_exit1_x = 0;
 	in_navmap_exit1_y = 0;
-	in_navmap_exit2_x = 0;
-	in_navmap_exit2_y = 0;
-	in_navmap_exit3_x = 0;
-	in_navmap_exit3_y = 0;
-	in_navmap_exit4_x = 0;
-	in_navmap_exit4_y = 0;
-	in_navmap_exit5_x = 0;
-	in_navmap_exit5_y = 0;
-	in_navmap_exit6_x = 0;
-	in_navmap_exit6_y = 0;
 	in_navmap_cant_generados = 0;
     in_env_EMMISION_RATE_EXIT1 = 0;
     in_env_EMMISION_RATE_EXIT2 = 0;
@@ -971,16 +891,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_navmaps->exit0_y[k] = 0;
 		h_navmaps->exit1_x[k] = 0;
 		h_navmaps->exit1_y[k] = 0;
-		h_navmaps->exit2_x[k] = 0;
-		h_navmaps->exit2_y[k] = 0;
-		h_navmaps->exit3_x[k] = 0;
-		h_navmaps->exit3_y[k] = 0;
-		h_navmaps->exit4_x[k] = 0;
-		h_navmaps->exit4_y[k] = 0;
-		h_navmaps->exit5_x[k] = 0;
-		h_navmaps->exit5_y[k] = 0;
-		h_navmaps->exit6_x[k] = 0;
-		h_navmaps->exit6_y[k] = 0;
 		h_navmaps->cant_generados[k] = 0;
 	}
 	
@@ -1010,16 +920,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     navmap_exit0_y = 0;
     navmap_exit1_x = 0;
     navmap_exit1_y = 0;
-    navmap_exit2_x = 0;
-    navmap_exit2_y = 0;
-    navmap_exit3_x = 0;
-    navmap_exit3_y = 0;
-    navmap_exit4_x = 0;
-    navmap_exit4_y = 0;
-    navmap_exit5_x = 0;
-    navmap_exit5_y = 0;
-    navmap_exit6_x = 0;
-    navmap_exit6_y = 0;
     navmap_cant_generados = 0;
 
     /* Default variables for environment variables */
@@ -1213,16 +1113,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_navmaps->exit0_y[*h_xmachine_memory_navmap_count] = navmap_exit0_y;
 					h_navmaps->exit1_x[*h_xmachine_memory_navmap_count] = navmap_exit1_x;
 					h_navmaps->exit1_y[*h_xmachine_memory_navmap_count] = navmap_exit1_y;
-					h_navmaps->exit2_x[*h_xmachine_memory_navmap_count] = navmap_exit2_x;
-					h_navmaps->exit2_y[*h_xmachine_memory_navmap_count] = navmap_exit2_y;
-					h_navmaps->exit3_x[*h_xmachine_memory_navmap_count] = navmap_exit3_x;
-					h_navmaps->exit3_y[*h_xmachine_memory_navmap_count] = navmap_exit3_y;
-					h_navmaps->exit4_x[*h_xmachine_memory_navmap_count] = navmap_exit4_x;
-					h_navmaps->exit4_y[*h_xmachine_memory_navmap_count] = navmap_exit4_y;
-					h_navmaps->exit5_x[*h_xmachine_memory_navmap_count] = navmap_exit5_x;
-					h_navmaps->exit5_y[*h_xmachine_memory_navmap_count] = navmap_exit5_y;
-					h_navmaps->exit6_x[*h_xmachine_memory_navmap_count] = navmap_exit6_x;
-					h_navmaps->exit6_y[*h_xmachine_memory_navmap_count] = navmap_exit6_y;
 					h_navmaps->cant_generados[*h_xmachine_memory_navmap_count] = navmap_cant_generados;
 					(*h_xmachine_memory_navmap_count) ++;	
 				}
@@ -1258,16 +1148,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 navmap_exit0_y = 0;
                 navmap_exit1_x = 0;
                 navmap_exit1_y = 0;
-                navmap_exit2_x = 0;
-                navmap_exit2_y = 0;
-                navmap_exit3_x = 0;
-                navmap_exit3_y = 0;
-                navmap_exit4_x = 0;
-                navmap_exit4_y = 0;
-                navmap_exit5_x = 0;
-                navmap_exit5_y = 0;
-                navmap_exit6_x = 0;
-                navmap_exit6_y = 0;
                 navmap_cant_generados = 0;
                 
                 in_xagent = 0;
@@ -1320,26 +1200,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/exit1_x") == 0) in_navmap_exit1_x = 0;
 			if(strcmp(buffer, "exit1_y") == 0) in_navmap_exit1_y = 1;
 			if(strcmp(buffer, "/exit1_y") == 0) in_navmap_exit1_y = 0;
-			if(strcmp(buffer, "exit2_x") == 0) in_navmap_exit2_x = 1;
-			if(strcmp(buffer, "/exit2_x") == 0) in_navmap_exit2_x = 0;
-			if(strcmp(buffer, "exit2_y") == 0) in_navmap_exit2_y = 1;
-			if(strcmp(buffer, "/exit2_y") == 0) in_navmap_exit2_y = 0;
-			if(strcmp(buffer, "exit3_x") == 0) in_navmap_exit3_x = 1;
-			if(strcmp(buffer, "/exit3_x") == 0) in_navmap_exit3_x = 0;
-			if(strcmp(buffer, "exit3_y") == 0) in_navmap_exit3_y = 1;
-			if(strcmp(buffer, "/exit3_y") == 0) in_navmap_exit3_y = 0;
-			if(strcmp(buffer, "exit4_x") == 0) in_navmap_exit4_x = 1;
-			if(strcmp(buffer, "/exit4_x") == 0) in_navmap_exit4_x = 0;
-			if(strcmp(buffer, "exit4_y") == 0) in_navmap_exit4_y = 1;
-			if(strcmp(buffer, "/exit4_y") == 0) in_navmap_exit4_y = 0;
-			if(strcmp(buffer, "exit5_x") == 0) in_navmap_exit5_x = 1;
-			if(strcmp(buffer, "/exit5_x") == 0) in_navmap_exit5_x = 0;
-			if(strcmp(buffer, "exit5_y") == 0) in_navmap_exit5_y = 1;
-			if(strcmp(buffer, "/exit5_y") == 0) in_navmap_exit5_y = 0;
-			if(strcmp(buffer, "exit6_x") == 0) in_navmap_exit6_x = 1;
-			if(strcmp(buffer, "/exit6_x") == 0) in_navmap_exit6_x = 0;
-			if(strcmp(buffer, "exit6_y") == 0) in_navmap_exit6_y = 1;
-			if(strcmp(buffer, "/exit6_y") == 0) in_navmap_exit6_y = 0;
 			if(strcmp(buffer, "cant_generados") == 0) in_navmap_cant_generados = 1;
 			if(strcmp(buffer, "/cant_generados") == 0) in_navmap_cant_generados = 0;
 			
@@ -1499,36 +1359,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_navmap_exit1_y){
                     navmap_exit1_y = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit2_x){
-                    navmap_exit2_x = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit2_y){
-                    navmap_exit2_y = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit3_x){
-                    navmap_exit3_x = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit3_y){
-                    navmap_exit3_y = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit4_x){
-                    navmap_exit4_x = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit4_y){
-                    navmap_exit4_y = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit5_x){
-                    navmap_exit5_x = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit5_y){
-                    navmap_exit5_y = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit6_x){
-                    navmap_exit6_x = (float) fgpu_atof(buffer); 
-                }
-				if(in_navmap_exit6_y){
-                    navmap_exit6_y = (float) fgpu_atof(buffer); 
                 }
 				if(in_navmap_cant_generados){
                     navmap_cant_generados = (int) fpgu_strtol(buffer); 

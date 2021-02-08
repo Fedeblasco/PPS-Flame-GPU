@@ -84,9 +84,9 @@ static const char pedestrian_vshader_source[] =
 	"	//color																		\n"
 	"   int exit = int(data2.z);													\n"
 	"	if (exit == active_exit)																\n"
-	"		gl_FrontColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);							\n"	
+	"		gl_FrontColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);							\n"	
 	"	else																		\n"
-	"		gl_FrontColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);							\n"	
+	"		gl_FrontColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);							\n"	
 
 	"   //apply model view proj														\n"
 	"   gl_Position = gl_ModelViewProjectionMatrix * vec4(position, 1);				\n"

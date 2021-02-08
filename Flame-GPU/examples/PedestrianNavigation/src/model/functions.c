@@ -70,14 +70,7 @@ __FLAME_GPU_FUNC__ int output_navmap_cells(xmachine_memory_navmap* agent, xmachi
 		agent->x, agent->y, 
 		agent->exit_no, 
 		agent->height,
-		agent->collision_x, agent->collision_y, 
-		agent->exit0_x, agent->exit0_y,
-		agent->exit1_x, agent->exit1_y,
-		agent->exit2_x, agent->exit2_y,
-		agent->exit3_x, agent->exit3_y,
-		agent->exit4_x, agent->exit4_y,
-		agent->exit5_x, agent->exit5_y,
-		agent->exit6_x, agent->exit6_y);
+		agent->collision_x, agent->collision_y);
        
     return 0;
 }
@@ -260,18 +253,6 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 		float random = rnd<DISCRETE_2D>(rand48);
 		bool emit_agent = false;
 		if ((agent->exit_no == 1)&&((random < EMMISION_RATE_EXIT1*TIME_SCALER)))
-			emit_agent = true;
-		if ((agent->exit_no == 2)&&((random <EMMISION_RATE_EXIT2*TIME_SCALER)))
-			emit_agent = true;
-		if ((agent->exit_no == 3)&&((random <EMMISION_RATE_EXIT3*TIME_SCALER)))
-			emit_agent = true;
-		if ((agent->exit_no == 4)&&((random <EMMISION_RATE_EXIT4*TIME_SCALER)))
-			emit_agent = true;
-		if ((agent->exit_no == 5)&&((random <EMMISION_RATE_EXIT5*TIME_SCALER)))
-			emit_agent = true;
-		if ((agent->exit_no == 6)&&((random <EMMISION_RATE_EXIT6*TIME_SCALER)))
-			emit_agent = true;
-		if ((agent->exit_no == 7)&&((random <EMMISION_RATE_EXIT7*TIME_SCALER)))
 			emit_agent = true;
 
 		if (agent->cant_generados<cant_personas){

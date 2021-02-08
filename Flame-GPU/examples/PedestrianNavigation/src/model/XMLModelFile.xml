@@ -297,46 +297,6 @@
           <name>exit1_y</name>
         </gpu:variable>
         <gpu:variable>
-          <type>float</type>
-          <name>exit2_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit2_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit3_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit3_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit4_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit4_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit5_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit5_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit6_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit6_y</name>
-        </gpu:variable>
-        <gpu:variable>
           <type>int</type>
           <name>cant_generados</name>
           <defaultValue>0</defaultValue>
@@ -438,62 +398,6 @@
         <gpu:variable>
           <type>float</type>
           <name>collision_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit0_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit0_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit1_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit1_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit2_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit2_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit3_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit3_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit4_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit4_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit5_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit5_y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit6_x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>float</type>
-          <name>exit6_y</name>
         </gpu:variable>
       </variables>
       <gpu:partitioningDiscrete>

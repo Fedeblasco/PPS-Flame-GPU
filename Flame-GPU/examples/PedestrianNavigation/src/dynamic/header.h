@@ -170,16 +170,6 @@ struct __align__(16) xmachine_memory_navmap
     float exit0_y;    /**< X-machine memory variable exit0_y of type float.*/
     float exit1_x;    /**< X-machine memory variable exit1_x of type float.*/
     float exit1_y;    /**< X-machine memory variable exit1_y of type float.*/
-    float exit2_x;    /**< X-machine memory variable exit2_x of type float.*/
-    float exit2_y;    /**< X-machine memory variable exit2_y of type float.*/
-    float exit3_x;    /**< X-machine memory variable exit3_x of type float.*/
-    float exit3_y;    /**< X-machine memory variable exit3_y of type float.*/
-    float exit4_x;    /**< X-machine memory variable exit4_x of type float.*/
-    float exit4_y;    /**< X-machine memory variable exit4_y of type float.*/
-    float exit5_x;    /**< X-machine memory variable exit5_x of type float.*/
-    float exit5_y;    /**< X-machine memory variable exit5_y of type float.*/
-    float exit6_x;    /**< X-machine memory variable exit6_x of type float.*/
-    float exit6_y;    /**< X-machine memory variable exit6_y of type float.*/
     int cant_generados;    /**< X-machine memory variable cant_generados of type int.*/
 };
 
@@ -220,21 +210,7 @@ struct __align__(16) xmachine_message_navmap_cell
     int exit_no;        /**< Message variable exit_no of type int.*/  
     float height;        /**< Message variable height of type float.*/  
     float collision_x;        /**< Message variable collision_x of type float.*/  
-    float collision_y;        /**< Message variable collision_y of type float.*/  
-    float exit0_x;        /**< Message variable exit0_x of type float.*/  
-    float exit0_y;        /**< Message variable exit0_y of type float.*/  
-    float exit1_x;        /**< Message variable exit1_x of type float.*/  
-    float exit1_y;        /**< Message variable exit1_y of type float.*/  
-    float exit2_x;        /**< Message variable exit2_x of type float.*/  
-    float exit2_y;        /**< Message variable exit2_y of type float.*/  
-    float exit3_x;        /**< Message variable exit3_x of type float.*/  
-    float exit3_y;        /**< Message variable exit3_y of type float.*/  
-    float exit4_x;        /**< Message variable exit4_x of type float.*/  
-    float exit4_y;        /**< Message variable exit4_y of type float.*/  
-    float exit5_x;        /**< Message variable exit5_x of type float.*/  
-    float exit5_y;        /**< Message variable exit5_y of type float.*/  
-    float exit6_x;        /**< Message variable exit6_x of type float.*/  
-    float exit6_y;        /**< Message variable exit6_y of type float.*/
+    float collision_y;        /**< Message variable collision_y of type float.*/
 };
 
 
@@ -287,16 +263,6 @@ struct xmachine_memory_navmap_list
     float exit0_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit0_y of type float.*/
     float exit1_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_x of type float.*/
     float exit1_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_y of type float.*/
-    float exit2_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_x of type float.*/
-    float exit2_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_y of type float.*/
-    float exit3_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_x of type float.*/
-    float exit3_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_y of type float.*/
-    float exit4_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_x of type float.*/
-    float exit4_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_y of type float.*/
-    float exit5_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_x of type float.*/
-    float exit5_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_y of type float.*/
-    float exit6_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_x of type float.*/
-    float exit6_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_y of type float.*/
     int cant_generados [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list cant_generados of type int.*/
 };
 
@@ -333,20 +299,6 @@ struct xmachine_message_navmap_cell_list
     float height [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list height of type float.*/
     float collision_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list collision_x of type float.*/
     float collision_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list collision_y of type float.*/
-    float exit0_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit0_x of type float.*/
-    float exit0_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit0_y of type float.*/
-    float exit1_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit1_x of type float.*/
-    float exit1_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit1_y of type float.*/
-    float exit2_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit2_x of type float.*/
-    float exit2_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit2_y of type float.*/
-    float exit3_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit3_x of type float.*/
-    float exit3_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit3_y of type float.*/
-    float exit4_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit4_x of type float.*/
-    float exit4_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit4_y of type float.*/
-    float exit5_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit5_x of type float.*/
-    float exit5_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit5_y of type float.*/
-    float exit6_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit6_x of type float.*/
-    float exit6_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit6_y of type float.*/
     
 };
 
@@ -493,23 +445,9 @@ __FLAME_GPU_FUNC__ xmachine_message_pedestrian_location * get_next_pedestrian_lo
  * @param height	message variable of type float
  * @param collision_x	message variable of type float
  * @param collision_y	message variable of type float
- * @param exit0_x	message variable of type float
- * @param exit0_y	message variable of type float
- * @param exit1_x	message variable of type float
- * @param exit1_y	message variable of type float
- * @param exit2_x	message variable of type float
- * @param exit2_y	message variable of type float
- * @param exit3_x	message variable of type float
- * @param exit3_y	message variable of type float
- * @param exit4_x	message variable of type float
- * @param exit4_y	message variable of type float
- * @param exit5_x	message variable of type float
- * @param exit5_y	message variable of type float
- * @param exit6_x	message variable of type float
- * @param exit6_y	message variable of type float
  */
  template <int AGENT_TYPE>
- __FLAME_GPU_FUNC__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* navmap_cell_messages, int x, int y, int exit_no, float height, float collision_x, float collision_y, float exit0_x, float exit0_y, float exit1_x, float exit1_y, float exit2_x, float exit2_y, float exit3_x, float exit3_y, float exit4_x, float exit4_y, float exit5_x, float exit5_y, float exit6_x, float exit6_y);
+ __FLAME_GPU_FUNC__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* navmap_cell_messages, int x, int y, int exit_no, float height, float collision_x, float collision_y);
  
 /** get_first_navmap_cell_message
  * Get first message function for discrete partitioned messages. Template function will call either shared memory or texture cache implementation depending on AGENT_TYPE
@@ -1216,96 +1154,6 @@ __host__ float get_navmap_static_variable_exit1_x(unsigned int index);
  * @return value of agent variable exit1_y
  */
 __host__ float get_navmap_static_variable_exit1_y(unsigned int index);
-
-/** float get_navmap_static_variable_exit2_x(unsigned int index)
- * Gets the value of the exit2_x variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit2_x
- */
-__host__ float get_navmap_static_variable_exit2_x(unsigned int index);
-
-/** float get_navmap_static_variable_exit2_y(unsigned int index)
- * Gets the value of the exit2_y variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit2_y
- */
-__host__ float get_navmap_static_variable_exit2_y(unsigned int index);
-
-/** float get_navmap_static_variable_exit3_x(unsigned int index)
- * Gets the value of the exit3_x variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit3_x
- */
-__host__ float get_navmap_static_variable_exit3_x(unsigned int index);
-
-/** float get_navmap_static_variable_exit3_y(unsigned int index)
- * Gets the value of the exit3_y variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit3_y
- */
-__host__ float get_navmap_static_variable_exit3_y(unsigned int index);
-
-/** float get_navmap_static_variable_exit4_x(unsigned int index)
- * Gets the value of the exit4_x variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit4_x
- */
-__host__ float get_navmap_static_variable_exit4_x(unsigned int index);
-
-/** float get_navmap_static_variable_exit4_y(unsigned int index)
- * Gets the value of the exit4_y variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit4_y
- */
-__host__ float get_navmap_static_variable_exit4_y(unsigned int index);
-
-/** float get_navmap_static_variable_exit5_x(unsigned int index)
- * Gets the value of the exit5_x variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit5_x
- */
-__host__ float get_navmap_static_variable_exit5_x(unsigned int index);
-
-/** float get_navmap_static_variable_exit5_y(unsigned int index)
- * Gets the value of the exit5_y variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit5_y
- */
-__host__ float get_navmap_static_variable_exit5_y(unsigned int index);
-
-/** float get_navmap_static_variable_exit6_x(unsigned int index)
- * Gets the value of the exit6_x variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit6_x
- */
-__host__ float get_navmap_static_variable_exit6_x(unsigned int index);
-
-/** float get_navmap_static_variable_exit6_y(unsigned int index)
- * Gets the value of the exit6_y variable of an navmap agent in the static state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit6_y
- */
-__host__ float get_navmap_static_variable_exit6_y(unsigned int index);
 
 /** int get_navmap_static_variable_cant_generados(unsigned int index)
  * Gets the value of the cant_generados variable of an navmap agent in the static state on the host. 
@@ -2560,196 +2408,6 @@ float min_navmap_static_exit1_y_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 float max_navmap_static_exit1_y_variable();
-
-/** float reduce_navmap_static_exit2_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit2_x_variable();
-
-
-
-/** float min_navmap_static_exit2_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit2_x_variable();
-/** float max_navmap_static_exit2_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit2_x_variable();
-
-/** float reduce_navmap_static_exit2_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit2_y_variable();
-
-
-
-/** float min_navmap_static_exit2_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit2_y_variable();
-/** float max_navmap_static_exit2_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit2_y_variable();
-
-/** float reduce_navmap_static_exit3_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit3_x_variable();
-
-
-
-/** float min_navmap_static_exit3_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit3_x_variable();
-/** float max_navmap_static_exit3_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit3_x_variable();
-
-/** float reduce_navmap_static_exit3_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit3_y_variable();
-
-
-
-/** float min_navmap_static_exit3_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit3_y_variable();
-/** float max_navmap_static_exit3_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit3_y_variable();
-
-/** float reduce_navmap_static_exit4_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit4_x_variable();
-
-
-
-/** float min_navmap_static_exit4_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit4_x_variable();
-/** float max_navmap_static_exit4_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit4_x_variable();
-
-/** float reduce_navmap_static_exit4_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit4_y_variable();
-
-
-
-/** float min_navmap_static_exit4_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit4_y_variable();
-/** float max_navmap_static_exit4_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit4_y_variable();
-
-/** float reduce_navmap_static_exit5_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit5_x_variable();
-
-
-
-/** float min_navmap_static_exit5_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit5_x_variable();
-/** float max_navmap_static_exit5_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit5_x_variable();
-
-/** float reduce_navmap_static_exit5_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit5_y_variable();
-
-
-
-/** float min_navmap_static_exit5_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit5_y_variable();
-/** float max_navmap_static_exit5_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit5_y_variable();
-
-/** float reduce_navmap_static_exit6_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit6_x_variable();
-
-
-
-/** float min_navmap_static_exit6_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit6_x_variable();
-/** float max_navmap_static_exit6_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit6_x_variable();
-
-/** float reduce_navmap_static_exit6_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_navmap_static_exit6_y_variable();
-
-
-
-/** float min_navmap_static_exit6_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_navmap_static_exit6_y_variable();
-/** float max_navmap_static_exit6_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_navmap_static_exit6_y_variable();
 
 /** int reduce_navmap_static_cant_generados_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
