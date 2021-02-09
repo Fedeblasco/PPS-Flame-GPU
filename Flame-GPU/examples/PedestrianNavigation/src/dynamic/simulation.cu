@@ -272,6 +272,11 @@ void agent_output_pedestrian_location(cudaStream_t &stream);
  */
 void agent_avoid_pedestrians(cudaStream_t &stream);
 
+/** agent_infect_pedestrians
+ * Agent function prototype for infect_pedestrians function of agent agent
+ */
+void agent_infect_pedestrians(cudaStream_t &stream);
+
 /** agent_move
  * Agent function prototype for move function of agent agent
  */
@@ -913,6 +918,23 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaDeviceSynchronize();
   
 	/* Layer 4*/
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_infect_pedestrians");
+	agent_infect_pedestrians(stream1);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_infect_pedestrians = %f (ms)\n", instrument_milliseconds);
+#endif
+	cudaDeviceSynchronize();
+  
+	/* Layer 5*/
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_start);
@@ -5212,6 +5234,149 @@ void agent_avoid_pedestrians(cudaStream_t &stream){
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
 		printf("Error: Buffer size of avoid_pedestrians agents in state default will be exceeded moving working agents to next state in function avoid_pedestrians\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  agents_default_temp = d_agents;
+  d_agents = d_agents_default;
+  d_agents_default = agents_default_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_infect_pedestrians_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input is spatially partitioned
+	sm_size += (blockSize * sizeof(xmachine_message_pedestrian_location));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** agent_infect_pedestrians
+ * Agent function prototype for infect_pedestrians function of agent agent
+ */
+void agent_infect_pedestrians(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_agent_list* agents_default_temp = d_agents;
+	d_agents = d_agents_default;
+	d_agents_default = agents_default_temp;
+	//set working count to current state count
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_agent_default_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_infect_pedestrians, agent_infect_pedestrians_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_infect_pedestrians_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	//any agent with discrete or partitioned message input uses texture caching
+	size_t tex_xmachine_message_pedestrian_location_x_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_x_byte_offset, tex_xmachine_message_pedestrian_location_x, d_pedestrian_locations->x, sizeof(float)*xmachine_message_pedestrian_location_MAX));
+	h_tex_xmachine_message_pedestrian_location_x_offset = (int)tex_xmachine_message_pedestrian_location_x_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_x_offset, &h_tex_xmachine_message_pedestrian_location_x_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_location_y_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_y_byte_offset, tex_xmachine_message_pedestrian_location_y, d_pedestrian_locations->y, sizeof(float)*xmachine_message_pedestrian_location_MAX));
+	h_tex_xmachine_message_pedestrian_location_y_offset = (int)tex_xmachine_message_pedestrian_location_y_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_y_offset, &h_tex_xmachine_message_pedestrian_location_y_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_location_z_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_z_byte_offset, tex_xmachine_message_pedestrian_location_z, d_pedestrian_locations->z, sizeof(float)*xmachine_message_pedestrian_location_MAX));
+	h_tex_xmachine_message_pedestrian_location_z_offset = (int)tex_xmachine_message_pedestrian_location_z_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_z_offset, &h_tex_xmachine_message_pedestrian_location_z_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_location_estado_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_estado_byte_offset, tex_xmachine_message_pedestrian_location_estado, d_pedestrian_locations->estado, sizeof(int)*xmachine_message_pedestrian_location_MAX));
+	h_tex_xmachine_message_pedestrian_location_estado_offset = (int)tex_xmachine_message_pedestrian_location_estado_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_estado_offset, &h_tex_xmachine_message_pedestrian_location_estado_offset, sizeof(int)));
+	//bind pbm start and end indices to textures
+	size_t tex_xmachine_message_pedestrian_location_pbm_start_byte_offset;
+	size_t tex_xmachine_message_pedestrian_location_pbm_end_or_count_byte_offset;
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_pbm_start_byte_offset, tex_xmachine_message_pedestrian_location_pbm_start, d_pedestrian_location_partition_matrix->start, sizeof(int)*xmachine_message_pedestrian_location_grid_size));
+	h_tex_xmachine_message_pedestrian_location_pbm_start_offset = (int)tex_xmachine_message_pedestrian_location_pbm_start_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_pbm_start_offset, &h_tex_xmachine_message_pedestrian_location_pbm_start_offset, sizeof(int)));
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_pbm_end_or_count_byte_offset, tex_xmachine_message_pedestrian_location_pbm_end_or_count, d_pedestrian_location_partition_matrix->end_or_count, sizeof(int)*xmachine_message_pedestrian_location_grid_size));
+  h_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset = (int)tex_xmachine_message_pedestrian_location_pbm_end_or_count_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset, &h_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset, sizeof(int)));
+
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (infect_pedestrians)
+	//Reallocate   : false
+	//Input        : pedestrian_location
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_infect_pedestrians<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_locations, d_pedestrian_location_partition_matrix, d_rand48);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	//any agent with discrete or partitioned message input uses texture caching
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_x));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_y));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_z));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_estado));
+	//unbind pbm indices
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_pbm_start));
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_pbm_end_or_count));
+    
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of infect_pedestrians agents in state default will be exceeded moving working agents to next state in function infect_pedestrians\n");
       exit(EXIT_FAILURE);
       }
       

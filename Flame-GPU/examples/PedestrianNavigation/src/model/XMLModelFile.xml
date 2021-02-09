@@ -231,6 +231,18 @@
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
         <gpu:function>
+          <name>infect_pedestrians</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>pedestrian_location</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+        <gpu:function>
           <name>move</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
@@ -423,6 +435,11 @@
     <layer>
       <gpu:layerFunction>
         <name>avoid_pedestrians</name>
+      </gpu:layerFunction>
+    </layer>
+    <layer>
+      <gpu:layerFunction>
+        <name>infect_pedestrians</name>
       </gpu:layerFunction>
     </layer>
     <layer>

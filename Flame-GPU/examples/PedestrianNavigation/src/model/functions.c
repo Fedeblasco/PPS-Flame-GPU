@@ -32,17 +32,17 @@
 #define RADIANS(x) (PI / 180.0f) * x
 
 //Probabilidades usadas para manejar la cantidad de enfermos
-#define probabilidad_estornudar 0.0
-#define probabilidad_contagio 0.0
+#define probabilidad_estornudar 1.0
+#define probabilidad_contagio 1.0
 #define probabilidad_generar_enfermo 0.5
 //Cantidad de ticks enfermo y portador
-#define ticks_portador 5000000
-#define ticks_enfermo 5000000
+#define ticks_portador 50000
+#define ticks_enfermo 50000
 //Cantidad de personas a generar
-#define cant_personas 1
+#define cant_personas 2
 
-#define ir_x 180
-#define ir_y 150
+#define ir_x 120
+#define ir_y 90
 
 
 /**
@@ -115,15 +115,17 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 			avoid_velocity += a_velocity;
 
 			//Si estoy sano, y me cruce con un paciente que esta enfermo o es portador, cambio mi estado a portador
-			if(agent->estado==0){
+			/*if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
 					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
 					if(temp<probabilidad_estornudar*probabilidad_contagio){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
 						agent->estado = 1;
-						//printf("Contagiado\n");
+						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+						printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
 					}
 				}	
-			}				
+			}*/				
 		}
 		 current_message = get_next_pedestrian_location_message(current_message, pedestrian_location_messages, partition_matrix);
 	}
@@ -137,12 +139,45 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
     return 0;
 }
 
+__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix, RNG_rand48* rand48){
+
+    xmachine_message_pedestrian_location* current_message = get_first_pedestrian_location_message(pedestrian_location_messages, partition_matrix, agent->x, agent->y, 0.0);
+	
+	glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
+	
+	while (current_message)
+	{	
+		glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
+		glm::vec2 message_pos = glm::vec2(current_message->x, current_message->y);
+		float separation = length(agent_pos - message_pos);
+		//Si la distancia entre uno y el otro es menor a la distancia minima
+		if ((separation < MESSAGE_RADIUS)&&(separation>MIN_DISTANCE)){
+
+			//Si estoy sano, y me cruce con un paciente que esta enfermo o es portador, cambio mi estado a portador
+			if(agent->estado==0){
+				if(current_message->estado==1 || current_message->estado==2){
+					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
+					if(temp<probabilidad_estornudar*probabilidad_contagio){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
+						agent->estado = 1;
+						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+						printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
+					}
+				}	
+			}			
+		}
+		 current_message = get_next_pedestrian_location_message(current_message, pedestrian_location_messages, partition_matrix);
+	}
+
+	return 0;
+}
+
 __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, int igriega){
 
 		glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
 		glm::vec2 agent_vel = glm::vec2(agent->velx, agent->vely);
 		
-		printf("%d, %d\n",equis,igriega);
+		//printf("%d, %d\n",equis,igriega);
 		
 		glm::vec2 agent_steer = glm::vec2(equis, igriega);
 
@@ -207,9 +242,9 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 	int igriega = ir_y-y;
 
 	if(equis!=0 || igriega!=0){
-		mover_a_destino(agent,equis,igriega);
+		//mover_a_destino(agent,equis,igriega);
 	}else{
-		printf("No me muevo mas che");
+		//printf("No me muevo mas che");
 	}
 
     //Como el movimiento se hace cada un tick, se incrementa aca el tick del paciente
@@ -218,7 +253,6 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 		if(agent->tick>=ticks_portador){//Si paso los ticks de portador, me enfermo
 			agent->tick=0;
 			agent->estado=2;
-			//printf("Me enferme");
 		}
 	}
 	if(agent->estado==2){//Si el agente esta enfermo
@@ -229,8 +263,9 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 			//printf("Me cure");
 		}
 	}
-	//Por cada tick, informo mi posición en Y
-	//printf("%f\n",agent->y);
+	//Por cada tick, informo mi posición
+	//printf("%d, ",x);
+	//printf("%d\n",y);
 	
 	//Por cada tick, informo mi estado
 	//printf("%d\n",agent->estado);
@@ -252,6 +287,8 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 	{
 		float random = rnd<DISCRETE_2D>(rand48);
 		bool emit_agent = false;
+		
+		
 		if ((agent->exit_no == 1)&&((random < EMMISION_RATE_EXIT1*TIME_SCALER)))
 			emit_agent = true;
 
@@ -259,6 +296,9 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 			if (emit_agent){
 				float x = ((agent->x+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				float y = ((agent->y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+				
+				float xpalotro = ((agent->x+1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+				
 				//int exit = getNewExitLocation(rand48);
 				float animate = rnd<DISCRETE_2D>(rand48);
 				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;
@@ -274,7 +314,13 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 
-				add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
+				//add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
+				if(agent->cant_generados == 0){
+					add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0);
+				}else{
+					add_agent_agent(agent_agents, xpalotro, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0);
+				}
+
 				//Imprimo que se creo un paciente
 				//printf("Creado\n");
 				agent->cant_generados++;
