@@ -230,18 +230,35 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
+        
+    
+        <gpu:function>
+          <name>output_pedestrian_state</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>pedestrian_state</messageName>
+              <gpu:type>single_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
         <gpu:function>
           <name>infect_pedestrians</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <inputs>
             <gpu:input>
-              <messageName>pedestrian_location</messageName>
+              <messageName>pedestrian_state</messageName>
             </gpu:input>
           </inputs>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
+      
+        
         <gpu:function>
           <name>move</name>
           <currentState>default</currentState>
@@ -253,12 +270,6 @@
       <states>
         <gpu:state>
           <name>default</name>
-        </gpu:state>
-        <gpu:state>
-          <name>portador</name>
-        </gpu:state>
-        <gpu:state>
-          <name>enfermo</name>
         </gpu:state>
         <initialState>default</initialState>
       </states>
@@ -384,6 +395,40 @@
       </gpu:partitioningSpatial>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
+
+    <gpu:message> 
+      <name>pedestrian_state</name>
+      <variables>
+        <gpu:variable>
+          <type>float</type>
+          <name>x</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>float</type>
+          <name>y</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>float</type>
+          <name>z</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>estado</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningSpatial>
+        <gpu:radius>0.015625</gpu:radius>
+        <gpu:xmin>-1.0</gpu:xmin>
+        <gpu:xmax>1.0</gpu:xmax>
+        <gpu:ymin>-1.0</gpu:ymin>
+        <gpu:ymax>1.0</gpu:ymax>
+        <gpu:zmin>0.0</gpu:zmin>
+        <gpu:zmax>0.015625</gpu:zmax>
+      </gpu:partitioningSpatial>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+
     <gpu:message>
       <name>navmap_cell</name>
       <variables>
@@ -430,6 +475,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>output_navmap_cells</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>output_pedestrian_state</name>
       </gpu:layerFunction>
     </layer>
     <layer>

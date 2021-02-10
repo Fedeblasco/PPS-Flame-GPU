@@ -83,6 +83,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_pedestrian_location
 #define xmachine_message_pedestrian_location_MAX 65536
 
+//Maximum population size of xmachine_mmessage_pedestrian_state
+#define xmachine_message_pedestrian_state_MAX 65536
+
 //Maximum population size of xmachine_mmessage_navmap_cell
 #define xmachine_message_navmap_cell_MAX 65536
 
@@ -90,11 +93,14 @@ typedef glm::dvec4 dvec4;
 /* Define preprocessor symbols for each message to specify the type, to simplify / improve portability */
 
 #define xmachine_message_pedestrian_location_partitioningSpatial
+#define xmachine_message_pedestrian_state_partitioningSpatial
 #define xmachine_message_navmap_cell_partitioningDiscrete
 
 /* Spatial partitioning grid size definitions */
 //xmachine_message_pedestrian_location partition grid size (gridDim.X*gridDim.Y*gridDim.Z)
 #define xmachine_message_pedestrian_location_grid_size 6400
+//xmachine_message_pedestrian_state partition grid size (gridDim.X*gridDim.Y*gridDim.Z)
+#define xmachine_message_pedestrian_state_grid_size 16384
 
 /* Static Graph size definitions*/
   
@@ -182,6 +188,24 @@ struct __align__(16) xmachine_memory_navmap
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
  */
 struct __align__(16) xmachine_message_pedestrian_location
+{	
+    /* Spatial Partitioning Variables */
+    glm::ivec3 _relative_cell;    /**< Relative cell position from agent grid cell position range -1 to 1 */
+    int _cell_index_max;    /**< Max boundary value of current cell */
+    glm::ivec3 _agent_grid_cell;  /**< Agents partition cell position */
+    int _cell_index;        /**< Index of position in current cell */  
+      
+    float x;        /**< Message variable x of type float.*/  
+    float y;        /**< Message variable y of type float.*/  
+    float z;        /**< Message variable z of type float.*/  
+    int estado;        /**< Message variable estado of type int.*/
+};
+
+/** struct xmachine_message_pedestrian_state
+ * Spatial Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_pedestrian_state
 {	
     /* Spatial Partitioning Variables */
     glm::ivec3 _relative_cell;    /**< Relative cell position from agent grid cell position range -1 to 1 */
@@ -287,6 +311,23 @@ struct xmachine_message_pedestrian_location_list
     
 };
 
+/** struct xmachine_message_pedestrian_state_list
+ * Spatial Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_pedestrian_state_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_pedestrian_state_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_pedestrian_state_MAX];  /**< Used during parallel prefix sum */
+    
+    float x [xmachine_message_pedestrian_state_MAX];    /**< Message memory variable list x of type float.*/
+    float y [xmachine_message_pedestrian_state_MAX];    /**< Message memory variable list y of type float.*/
+    float z [xmachine_message_pedestrian_state_MAX];    /**< Message memory variable list z of type float.*/
+    int estado [xmachine_message_pedestrian_state_MAX];    /**< Message memory variable list estado of type int.*/
+    
+};
+
 /** struct xmachine_message_navmap_cell_list
  * Discrete Partitioning
  * Structure of Array for memory coalescing 
@@ -313,6 +354,15 @@ struct xmachine_message_pedestrian_location_PBM
 {
 	int start[xmachine_message_pedestrian_location_grid_size];
 	int end_or_count[xmachine_message_pedestrian_location_grid_size];
+};
+
+/** struct xmachine_message_pedestrian_state_PBM
+ * Partition Boundary Matrix (PBM) for xmachine_message_pedestrian_state 
+ */
+struct xmachine_message_pedestrian_state_PBM
+{
+	int start[xmachine_message_pedestrian_state_grid_size];
+	int end_or_count[xmachine_message_pedestrian_state_grid_size];
 };
 
 
@@ -377,11 +427,18 @@ __FLAME_GPU_FUNC__ int output_pedestrian_location(xmachine_memory_agent* agent, 
 __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix, RNG_rand48* rand48);
 
 /**
+ * output_pedestrian_state FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param pedestrian_state_messages Pointer to output message list of type xmachine_message_pedestrian_state_list. Must be passed as an argument to the add_pedestrian_state_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_pedestrian_state(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages);
+
+/**
  * infect_pedestrians FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param pedestrian_location_messages  pedestrian_location_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_location_message and get_next_pedestrian_location_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_location_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ * @param pedestrian_state_messages  pedestrian_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_state_message and get_next_pedestrian_state_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_state_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
-__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix, RNG_rand48* rand48);
+__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
 
 /**
  * move FLAMEGPU Agent Function
@@ -438,6 +495,41 @@ __FLAME_GPU_FUNC__ xmachine_message_pedestrian_location * get_first_pedestrian_l
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_pedestrian_location * get_next_pedestrian_location_message(xmachine_message_pedestrian_location* current, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix);
+
+  
+/* Message Function Prototypes for Spatially Partitioned pedestrian_state message implemented in FLAMEGPU_Kernels */
+
+/** add_pedestrian_state_message
+ * Function for all types of message partitioning
+ * Adds a new pedestrian_state agent to the xmachine_memory_pedestrian_state_list list using a linear mapping
+ * @param agents	xmachine_memory_pedestrian_state_list agent list
+ * @param x	message variable of type float
+ * @param y	message variable of type float
+ * @param z	message variable of type float
+ * @param estado	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_pedestrian_state_message(xmachine_message_pedestrian_state_list* pedestrian_state_messages, float x, float y, float z, int estado);
+ 
+/** get_first_pedestrian_state_message
+ * Get first message function for spatially partitioned messages
+ * @param pedestrian_state_messages message list
+ * @param partition_matrix the boundary partition matrix for the spatially partitioned message list
+ * @param agentx x position of the agent
+ * @param agenty y position of the agent
+ * @param agentz z position of the agent
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_pedestrian_state * get_first_pedestrian_state_message(xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, float x, float y, float z);
+
+/** get_next_pedestrian_state_message
+ * Get first message function for discrete partitioned messages. Template function will call either shared memory or texture cache implementation depending on AGENT_TYPE
+ * @param current the current message struct
+ * @param pedestrian_state_messages message list
+ * @param partition_matrix the boundary partition matrix for the spatially partitioned message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_pedestrian_state * get_next_pedestrian_state_message(xmachine_message_pedestrian_state* current, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix);
 
   
 /* Message Function Prototypes for Discrete Partitioned navmap_cell message implemented in FLAMEGPU_Kernels */
@@ -534,7 +626,7 @@ extern void singleIteration();
  * @param d_navmaps Pointer to agent list on the GPU device
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_agent_list* h_agents_portador, xmachine_memory_agent_list* d_agents_portador, int h_xmachine_memory_agent_portador_count,xmachine_memory_agent_list* h_agents_enfermo, xmachine_memory_agent_list* d_agents_enfermo, int h_xmachine_memory_agent_enfermo_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
+extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
 
 
 /** readInitialStates
@@ -588,68 +680,6 @@ extern xmachine_memory_agent_list* get_host_agent_default_agents();
  * @param		a pointer CUDA kernal function to generate key value pairs
  */
 void sort_agents_default(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents));
-
-
-/** get_agent_agent_portador_count
- * Gets the agent count for the agent agent type in state portador
- * @return		the current agent agent count in state portador
- */
-extern int get_agent_agent_portador_count();
-
-/** reset_portador_count
- * Resets the agent count of the agent in state portador to 0. This is useful for interacting with some visualisations.
- */
-extern void reset_agent_portador_count();
-
-/** get_device_agent_portador_agents
- * Gets a pointer to xmachine_memory_agent_list on the GPU device
- * @return		a xmachine_memory_agent_list on the GPU device
- */
-extern xmachine_memory_agent_list* get_device_agent_portador_agents();
-
-/** get_host_agent_portador_agents
- * Gets a pointer to xmachine_memory_agent_list on the CPU host
- * @return		a xmachine_memory_agent_list on the CPU host
- */
-extern xmachine_memory_agent_list* get_host_agent_portador_agents();
-
-
-/** sort_agents_portador
- * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
- * @param		a pointer CUDA kernal function to generate key value pairs
- */
-void sort_agents_portador(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents));
-
-
-/** get_agent_agent_enfermo_count
- * Gets the agent count for the agent agent type in state enfermo
- * @return		the current agent agent count in state enfermo
- */
-extern int get_agent_agent_enfermo_count();
-
-/** reset_enfermo_count
- * Resets the agent count of the agent in state enfermo to 0. This is useful for interacting with some visualisations.
- */
-extern void reset_agent_enfermo_count();
-
-/** get_device_agent_enfermo_agents
- * Gets a pointer to xmachine_memory_agent_list on the GPU device
- * @return		a xmachine_memory_agent_list on the GPU device
- */
-extern xmachine_memory_agent_list* get_device_agent_enfermo_agents();
-
-/** get_host_agent_enfermo_agents
- * Gets a pointer to xmachine_memory_agent_list on the CPU host
- * @return		a xmachine_memory_agent_list on the CPU host
- */
-extern xmachine_memory_agent_list* get_host_agent_enfermo_agents();
-
-
-/** sort_agents_enfermo
- * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
- * @param		a pointer CUDA kernal function to generate key value pairs
- */
-void sort_agents_enfermo(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents));
 
 
     
@@ -820,258 +850,6 @@ __host__ int get_agent_default_variable_estado(unsigned int index);
  */
 __host__ int get_agent_default_variable_tick(unsigned int index);
 
-/** float get_agent_portador_variable_x(unsigned int index)
- * Gets the value of the x variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ float get_agent_portador_variable_x(unsigned int index);
-
-/** float get_agent_portador_variable_y(unsigned int index)
- * Gets the value of the y variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ float get_agent_portador_variable_y(unsigned int index);
-
-/** float get_agent_portador_variable_velx(unsigned int index)
- * Gets the value of the velx variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable velx
- */
-__host__ float get_agent_portador_variable_velx(unsigned int index);
-
-/** float get_agent_portador_variable_vely(unsigned int index)
- * Gets the value of the vely variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable vely
- */
-__host__ float get_agent_portador_variable_vely(unsigned int index);
-
-/** float get_agent_portador_variable_steer_x(unsigned int index)
- * Gets the value of the steer_x variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_x
- */
-__host__ float get_agent_portador_variable_steer_x(unsigned int index);
-
-/** float get_agent_portador_variable_steer_y(unsigned int index)
- * Gets the value of the steer_y variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_y
- */
-__host__ float get_agent_portador_variable_steer_y(unsigned int index);
-
-/** float get_agent_portador_variable_height(unsigned int index)
- * Gets the value of the height variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable height
- */
-__host__ float get_agent_portador_variable_height(unsigned int index);
-
-/** int get_agent_portador_variable_exit_no(unsigned int index)
- * Gets the value of the exit_no variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit_no
- */
-__host__ int get_agent_portador_variable_exit_no(unsigned int index);
-
-/** float get_agent_portador_variable_speed(unsigned int index)
- * Gets the value of the speed variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable speed
- */
-__host__ float get_agent_portador_variable_speed(unsigned int index);
-
-/** int get_agent_portador_variable_lod(unsigned int index)
- * Gets the value of the lod variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable lod
- */
-__host__ int get_agent_portador_variable_lod(unsigned int index);
-
-/** float get_agent_portador_variable_animate(unsigned int index)
- * Gets the value of the animate variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate
- */
-__host__ float get_agent_portador_variable_animate(unsigned int index);
-
-/** int get_agent_portador_variable_animate_dir(unsigned int index)
- * Gets the value of the animate_dir variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate_dir
- */
-__host__ int get_agent_portador_variable_animate_dir(unsigned int index);
-
-/** int get_agent_portador_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_agent_portador_variable_estado(unsigned int index);
-
-/** int get_agent_portador_variable_tick(unsigned int index)
- * Gets the value of the tick variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable tick
- */
-__host__ int get_agent_portador_variable_tick(unsigned int index);
-
-/** float get_agent_enfermo_variable_x(unsigned int index)
- * Gets the value of the x variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ float get_agent_enfermo_variable_x(unsigned int index);
-
-/** float get_agent_enfermo_variable_y(unsigned int index)
- * Gets the value of the y variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ float get_agent_enfermo_variable_y(unsigned int index);
-
-/** float get_agent_enfermo_variable_velx(unsigned int index)
- * Gets the value of the velx variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable velx
- */
-__host__ float get_agent_enfermo_variable_velx(unsigned int index);
-
-/** float get_agent_enfermo_variable_vely(unsigned int index)
- * Gets the value of the vely variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable vely
- */
-__host__ float get_agent_enfermo_variable_vely(unsigned int index);
-
-/** float get_agent_enfermo_variable_steer_x(unsigned int index)
- * Gets the value of the steer_x variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_x
- */
-__host__ float get_agent_enfermo_variable_steer_x(unsigned int index);
-
-/** float get_agent_enfermo_variable_steer_y(unsigned int index)
- * Gets the value of the steer_y variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_y
- */
-__host__ float get_agent_enfermo_variable_steer_y(unsigned int index);
-
-/** float get_agent_enfermo_variable_height(unsigned int index)
- * Gets the value of the height variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable height
- */
-__host__ float get_agent_enfermo_variable_height(unsigned int index);
-
-/** int get_agent_enfermo_variable_exit_no(unsigned int index)
- * Gets the value of the exit_no variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit_no
- */
-__host__ int get_agent_enfermo_variable_exit_no(unsigned int index);
-
-/** float get_agent_enfermo_variable_speed(unsigned int index)
- * Gets the value of the speed variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable speed
- */
-__host__ float get_agent_enfermo_variable_speed(unsigned int index);
-
-/** int get_agent_enfermo_variable_lod(unsigned int index)
- * Gets the value of the lod variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable lod
- */
-__host__ int get_agent_enfermo_variable_lod(unsigned int index);
-
-/** float get_agent_enfermo_variable_animate(unsigned int index)
- * Gets the value of the animate variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate
- */
-__host__ float get_agent_enfermo_variable_animate(unsigned int index);
-
-/** int get_agent_enfermo_variable_animate_dir(unsigned int index)
- * Gets the value of the animate_dir variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate_dir
- */
-__host__ int get_agent_enfermo_variable_animate_dir(unsigned int index);
-
-/** int get_agent_enfermo_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_agent_enfermo_variable_estado(unsigned int index);
-
-/** int get_agent_enfermo_variable_tick(unsigned int index)
- * Gets the value of the tick variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable tick
- */
-__host__ int get_agent_enfermo_variable_tick(unsigned int index);
-
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -1216,40 +994,6 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent);
  * @param count the number of agents to copy from the host to the device.
  */
 void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int count);
-
-
-/** h_add_agent_agent_portador
- * Host function to add a single agent of type agent to the portador state on the device.
- * This invokes many cudaMempcy, and an append kernel launch. 
- * If multiple agents are to be created in a single iteration, consider h_add_agent_agent_portador instead.
- * @param agent pointer to agent struct on the host. Agent member arrays are supported.
- */
-void h_add_agent_agent_portador(xmachine_memory_agent* agent);
-
-/** h_add_agents_agent_portador(
- * Host function to add multiple agents of type agent to the portador state on the device if possible.
- * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
- * @param agents pointer to host struct of arrays of agent agents
- * @param count the number of agents to copy from the host to the device.
- */
-void h_add_agents_agent_portador(xmachine_memory_agent** agents, unsigned int count);
-
-
-/** h_add_agent_agent_enfermo
- * Host function to add a single agent of type agent to the enfermo state on the device.
- * This invokes many cudaMempcy, and an append kernel launch. 
- * If multiple agents are to be created in a single iteration, consider h_add_agent_agent_enfermo instead.
- * @param agent pointer to agent struct on the host. Agent member arrays are supported.
- */
-void h_add_agent_agent_enfermo(xmachine_memory_agent* agent);
-
-/** h_add_agents_agent_enfermo(
- * Host function to add multiple agents of type agent to the enfermo state on the device if possible.
- * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
- * @param agents pointer to host struct of arrays of agent agents
- * @param count the number of agents to copy from the host to the device.
- */
-void h_add_agents_agent_enfermo(xmachine_memory_agent** agents, unsigned int count);
 
 /** h_allocate_agent_navmap
  * Utility function to allocate and initialise an agent struct on the host.
@@ -1602,608 +1346,6 @@ int min_agent_default_tick_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 int max_agent_default_tick_variable();
-
-/** float reduce_agent_portador_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_x_variable();
-
-
-
-/** float min_agent_portador_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_x_variable();
-/** float max_agent_portador_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_x_variable();
-
-/** float reduce_agent_portador_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_y_variable();
-
-
-
-/** float min_agent_portador_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_y_variable();
-/** float max_agent_portador_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_y_variable();
-
-/** float reduce_agent_portador_velx_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_velx_variable();
-
-
-
-/** float min_agent_portador_velx_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_velx_variable();
-/** float max_agent_portador_velx_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_velx_variable();
-
-/** float reduce_agent_portador_vely_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_vely_variable();
-
-
-
-/** float min_agent_portador_vely_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_vely_variable();
-/** float max_agent_portador_vely_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_vely_variable();
-
-/** float reduce_agent_portador_steer_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_steer_x_variable();
-
-
-
-/** float min_agent_portador_steer_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_steer_x_variable();
-/** float max_agent_portador_steer_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_steer_x_variable();
-
-/** float reduce_agent_portador_steer_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_steer_y_variable();
-
-
-
-/** float min_agent_portador_steer_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_steer_y_variable();
-/** float max_agent_portador_steer_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_steer_y_variable();
-
-/** float reduce_agent_portador_height_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_height_variable();
-
-
-
-/** float min_agent_portador_height_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_height_variable();
-/** float max_agent_portador_height_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_height_variable();
-
-/** int reduce_agent_portador_exit_no_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_portador_exit_no_variable();
-
-
-
-/** int count_agent_portador_exit_no_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_portador_exit_no_variable(int count_value);
-
-/** int min_agent_portador_exit_no_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_portador_exit_no_variable();
-/** int max_agent_portador_exit_no_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_portador_exit_no_variable();
-
-/** float reduce_agent_portador_speed_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_speed_variable();
-
-
-
-/** float min_agent_portador_speed_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_speed_variable();
-/** float max_agent_portador_speed_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_speed_variable();
-
-/** int reduce_agent_portador_lod_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_portador_lod_variable();
-
-
-
-/** int count_agent_portador_lod_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_portador_lod_variable(int count_value);
-
-/** int min_agent_portador_lod_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_portador_lod_variable();
-/** int max_agent_portador_lod_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_portador_lod_variable();
-
-/** float reduce_agent_portador_animate_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_portador_animate_variable();
-
-
-
-/** float min_agent_portador_animate_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_portador_animate_variable();
-/** float max_agent_portador_animate_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_portador_animate_variable();
-
-/** int reduce_agent_portador_animate_dir_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_portador_animate_dir_variable();
-
-
-
-/** int count_agent_portador_animate_dir_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_portador_animate_dir_variable(int count_value);
-
-/** int min_agent_portador_animate_dir_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_portador_animate_dir_variable();
-/** int max_agent_portador_animate_dir_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_portador_animate_dir_variable();
-
-/** int reduce_agent_portador_estado_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_portador_estado_variable();
-
-
-
-/** int count_agent_portador_estado_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_portador_estado_variable(int count_value);
-
-/** int min_agent_portador_estado_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_portador_estado_variable();
-/** int max_agent_portador_estado_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_portador_estado_variable();
-
-/** int reduce_agent_portador_tick_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_portador_tick_variable();
-
-
-
-/** int count_agent_portador_tick_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_portador_tick_variable(int count_value);
-
-/** int min_agent_portador_tick_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_portador_tick_variable();
-/** int max_agent_portador_tick_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_portador_tick_variable();
-
-/** float reduce_agent_enfermo_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_x_variable();
-
-
-
-/** float min_agent_enfermo_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_x_variable();
-/** float max_agent_enfermo_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_x_variable();
-
-/** float reduce_agent_enfermo_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_y_variable();
-
-
-
-/** float min_agent_enfermo_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_y_variable();
-/** float max_agent_enfermo_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_y_variable();
-
-/** float reduce_agent_enfermo_velx_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_velx_variable();
-
-
-
-/** float min_agent_enfermo_velx_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_velx_variable();
-/** float max_agent_enfermo_velx_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_velx_variable();
-
-/** float reduce_agent_enfermo_vely_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_vely_variable();
-
-
-
-/** float min_agent_enfermo_vely_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_vely_variable();
-/** float max_agent_enfermo_vely_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_vely_variable();
-
-/** float reduce_agent_enfermo_steer_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_steer_x_variable();
-
-
-
-/** float min_agent_enfermo_steer_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_steer_x_variable();
-/** float max_agent_enfermo_steer_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_steer_x_variable();
-
-/** float reduce_agent_enfermo_steer_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_steer_y_variable();
-
-
-
-/** float min_agent_enfermo_steer_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_steer_y_variable();
-/** float max_agent_enfermo_steer_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_steer_y_variable();
-
-/** float reduce_agent_enfermo_height_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_height_variable();
-
-
-
-/** float min_agent_enfermo_height_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_height_variable();
-/** float max_agent_enfermo_height_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_height_variable();
-
-/** int reduce_agent_enfermo_exit_no_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_enfermo_exit_no_variable();
-
-
-
-/** int count_agent_enfermo_exit_no_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_enfermo_exit_no_variable(int count_value);
-
-/** int min_agent_enfermo_exit_no_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_enfermo_exit_no_variable();
-/** int max_agent_enfermo_exit_no_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_enfermo_exit_no_variable();
-
-/** float reduce_agent_enfermo_speed_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_speed_variable();
-
-
-
-/** float min_agent_enfermo_speed_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_speed_variable();
-/** float max_agent_enfermo_speed_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_speed_variable();
-
-/** int reduce_agent_enfermo_lod_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_enfermo_lod_variable();
-
-
-
-/** int count_agent_enfermo_lod_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_enfermo_lod_variable(int count_value);
-
-/** int min_agent_enfermo_lod_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_enfermo_lod_variable();
-/** int max_agent_enfermo_lod_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_enfermo_lod_variable();
-
-/** float reduce_agent_enfermo_animate_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-float reduce_agent_enfermo_animate_variable();
-
-
-
-/** float min_agent_enfermo_animate_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float min_agent_enfermo_animate_variable();
-/** float max_agent_enfermo_animate_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-float max_agent_enfermo_animate_variable();
-
-/** int reduce_agent_enfermo_animate_dir_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_enfermo_animate_dir_variable();
-
-
-
-/** int count_agent_enfermo_animate_dir_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_enfermo_animate_dir_variable(int count_value);
-
-/** int min_agent_enfermo_animate_dir_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_enfermo_animate_dir_variable();
-/** int max_agent_enfermo_animate_dir_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_enfermo_animate_dir_variable();
-
-/** int reduce_agent_enfermo_estado_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_enfermo_estado_variable();
-
-
-
-/** int count_agent_enfermo_estado_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_enfermo_estado_variable(int count_value);
-
-/** int min_agent_enfermo_estado_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_enfermo_estado_variable();
-/** int max_agent_enfermo_estado_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_enfermo_estado_variable();
-
-/** int reduce_agent_enfermo_tick_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_enfermo_tick_variable();
-
-
-
-/** int count_agent_enfermo_tick_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_enfermo_tick_variable(int count_value);
-
-/** int min_agent_enfermo_tick_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_enfermo_tick_variable();
-/** int max_agent_enfermo_tick_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_enfermo_tick_variable();
 
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

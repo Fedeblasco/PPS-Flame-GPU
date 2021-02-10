@@ -41,8 +41,8 @@
 //Cantidad de personas a generar
 #define cant_personas 2
 
-#define ir_x 120
-#define ir_y 90
+#define ir_x 140
+#define ir_y 102
 
 
 /**
@@ -54,6 +54,13 @@
 __FLAME_GPU_FUNC__ int output_pedestrian_location(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages){
 
 	add_pedestrian_location_message(pedestrian_location_messages, agent->x, agent->y, 0.0,agent->estado);
+  
+    return 0;
+}
+
+__FLAME_GPU_FUNC__ int output_pedestrian_state(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages){
+
+	add_pedestrian_state_message(pedestrian_state_messages, agent->x, agent->y, 0.0,agent->estado);
   
     return 0;
 }
@@ -139,9 +146,9 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
     return 0;
 }
 
-__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix, RNG_rand48* rand48){
+__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
 
-    xmachine_message_pedestrian_location* current_message = get_first_pedestrian_location_message(pedestrian_location_messages, partition_matrix, agent->x, agent->y, 0.0);
+    xmachine_message_pedestrian_state* current_message = get_first_pedestrian_state_message(pedestrian_state_messages, partition_matrix, agent->x, agent->y, 0.0);
 	
 	glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
 	
@@ -166,7 +173,7 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 				}	
 			}			
 		}
-		 current_message = get_next_pedestrian_location_message(current_message, pedestrian_location_messages, partition_matrix);
+		 current_message = get_next_pedestrian_state_message(current_message, pedestrian_state_messages, partition_matrix);
 	}
 
 	return 0;
@@ -242,7 +249,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 	int igriega = ir_y-y;
 
 	if(equis!=0 || igriega!=0){
-		//mover_a_destino(agent,equis,igriega);
+		mover_a_destino(agent,equis,igriega);
 	}else{
 		//printf("No me muevo mas che");
 	}
@@ -297,13 +304,13 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				float x = ((agent->x+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				float y = ((agent->y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				
-				float xpalotro = ((agent->x+1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+				float xpalotro = ((agent->x+3.6f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				
 				//int exit = getNewExitLocation(rand48);
 				float animate = rnd<DISCRETE_2D>(rand48);
 				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;
 				
-				//Hago el random e imprimo
+				/*//Hago el random e imprimo
 				float rand = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
 				int estado;
 				if(rand<=probabilidad_generar_enfermo){
@@ -312,7 +319,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				}else{
 					estado=0;
 					//printf("Sano");
-				}
+				}*/
 
 				//add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
 				if(agent->cant_generados == 0){

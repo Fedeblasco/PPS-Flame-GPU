@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_agent_list* h_agents_portador, xmachine_memory_agent_list* d_agents_portador, int h_xmachine_memory_agent_portador_count,xmachine_memory_agent_list* h_agents_enfermo, xmachine_memory_agent_list* d_agents_enfermo, int h_xmachine_memory_agent_enfermo_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -128,18 +128,6 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying agent Agent default State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
-		exit(cudaStatus);
-	}
-	cudaStatus = cudaMemcpy( h_agents_portador, d_agents_portador, sizeof(xmachine_memory_agent_list), cudaMemcpyDeviceToHost);
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr,"Error Copying agent Agent portador State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
-		exit(cudaStatus);
-	}
-	cudaStatus = cudaMemcpy( h_agents_enfermo, d_agents_enfermo, sizeof(xmachine_memory_agent_list), cudaMemcpyDeviceToHost);
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr,"Error Copying agent Agent enfermo State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_navmaps_static, d_navmaps_static, sizeof(xmachine_memory_navmap_list), cudaMemcpyDeviceToHost);
@@ -372,160 +360,6 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         
 		fputs("<tick>", file);
         sprintf(data, "%d", h_agents_default->tick[i]);
-		fputs(data, file);
-		fputs("</tick>\n", file);
-        
-		fputs("</xagent>\n", file);
-	}
-	//Write each agent agent to xml
-	for (int i=0; i<h_xmachine_memory_agent_portador_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>agent</name>\n", file);
-        
-		fputs("<x>", file);
-        sprintf(data, "%f", h_agents_portador->x[i]);
-		fputs(data, file);
-		fputs("</x>\n", file);
-        
-		fputs("<y>", file);
-        sprintf(data, "%f", h_agents_portador->y[i]);
-		fputs(data, file);
-		fputs("</y>\n", file);
-        
-		fputs("<velx>", file);
-        sprintf(data, "%f", h_agents_portador->velx[i]);
-		fputs(data, file);
-		fputs("</velx>\n", file);
-        
-		fputs("<vely>", file);
-        sprintf(data, "%f", h_agents_portador->vely[i]);
-		fputs(data, file);
-		fputs("</vely>\n", file);
-        
-		fputs("<steer_x>", file);
-        sprintf(data, "%f", h_agents_portador->steer_x[i]);
-		fputs(data, file);
-		fputs("</steer_x>\n", file);
-        
-		fputs("<steer_y>", file);
-        sprintf(data, "%f", h_agents_portador->steer_y[i]);
-		fputs(data, file);
-		fputs("</steer_y>\n", file);
-        
-		fputs("<height>", file);
-        sprintf(data, "%f", h_agents_portador->height[i]);
-		fputs(data, file);
-		fputs("</height>\n", file);
-        
-		fputs("<exit_no>", file);
-        sprintf(data, "%d", h_agents_portador->exit_no[i]);
-		fputs(data, file);
-		fputs("</exit_no>\n", file);
-        
-		fputs("<speed>", file);
-        sprintf(data, "%f", h_agents_portador->speed[i]);
-		fputs(data, file);
-		fputs("</speed>\n", file);
-        
-		fputs("<lod>", file);
-        sprintf(data, "%d", h_agents_portador->lod[i]);
-		fputs(data, file);
-		fputs("</lod>\n", file);
-        
-		fputs("<animate>", file);
-        sprintf(data, "%f", h_agents_portador->animate[i]);
-		fputs(data, file);
-		fputs("</animate>\n", file);
-        
-		fputs("<animate_dir>", file);
-        sprintf(data, "%d", h_agents_portador->animate_dir[i]);
-		fputs(data, file);
-		fputs("</animate_dir>\n", file);
-        
-		fputs("<estado>", file);
-        sprintf(data, "%d", h_agents_portador->estado[i]);
-		fputs(data, file);
-		fputs("</estado>\n", file);
-        
-		fputs("<tick>", file);
-        sprintf(data, "%d", h_agents_portador->tick[i]);
-		fputs(data, file);
-		fputs("</tick>\n", file);
-        
-		fputs("</xagent>\n", file);
-	}
-	//Write each agent agent to xml
-	for (int i=0; i<h_xmachine_memory_agent_enfermo_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>agent</name>\n", file);
-        
-		fputs("<x>", file);
-        sprintf(data, "%f", h_agents_enfermo->x[i]);
-		fputs(data, file);
-		fputs("</x>\n", file);
-        
-		fputs("<y>", file);
-        sprintf(data, "%f", h_agents_enfermo->y[i]);
-		fputs(data, file);
-		fputs("</y>\n", file);
-        
-		fputs("<velx>", file);
-        sprintf(data, "%f", h_agents_enfermo->velx[i]);
-		fputs(data, file);
-		fputs("</velx>\n", file);
-        
-		fputs("<vely>", file);
-        sprintf(data, "%f", h_agents_enfermo->vely[i]);
-		fputs(data, file);
-		fputs("</vely>\n", file);
-        
-		fputs("<steer_x>", file);
-        sprintf(data, "%f", h_agents_enfermo->steer_x[i]);
-		fputs(data, file);
-		fputs("</steer_x>\n", file);
-        
-		fputs("<steer_y>", file);
-        sprintf(data, "%f", h_agents_enfermo->steer_y[i]);
-		fputs(data, file);
-		fputs("</steer_y>\n", file);
-        
-		fputs("<height>", file);
-        sprintf(data, "%f", h_agents_enfermo->height[i]);
-		fputs(data, file);
-		fputs("</height>\n", file);
-        
-		fputs("<exit_no>", file);
-        sprintf(data, "%d", h_agents_enfermo->exit_no[i]);
-		fputs(data, file);
-		fputs("</exit_no>\n", file);
-        
-		fputs("<speed>", file);
-        sprintf(data, "%f", h_agents_enfermo->speed[i]);
-		fputs(data, file);
-		fputs("</speed>\n", file);
-        
-		fputs("<lod>", file);
-        sprintf(data, "%d", h_agents_enfermo->lod[i]);
-		fputs(data, file);
-		fputs("</lod>\n", file);
-        
-		fputs("<animate>", file);
-        sprintf(data, "%f", h_agents_enfermo->animate[i]);
-		fputs(data, file);
-		fputs("</animate>\n", file);
-        
-		fputs("<animate_dir>", file);
-        sprintf(data, "%d", h_agents_enfermo->animate_dir[i]);
-		fputs(data, file);
-		fputs("</animate_dir>\n", file);
-        
-		fputs("<estado>", file);
-        sprintf(data, "%d", h_agents_enfermo->estado[i]);
-		fputs(data, file);
-		fputs("</estado>\n", file);
-        
-		fputs("<tick>", file);
-        sprintf(data, "%d", h_agents_enfermo->tick[i]);
 		fputs(data, file);
 		fputs("</tick>\n", file);
         

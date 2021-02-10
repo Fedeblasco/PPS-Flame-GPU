@@ -33,10 +33,6 @@ __constant__ int d_xmachine_memory_navmap_count;
 
 __constant__ int d_xmachine_memory_agent_default_count;
 
-__constant__ int d_xmachine_memory_agent_portador_count;
-
-__constant__ int d_xmachine_memory_agent_enfermo_count;
-
 __constant__ int d_xmachine_memory_navmap_static_count;
 
 
@@ -51,6 +47,16 @@ __constant__ glm::vec3 d_message_pedestrian_location_min_bounds;           /**< 
 __constant__ glm::vec3 d_message_pedestrian_location_max_bounds;           /**< max bounds (x,y,z) of partitioning environment */
 __constant__ glm::ivec3 d_message_pedestrian_location_partitionDim;           /**< partition dimensions (x,y,z) of partitioning environment */
 __constant__ float d_message_pedestrian_location_radius;                 /**< partition radius (used to determin the size of the partitions) */
+
+/* pedestrian_state Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_pedestrian_state_count;         /**< message list counter*/
+__constant__ int d_message_pedestrian_state_output_type;   /**< message output type (single or optional)*/
+//Spatial Partitioning Variables
+__constant__ glm::vec3 d_message_pedestrian_state_min_bounds;           /**< min bounds (x,y,z) of partitioning environment */
+__constant__ glm::vec3 d_message_pedestrian_state_max_bounds;           /**< max bounds (x,y,z) of partitioning environment */
+__constant__ glm::ivec3 d_message_pedestrian_state_partitionDim;           /**< partition dimensions (x,y,z) of partitioning environment */
+__constant__ float d_message_pedestrian_state_radius;                 /**< partition radius (used to determin the size of the partitions) */
 
 /* navmap_cell Message variables */
 //Discrete Partitioning Variables
@@ -82,6 +88,17 @@ texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_locatio
 __constant__ int d_tex_xmachine_message_pedestrian_location_pbm_start_offset;
 texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_location_pbm_end_or_count;
 __constant__ int d_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset;
+
+
+/* pedestrian_state Message Bindings */texture<float, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_x;
+__constant__ int d_tex_xmachine_message_pedestrian_state_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_y;
+__constant__ int d_tex_xmachine_message_pedestrian_state_y_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_z;
+__constant__ int d_tex_xmachine_message_pedestrian_state_z_offset;texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_estado;
+__constant__ int d_tex_xmachine_message_pedestrian_state_estado_offset;
+texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_pbm_start;
+__constant__ int d_tex_xmachine_message_pedestrian_state_pbm_start_offset;
+texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_pbm_end_or_count;
+__constant__ int d_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset;
 
 
 /* navmap_cell Message Bindings */texture<int, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_x;
@@ -753,6 +770,391 @@ __device__ xmachine_message_pedestrian_location* get_next_pedestrian_location_me
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created pedestrian_state message functions */
+
+
+/** add_pedestrian_state_message
+ * Add non partitioned or spatially partitioned pedestrian_state message
+ * @param messages xmachine_message_pedestrian_state_list message list to add too
+ * @param x agent variable of type float
+ * @param y agent variable of type float
+ * @param z agent variable of type float
+ * @param estado agent variable of type int
+ */
+__device__ void add_pedestrian_state_message(xmachine_message_pedestrian_state_list* messages, float x, float y, float z, int estado){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_pedestrian_state_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_pedestrian_state_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_pedestrian_state_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_pedestrian_state Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->x[index] = x;
+	messages->y[index] = y;
+	messages->z[index] = z;
+	messages->estado[index] = estado;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned pedestrian_state message (for optional messages)
+ * @param messages scatter_optional_pedestrian_state_messages Sparse xmachine_message_pedestrian_state_list message list
+ * @param message_swap temp xmachine_message_pedestrian_state_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_pedestrian_state_messages(xmachine_message_pedestrian_state_list* messages, xmachine_message_pedestrian_state_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_pedestrian_state_count;
+
+		//AoS - xmachine_message_pedestrian_state Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->x[output_index] = messages_swap->x[index];
+		messages->y[output_index] = messages_swap->y[index];
+		messages->z[output_index] = messages_swap->z[index];
+		messages->estado[output_index] = messages_swap->estado[index];				
+	}
+}
+
+/** reset_pedestrian_state_swaps
+ * Reset non partitioned or spatially partitioned pedestrian_state message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_pedestrian_state_swaps(xmachine_message_pedestrian_state_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+/** message_pedestrian_state_grid_position
+ * Calculates the grid cell position given an glm::vec3 vector
+ * @param position glm::vec3 vector representing a position
+ */
+__device__ glm::ivec3 message_pedestrian_state_grid_position(glm::vec3 position)
+{
+    glm::ivec3 gridPos;
+    gridPos.x = floor((position.x - d_message_pedestrian_state_min_bounds.x) * (float)d_message_pedestrian_state_partitionDim.x / (d_message_pedestrian_state_max_bounds.x - d_message_pedestrian_state_min_bounds.x));
+    gridPos.y = floor((position.y - d_message_pedestrian_state_min_bounds.y) * (float)d_message_pedestrian_state_partitionDim.y / (d_message_pedestrian_state_max_bounds.y - d_message_pedestrian_state_min_bounds.y));
+    gridPos.z = floor((position.z - d_message_pedestrian_state_min_bounds.z) * (float)d_message_pedestrian_state_partitionDim.z / (d_message_pedestrian_state_max_bounds.z - d_message_pedestrian_state_min_bounds.z));
+
+	//do wrapping or bounding
+	
+
+    return gridPos;
+}
+
+/** message_pedestrian_state_hash
+ * Given the grid position in partition space this function calculates a hash value
+ * @param gridPos The position in partition space
+ */
+__device__ unsigned int message_pedestrian_state_hash(glm::ivec3 gridPos)
+{
+	//cheap bounding without mod (within range +- partition dimension)
+	gridPos.x = (gridPos.x<0)? d_message_pedestrian_state_partitionDim.x-1: gridPos.x; 
+	gridPos.x = (gridPos.x>=d_message_pedestrian_state_partitionDim.x)? 0 : gridPos.x; 
+	gridPos.y = (gridPos.y<0)? d_message_pedestrian_state_partitionDim.y-1 : gridPos.y; 
+	gridPos.y = (gridPos.y>=d_message_pedestrian_state_partitionDim.y)? 0 : gridPos.y; 
+	gridPos.z = (gridPos.z<0)? d_message_pedestrian_state_partitionDim.z-1: gridPos.z; 
+	gridPos.z = (gridPos.z>=d_message_pedestrian_state_partitionDim.z)? 0 : gridPos.z; 
+
+	//unique id
+	return ((gridPos.z * d_message_pedestrian_state_partitionDim.y) * d_message_pedestrian_state_partitionDim.x) + (gridPos.y * d_message_pedestrian_state_partitionDim.x) + gridPos.x;
+}
+
+#ifdef FAST_ATOMIC_SORTING
+	/** hist_pedestrian_state_messages
+		 * Kernal function for performing a histogram (count) on each partition bin and saving the hash and index of a message within that bin
+		 * @param local_bin_index output index of the message within the calculated bin
+		 * @param unsorted_index output bin index (hash) value
+		 * @param messages the message list used to generate the hash value outputs
+		 * @param agent_count the current number of agents outputting messages
+		 */
+	__global__ void hist_pedestrian_state_messages(uint* local_bin_index, uint* unsorted_index, int* global_bin_count, xmachine_message_pedestrian_state_list* messages, int agent_count)
+	{
+		unsigned int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+		if (index >= agent_count)
+			return;
+        glm::vec3 position = glm::vec3(messages->x[index], messages->y[index], messages->z[index]);
+		glm::ivec3 grid_position = message_pedestrian_state_grid_position(position);
+		unsigned int hash = message_pedestrian_state_hash(grid_position);
+		unsigned int bin_idx = atomicInc((unsigned int*) &global_bin_count[hash], 0xFFFFFFFF);
+		local_bin_index[index] = bin_idx;
+		unsorted_index[index] = hash;
+	}
+	
+	/** reorder_pedestrian_state_messages
+	 * Reorders the messages accoring to the partition boundary matrix start indices of each bin
+	 * @param local_bin_index index of the message within the desired bin
+	 * @param unsorted_index bin index (hash) value
+	 * @param pbm_start_index the start indices of the partition boundary matrix
+	 * @param unordered_messages the original unordered message data
+	 * @param ordered_messages buffer used to scatter messages into the correct order
+	  @param agent_count the current number of agents outputting messages
+	 */
+	 __global__ void reorder_pedestrian_state_messages(uint* local_bin_index, uint* unsorted_index, int* pbm_start_index, xmachine_message_pedestrian_state_list* unordered_messages, xmachine_message_pedestrian_state_list* ordered_messages, int agent_count)
+	{
+		int index = (blockIdx.x *blockDim.x) + threadIdx.x;
+
+		if (index >= agent_count)
+			return;
+
+		uint i = unsorted_index[index];
+		unsigned int sorted_index = local_bin_index[index] + pbm_start_index[i];
+
+		//finally reorder agent data
+		ordered_messages->x[sorted_index] = unordered_messages->x[index];
+		ordered_messages->y[sorted_index] = unordered_messages->y[index];
+		ordered_messages->z[sorted_index] = unordered_messages->z[index];
+		ordered_messages->estado[sorted_index] = unordered_messages->estado[index];
+	}
+	 
+#else
+
+	/** hash_pedestrian_state_messages
+	 * Kernal function for calculating a hash value for each messahe depending on its position
+	 * @param keys output for the hash key
+	 * @param values output for the index value
+	 * @param messages the message list used to generate the hash value outputs
+	 */
+	__global__ void hash_pedestrian_state_messages(uint* keys, uint* values, xmachine_message_pedestrian_state_list* messages)
+	{
+		unsigned int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+        glm::vec3 position = glm::vec3(messages->x[index], messages->y[index], messages->z[index]);
+		glm::ivec3 grid_position = message_pedestrian_state_grid_position(position);
+		unsigned int hash = message_pedestrian_state_hash(grid_position);
+
+		keys[index] = hash;
+		values[index] = index;
+	}
+
+	/** reorder_pedestrian_state_messages
+	 * Reorders the messages accoring to the ordered sort identifiers and builds a Partition Boundary Matrix by looking at the previosu threads sort id.
+	 * @param keys the sorted hash keys
+	 * @param values the sorted index values
+	 * @param matrix the PBM
+	 * @param unordered_messages the original unordered message data
+	 * @param ordered_messages buffer used to scatter messages into the correct order
+	 */
+	__global__ void reorder_pedestrian_state_messages(uint* keys, uint* values, xmachine_message_pedestrian_state_PBM* matrix, xmachine_message_pedestrian_state_list* unordered_messages, xmachine_message_pedestrian_state_list* ordered_messages)
+	{
+		extern __shared__ int sm_data [];
+
+		int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+		//load threads sort key into sm
+		uint key = keys[index];
+		uint old_pos = values[index];
+
+		sm_data[threadIdx.x] = key;
+		__syncthreads();
+	
+		unsigned int prev_key;
+
+		//if first thread then no prev sm value so get prev from global memory 
+		if (threadIdx.x == 0)
+		{
+			//first thread has no prev value so ignore
+			if (index != 0)
+				prev_key = keys[index-1];
+		}
+		//get previous ident from sm
+		else	
+		{
+			prev_key = sm_data[threadIdx.x-1];
+		}
+
+		//TODO: Check key is not out of bounds
+
+		//set partition boundaries
+		if (index < d_message_pedestrian_state_count)
+		{
+			//if first thread then set first partition cell start
+			if (index == 0)
+			{
+				matrix->start[key] = index;
+			}
+
+			//if edge of a boundr update start and end of partition
+			else if (prev_key != key)
+			{
+				//set start for key
+				matrix->start[key] = index;
+
+				//set end for key -1
+				matrix->end_or_count[prev_key] = index;
+			}
+
+			//if last thread then set final partition cell end
+			if (index == d_message_pedestrian_state_count-1)
+			{
+				matrix->end_or_count[key] = index+1;
+			}
+		}
+	
+		//finally reorder agent data
+		ordered_messages->x[index] = unordered_messages->x[old_pos];
+		ordered_messages->y[index] = unordered_messages->y[old_pos];
+		ordered_messages->z[index] = unordered_messages->z[old_pos];
+		ordered_messages->estado[index] = unordered_messages->estado[old_pos];
+	}
+
+#endif
+
+/** load_next_pedestrian_state_message
+ * Used to load the next message data to shared memory
+ * Idea is check the current cell index to see if we can simply get a message from the current cell
+ * If we are at the end of the current cell then loop till we find the next cell with messages (this way we ignore cells with no messages)
+ * @param messages the message list
+ * @param partition_matrix the PBM
+ * @param relative_cell the relative partition cell position from the agent position
+ * @param cell_index_max the maximum index of the current partition cell
+ * @param agent_grid_cell the agents partition cell position
+ * @param cell_index the current cell index in agent_grid_cell+relative_cell
+ * @return true if a message has been loaded into sm false otherwise
+ */
+__device__ bool load_next_pedestrian_state_message(xmachine_message_pedestrian_state_list* messages, xmachine_message_pedestrian_state_PBM* partition_matrix, glm::ivec3 relative_cell, int cell_index_max, glm::ivec3 agent_grid_cell, int cell_index)
+{
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+
+	int move_cell = true;
+	cell_index ++;
+
+	//see if we need to move to a new partition cell
+	if(cell_index < cell_index_max)
+		move_cell = false;
+
+	while(move_cell)
+	{
+		//get the next relative grid position 
+        if (next_cell2D(&relative_cell))
+		{
+			//calculate the next cells grid position and hash
+			glm::ivec3 next_cell_position = agent_grid_cell + relative_cell;
+			int next_cell_hash = message_pedestrian_state_hash(next_cell_position);
+			//use the hash to calculate the start index
+			int cell_index_min = tex1Dfetch(tex_xmachine_message_pedestrian_state_pbm_start, next_cell_hash + d_tex_xmachine_message_pedestrian_state_pbm_start_offset);
+			cell_index_max = tex1Dfetch(tex_xmachine_message_pedestrian_state_pbm_end_or_count, next_cell_hash + d_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset);
+			//check for messages in the cell (cell index max is the count for atomic sorting)
+#ifdef FAST_ATOMIC_SORTING
+			if (cell_index_max > 0)
+			{
+				//when using fast atomics value represents bin count not last index!
+				cell_index_max += cell_index_min; //when using fast atomics value represents bin count not last index!
+#else
+			if (cell_index_min != 0xffffffff)
+			{
+#endif
+				//start from the cell index min
+				cell_index = cell_index_min;
+				//exit the loop as we have found a valid cell with message data
+				move_cell = false;
+			}
+		}
+		else
+		{
+			//we have exhausted all the neighbouring cells so there are no more messages
+			return false;
+		}
+	}
+	
+	//get message data using texture fetch
+	xmachine_message_pedestrian_state temp_message;
+	temp_message._relative_cell = relative_cell;
+	temp_message._cell_index_max = cell_index_max;
+	temp_message._cell_index = cell_index;
+	temp_message._agent_grid_cell = agent_grid_cell;
+
+	//Using texture cache
+  temp_message.x = tex1Dfetch(tex_xmachine_message_pedestrian_state_x, cell_index + d_tex_xmachine_message_pedestrian_state_x_offset); temp_message.y = tex1Dfetch(tex_xmachine_message_pedestrian_state_y, cell_index + d_tex_xmachine_message_pedestrian_state_y_offset); temp_message.z = tex1Dfetch(tex_xmachine_message_pedestrian_state_z, cell_index + d_tex_xmachine_message_pedestrian_state_z_offset); temp_message.estado = tex1Dfetch(tex_xmachine_message_pedestrian_state_estado, cell_index + d_tex_xmachine_message_pedestrian_state_estado_offset); 
+
+	//load it into shared memory (no sync as no sharing between threads)
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_pedestrian_state));
+	xmachine_message_pedestrian_state* sm_message = ((xmachine_message_pedestrian_state*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	return true;
+}
+
+
+/*
+ * get first spatial partitioned pedestrian_state message (first batch load into shared memory)
+ */
+__device__ xmachine_message_pedestrian_state* get_first_pedestrian_state_message(xmachine_message_pedestrian_state_list* messages, xmachine_message_pedestrian_state_PBM* partition_matrix, float x, float y, float z){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+
+	// If there are no messages, do not load any messages
+	if(d_message_pedestrian_state_count == 0){
+		return nullptr;
+	}
+
+	glm::ivec3 relative_cell = glm::ivec3(-2, -1, -1);
+	int cell_index_max = 0;
+	int cell_index = 0;
+	glm::vec3 position = glm::vec3(x, y, z);
+	glm::ivec3 agent_grid_cell = message_pedestrian_state_grid_position(position);
+	
+	if (load_next_pedestrian_state_message(messages, partition_matrix, relative_cell, cell_index_max, agent_grid_cell, cell_index))
+	{
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_pedestrian_state));
+		return ((xmachine_message_pedestrian_state*)&message_share[message_index]);
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+/*
+ * get next spatial partitioned pedestrian_state message (either from SM or next batch load)
+ */
+__device__ xmachine_message_pedestrian_state* get_next_pedestrian_state_message(xmachine_message_pedestrian_state* message, xmachine_message_pedestrian_state_list* messages, xmachine_message_pedestrian_state_PBM* partition_matrix){
+	
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	// If there are no messages, do not load any messages
+	if(d_message_pedestrian_state_count == 0){
+		return nullptr;
+	}
+	
+	if (load_next_pedestrian_state_message(messages, partition_matrix, message->_relative_cell, message->_cell_index_max, message->_agent_grid_cell, message->_cell_index))
+	{
+		//get conflict free address of 
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_pedestrian_state));
+		return ((xmachine_message_pedestrian_state*)&message_share[message_index]);
+	}
+	else
+		return nullptr;
+	
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created navmap_cell message functions */
 
 
@@ -1211,7 +1613,64 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 /**
  *
  */
-__global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix, RNG_rand48* rand48){
+__global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* agents, xmachine_message_pedestrian_state_list* pedestrian_state_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_output_pedestrian_state Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+
+	//FLAME function call
+	int dead = !output_pedestrian_state(&agent, pedestrian_state_messages	);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_output_pedestrian_state Coalesced memory write (ignore arrays)
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -1242,7 +1701,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.tick = agents->tick[index];
 
 	//FLAME function call
-	int dead = !infect_pedestrians(&agent, pedestrian_location_messages, partition_matrix, rand48);
+	int dead = !infect_pedestrians(&agent, pedestrian_state_messages, partition_matrix, rand48);
 	
 
 	//continuous agent: set reallocation flag

@@ -96,16 +96,6 @@ xmachine_memory_agent_list* h_agents_default;      /**< Pointer to agent list (p
 xmachine_memory_agent_list* d_agents_default;      /**< Pointer to agent list (population) on the device*/
 int h_xmachine_memory_agent_default_count;   /**< Agent population size counter */ 
 
-/* agent state variables */
-xmachine_memory_agent_list* h_agents_portador;      /**< Pointer to agent list (population) on host*/
-xmachine_memory_agent_list* d_agents_portador;      /**< Pointer to agent list (population) on the device*/
-int h_xmachine_memory_agent_portador_count;   /**< Agent population size counter */ 
-
-/* agent state variables */
-xmachine_memory_agent_list* h_agents_enfermo;      /**< Pointer to agent list (population) on host*/
-xmachine_memory_agent_list* d_agents_enfermo;      /**< Pointer to agent list (population) on the device*/
-int h_xmachine_memory_agent_enfermo_count;   /**< Agent population size counter */ 
-
 /* navmap Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
 xmachine_memory_navmap_list* d_navmaps;      /**< Pointer to agent list (population) on the device*/
 xmachine_memory_navmap_list* d_navmaps_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
@@ -138,34 +128,6 @@ unsigned int h_agents_default_variable_animate_data_iteration;
 unsigned int h_agents_default_variable_animate_dir_data_iteration;
 unsigned int h_agents_default_variable_estado_data_iteration;
 unsigned int h_agents_default_variable_tick_data_iteration;
-unsigned int h_agents_portador_variable_x_data_iteration;
-unsigned int h_agents_portador_variable_y_data_iteration;
-unsigned int h_agents_portador_variable_velx_data_iteration;
-unsigned int h_agents_portador_variable_vely_data_iteration;
-unsigned int h_agents_portador_variable_steer_x_data_iteration;
-unsigned int h_agents_portador_variable_steer_y_data_iteration;
-unsigned int h_agents_portador_variable_height_data_iteration;
-unsigned int h_agents_portador_variable_exit_no_data_iteration;
-unsigned int h_agents_portador_variable_speed_data_iteration;
-unsigned int h_agents_portador_variable_lod_data_iteration;
-unsigned int h_agents_portador_variable_animate_data_iteration;
-unsigned int h_agents_portador_variable_animate_dir_data_iteration;
-unsigned int h_agents_portador_variable_estado_data_iteration;
-unsigned int h_agents_portador_variable_tick_data_iteration;
-unsigned int h_agents_enfermo_variable_x_data_iteration;
-unsigned int h_agents_enfermo_variable_y_data_iteration;
-unsigned int h_agents_enfermo_variable_velx_data_iteration;
-unsigned int h_agents_enfermo_variable_vely_data_iteration;
-unsigned int h_agents_enfermo_variable_steer_x_data_iteration;
-unsigned int h_agents_enfermo_variable_steer_y_data_iteration;
-unsigned int h_agents_enfermo_variable_height_data_iteration;
-unsigned int h_agents_enfermo_variable_exit_no_data_iteration;
-unsigned int h_agents_enfermo_variable_speed_data_iteration;
-unsigned int h_agents_enfermo_variable_lod_data_iteration;
-unsigned int h_agents_enfermo_variable_animate_data_iteration;
-unsigned int h_agents_enfermo_variable_animate_dir_data_iteration;
-unsigned int h_agents_enfermo_variable_estado_data_iteration;
-unsigned int h_agents_enfermo_variable_tick_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -212,6 +174,37 @@ int h_tex_xmachine_message_pedestrian_location_estado_offset;
 int h_tex_xmachine_message_pedestrian_location_pbm_start_offset;
 int h_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset;
 
+/* pedestrian_state Message variables */
+xmachine_message_pedestrian_state_list* h_pedestrian_states;         /**< Pointer to message list on host*/
+xmachine_message_pedestrian_state_list* d_pedestrian_states;         /**< Pointer to message list on device*/
+xmachine_message_pedestrian_state_list* d_pedestrian_states_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_pedestrian_state_count;         /**< message list counter*/
+int h_message_pedestrian_state_output_type;   /**< message output type (single or optional)*/
+/* Spatial Partitioning Variables*/
+#ifdef FAST_ATOMIC_SORTING
+	uint * d_xmachine_message_pedestrian_state_local_bin_index;	  /**< index offset within the assigned bin */
+	uint * d_xmachine_message_pedestrian_state_unsorted_index;		/**< unsorted index (hash) value for message */
+    // Values for CUB exclusive scan of spatially partitioned variables
+    void * d_temp_scan_storage_xmachine_message_pedestrian_state;
+    size_t temp_scan_bytes_xmachine_message_pedestrian_state;
+#else
+	uint * d_xmachine_message_pedestrian_state_keys;	  /**< message sort identifier keys*/
+	uint * d_xmachine_message_pedestrian_state_values;  /**< message sort identifier values */
+#endif
+xmachine_message_pedestrian_state_PBM * d_pedestrian_state_partition_matrix;  /**< Pointer to PCB matrix */
+glm::vec3 h_message_pedestrian_state_min_bounds;           /**< min bounds (x,y,z) of partitioning environment */
+glm::vec3 h_message_pedestrian_state_max_bounds;           /**< max bounds (x,y,z) of partitioning environment */
+glm::ivec3 h_message_pedestrian_state_partitionDim;           /**< partition dimensions (x,y,z) of partitioning environment */
+float h_message_pedestrian_state_radius;                 /**< partition radius (used to determin the size of the partitions) */
+/* Texture offset values for host */
+int h_tex_xmachine_message_pedestrian_state_x_offset;
+int h_tex_xmachine_message_pedestrian_state_y_offset;
+int h_tex_xmachine_message_pedestrian_state_z_offset;
+int h_tex_xmachine_message_pedestrian_state_estado_offset;
+int h_tex_xmachine_message_pedestrian_state_pbm_start_offset;
+int h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset;
+
 /* navmap_cell Message variables */
 xmachine_message_navmap_cell_list* h_navmap_cells;         /**< Pointer to message list on host*/
 xmachine_message_navmap_cell_list* d_navmap_cells;         /**< Pointer to message list on device*/
@@ -230,6 +223,7 @@ int h_tex_xmachine_message_navmap_cell_collision_y_offset;
 /* CUDA Streams for function layers */
 cudaStream_t stream1;
 cudaStream_t stream2;
+cudaStream_t stream3;
 
 /* Device memory and sizes for CUB values */
 
@@ -271,6 +265,11 @@ void agent_output_pedestrian_location(cudaStream_t &stream);
  * Agent function prototype for avoid_pedestrians function of agent agent
  */
 void agent_avoid_pedestrians(cudaStream_t &stream);
+
+/** agent_output_pedestrian_state
+ * Agent function prototype for output_pedestrian_state function of agent agent
+ */
+void agent_output_pedestrian_state(cudaStream_t &stream);
 
 /** agent_infect_pedestrians
  * Agent function prototype for infect_pedestrians function of agent agent
@@ -398,34 +397,6 @@ void initialise(char * inputfile){
     h_agents_default_variable_animate_dir_data_iteration = 0;
     h_agents_default_variable_estado_data_iteration = 0;
     h_agents_default_variable_tick_data_iteration = 0;
-    h_agents_portador_variable_x_data_iteration = 0;
-    h_agents_portador_variable_y_data_iteration = 0;
-    h_agents_portador_variable_velx_data_iteration = 0;
-    h_agents_portador_variable_vely_data_iteration = 0;
-    h_agents_portador_variable_steer_x_data_iteration = 0;
-    h_agents_portador_variable_steer_y_data_iteration = 0;
-    h_agents_portador_variable_height_data_iteration = 0;
-    h_agents_portador_variable_exit_no_data_iteration = 0;
-    h_agents_portador_variable_speed_data_iteration = 0;
-    h_agents_portador_variable_lod_data_iteration = 0;
-    h_agents_portador_variable_animate_data_iteration = 0;
-    h_agents_portador_variable_animate_dir_data_iteration = 0;
-    h_agents_portador_variable_estado_data_iteration = 0;
-    h_agents_portador_variable_tick_data_iteration = 0;
-    h_agents_enfermo_variable_x_data_iteration = 0;
-    h_agents_enfermo_variable_y_data_iteration = 0;
-    h_agents_enfermo_variable_velx_data_iteration = 0;
-    h_agents_enfermo_variable_vely_data_iteration = 0;
-    h_agents_enfermo_variable_steer_x_data_iteration = 0;
-    h_agents_enfermo_variable_steer_y_data_iteration = 0;
-    h_agents_enfermo_variable_height_data_iteration = 0;
-    h_agents_enfermo_variable_exit_no_data_iteration = 0;
-    h_agents_enfermo_variable_speed_data_iteration = 0;
-    h_agents_enfermo_variable_lod_data_iteration = 0;
-    h_agents_enfermo_variable_animate_data_iteration = 0;
-    h_agents_enfermo_variable_animate_dir_data_iteration = 0;
-    h_agents_enfermo_variable_estado_data_iteration = 0;
-    h_agents_enfermo_variable_tick_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -446,14 +417,14 @@ void initialise(char * inputfile){
 	/* Agent memory allocation (CPU) */
 	int xmachine_agent_SoA_size = sizeof(xmachine_memory_agent_list);
 	h_agents_default = (xmachine_memory_agent_list*)malloc(xmachine_agent_SoA_size);
-	h_agents_portador = (xmachine_memory_agent_list*)malloc(xmachine_agent_SoA_size);
-	h_agents_enfermo = (xmachine_memory_agent_list*)malloc(xmachine_agent_SoA_size);
 	int xmachine_navmap_SoA_size = sizeof(xmachine_memory_navmap_list);
 	h_navmaps_static = (xmachine_memory_navmap_list*)malloc(xmachine_navmap_SoA_size);
 
 	/* Message memory allocation (CPU) */
 	int message_pedestrian_location_SoA_size = sizeof(xmachine_message_pedestrian_location_list);
 	h_pedestrian_locations = (xmachine_message_pedestrian_location_list*)malloc(message_pedestrian_location_SoA_size);
+	int message_pedestrian_state_SoA_size = sizeof(xmachine_message_pedestrian_state_list);
+	h_pedestrian_states = (xmachine_message_pedestrian_state_list*)malloc(message_pedestrian_state_SoA_size);
 	int message_navmap_cell_SoA_size = sizeof(xmachine_message_navmap_cell_list);
 	h_navmap_cells = (xmachine_message_navmap_cell_list*)malloc(message_navmap_cell_SoA_size);
 
@@ -476,6 +447,19 @@ void initialise(char * inputfile){
 	h_message_pedestrian_location_partitionDim.y = (int)ceil((h_message_pedestrian_location_max_bounds.y - h_message_pedestrian_location_min_bounds.y)/h_message_pedestrian_location_radius);
 	h_message_pedestrian_location_partitionDim.z = (int)ceil((h_message_pedestrian_location_max_bounds.z - h_message_pedestrian_location_min_bounds.z)/h_message_pedestrian_location_radius);
 	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_location_partitionDim, &h_message_pedestrian_location_partitionDim, sizeof(glm::ivec3)));	
+	
+			
+	/* Set spatial partitioning pedestrian_state message variables (min_bounds, max_bounds)*/
+	h_message_pedestrian_state_radius = (float)0.015625;
+	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_state_radius, &h_message_pedestrian_state_radius, sizeof(float)));	
+	    h_message_pedestrian_state_min_bounds = glm::vec3((float)-1.0, (float)-1.0, (float)0.0);
+	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_state_min_bounds, &h_message_pedestrian_state_min_bounds, sizeof(glm::vec3)));	
+	h_message_pedestrian_state_max_bounds = glm::vec3((float)1.0, (float)1.0, (float)0.015625);
+	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_state_max_bounds, &h_message_pedestrian_state_max_bounds, sizeof(glm::vec3)));	
+	h_message_pedestrian_state_partitionDim.x = (int)ceil((h_message_pedestrian_state_max_bounds.x - h_message_pedestrian_state_min_bounds.x)/h_message_pedestrian_state_radius);
+	h_message_pedestrian_state_partitionDim.y = (int)ceil((h_message_pedestrian_state_max_bounds.y - h_message_pedestrian_state_min_bounds.y)/h_message_pedestrian_state_radius);
+	h_message_pedestrian_state_partitionDim.z = (int)ceil((h_message_pedestrian_state_max_bounds.z - h_message_pedestrian_state_min_bounds.z)/h_message_pedestrian_state_radius);
+	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_state_partitionDim, &h_message_pedestrian_state_partitionDim, sizeof(glm::ivec3)));	
 	
 	
 	/* Set discrete navmap_cell message variables (range, width)*/
@@ -516,14 +500,6 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_agents_default, xmachine_agent_SoA_size));
 	gpuErrchk( cudaMemcpy( d_agents_default, h_agents_default, xmachine_agent_SoA_size, cudaMemcpyHostToDevice));
     
-	/* portador memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_agents_portador, xmachine_agent_SoA_size));
-	gpuErrchk( cudaMemcpy( d_agents_portador, h_agents_portador, xmachine_agent_SoA_size, cudaMemcpyHostToDevice));
-    
-	/* enfermo memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_agents_enfermo, xmachine_agent_SoA_size));
-	gpuErrchk( cudaMemcpy( d_agents_enfermo, h_agents_enfermo, xmachine_agent_SoA_size, cudaMemcpyHostToDevice));
-    
 	/* navmap Agent memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_navmaps, xmachine_navmap_SoA_size));
 	gpuErrchk( cudaMalloc( (void**) &d_navmaps_swap, xmachine_navmap_SoA_size));
@@ -555,6 +531,30 @@ void initialise(char * inputfile){
 #else
 	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_location_keys, xmachine_message_pedestrian_location_MAX* sizeof(uint)));
 	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_location_values, xmachine_message_pedestrian_location_MAX* sizeof(uint)));
+#endif
+	
+	/* pedestrian_state Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_pedestrian_states, message_pedestrian_state_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_pedestrian_states_swap, message_pedestrian_state_SoA_size));
+	gpuErrchk( cudaMemcpy( d_pedestrian_states, h_pedestrian_states, message_pedestrian_state_SoA_size, cudaMemcpyHostToDevice));
+	gpuErrchk( cudaMalloc( (void**) &d_pedestrian_state_partition_matrix, sizeof(xmachine_message_pedestrian_state_PBM)));
+#ifdef FAST_ATOMIC_SORTING
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_state_local_bin_index, xmachine_message_pedestrian_state_MAX* sizeof(uint)));
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_state_unsorted_index, xmachine_message_pedestrian_state_MAX* sizeof(uint)));
+    /* Calculate and allocate CUB temporary memory for exclusive scans */
+    d_temp_scan_storage_xmachine_message_pedestrian_state = nullptr;
+    temp_scan_bytes_xmachine_message_pedestrian_state = 0;
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_xmachine_message_pedestrian_state, 
+        temp_scan_bytes_xmachine_message_pedestrian_state, 
+        (int*) nullptr, 
+        (int*) nullptr, 
+        xmachine_message_pedestrian_state_grid_size
+    );
+    gpuErrchk(cudaMalloc(&d_temp_scan_storage_xmachine_message_pedestrian_state, temp_scan_bytes_xmachine_message_pedestrian_state));
+#else
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_state_keys, xmachine_message_pedestrian_state_MAX* sizeof(uint)));
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_state_values, xmachine_message_pedestrian_state_MAX* sizeof(uint)));
 #endif
 	
 	/* navmap_cell Message memory allocation (GPU) */
@@ -644,15 +644,12 @@ void initialise(char * inputfile){
   
   gpuErrchk(cudaStreamCreate(&stream1));
   gpuErrchk(cudaStreamCreate(&stream2));
+  gpuErrchk(cudaStreamCreate(&stream3));
 
 #if defined(OUTPUT_POPULATION_PER_ITERATION) && OUTPUT_POPULATION_PER_ITERATION
 	// Print the agent population size of all agents in all states
 	
 		printf("Init agent_agent_default_count: %u\n",get_agent_agent_default_count());
-	
-		printf("Init agent_agent_portador_count: %u\n",get_agent_agent_portador_count());
-	
-		printf("Init agent_agent_enfermo_count: %u\n",get_agent_agent_enfermo_count());
 	
 		printf("Init agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
@@ -688,62 +685,6 @@ void sort_agents_default(void (*generate_key_value_pairs)(unsigned int* keys, un
 	d_agents_swap = d_agents_temp;	
 }
 
-void sort_agents_portador(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents))
-{
-	int blockSize;
-	int minGridSize;
-	int gridSize;
-
-	//generate sort keys
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_key_value_pairs, no_sm, h_xmachine_memory_agent_portador_count); 
-	gridSize = (h_xmachine_memory_agent_portador_count + blockSize - 1) / blockSize;    // Round up according to array size 
-	generate_key_value_pairs<<<gridSize, blockSize>>>(d_xmachine_memory_agent_keys, d_xmachine_memory_agent_values, d_agents_portador);
-	gpuErrchkLaunch();
-
-	//updated Thrust sort
-	thrust::sort_by_key( thrust::device_pointer_cast(d_xmachine_memory_agent_keys),  thrust::device_pointer_cast(d_xmachine_memory_agent_keys) + h_xmachine_memory_agent_portador_count,  thrust::device_pointer_cast(d_xmachine_memory_agent_values));
-	gpuErrchkLaunch();
-
-	//reorder agents
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_agent_agents, no_sm, h_xmachine_memory_agent_portador_count); 
-	gridSize = (h_xmachine_memory_agent_portador_count + blockSize - 1) / blockSize;    // Round up according to array size 
-	reorder_agent_agents<<<gridSize, blockSize>>>(d_xmachine_memory_agent_values, d_agents_portador, d_agents_swap);
-	gpuErrchkLaunch();
-
-	//swap
-	xmachine_memory_agent_list* d_agents_temp = d_agents_portador;
-	d_agents_portador = d_agents_swap;
-	d_agents_swap = d_agents_temp;	
-}
-
-void sort_agents_enfermo(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents))
-{
-	int blockSize;
-	int minGridSize;
-	int gridSize;
-
-	//generate sort keys
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_key_value_pairs, no_sm, h_xmachine_memory_agent_enfermo_count); 
-	gridSize = (h_xmachine_memory_agent_enfermo_count + blockSize - 1) / blockSize;    // Round up according to array size 
-	generate_key_value_pairs<<<gridSize, blockSize>>>(d_xmachine_memory_agent_keys, d_xmachine_memory_agent_values, d_agents_enfermo);
-	gpuErrchkLaunch();
-
-	//updated Thrust sort
-	thrust::sort_by_key( thrust::device_pointer_cast(d_xmachine_memory_agent_keys),  thrust::device_pointer_cast(d_xmachine_memory_agent_keys) + h_xmachine_memory_agent_enfermo_count,  thrust::device_pointer_cast(d_xmachine_memory_agent_values));
-	gpuErrchkLaunch();
-
-	//reorder agents
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_agent_agents, no_sm, h_xmachine_memory_agent_enfermo_count); 
-	gridSize = (h_xmachine_memory_agent_enfermo_count + blockSize - 1) / blockSize;    // Round up according to array size 
-	reorder_agent_agents<<<gridSize, blockSize>>>(d_xmachine_memory_agent_values, d_agents_enfermo, d_agents_swap);
-	gpuErrchkLaunch();
-
-	//swap
-	xmachine_memory_agent_list* d_agents_temp = d_agents_enfermo;
-	d_agents_enfermo = d_agents_swap;
-	d_agents_swap = d_agents_temp;	
-}
-
 
 void cleanup(){
     PROFILE_SCOPED_RANGE("cleanup");
@@ -760,12 +701,6 @@ void cleanup(){
 	
 	free( h_agents_default);
 	gpuErrchk(cudaFree(d_agents_default));
-	
-	free( h_agents_portador);
-	gpuErrchk(cudaFree(d_agents_portador));
-	
-	free( h_agents_enfermo);
-	gpuErrchk(cudaFree(d_agents_enfermo));
 	
 	/* navmap Agent variables */
 	gpuErrchk(cudaFree(d_navmaps));
@@ -792,6 +727,22 @@ void cleanup(){
 #else
 	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_location_keys));
 	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_location_values));
+#endif
+	
+	/* pedestrian_state Message variables */
+	free( h_pedestrian_states);
+	gpuErrchk(cudaFree(d_pedestrian_states));
+	gpuErrchk(cudaFree(d_pedestrian_states_swap));
+	gpuErrchk(cudaFree(d_pedestrian_state_partition_matrix));
+#ifdef FAST_ATOMIC_SORTING
+	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_state_local_bin_index));
+	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_state_unsorted_index));
+  gpuErrchk(cudaFree(d_temp_scan_storage_xmachine_message_pedestrian_state));
+  d_temp_scan_storage_xmachine_message_pedestrian_state = nullptr;
+  temp_scan_bytes_xmachine_message_pedestrian_state = 0;
+#else
+	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_state_keys));
+	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_state_values));
 #endif
 	
 	/* navmap_cell Message variables */
@@ -822,6 +773,7 @@ void cleanup(){
   
   gpuErrchk(cudaStreamDestroy(stream1));
   gpuErrchk(cudaStreamDestroy(stream2));
+  gpuErrchk(cudaStreamDestroy(stream3));
 
   /* CUDA Event Timers for Instrumentation */
 #if defined(INSTRUMENT_ITERATIONS) && INSTRUMENT_ITERATIONS
@@ -848,6 +800,10 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	h_message_pedestrian_location_count = 0;
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_location_count, &h_message_pedestrian_location_count, sizeof(int)));
+	
+	h_message_pedestrian_state_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_pedestrian_state_count, &h_message_pedestrian_state_count, sizeof(int)));
 	
 
 	/* Call agent functions in order iterating through the layer functions */
@@ -897,6 +853,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: navmap_output_navmap_cells = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_output_pedestrian_state");
+	agent_output_pedestrian_state(stream3);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_output_pedestrian_state = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -959,10 +929,6 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	// Print the agent population size of all agents in all states
 	
 		printf("agent_agent_default_count: %u\n",get_agent_agent_default_count());
-	
-		printf("agent_agent_portador_count: %u\n",get_agent_agent_portador_count());
-	
-		printf("agent_agent_enfermo_count: %u\n",get_agent_agent_enfermo_count());
 	
 		printf("agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
@@ -1464,34 +1430,6 @@ xmachine_memory_agent_list* get_device_agent_default_agents(){
 
 xmachine_memory_agent_list* get_host_agent_default_agents(){
 	return h_agents_default;
-}
-
-int get_agent_agent_portador_count(){
-	//continuous agent
-	return h_xmachine_memory_agent_portador_count;
-	
-}
-
-xmachine_memory_agent_list* get_device_agent_portador_agents(){
-	return d_agents_portador;
-}
-
-xmachine_memory_agent_list* get_host_agent_portador_agents(){
-	return h_agents_portador;
-}
-
-int get_agent_agent_enfermo_count(){
-	//continuous agent
-	return h_xmachine_memory_agent_enfermo_count;
-	
-}
-
-xmachine_memory_agent_list* get_device_agent_enfermo_agents(){
-	return d_agents_enfermo;
-}
-
-xmachine_memory_agent_list* get_host_agent_enfermo_agents(){
-	return h_agents_enfermo;
 }
 
     
@@ -2047,1070 +1985,6 @@ __host__ int get_agent_default_variable_tick(unsigned int index){
 
     } else {
         fprintf(stderr, "Warning: Attempting to access tick for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_x(unsigned int index)
- * Gets the value of the x variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ float get_agent_portador_variable_x(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->x,
-                    d_agents_portador->x,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access x for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_y(unsigned int index)
- * Gets the value of the y variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ float get_agent_portador_variable_y(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->y,
-                    d_agents_portador->y,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access y for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_velx(unsigned int index)
- * Gets the value of the velx variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable velx
- */
-__host__ float get_agent_portador_variable_velx(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_velx_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->velx,
-                    d_agents_portador->velx,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_velx_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->velx[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access velx for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_vely(unsigned int index)
- * Gets the value of the vely variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable vely
- */
-__host__ float get_agent_portador_variable_vely(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_vely_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->vely,
-                    d_agents_portador->vely,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_vely_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->vely[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access vely for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_steer_x(unsigned int index)
- * Gets the value of the steer_x variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_x
- */
-__host__ float get_agent_portador_variable_steer_x(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_steer_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->steer_x,
-                    d_agents_portador->steer_x,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_steer_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->steer_x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access steer_x for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_steer_y(unsigned int index)
- * Gets the value of the steer_y variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_y
- */
-__host__ float get_agent_portador_variable_steer_y(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_steer_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->steer_y,
-                    d_agents_portador->steer_y,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_steer_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->steer_y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access steer_y for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_height(unsigned int index)
- * Gets the value of the height variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable height
- */
-__host__ float get_agent_portador_variable_height(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_height_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->height,
-                    d_agents_portador->height,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_height_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->height[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access height for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_portador_variable_exit_no(unsigned int index)
- * Gets the value of the exit_no variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit_no
- */
-__host__ int get_agent_portador_variable_exit_no(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_exit_no_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->exit_no,
-                    d_agents_portador->exit_no,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_exit_no_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->exit_no[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access exit_no for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_speed(unsigned int index)
- * Gets the value of the speed variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable speed
- */
-__host__ float get_agent_portador_variable_speed(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_speed_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->speed,
-                    d_agents_portador->speed,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_speed_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->speed[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access speed for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_portador_variable_lod(unsigned int index)
- * Gets the value of the lod variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable lod
- */
-__host__ int get_agent_portador_variable_lod(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_lod_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->lod,
-                    d_agents_portador->lod,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_lod_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->lod[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access lod for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_portador_variable_animate(unsigned int index)
- * Gets the value of the animate variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate
- */
-__host__ float get_agent_portador_variable_animate(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_animate_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->animate,
-                    d_agents_portador->animate,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_animate_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->animate[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access animate for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_portador_variable_animate_dir(unsigned int index)
- * Gets the value of the animate_dir variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate_dir
- */
-__host__ int get_agent_portador_variable_animate_dir(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_animate_dir_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->animate_dir,
-                    d_agents_portador->animate_dir,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_animate_dir_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->animate_dir[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access animate_dir for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_portador_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_agent_portador_variable_estado(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_estado_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->estado,
-                    d_agents_portador->estado,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_estado_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->estado[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access estado for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_portador_variable_tick(unsigned int index)
- * Gets the value of the tick variable of an agent agent in the portador state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable tick
- */
-__host__ int get_agent_portador_variable_tick(unsigned int index){
-    unsigned int count = get_agent_agent_portador_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_portador_variable_tick_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_portador->tick,
-                    d_agents_portador->tick,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_portador_variable_tick_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_portador->tick[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of agent_portador. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_x(unsigned int index)
- * Gets the value of the x variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ float get_agent_enfermo_variable_x(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->x,
-                    d_agents_enfermo->x,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access x for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_y(unsigned int index)
- * Gets the value of the y variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ float get_agent_enfermo_variable_y(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->y,
-                    d_agents_enfermo->y,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access y for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_velx(unsigned int index)
- * Gets the value of the velx variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable velx
- */
-__host__ float get_agent_enfermo_variable_velx(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_velx_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->velx,
-                    d_agents_enfermo->velx,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_velx_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->velx[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access velx for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_vely(unsigned int index)
- * Gets the value of the vely variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable vely
- */
-__host__ float get_agent_enfermo_variable_vely(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_vely_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->vely,
-                    d_agents_enfermo->vely,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_vely_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->vely[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access vely for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_steer_x(unsigned int index)
- * Gets the value of the steer_x variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_x
- */
-__host__ float get_agent_enfermo_variable_steer_x(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_steer_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->steer_x,
-                    d_agents_enfermo->steer_x,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_steer_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->steer_x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access steer_x for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_steer_y(unsigned int index)
- * Gets the value of the steer_y variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable steer_y
- */
-__host__ float get_agent_enfermo_variable_steer_y(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_steer_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->steer_y,
-                    d_agents_enfermo->steer_y,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_steer_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->steer_y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access steer_y for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_height(unsigned int index)
- * Gets the value of the height variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable height
- */
-__host__ float get_agent_enfermo_variable_height(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_height_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->height,
-                    d_agents_enfermo->height,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_height_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->height[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access height for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_enfermo_variable_exit_no(unsigned int index)
- * Gets the value of the exit_no variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable exit_no
- */
-__host__ int get_agent_enfermo_variable_exit_no(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_exit_no_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->exit_no,
-                    d_agents_enfermo->exit_no,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_exit_no_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->exit_no[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access exit_no for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_speed(unsigned int index)
- * Gets the value of the speed variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable speed
- */
-__host__ float get_agent_enfermo_variable_speed(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_speed_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->speed,
-                    d_agents_enfermo->speed,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_speed_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->speed[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access speed for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_enfermo_variable_lod(unsigned int index)
- * Gets the value of the lod variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable lod
- */
-__host__ int get_agent_enfermo_variable_lod(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_lod_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->lod,
-                    d_agents_enfermo->lod,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_lod_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->lod[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access lod for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** float get_agent_enfermo_variable_animate(unsigned int index)
- * Gets the value of the animate variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate
- */
-__host__ float get_agent_enfermo_variable_animate(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_animate_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->animate,
-                    d_agents_enfermo->animate,
-                    count * sizeof(float),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_animate_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->animate[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access animate for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_enfermo_variable_animate_dir(unsigned int index)
- * Gets the value of the animate_dir variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable animate_dir
- */
-__host__ int get_agent_enfermo_variable_animate_dir(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_animate_dir_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->animate_dir,
-                    d_agents_enfermo->animate_dir,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_animate_dir_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->animate_dir[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access animate_dir for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_enfermo_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_agent_enfermo_variable_estado(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_estado_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->estado,
-                    d_agents_enfermo->estado,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_estado_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->estado[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access estado for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_enfermo_variable_tick(unsigned int index)
- * Gets the value of the tick variable of an agent agent in the enfermo state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable tick
- */
-__host__ int get_agent_enfermo_variable_tick(unsigned int index){
-    unsigned int count = get_agent_agent_enfermo_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agents_enfermo_variable_tick_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agents_enfermo->tick,
-                    d_agents_enfermo->tick,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agents_enfermo_variable_tick_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agents_enfermo->tick[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of agent_enfermo. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -3777,186 +2651,6 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
 }
 
 
-void h_add_agent_agent_portador(xmachine_memory_agent* agent){
-	if (h_xmachine_memory_agent_count + 1 > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of agent agents in state portador will be exceeded by h_add_agent_agent_portador\n");
-		exit(EXIT_FAILURE);
-	}	
-
-	int blockSize;
-	int minGridSize;
-	int gridSize;
-	unsigned int count = 1;
-	
-	// Copy data from host struct to device SoA for target state
-	copy_single_xmachine_memory_agent_hostToDevice(d_agents_new, agent);
-
-	// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_agent_Agents, no_sm, count);
-	gridSize = (count + blockSize - 1) / blockSize;
-	append_agent_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_agents_portador, d_agents_new, h_xmachine_memory_agent_portador_count, count);
-	gpuErrchkLaunch();
-	// Update the number of agents in this state.
-	h_xmachine_memory_agent_portador_count += count;
-	gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_agent_portador_count, &h_xmachine_memory_agent_portador_count, sizeof(int)));
-	cudaDeviceSynchronize();
-
-    // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
-    h_agents_portador_variable_x_data_iteration = 0;
-    h_agents_portador_variable_y_data_iteration = 0;
-    h_agents_portador_variable_velx_data_iteration = 0;
-    h_agents_portador_variable_vely_data_iteration = 0;
-    h_agents_portador_variable_steer_x_data_iteration = 0;
-    h_agents_portador_variable_steer_y_data_iteration = 0;
-    h_agents_portador_variable_height_data_iteration = 0;
-    h_agents_portador_variable_exit_no_data_iteration = 0;
-    h_agents_portador_variable_speed_data_iteration = 0;
-    h_agents_portador_variable_lod_data_iteration = 0;
-    h_agents_portador_variable_animate_data_iteration = 0;
-    h_agents_portador_variable_animate_dir_data_iteration = 0;
-    h_agents_portador_variable_estado_data_iteration = 0;
-    h_agents_portador_variable_tick_data_iteration = 0;
-    
-
-}
-void h_add_agents_agent_portador(xmachine_memory_agent** agents, unsigned int count){
-	if(count > 0){
-		int blockSize;
-		int minGridSize;
-		int gridSize;
-
-		if (h_xmachine_memory_agent_count + count > xmachine_memory_agent_MAX){
-			printf("Error: Buffer size of agent agents in state portador will be exceeded by h_add_agents_agent_portador\n");
-			exit(EXIT_FAILURE);
-		}
-
-		// Unpack data from AoS into the pre-existing SoA
-		h_unpack_agents_agent_AoS_to_SoA(h_agents_portador, agents, count);
-
-		// Copy data from the host SoA to the device SoA for the target state
-		copy_partial_xmachine_memory_agent_hostToDevice(d_agents_new, h_agents_portador, count);
-
-		// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
-		cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_agent_Agents, no_sm, count);
-		gridSize = (count + blockSize - 1) / blockSize;
-		append_agent_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_agents_portador, d_agents_new, h_xmachine_memory_agent_portador_count, count);
-		gpuErrchkLaunch();
-		// Update the number of agents in this state.
-		h_xmachine_memory_agent_portador_count += count;
-		gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_agent_portador_count, &h_xmachine_memory_agent_portador_count, sizeof(int)));
-		cudaDeviceSynchronize();
-
-        // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
-        h_agents_portador_variable_x_data_iteration = 0;
-        h_agents_portador_variable_y_data_iteration = 0;
-        h_agents_portador_variable_velx_data_iteration = 0;
-        h_agents_portador_variable_vely_data_iteration = 0;
-        h_agents_portador_variable_steer_x_data_iteration = 0;
-        h_agents_portador_variable_steer_y_data_iteration = 0;
-        h_agents_portador_variable_height_data_iteration = 0;
-        h_agents_portador_variable_exit_no_data_iteration = 0;
-        h_agents_portador_variable_speed_data_iteration = 0;
-        h_agents_portador_variable_lod_data_iteration = 0;
-        h_agents_portador_variable_animate_data_iteration = 0;
-        h_agents_portador_variable_animate_dir_data_iteration = 0;
-        h_agents_portador_variable_estado_data_iteration = 0;
-        h_agents_portador_variable_tick_data_iteration = 0;
-        
-
-	}
-}
-
-
-void h_add_agent_agent_enfermo(xmachine_memory_agent* agent){
-	if (h_xmachine_memory_agent_count + 1 > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of agent agents in state enfermo will be exceeded by h_add_agent_agent_enfermo\n");
-		exit(EXIT_FAILURE);
-	}	
-
-	int blockSize;
-	int minGridSize;
-	int gridSize;
-	unsigned int count = 1;
-	
-	// Copy data from host struct to device SoA for target state
-	copy_single_xmachine_memory_agent_hostToDevice(d_agents_new, agent);
-
-	// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_agent_Agents, no_sm, count);
-	gridSize = (count + blockSize - 1) / blockSize;
-	append_agent_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_agents_enfermo, d_agents_new, h_xmachine_memory_agent_enfermo_count, count);
-	gpuErrchkLaunch();
-	// Update the number of agents in this state.
-	h_xmachine_memory_agent_enfermo_count += count;
-	gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_agent_enfermo_count, &h_xmachine_memory_agent_enfermo_count, sizeof(int)));
-	cudaDeviceSynchronize();
-
-    // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
-    h_agents_enfermo_variable_x_data_iteration = 0;
-    h_agents_enfermo_variable_y_data_iteration = 0;
-    h_agents_enfermo_variable_velx_data_iteration = 0;
-    h_agents_enfermo_variable_vely_data_iteration = 0;
-    h_agents_enfermo_variable_steer_x_data_iteration = 0;
-    h_agents_enfermo_variable_steer_y_data_iteration = 0;
-    h_agents_enfermo_variable_height_data_iteration = 0;
-    h_agents_enfermo_variable_exit_no_data_iteration = 0;
-    h_agents_enfermo_variable_speed_data_iteration = 0;
-    h_agents_enfermo_variable_lod_data_iteration = 0;
-    h_agents_enfermo_variable_animate_data_iteration = 0;
-    h_agents_enfermo_variable_animate_dir_data_iteration = 0;
-    h_agents_enfermo_variable_estado_data_iteration = 0;
-    h_agents_enfermo_variable_tick_data_iteration = 0;
-    
-
-}
-void h_add_agents_agent_enfermo(xmachine_memory_agent** agents, unsigned int count){
-	if(count > 0){
-		int blockSize;
-		int minGridSize;
-		int gridSize;
-
-		if (h_xmachine_memory_agent_count + count > xmachine_memory_agent_MAX){
-			printf("Error: Buffer size of agent agents in state enfermo will be exceeded by h_add_agents_agent_enfermo\n");
-			exit(EXIT_FAILURE);
-		}
-
-		// Unpack data from AoS into the pre-existing SoA
-		h_unpack_agents_agent_AoS_to_SoA(h_agents_enfermo, agents, count);
-
-		// Copy data from the host SoA to the device SoA for the target state
-		copy_partial_xmachine_memory_agent_hostToDevice(d_agents_new, h_agents_enfermo, count);
-
-		// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
-		cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_agent_Agents, no_sm, count);
-		gridSize = (count + blockSize - 1) / blockSize;
-		append_agent_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_agents_enfermo, d_agents_new, h_xmachine_memory_agent_enfermo_count, count);
-		gpuErrchkLaunch();
-		// Update the number of agents in this state.
-		h_xmachine_memory_agent_enfermo_count += count;
-		gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_agent_enfermo_count, &h_xmachine_memory_agent_enfermo_count, sizeof(int)));
-		cudaDeviceSynchronize();
-
-        // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
-        h_agents_enfermo_variable_x_data_iteration = 0;
-        h_agents_enfermo_variable_y_data_iteration = 0;
-        h_agents_enfermo_variable_velx_data_iteration = 0;
-        h_agents_enfermo_variable_vely_data_iteration = 0;
-        h_agents_enfermo_variable_steer_x_data_iteration = 0;
-        h_agents_enfermo_variable_steer_y_data_iteration = 0;
-        h_agents_enfermo_variable_height_data_iteration = 0;
-        h_agents_enfermo_variable_exit_no_data_iteration = 0;
-        h_agents_enfermo_variable_speed_data_iteration = 0;
-        h_agents_enfermo_variable_lod_data_iteration = 0;
-        h_agents_enfermo_variable_animate_data_iteration = 0;
-        h_agents_enfermo_variable_animate_dir_data_iteration = 0;
-        h_agents_enfermo_variable_estado_data_iteration = 0;
-        h_agents_enfermo_variable_tick_data_iteration = 0;
-        
-
-	}
-}
-
-
 /*  Analytics Functions */
 
 float reduce_agent_default_x_variable(){
@@ -4215,522 +2909,6 @@ int max_agent_default_tick_variable(){
     //max in default stream
     thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->tick);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->x),  thrust::device_pointer_cast(d_agents_portador->x) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_x_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_x_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->y),  thrust::device_pointer_cast(d_agents_portador->y) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_y_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_y_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_velx_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->velx),  thrust::device_pointer_cast(d_agents_portador->velx) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_velx_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->velx);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_velx_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->velx);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_vely_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->vely),  thrust::device_pointer_cast(d_agents_portador->vely) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_vely_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->vely);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_vely_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->vely);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_steer_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->steer_x),  thrust::device_pointer_cast(d_agents_portador->steer_x) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_steer_x_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->steer_x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_steer_x_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->steer_x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_steer_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->steer_y),  thrust::device_pointer_cast(d_agents_portador->steer_y) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_steer_y_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->steer_y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_steer_y_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->steer_y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_height_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->height),  thrust::device_pointer_cast(d_agents_portador->height) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_height_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->height);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_height_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->height);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_portador_exit_no_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->exit_no),  thrust::device_pointer_cast(d_agents_portador->exit_no) + h_xmachine_memory_agent_portador_count);
-}
-
-int count_agent_portador_exit_no_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_portador->exit_no),  thrust::device_pointer_cast(d_agents_portador->exit_no) + h_xmachine_memory_agent_portador_count, count_value);
-}
-int min_agent_portador_exit_no_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->exit_no);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_portador_exit_no_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->exit_no);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_speed_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->speed),  thrust::device_pointer_cast(d_agents_portador->speed) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_speed_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->speed);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_speed_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->speed);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_portador_lod_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->lod),  thrust::device_pointer_cast(d_agents_portador->lod) + h_xmachine_memory_agent_portador_count);
-}
-
-int count_agent_portador_lod_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_portador->lod),  thrust::device_pointer_cast(d_agents_portador->lod) + h_xmachine_memory_agent_portador_count, count_value);
-}
-int min_agent_portador_lod_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->lod);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_portador_lod_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->lod);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_portador_animate_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->animate),  thrust::device_pointer_cast(d_agents_portador->animate) + h_xmachine_memory_agent_portador_count);
-}
-
-float min_agent_portador_animate_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->animate);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_portador_animate_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->animate);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_portador_animate_dir_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->animate_dir),  thrust::device_pointer_cast(d_agents_portador->animate_dir) + h_xmachine_memory_agent_portador_count);
-}
-
-int count_agent_portador_animate_dir_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_portador->animate_dir),  thrust::device_pointer_cast(d_agents_portador->animate_dir) + h_xmachine_memory_agent_portador_count, count_value);
-}
-int min_agent_portador_animate_dir_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->animate_dir);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_portador_animate_dir_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->animate_dir);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_portador_estado_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->estado),  thrust::device_pointer_cast(d_agents_portador->estado) + h_xmachine_memory_agent_portador_count);
-}
-
-int count_agent_portador_estado_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_portador->estado),  thrust::device_pointer_cast(d_agents_portador->estado) + h_xmachine_memory_agent_portador_count, count_value);
-}
-int min_agent_portador_estado_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->estado);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_portador_estado_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->estado);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_portador_tick_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_portador->tick),  thrust::device_pointer_cast(d_agents_portador->tick) + h_xmachine_memory_agent_portador_count);
-}
-
-int count_agent_portador_tick_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_portador->tick),  thrust::device_pointer_cast(d_agents_portador->tick) + h_xmachine_memory_agent_portador_count, count_value);
-}
-int min_agent_portador_tick_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->tick);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_portador_tick_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_portador->tick);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_portador_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->x),  thrust::device_pointer_cast(d_agents_enfermo->x) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_x_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_x_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->y),  thrust::device_pointer_cast(d_agents_enfermo->y) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_y_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_y_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_velx_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->velx),  thrust::device_pointer_cast(d_agents_enfermo->velx) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_velx_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->velx);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_velx_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->velx);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_vely_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->vely),  thrust::device_pointer_cast(d_agents_enfermo->vely) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_vely_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->vely);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_vely_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->vely);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_steer_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->steer_x),  thrust::device_pointer_cast(d_agents_enfermo->steer_x) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_steer_x_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->steer_x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_steer_x_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->steer_x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_steer_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->steer_y),  thrust::device_pointer_cast(d_agents_enfermo->steer_y) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_steer_y_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->steer_y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_steer_y_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->steer_y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_height_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->height),  thrust::device_pointer_cast(d_agents_enfermo->height) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_height_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->height);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_height_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->height);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_enfermo_exit_no_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->exit_no),  thrust::device_pointer_cast(d_agents_enfermo->exit_no) + h_xmachine_memory_agent_enfermo_count);
-}
-
-int count_agent_enfermo_exit_no_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_enfermo->exit_no),  thrust::device_pointer_cast(d_agents_enfermo->exit_no) + h_xmachine_memory_agent_enfermo_count, count_value);
-}
-int min_agent_enfermo_exit_no_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->exit_no);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_enfermo_exit_no_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->exit_no);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_speed_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->speed),  thrust::device_pointer_cast(d_agents_enfermo->speed) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_speed_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->speed);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_speed_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->speed);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_enfermo_lod_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->lod),  thrust::device_pointer_cast(d_agents_enfermo->lod) + h_xmachine_memory_agent_enfermo_count);
-}
-
-int count_agent_enfermo_lod_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_enfermo->lod),  thrust::device_pointer_cast(d_agents_enfermo->lod) + h_xmachine_memory_agent_enfermo_count, count_value);
-}
-int min_agent_enfermo_lod_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->lod);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_enfermo_lod_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->lod);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float reduce_agent_enfermo_animate_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->animate),  thrust::device_pointer_cast(d_agents_enfermo->animate) + h_xmachine_memory_agent_enfermo_count);
-}
-
-float min_agent_enfermo_animate_variable(){
-    //min in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->animate);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-float max_agent_enfermo_animate_variable(){
-    //max in default stream
-    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->animate);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_enfermo_animate_dir_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->animate_dir),  thrust::device_pointer_cast(d_agents_enfermo->animate_dir) + h_xmachine_memory_agent_enfermo_count);
-}
-
-int count_agent_enfermo_animate_dir_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_enfermo->animate_dir),  thrust::device_pointer_cast(d_agents_enfermo->animate_dir) + h_xmachine_memory_agent_enfermo_count, count_value);
-}
-int min_agent_enfermo_animate_dir_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->animate_dir);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_enfermo_animate_dir_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->animate_dir);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_enfermo_estado_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->estado),  thrust::device_pointer_cast(d_agents_enfermo->estado) + h_xmachine_memory_agent_enfermo_count);
-}
-
-int count_agent_enfermo_estado_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_enfermo->estado),  thrust::device_pointer_cast(d_agents_enfermo->estado) + h_xmachine_memory_agent_enfermo_count, count_value);
-}
-int min_agent_enfermo_estado_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->estado);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_enfermo_estado_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->estado);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_enfermo_tick_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agents_enfermo->tick),  thrust::device_pointer_cast(d_agents_enfermo->tick) + h_xmachine_memory_agent_enfermo_count);
-}
-
-int count_agent_enfermo_tick_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agents_enfermo->tick),  thrust::device_pointer_cast(d_agents_enfermo->tick) + h_xmachine_memory_agent_enfermo_count, count_value);
-}
-int min_agent_enfermo_tick_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->tick);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_enfermo_tick_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_enfermo->tick);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_enfermo_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
 int reduce_navmap_static_x_variable(){
@@ -5253,11 +3431,177 @@ void agent_avoid_pedestrians(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
+int agent_output_pedestrian_state_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** agent_output_pedestrian_state
+ * Agent function prototype for output_pedestrian_state function of agent agent
+ */
+void agent_output_pedestrian_state(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_agent_list* agents_default_temp = d_agents;
+	d_agents = d_agents_default;
+	d_agents_default = agents_default_temp;
+	//set working count to current state count
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_agent_default_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_pedestrian_state_count + h_xmachine_memory_agent_count > xmachine_message_pedestrian_state_MAX){
+		printf("Error: Buffer size of pedestrian_state message will be exceeded in function output_pedestrian_state\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_output_pedestrian_state, agent_output_pedestrian_state_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_output_pedestrian_state_sm_size(blockSize);
+	
+	
+	
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_pedestrian_state_output_type = single_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_pedestrian_state_output_type, &h_message_pedestrian_state_output_type, sizeof(int)));
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (output_pedestrian_state)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : pedestrian_state
+	//Agent Output : 
+	GPUFLAME_output_pedestrian_state<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_states);
+	gpuErrchkLaunch();
+	
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	h_message_pedestrian_state_count += h_xmachine_memory_agent_count;
+	//Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_pedestrian_state_count, &h_message_pedestrian_state_count, sizeof(int)));	
+	
+	//reset partition matrix
+	gpuErrchk( cudaMemset( (void*) d_pedestrian_state_partition_matrix, 0, sizeof(xmachine_message_pedestrian_state_PBM)));
+    //PR Bug fix: Second fix. This should prevent future problems when multiple agents write the same message as now the message structure is completely rebuilt after an output.
+    if (h_message_pedestrian_state_count > 0){
+#ifdef FAST_ATOMIC_SORTING
+      //USE ATOMICS TO BUILD PARTITION BOUNDARY
+	  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, hist_pedestrian_state_messages, no_sm, h_message_pedestrian_state_count); 
+	  gridSize = (h_message_pedestrian_state_count + blockSize - 1) / blockSize;
+	  hist_pedestrian_state_messages<<<gridSize, blockSize, 0, stream>>>(d_xmachine_message_pedestrian_state_local_bin_index, d_xmachine_message_pedestrian_state_unsorted_index, d_pedestrian_state_partition_matrix->end_or_count, d_pedestrian_states, h_message_pedestrian_state_count);
+	  gpuErrchkLaunch();
+	
+      // Scan
+      cub::DeviceScan::ExclusiveSum(
+          d_temp_scan_storage_xmachine_message_pedestrian_state, 
+          temp_scan_bytes_xmachine_message_pedestrian_state, 
+          d_pedestrian_state_partition_matrix->end_or_count,
+          d_pedestrian_state_partition_matrix->start,
+          xmachine_message_pedestrian_state_grid_size, 
+          stream
+      );
+	
+	  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_pedestrian_state_messages, no_sm, h_message_pedestrian_state_count); 
+	  gridSize = (h_message_pedestrian_state_count + blockSize - 1) / blockSize; 	// Round up according to array size 
+	  reorder_pedestrian_state_messages <<<gridSize, blockSize, 0, stream>>>(d_xmachine_message_pedestrian_state_local_bin_index, d_xmachine_message_pedestrian_state_unsorted_index, d_pedestrian_state_partition_matrix->start, d_pedestrian_states, d_pedestrian_states_swap, h_message_pedestrian_state_count);
+	  gpuErrchkLaunch();
+#else
+	  //HASH, SORT, REORDER AND BUILD PMB FOR SPATIAL PARTITIONING MESSAGE OUTPUTS
+	  //Get message hash values for sorting
+	  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, hash_pedestrian_state_messages, no_sm, h_message_pedestrian_state_count); 
+	  gridSize = (h_message_pedestrian_state_count + blockSize - 1) / blockSize;
+	  hash_pedestrian_state_messages<<<gridSize, blockSize, 0, stream>>>(d_xmachine_message_pedestrian_state_keys, d_xmachine_message_pedestrian_state_values, d_pedestrian_states);
+	  gpuErrchkLaunch();
+	  //Sort
+	  thrust::sort_by_key(thrust::cuda::par.on(stream), thrust::device_pointer_cast(d_xmachine_message_pedestrian_state_keys),  thrust::device_pointer_cast(d_xmachine_message_pedestrian_state_keys) + h_message_pedestrian_state_count,  thrust::device_pointer_cast(d_xmachine_message_pedestrian_state_values));
+	  gpuErrchkLaunch();
+	  //reorder and build pcb
+	  gpuErrchk(cudaMemset(d_pedestrian_state_partition_matrix->start, 0xffffffff, xmachine_message_pedestrian_state_grid_size* sizeof(int)));
+	  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_pedestrian_state_messages, reorder_messages_sm_size, h_message_pedestrian_state_count); 
+	  gridSize = (h_message_pedestrian_state_count + blockSize - 1) / blockSize;
+	  int reorder_sm_size = reorder_messages_sm_size(blockSize);
+	  reorder_pedestrian_state_messages<<<gridSize, blockSize, reorder_sm_size, stream>>>(d_xmachine_message_pedestrian_state_keys, d_xmachine_message_pedestrian_state_values, d_pedestrian_state_partition_matrix, d_pedestrian_states, d_pedestrian_states_swap);
+	  gpuErrchkLaunch();
+#endif
+  }
+	//swap ordered list
+	xmachine_message_pedestrian_state_list* d_pedestrian_states_temp = d_pedestrian_states;
+	d_pedestrian_states = d_pedestrian_states_swap;
+	d_pedestrian_states_swap = d_pedestrian_states_temp;
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of output_pedestrian_state agents in state default will be exceeded moving working agents to next state in function output_pedestrian_state\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  agents_default_temp = d_agents;
+  d_agents = d_agents_default;
+  d_agents_default = agents_default_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
 int agent_infect_pedestrians_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   //Continuous agent and message input is spatially partitioned
-	sm_size += (blockSize * sizeof(xmachine_message_pedestrian_location));
+	sm_size += (blockSize * sizeof(xmachine_message_pedestrian_state));
 	
 	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
 	sm_size += (blockSize * PADDING);
@@ -5324,52 +3668,52 @@ void agent_infect_pedestrians(cudaStream_t &stream){
 	
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	//any agent with discrete or partitioned message input uses texture caching
-	size_t tex_xmachine_message_pedestrian_location_x_byte_offset;    
-	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_x_byte_offset, tex_xmachine_message_pedestrian_location_x, d_pedestrian_locations->x, sizeof(float)*xmachine_message_pedestrian_location_MAX));
-	h_tex_xmachine_message_pedestrian_location_x_offset = (int)tex_xmachine_message_pedestrian_location_x_byte_offset / sizeof(float);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_x_offset, &h_tex_xmachine_message_pedestrian_location_x_offset, sizeof(int)));
-	size_t tex_xmachine_message_pedestrian_location_y_byte_offset;    
-	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_y_byte_offset, tex_xmachine_message_pedestrian_location_y, d_pedestrian_locations->y, sizeof(float)*xmachine_message_pedestrian_location_MAX));
-	h_tex_xmachine_message_pedestrian_location_y_offset = (int)tex_xmachine_message_pedestrian_location_y_byte_offset / sizeof(float);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_y_offset, &h_tex_xmachine_message_pedestrian_location_y_offset, sizeof(int)));
-	size_t tex_xmachine_message_pedestrian_location_z_byte_offset;    
-	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_z_byte_offset, tex_xmachine_message_pedestrian_location_z, d_pedestrian_locations->z, sizeof(float)*xmachine_message_pedestrian_location_MAX));
-	h_tex_xmachine_message_pedestrian_location_z_offset = (int)tex_xmachine_message_pedestrian_location_z_byte_offset / sizeof(float);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_z_offset, &h_tex_xmachine_message_pedestrian_location_z_offset, sizeof(int)));
-	size_t tex_xmachine_message_pedestrian_location_estado_byte_offset;    
-	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_estado_byte_offset, tex_xmachine_message_pedestrian_location_estado, d_pedestrian_locations->estado, sizeof(int)*xmachine_message_pedestrian_location_MAX));
-	h_tex_xmachine_message_pedestrian_location_estado_offset = (int)tex_xmachine_message_pedestrian_location_estado_byte_offset / sizeof(int);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_estado_offset, &h_tex_xmachine_message_pedestrian_location_estado_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_x_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_x_byte_offset, tex_xmachine_message_pedestrian_state_x, d_pedestrian_states->x, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_x_offset = (int)tex_xmachine_message_pedestrian_state_x_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_x_offset, &h_tex_xmachine_message_pedestrian_state_x_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_y_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_y_byte_offset, tex_xmachine_message_pedestrian_state_y, d_pedestrian_states->y, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_y_offset = (int)tex_xmachine_message_pedestrian_state_y_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_y_offset, &h_tex_xmachine_message_pedestrian_state_y_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_z_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_z_byte_offset, tex_xmachine_message_pedestrian_state_z, d_pedestrian_states->z, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_z_offset = (int)tex_xmachine_message_pedestrian_state_z_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_z_offset, &h_tex_xmachine_message_pedestrian_state_z_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_estado_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_estado_byte_offset, tex_xmachine_message_pedestrian_state_estado, d_pedestrian_states->estado, sizeof(int)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_estado_offset = (int)tex_xmachine_message_pedestrian_state_estado_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_estado_offset, &h_tex_xmachine_message_pedestrian_state_estado_offset, sizeof(int)));
 	//bind pbm start and end indices to textures
-	size_t tex_xmachine_message_pedestrian_location_pbm_start_byte_offset;
-	size_t tex_xmachine_message_pedestrian_location_pbm_end_or_count_byte_offset;
-	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_pbm_start_byte_offset, tex_xmachine_message_pedestrian_location_pbm_start, d_pedestrian_location_partition_matrix->start, sizeof(int)*xmachine_message_pedestrian_location_grid_size));
-	h_tex_xmachine_message_pedestrian_location_pbm_start_offset = (int)tex_xmachine_message_pedestrian_location_pbm_start_byte_offset / sizeof(int);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_pbm_start_offset, &h_tex_xmachine_message_pedestrian_location_pbm_start_offset, sizeof(int)));
-	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_location_pbm_end_or_count_byte_offset, tex_xmachine_message_pedestrian_location_pbm_end_or_count, d_pedestrian_location_partition_matrix->end_or_count, sizeof(int)*xmachine_message_pedestrian_location_grid_size));
-  h_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset = (int)tex_xmachine_message_pedestrian_location_pbm_end_or_count_byte_offset / sizeof(int);
-	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset, &h_tex_xmachine_message_pedestrian_location_pbm_end_or_count_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_pbm_start_byte_offset;
+	size_t tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset;
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_pbm_start_byte_offset, tex_xmachine_message_pedestrian_state_pbm_start, d_pedestrian_state_partition_matrix->start, sizeof(int)*xmachine_message_pedestrian_state_grid_size));
+	h_tex_xmachine_message_pedestrian_state_pbm_start_offset = (int)tex_xmachine_message_pedestrian_state_pbm_start_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_pbm_start_offset, &h_tex_xmachine_message_pedestrian_state_pbm_start_offset, sizeof(int)));
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset, tex_xmachine_message_pedestrian_state_pbm_end_or_count, d_pedestrian_state_partition_matrix->end_or_count, sizeof(int)*xmachine_message_pedestrian_state_grid_size));
+  h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset = (int)tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset, &h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset, sizeof(int)));
 
 	
 	
 	//MAIN XMACHINE FUNCTION CALL (infect_pedestrians)
 	//Reallocate   : false
-	//Input        : pedestrian_location
+	//Input        : pedestrian_state
 	//Output       : 
 	//Agent Output : 
-	GPUFLAME_infect_pedestrians<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_locations, d_pedestrian_location_partition_matrix, d_rand48);
+	GPUFLAME_infect_pedestrians<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_states, d_pedestrian_state_partition_matrix, d_rand48);
 	gpuErrchkLaunch();
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	//any agent with discrete or partitioned message input uses texture caching
-	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_x));
-	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_y));
-	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_z));
-	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_estado));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_x));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_y));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_z));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_estado));
 	//unbind pbm indices
-    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_pbm_start));
-    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_location_pbm_end_or_count));
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_pbm_start));
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_pbm_end_or_count));
     
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
@@ -5731,16 +4075,6 @@ void navmap_generate_pedestrians(cudaStream_t &stream){
 extern void reset_agent_default_count()
 {
     h_xmachine_memory_agent_default_count = 0;
-}
- 
-extern void reset_agent_portador_count()
-{
-    h_xmachine_memory_agent_portador_count = 0;
-}
- 
-extern void reset_agent_enfermo_count()
-{
-    h_xmachine_memory_agent_enfermo_count = 0;
 }
  
 extern void reset_navmap_static_count()
