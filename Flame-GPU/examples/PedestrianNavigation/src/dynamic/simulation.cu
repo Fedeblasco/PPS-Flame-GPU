@@ -96,6 +96,19 @@ xmachine_memory_agent_list* h_agents_default;      /**< Pointer to agent list (p
 xmachine_memory_agent_list* d_agents_default;      /**< Pointer to agent list (population) on the device*/
 int h_xmachine_memory_agent_default_count;   /**< Agent population size counter */ 
 
+/* medic Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
+xmachine_memory_medic_list* d_medics;      /**< Pointer to agent list (population) on the device*/
+xmachine_memory_medic_list* d_medics_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
+xmachine_memory_medic_list* d_medics_new;  /**< Pointer to new agent list on the device (used to hold new agents before they are appended to the population)*/
+int h_xmachine_memory_medic_count;   /**< Agent population size counter */ 
+uint * d_xmachine_memory_medic_keys;	  /**< Agent sort identifiers keys*/
+uint * d_xmachine_memory_medic_values;  /**< Agent sort identifiers value */
+
+/* medic state variables */
+xmachine_memory_medic_list* h_medics_default2;      /**< Pointer to agent list (population) on host*/
+xmachine_memory_medic_list* d_medics_default2;      /**< Pointer to agent list (population) on the device*/
+int h_xmachine_memory_medic_default2_count;   /**< Agent population size counter */ 
+
 /* navmap Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
 xmachine_memory_navmap_list* d_navmaps;      /**< Pointer to agent list (population) on the device*/
 xmachine_memory_navmap_list* d_navmaps_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
@@ -114,6 +127,7 @@ int h_xmachine_memory_navmap_static_count;   /**< Agent population size counter 
 /* Variables to track the state of host copies of state lists, for the purposes of host agent data access.
  * @future - if the host data is current it may be possible to avoid duplicating memcpy in xml output.
  */
+unsigned int h_agents_default_variable_id_data_iteration;
 unsigned int h_agents_default_variable_x_data_iteration;
 unsigned int h_agents_default_variable_y_data_iteration;
 unsigned int h_agents_default_variable_velx_data_iteration;
@@ -128,6 +142,7 @@ unsigned int h_agents_default_variable_animate_data_iteration;
 unsigned int h_agents_default_variable_animate_dir_data_iteration;
 unsigned int h_agents_default_variable_estado_data_iteration;
 unsigned int h_agents_default_variable_tick_data_iteration;
+unsigned int h_medics_default2_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -138,6 +153,16 @@ unsigned int h_navmaps_static_variable_exit0_x_data_iteration;
 unsigned int h_navmaps_static_variable_exit0_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit1_x_data_iteration;
 unsigned int h_navmaps_static_variable_exit1_y_data_iteration;
+unsigned int h_navmaps_static_variable_exit2_x_data_iteration;
+unsigned int h_navmaps_static_variable_exit2_y_data_iteration;
+unsigned int h_navmaps_static_variable_exit3_x_data_iteration;
+unsigned int h_navmaps_static_variable_exit3_y_data_iteration;
+unsigned int h_navmaps_static_variable_exit4_x_data_iteration;
+unsigned int h_navmaps_static_variable_exit4_y_data_iteration;
+unsigned int h_navmaps_static_variable_exit5_x_data_iteration;
+unsigned int h_navmaps_static_variable_exit5_y_data_iteration;
+unsigned int h_navmaps_static_variable_exit6_x_data_iteration;
+unsigned int h_navmaps_static_variable_exit6_y_data_iteration;
 unsigned int h_navmaps_static_variable_cant_generados_data_iteration;
 
 
@@ -230,6 +255,9 @@ cudaStream_t stream3;
 void * d_temp_scan_storage_agent;
 size_t temp_scan_storage_bytes_agent;
 
+void * d_temp_scan_storage_medic;
+size_t temp_scan_storage_bytes_medic;
+
 void * d_temp_scan_storage_navmap;
 size_t temp_scan_storage_bytes_navmap;
 
@@ -281,6 +309,11 @@ void agent_infect_pedestrians(cudaStream_t &stream);
  */
 void agent_move(cudaStream_t &stream);
 
+/** medic_prueba
+ * Agent function prototype for prueba function of medic agent
+ */
+void medic_prueba(cudaStream_t &stream);
+
 /** navmap_output_navmap_cells
  * Agent function prototype for output_navmap_cells function of navmap agent
  */
@@ -290,6 +323,11 @@ void navmap_output_navmap_cells(cudaStream_t &stream);
  * Agent function prototype for generate_pedestrians function of navmap agent
  */
 void navmap_generate_pedestrians(cudaStream_t &stream);
+
+/** navmap_generate_medics
+ * Agent function prototype for generate_medics function of navmap agent
+ */
+void navmap_generate_medics(cudaStream_t &stream);
 
   
 void setPaddingAndOffset()
@@ -383,6 +421,7 @@ void initialise(char * inputfile){
     g_iterationNumber = 0;
 
     // Initialise variables for tracking which iterations' data is accessible on the host.
+    h_agents_default_variable_id_data_iteration = 0;
     h_agents_default_variable_x_data_iteration = 0;
     h_agents_default_variable_y_data_iteration = 0;
     h_agents_default_variable_velx_data_iteration = 0;
@@ -397,6 +436,7 @@ void initialise(char * inputfile){
     h_agents_default_variable_animate_dir_data_iteration = 0;
     h_agents_default_variable_estado_data_iteration = 0;
     h_agents_default_variable_tick_data_iteration = 0;
+    h_medics_default2_variable_x_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -407,6 +447,16 @@ void initialise(char * inputfile){
     h_navmaps_static_variable_exit0_y_data_iteration = 0;
     h_navmaps_static_variable_exit1_x_data_iteration = 0;
     h_navmaps_static_variable_exit1_y_data_iteration = 0;
+    h_navmaps_static_variable_exit2_x_data_iteration = 0;
+    h_navmaps_static_variable_exit2_y_data_iteration = 0;
+    h_navmaps_static_variable_exit3_x_data_iteration = 0;
+    h_navmaps_static_variable_exit3_y_data_iteration = 0;
+    h_navmaps_static_variable_exit4_x_data_iteration = 0;
+    h_navmaps_static_variable_exit4_y_data_iteration = 0;
+    h_navmaps_static_variable_exit5_x_data_iteration = 0;
+    h_navmaps_static_variable_exit5_y_data_iteration = 0;
+    h_navmaps_static_variable_exit6_x_data_iteration = 0;
+    h_navmaps_static_variable_exit6_y_data_iteration = 0;
     h_navmaps_static_variable_cant_generados_data_iteration = 0;
     
 
@@ -417,6 +467,8 @@ void initialise(char * inputfile){
 	/* Agent memory allocation (CPU) */
 	int xmachine_agent_SoA_size = sizeof(xmachine_memory_agent_list);
 	h_agents_default = (xmachine_memory_agent_list*)malloc(xmachine_agent_SoA_size);
+	int xmachine_medic_SoA_size = sizeof(xmachine_memory_medic_list);
+	h_medics_default2 = (xmachine_memory_medic_list*)malloc(xmachine_medic_SoA_size);
 	int xmachine_navmap_SoA_size = sizeof(xmachine_memory_navmap_list);
 	h_navmaps_static = (xmachine_memory_navmap_list*)malloc(xmachine_navmap_SoA_size);
 
@@ -482,7 +534,7 @@ void initialise(char * inputfile){
 	
 
 	//read initial states
-	readInitialStates(inputfile, h_agents_default, &h_xmachine_memory_agent_default_count, h_navmaps_static, &h_xmachine_memory_navmap_static_count);
+	readInitialStates(inputfile, h_agents_default, &h_xmachine_memory_agent_default_count, h_medics_default2, &h_xmachine_memory_medic_default2_count, h_navmaps_static, &h_xmachine_memory_navmap_static_count);
 
   // Read graphs from disk
   
@@ -499,6 +551,17 @@ void initialise(char * inputfile){
 	/* default memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_agents_default, xmachine_agent_SoA_size));
 	gpuErrchk( cudaMemcpy( d_agents_default, h_agents_default, xmachine_agent_SoA_size, cudaMemcpyHostToDevice));
+    
+	/* medic Agent memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_medics, xmachine_medic_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_medics_swap, xmachine_medic_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_medics_new, xmachine_medic_SoA_size));
+    //continuous agent sort identifiers
+  gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_medic_keys, xmachine_memory_medic_MAX* sizeof(uint)));
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_medic_values, xmachine_memory_medic_MAX* sizeof(uint)));
+	/* default2 memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_medics_default2, xmachine_medic_SoA_size));
+	gpuErrchk( cudaMemcpy( d_medics_default2, h_medics_default2, xmachine_medic_SoA_size, cudaMemcpyHostToDevice));
     
 	/* navmap Agent memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_navmaps, xmachine_navmap_SoA_size));
@@ -582,6 +645,17 @@ void initialise(char * inputfile){
     );
     gpuErrchk(cudaMalloc(&d_temp_scan_storage_agent, temp_scan_storage_bytes_agent));
     
+    d_temp_scan_storage_medic = nullptr;
+    temp_scan_storage_bytes_medic = 0;
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_medic, 
+        temp_scan_storage_bytes_medic, 
+        (int*) nullptr, 
+        (int*) nullptr, 
+        xmachine_memory_medic_MAX
+    );
+    gpuErrchk(cudaMalloc(&d_temp_scan_storage_medic, temp_scan_storage_bytes_medic));
+    
     d_temp_scan_storage_navmap = nullptr;
     temp_scan_storage_bytes_navmap = 0;
     cub::DeviceScan::ExclusiveSum(
@@ -651,6 +725,8 @@ void initialise(char * inputfile){
 	
 		printf("Init agent_agent_default_count: %u\n",get_agent_agent_default_count());
 	
+		printf("Init agent_medic_default2_count: %u\n",get_agent_medic_default2_count());
+	
 		printf("Init agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
 #endif
@@ -685,6 +761,34 @@ void sort_agents_default(void (*generate_key_value_pairs)(unsigned int* keys, un
 	d_agents_swap = d_agents_temp;	
 }
 
+void sort_medics_default2(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_medic_list* agents))
+{
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+
+	//generate sort keys
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_key_value_pairs, no_sm, h_xmachine_memory_medic_default2_count); 
+	gridSize = (h_xmachine_memory_medic_default2_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	generate_key_value_pairs<<<gridSize, blockSize>>>(d_xmachine_memory_medic_keys, d_xmachine_memory_medic_values, d_medics_default2);
+	gpuErrchkLaunch();
+
+	//updated Thrust sort
+	thrust::sort_by_key( thrust::device_pointer_cast(d_xmachine_memory_medic_keys),  thrust::device_pointer_cast(d_xmachine_memory_medic_keys) + h_xmachine_memory_medic_default2_count,  thrust::device_pointer_cast(d_xmachine_memory_medic_values));
+	gpuErrchkLaunch();
+
+	//reorder agents
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_medic_agents, no_sm, h_xmachine_memory_medic_default2_count); 
+	gridSize = (h_xmachine_memory_medic_default2_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	reorder_medic_agents<<<gridSize, blockSize>>>(d_xmachine_memory_medic_values, d_medics_default2, d_medics_swap);
+	gpuErrchkLaunch();
+
+	//swap
+	xmachine_memory_medic_list* d_medics_temp = d_medics_default2;
+	d_medics_default2 = d_medics_swap;
+	d_medics_swap = d_medics_temp;	
+}
+
 
 void cleanup(){
     PROFILE_SCOPED_RANGE("cleanup");
@@ -701,6 +805,14 @@ void cleanup(){
 	
 	free( h_agents_default);
 	gpuErrchk(cudaFree(d_agents_default));
+	
+	/* medic Agent variables */
+	gpuErrchk(cudaFree(d_medics));
+	gpuErrchk(cudaFree(d_medics_swap));
+	gpuErrchk(cudaFree(d_medics_new));
+	
+	free( h_medics_default2);
+	gpuErrchk(cudaFree(d_medics_default2));
 	
 	/* navmap Agent variables */
 	gpuErrchk(cudaFree(d_navmaps));
@@ -757,6 +869,12 @@ void cleanup(){
       gpuErrchk(cudaFree(d_temp_scan_storage_agent));
       d_temp_scan_storage_agent = nullptr;
       temp_scan_storage_bytes_agent = 0;
+    }
+    
+    if(d_temp_scan_storage_medic != nullptr){
+      gpuErrchk(cudaFree(d_temp_scan_storage_medic));
+      d_temp_scan_storage_medic = nullptr;
+      temp_scan_storage_bytes_medic = 0;
     }
     
     if(d_temp_scan_storage_navmap != nullptr){
@@ -822,6 +940,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: navmap_generate_pedestrians = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("navmap_generate_medics");
+	navmap_generate_medics(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: navmap_generate_medics = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -919,6 +1051,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_move = %f (ms)\n", instrument_milliseconds);
 #endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("medic_prueba");
+	medic_prueba(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: medic_prueba = %f (ms)\n", instrument_milliseconds);
+#endif
 	cudaDeviceSynchronize();
   
     
@@ -929,6 +1075,8 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	// Print the agent population size of all agents in all states
 	
 		printf("agent_agent_default_count: %u\n",get_agent_agent_default_count());
+	
+		printf("agent_medic_default2_count: %u\n",get_agent_medic_default2_count());
 	
 		printf("agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
@@ -1433,6 +1581,26 @@ xmachine_memory_agent_list* get_host_agent_default_agents(){
 }
 
     
+int get_agent_medic_MAX_count(){
+    return xmachine_memory_medic_MAX;
+}
+
+
+int get_agent_medic_default2_count(){
+	//continuous agent
+	return h_xmachine_memory_medic_default2_count;
+	
+}
+
+xmachine_memory_medic_list* get_device_medic_default2_agents(){
+	return d_medics_default2;
+}
+
+xmachine_memory_medic_list* get_host_medic_default2_agents(){
+	return h_medics_default2;
+}
+
+    
 int get_agent_navmap_MAX_count(){
     return xmachine_memory_navmap_MAX;
 }
@@ -1458,6 +1626,44 @@ int get_navmap_population_width(){
 
 
 /* Host based access of agent variables*/
+
+/** unsigned int get_agent_default_variable_id(unsigned int index)
+ * Gets the value of the id variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_agent_default_variable_id(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_id_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->id,
+                    d_agents_default->id,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_id_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->id[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access id for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
 
 /** float get_agent_default_variable_x(unsigned int index)
  * Gets the value of the x variable of an agent agent in the default state on the host. 
@@ -1991,6 +2197,44 @@ __host__ int get_agent_default_variable_tick(unsigned int index){
     }
 }
 
+/** int get_medic_default2_variable_x(unsigned int index)
+ * Gets the value of the x variable of an medic agent in the default2 state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_medic_default2_variable_x(unsigned int index){
+    unsigned int count = get_agent_medic_default2_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_medics_default2_variable_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_medics_default2->x,
+                    d_medics_default2->x,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_medics_default2_variable_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_medics_default2->x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access x for the %u th member of medic_default2. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -2371,14 +2615,394 @@ __host__ float get_navmap_static_variable_exit1_y(unsigned int index){
     }
 }
 
-/** int get_navmap_static_variable_cant_generados(unsigned int index)
+/** float get_navmap_static_variable_exit2_x(unsigned int index)
+ * Gets the value of the exit2_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit2_x
+ */
+__host__ float get_navmap_static_variable_exit2_x(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit2_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit2_x,
+                    d_navmaps_static->exit2_x,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit2_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit2_x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit2_x for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit2_y(unsigned int index)
+ * Gets the value of the exit2_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit2_y
+ */
+__host__ float get_navmap_static_variable_exit2_y(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit2_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit2_y,
+                    d_navmaps_static->exit2_y,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit2_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit2_y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit2_y for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit3_x(unsigned int index)
+ * Gets the value of the exit3_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit3_x
+ */
+__host__ float get_navmap_static_variable_exit3_x(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit3_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit3_x,
+                    d_navmaps_static->exit3_x,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit3_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit3_x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit3_x for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit3_y(unsigned int index)
+ * Gets the value of the exit3_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit3_y
+ */
+__host__ float get_navmap_static_variable_exit3_y(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit3_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit3_y,
+                    d_navmaps_static->exit3_y,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit3_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit3_y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit3_y for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit4_x(unsigned int index)
+ * Gets the value of the exit4_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit4_x
+ */
+__host__ float get_navmap_static_variable_exit4_x(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit4_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit4_x,
+                    d_navmaps_static->exit4_x,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit4_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit4_x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit4_x for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit4_y(unsigned int index)
+ * Gets the value of the exit4_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit4_y
+ */
+__host__ float get_navmap_static_variable_exit4_y(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit4_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit4_y,
+                    d_navmaps_static->exit4_y,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit4_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit4_y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit4_y for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit5_x(unsigned int index)
+ * Gets the value of the exit5_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit5_x
+ */
+__host__ float get_navmap_static_variable_exit5_x(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit5_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit5_x,
+                    d_navmaps_static->exit5_x,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit5_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit5_x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit5_x for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit5_y(unsigned int index)
+ * Gets the value of the exit5_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit5_y
+ */
+__host__ float get_navmap_static_variable_exit5_y(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit5_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit5_y,
+                    d_navmaps_static->exit5_y,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit5_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit5_y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit5_y for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit6_x(unsigned int index)
+ * Gets the value of the exit6_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit6_x
+ */
+__host__ float get_navmap_static_variable_exit6_x(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit6_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit6_x,
+                    d_navmaps_static->exit6_x,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit6_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit6_x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit6_x for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** float get_navmap_static_variable_exit6_y(unsigned int index)
+ * Gets the value of the exit6_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit6_y
+ */
+__host__ float get_navmap_static_variable_exit6_y(unsigned int index){
+    unsigned int count = get_agent_navmap_static_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_navmaps_static_variable_exit6_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_navmaps_static->exit6_y,
+                    d_navmaps_static->exit6_y,
+                    count * sizeof(float),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_navmaps_static_variable_exit6_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_navmaps_static->exit6_y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access exit6_y for the %u th member of navmap_static. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_navmap_static_variable_cant_generados(unsigned int index)
  * Gets the value of the cant_generados variable of an navmap agent in the static state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @return value of agent variable cant_generados
  */
-__host__ int get_navmap_static_variable_cant_generados(unsigned int index){
+__host__ unsigned int get_navmap_static_variable_cant_generados(unsigned int index){
     unsigned int count = get_agent_navmap_static_count();
     unsigned int currentIteration = getIterationNumber();
     
@@ -2390,7 +3014,7 @@ __host__ int get_navmap_static_variable_cant_generados(unsigned int index){
                 cudaMemcpy(
                     h_navmaps_static->cant_generados,
                     d_navmaps_static->cant_generados,
-                    count * sizeof(int),
+                    count * sizeof(unsigned int),
                     cudaMemcpyDeviceToHost
                 )
             );
@@ -2422,6 +3046,8 @@ __host__ int get_navmap_static_variable_cant_generados(unsigned int index){
  * @param h_agent agent struct
  */
 void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list * d_dst, xmachine_memory_agent * h_agent){
+ 
+		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->x, &h_agent->x, sizeof(float), cudaMemcpyHostToDevice));
  
@@ -2466,6 +3092,8 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
     // Only copy elements if there is data to move.
     if (count > 0){
 	 
+		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
 		gpuErrchk(cudaMemcpy(d_dst->x, h_src->x, count * sizeof(float), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->y, h_src->y, count * sizeof(float), cudaMemcpyHostToDevice));
@@ -2493,6 +3121,36 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
 		gpuErrchk(cudaMemcpy(d_dst->estado, h_src->estado, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(int), cudaMemcpyHostToDevice));
+
+    }
+}
+
+
+/* copy_single_xmachine_memory_medic_hostToDevice
+ * Private function to copy a host agent struct into a device SoA agent list.
+ * @param d_dst destination agent state list
+ * @param h_agent agent struct
+ */
+void copy_single_xmachine_memory_medic_hostToDevice(xmachine_memory_medic_list * d_dst, xmachine_memory_medic * h_agent){
+ 
+		gpuErrchk(cudaMemcpy(d_dst->x, &h_agent->x, sizeof(int), cudaMemcpyHostToDevice));
+
+}
+/*
+ * Private function to copy some elements from a host based struct of arrays to a device based struct of arrays for a single agent state.
+ * Individual copies of `count` elements are performed for each agent variable or each component of agent array variables, to avoid wasted data transfer.
+ * There will be a point at which a single cudaMemcpy will outperform many smaller memcpys, however host based agent creation should typically only populate a fraction of the maximum buffer size, so this should be more efficient.
+ * @optimisation - experimentally find the proportion at which transferring the whole SoA would be better and incorporate this. The same will apply to agent variable arrays.
+ * 
+ * @param d_dst device destination SoA
+ * @oaram h_src host source SoA
+ * @param count the number of agents to transfer data for
+ */
+void copy_partial_xmachine_memory_medic_hostToDevice(xmachine_memory_medic_list * d_dst, xmachine_memory_medic_list * h_src, unsigned int count){
+    // Only copy elements if there is data to move.
+    if (count > 0){
+	 
+		gpuErrchk(cudaMemcpy(d_dst->x, h_src->x, count * sizeof(int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -2527,6 +3185,8 @@ void h_free_agent_agent_array(xmachine_memory_agent*** agents, unsigned int coun
 void h_unpack_agents_agent_AoS_to_SoA(xmachine_memory_agent_list * dst, xmachine_memory_agent** src, unsigned int count){
 	if(count > 0){
 		for(unsigned int i = 0; i < count; i++){
+			 
+			dst->id[i] = src[i]->id;
 			 
 			dst->x[i] = src[i]->x;
 			 
@@ -2586,6 +3246,7 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent){
 	cudaDeviceSynchronize();
 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+    h_agents_default_variable_id_data_iteration = 0;
     h_agents_default_variable_x_data_iteration = 0;
     h_agents_default_variable_y_data_iteration = 0;
     h_agents_default_variable_velx_data_iteration = 0;
@@ -2631,6 +3292,7 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
 		cudaDeviceSynchronize();
 
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+        h_agents_default_variable_id_data_iteration = 0;
         h_agents_default_variable_x_data_iteration = 0;
         h_agents_default_variable_y_data_iteration = 0;
         h_agents_default_variable_velx_data_iteration = 0;
@@ -2650,9 +3312,131 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
 	}
 }
 
+xmachine_memory_medic* h_allocate_agent_medic(){
+	xmachine_memory_medic* agent = (xmachine_memory_medic*)malloc(sizeof(xmachine_memory_medic));
+	// Memset the whole agent strcuture
+    memset(agent, 0, sizeof(xmachine_memory_medic));
+
+	return agent;
+}
+void h_free_agent_medic(xmachine_memory_medic** agent){
+ 
+	free((*agent));
+	(*agent) = NULL;
+}
+xmachine_memory_medic** h_allocate_agent_medic_array(unsigned int count){
+	xmachine_memory_medic ** agents = (xmachine_memory_medic**)malloc(count * sizeof(xmachine_memory_medic*));
+	for (unsigned int i = 0; i < count; i++) {
+		agents[i] = h_allocate_agent_medic();
+	}
+	return agents;
+}
+void h_free_agent_medic_array(xmachine_memory_medic*** agents, unsigned int count){
+	for (unsigned int i = 0; i < count; i++) {
+		h_free_agent_medic(&((*agents)[i]));
+	}
+	free((*agents));
+	(*agents) = NULL;
+}
+
+void h_unpack_agents_medic_AoS_to_SoA(xmachine_memory_medic_list * dst, xmachine_memory_medic** src, unsigned int count){
+	if(count > 0){
+		for(unsigned int i = 0; i < count; i++){
+			 
+			dst->x[i] = src[i]->x;
+			
+		}
+	}
+}
+
+
+void h_add_agent_medic_default2(xmachine_memory_medic* agent){
+	if (h_xmachine_memory_medic_count + 1 > xmachine_memory_medic_MAX){
+		printf("Error: Buffer size of medic agents in state default2 will be exceeded by h_add_agent_medic_default2\n");
+		exit(EXIT_FAILURE);
+	}	
+
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+	unsigned int count = 1;
+	
+	// Copy data from host struct to device SoA for target state
+	copy_single_xmachine_memory_medic_hostToDevice(d_medics_new, agent);
+
+	// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_medic_Agents, no_sm, count);
+	gridSize = (count + blockSize - 1) / blockSize;
+	append_medic_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_medics_default2, d_medics_new, h_xmachine_memory_medic_default2_count, count);
+	gpuErrchkLaunch();
+	// Update the number of agents in this state.
+	h_xmachine_memory_medic_default2_count += count;
+	gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));
+	cudaDeviceSynchronize();
+
+    // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+    h_medics_default2_variable_x_data_iteration = 0;
+    
+
+}
+void h_add_agents_medic_default2(xmachine_memory_medic** agents, unsigned int count){
+	if(count > 0){
+		int blockSize;
+		int minGridSize;
+		int gridSize;
+
+		if (h_xmachine_memory_medic_count + count > xmachine_memory_medic_MAX){
+			printf("Error: Buffer size of medic agents in state default2 will be exceeded by h_add_agents_medic_default2\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// Unpack data from AoS into the pre-existing SoA
+		h_unpack_agents_medic_AoS_to_SoA(h_medics_default2, agents, count);
+
+		// Copy data from the host SoA to the device SoA for the target state
+		copy_partial_xmachine_memory_medic_hostToDevice(d_medics_new, h_medics_default2, count);
+
+		// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+		cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_medic_Agents, no_sm, count);
+		gridSize = (count + blockSize - 1) / blockSize;
+		append_medic_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_medics_default2, d_medics_new, h_xmachine_memory_medic_default2_count, count);
+		gpuErrchkLaunch();
+		// Update the number of agents in this state.
+		h_xmachine_memory_medic_default2_count += count;
+		gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));
+		cudaDeviceSynchronize();
+
+        // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+        h_medics_default2_variable_x_data_iteration = 0;
+        
+
+	}
+}
+
 
 /*  Analytics Functions */
 
+unsigned int reduce_agent_default_id_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->id),  thrust::device_pointer_cast(d_agents_default->id) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_id_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->id),  thrust::device_pointer_cast(d_agents_default->id) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_id_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->id);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_id_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
 float reduce_agent_default_x_variable(){
     //reduce in default stream
     return thrust::reduce(thrust::device_pointer_cast(d_agents_default->x),  thrust::device_pointer_cast(d_agents_default->x) + h_xmachine_memory_agent_default_count);
@@ -2911,6 +3695,27 @@ int max_agent_default_tick_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
+int reduce_medic_default2_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count);
+}
+
+int count_medic_default2_x_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count, count_value);
+}
+int min_medic_default2_x_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_medic_default2_x_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
 int reduce_navmap_static_x_variable(){
     //reduce in default stream
     return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->x),  thrust::device_pointer_cast(d_navmaps_static->x) + h_xmachine_memory_navmap_static_count);
@@ -3093,24 +3898,194 @@ float max_navmap_static_exit1_y_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-int reduce_navmap_static_cant_generados_variable(){
+float reduce_navmap_static_exit2_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit2_x),  thrust::device_pointer_cast(d_navmaps_static->exit2_x) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit2_x_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit2_x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit2_x_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit2_x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit2_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit2_y),  thrust::device_pointer_cast(d_navmaps_static->exit2_y) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit2_y_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit2_y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit2_y_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit2_y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit3_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit3_x),  thrust::device_pointer_cast(d_navmaps_static->exit3_x) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit3_x_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit3_x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit3_x_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit3_x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit3_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit3_y),  thrust::device_pointer_cast(d_navmaps_static->exit3_y) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit3_y_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit3_y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit3_y_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit3_y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit4_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit4_x),  thrust::device_pointer_cast(d_navmaps_static->exit4_x) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit4_x_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit4_x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit4_x_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit4_x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit4_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit4_y),  thrust::device_pointer_cast(d_navmaps_static->exit4_y) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit4_y_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit4_y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit4_y_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit4_y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit5_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit5_x),  thrust::device_pointer_cast(d_navmaps_static->exit5_x) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit5_x_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit5_x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit5_x_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit5_x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit5_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit5_y),  thrust::device_pointer_cast(d_navmaps_static->exit5_y) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit5_y_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit5_y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit5_y_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit5_y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit6_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit6_x),  thrust::device_pointer_cast(d_navmaps_static->exit6_x) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit6_x_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit6_x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit6_x_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit6_x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float reduce_navmap_static_exit6_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->exit6_y),  thrust::device_pointer_cast(d_navmaps_static->exit6_y) + h_xmachine_memory_navmap_static_count);
+}
+
+float min_navmap_static_exit6_y_variable(){
+    //min in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit6_y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+float max_navmap_static_exit6_y_variable(){
+    //max in default stream
+    thrust::device_ptr<float> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->exit6_y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_navmap_static_cant_generados_variable(){
     //reduce in default stream
     return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->cant_generados),  thrust::device_pointer_cast(d_navmaps_static->cant_generados) + h_xmachine_memory_navmap_static_count);
 }
 
-int count_navmap_static_cant_generados_variable(int count_value){
+unsigned int count_navmap_static_cant_generados_variable(unsigned int count_value){
     //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_navmaps_static->cant_generados),  thrust::device_pointer_cast(d_navmaps_static->cant_generados) + h_xmachine_memory_navmap_static_count, count_value);
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_navmaps_static->cant_generados),  thrust::device_pointer_cast(d_navmaps_static->cant_generados) + h_xmachine_memory_navmap_static_count, count_value);
 }
-int min_navmap_static_cant_generados_variable(){
+unsigned int min_navmap_static_cant_generados_variable(){
     //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->cant_generados);
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->cant_generados);
     size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-int max_navmap_static_cant_generados_variable(){
+unsigned int max_navmap_static_cant_generados_variable(){
     //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->cant_generados);
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->cant_generados);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -3839,6 +4814,105 @@ void agent_move(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
+int medic_prueba_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** medic_prueba
+ * Agent function prototype for prueba function of medic agent
+ */
+void medic_prueba(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_medic_default2_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_medic_default2_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_medic_list* medics_default2_temp = d_medics;
+	d_medics = d_medics_default2;
+	d_medics_default2 = medics_default2_temp;
+	//set working count to current state count
+	h_xmachine_memory_medic_count = h_xmachine_memory_medic_default2_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_medic_count, &h_xmachine_memory_medic_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_medic_default2_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_prueba, medic_prueba_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = medic_prueba_sm_size(blockSize);
+	
+	
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (prueba)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_prueba<<<g, b, sm_size, stream>>>(d_medics);
+	gpuErrchkLaunch();
+	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_medic_default2_count+h_xmachine_memory_medic_count > xmachine_memory_medic_MAX){
+		printf("Error: Buffer size of prueba agents in state default2 will be exceeded moving working agents to next state in function prueba\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  medics_default2_temp = d_medics;
+  d_medics = d_medics_default2;
+  d_medics_default2 = medics_default2_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_medic_default2_count += h_xmachine_memory_medic_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
 int navmap_output_navmap_cells_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
@@ -4071,10 +5145,151 @@ void navmap_generate_pedestrians(cudaStream_t &stream){
 }
 
 
+
+	
+/* Shared memory size calculator for agent function */
+int navmap_generate_medics_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** navmap_generate_medics
+ * Agent function prototype for generate_medics function of navmap agent
+ */
+void navmap_generate_medics(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_navmap_static_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_navmap_static_count;
+
+	
+	//FOR medic AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_medic_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_medic_scan_input<<<gridSize, blockSize, 0, stream>>>(d_medics_new);
+	gpuErrchkLaunch();
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
+	d_navmaps = d_navmaps_static;
+	d_navmaps_static = navmaps_static_temp;
+	//set working count to current state count
+	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_navmap_static_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_medics, navmap_generate_medics_sm_size, state_list_size);
+	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = (int)sqrt(blockSize);
+	b.y = b.x;
+	g.x = (int)sqrt(gridSize);
+	g.y = g.x;
+	sm_size = navmap_generate_medics_sm_size(blockSize);
+	
+	
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (generate_medics)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : 
+	//Agent Output : medic
+	GPUFLAME_generate_medics<<<g, b, sm_size, stream>>>(d_navmaps, d_medics_new, d_rand48);
+	gpuErrchkLaunch();
+	
+	
+    //COPY ANY AGENT COUNT BEFORE navmap AGENTS ARE KILLED (needed for scatter)
+	int navmaps_pre_death_count = h_xmachine_memory_navmap_count;
+	
+	//FOR medic AGENT OUTPUT SCATTER AGENTS 
+
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_medic, 
+        temp_scan_storage_bytes_medic, 
+        d_medics_new->_scan_input, 
+        d_medics_new->_position, 
+        navmaps_pre_death_count,
+        stream
+    );
+
+	//reset agent count
+	int medic_after_birth_count;
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_medics_new->_position[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_medics_new->_scan_input[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		medic_after_birth_count = h_xmachine_memory_medic_default2_count + scan_last_sum+1;
+	else
+		medic_after_birth_count = h_xmachine_memory_medic_default2_count + scan_last_sum;
+	//check buffer is not exceeded
+	if (medic_after_birth_count > xmachine_memory_medic_MAX){
+		printf("Error: Buffer size of medic agents in state default2 will be exceeded writing new agents in function generate_medics\n");
+		exit(EXIT_FAILURE);
+	}
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_medic_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_medic_Agents<<<gridSize, blockSize, 0, stream>>>(d_medics_default2, d_medics_new, h_xmachine_memory_medic_default2_count, navmaps_pre_death_count);
+	gpuErrchkLaunch();
+	//Copy count to device
+	h_xmachine_memory_medic_default2_count = medic_after_birth_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+    //currentState maps to working list
+	navmaps_static_temp = d_navmaps_static;
+	d_navmaps_static = d_navmaps;
+	d_navmaps = navmaps_static_temp;
+    //set current state count
+	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+	
+}
+
+
  
 extern void reset_agent_default_count()
 {
     h_xmachine_memory_agent_default_count = 0;
+}
+ 
+extern void reset_medic_default2_count()
+{
+    h_xmachine_memory_medic_default2_count = 0;
 }
  
 extern void reset_navmap_static_count()

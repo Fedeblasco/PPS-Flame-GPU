@@ -270,6 +270,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 			//printf("Me cure");
 		}
 	}
+
 	//Por cada tick, informo mi posición
 	//printf("%d, ",x);
 	//printf("%d\n",y);
@@ -279,8 +280,6 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 	
 	return 0;
 }
-
-
 
 /**
  * generate_pedestrians FLAMEGPU Agent Function
@@ -310,7 +309,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				float animate = rnd<DISCRETE_2D>(rand48);
 				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;
 				
-				/*//Hago el random e imprimo
+				//Hago el random e imprimo
 				float rand = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
 				int estado;
 				if(rand<=probabilidad_generar_enfermo){
@@ -319,13 +318,15 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				}else{
 					estado=0;
 					//printf("Sano");
-				}*/
-
-				//add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
+				}
+				
+				//add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
+				//printf("%d\n",agent->cant_generados);
+				
 				if(agent->cant_generados == 0){
-					add_agent_agent(agent_agents, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0);
+					add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0);
 				}else{
-					add_agent_agent(agent_agents, xpalotro, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0);
+					add_agent_agent(agent_agents, agent->cant_generados, xpalotro, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0);
 				}
 
 				//Imprimo que se creo un paciente
@@ -341,6 +342,33 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 
 
     return 0;
+}
+
+__FLAME_GPU_FUNC__ int prueba(xmachine_memory_medic* agent){
+	printf("Hola soy %d\n",agent->x);
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_memory_medic_list* agent_medics, RNG_rand48* rand48){
+
+	/*float random = rnd<DISCRETE_2D>(rand48);
+	bool emit_agent = false;
+		
+		
+	if ((agent->exit_no == 1)&&((random < EMMISION_RATE_EXIT1*TIME_SCALER)))
+		emit_agent = true;
+	
+	if(emit_agent){
+		if(agent->cant_generados == 0){
+			add_medic_agent(agent_medics, 0);
+		}
+		if(agent->cant_generados == 1){
+			add_medic_agent(agent_medics, 1);
+		}
+		agent->cant_generados++;
+	}*/
+	return 0;
+
 }
 
 #endif //_FLAMEGPU_FUNCTIONS

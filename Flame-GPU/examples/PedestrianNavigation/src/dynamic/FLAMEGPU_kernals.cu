@@ -27,11 +27,15 @@
 
 __constant__ int d_xmachine_memory_agent_count;
 
+__constant__ int d_xmachine_memory_medic_count;
+
 __constant__ int d_xmachine_memory_navmap_count;
 
 /* Agent state count constants */
 
 __constant__ int d_xmachine_memory_agent_default_count;
+
+__constant__ int d_xmachine_memory_medic_default2_count;
 
 __constant__ int d_xmachine_memory_navmap_static_count;
 
@@ -228,6 +232,7 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
+		agents_dst->id[output_index] = agents_src->id[index];        
 		agents_dst->x[output_index] = agents_src->x[index];        
 		agents_dst->y[output_index] = agents_src->y[index];        
 		agents_dst->velx[output_index] = agents_src->velx[index];        
@@ -261,6 +266,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
+	    agents_dst->id[output_index] = agents_src->id[index];
 	    agents_dst->x[output_index] = agents_src->x[index];
 	    agents_dst->y[output_index] = agents_src->y[index];
 	    agents_dst->velx[output_index] = agents_src->velx[index];
@@ -281,6 +287,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 /** add_agent_agent
  * Continuous agent agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_agent_list to add agents to 
+ * @param id agent variable of type unsigned int
  * @param x agent variable of type float
  * @param y agent variable of type float
  * @param velx agent variable of type float
@@ -297,7 +304,146 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param tick agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick){
+	
+	int index;
+    
+    //calculate the agents index in global agent list (depends on agent type)
+	if (AGENT_TYPE == DISCRETE_2D){
+		int width = (blockDim.x* gridDim.x);
+		glm::ivec2 global_position;
+		global_position.x = (blockIdx.x*blockDim.x) + threadIdx.x;
+		global_position.y = (blockIdx.y*blockDim.y) + threadIdx.y;
+		index = global_position.x + (global_position.y* width);
+	}else//AGENT_TYPE == CONTINOUS
+		index = threadIdx.x + blockIdx.x*blockDim.x;
+
+	//for prefix sum
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 1;
+
+	//write data to new buffer
+	agents->id[index] = id;
+	agents->x[index] = x;
+	agents->y[index] = y;
+	agents->velx[index] = velx;
+	agents->vely[index] = vely;
+	agents->steer_x[index] = steer_x;
+	agents->steer_y[index] = steer_y;
+	agents->height[index] = height;
+	agents->exit_no[index] = exit_no;
+	agents->speed[index] = speed;
+	agents->lod[index] = lod;
+	agents->animate[index] = animate;
+	agents->animate_dir[index] = animate_dir;
+	agents->estado[index] = estado;
+	agents->tick[index] = tick;
+
+}
+
+//non templated version assumes DISCRETE_2D but works also for CONTINUOUS
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick);
+}
+
+/** reorder_agent_agents
+ * Continuous agent agent areorder function used after key value pairs have been sorted
+ * @param values sorted index values
+ * @param unordered_agents list of unordered agents
+ * @ param ordered_agents list used to output ordered agents
+ */
+__global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent_list* unordered_agents, xmachine_memory_agent_list* ordered_agents)
+{
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	uint old_pos = values[index];
+
+	//reorder agent data
+	ordered_agents->id[index] = unordered_agents->id[old_pos];
+	ordered_agents->x[index] = unordered_agents->x[old_pos];
+	ordered_agents->y[index] = unordered_agents->y[old_pos];
+	ordered_agents->velx[index] = unordered_agents->velx[old_pos];
+	ordered_agents->vely[index] = unordered_agents->vely[old_pos];
+	ordered_agents->steer_x[index] = unordered_agents->steer_x[old_pos];
+	ordered_agents->steer_y[index] = unordered_agents->steer_y[old_pos];
+	ordered_agents->height[index] = unordered_agents->height[old_pos];
+	ordered_agents->exit_no[index] = unordered_agents->exit_no[old_pos];
+	ordered_agents->speed[index] = unordered_agents->speed[old_pos];
+	ordered_agents->lod[index] = unordered_agents->lod[old_pos];
+	ordered_agents->animate[index] = unordered_agents->animate[old_pos];
+	ordered_agents->animate_dir[index] = unordered_agents->animate_dir[old_pos];
+	ordered_agents->estado[index] = unordered_agents->estado[old_pos];
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created medic agent functions */
+
+/** reset_medic_scan_input
+ * medic agent reset scan input function
+ * @param agents The xmachine_memory_medic_list agent list
+ */
+__global__ void reset_medic_scan_input(xmachine_memory_medic_list* agents){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 0;
+}
+
+
+
+/** scatter_medic_Agents
+ * medic scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_medic_list agent list destination
+ * @param agents_src xmachine_memory_medic_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void scatter_medic_Agents(xmachine_memory_medic_list* agents_dst, xmachine_memory_medic_list* agents_src, int dst_agent_count, int number_to_scatter){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = agents_src->_scan_input[index];
+
+	//if optional message is to be written. 
+	//must check agent is within number to scatter as unused threads may have scan input = 1
+	if ((_scan_input == 1)&&(index < number_to_scatter)){
+		int output_index = agents_src->_position[index] + dst_agent_count;
+
+		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
+        agents_dst->_position[output_index] = output_index;        
+		agents_dst->x[output_index] = agents_src->x[index];
+	}
+}
+
+/** append_medic_Agents
+ * medic scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_medic_list agent list destination
+ * @param agents_src xmachine_memory_medic_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void append_medic_Agents(xmachine_memory_medic_list* agents_dst, xmachine_memory_medic_list* agents_src, int dst_agent_count, int number_to_append){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//must check agent is within number to append as unused threads may have scan input = 1
+    if (index < number_to_append){
+	    int output_index = index + dst_agent_count;
+
+	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
+	    agents_dst->_position[output_index] = output_index;
+	    agents_dst->x[output_index] = agents_src->x[index];
+    }
+}
+
+/** add_medic_agent
+ * Continuous medic agent add agent function writes agent data to agent swap
+ * @param agents xmachine_memory_medic_list to add agents to 
+ * @param x agent variable of type int
+ */
+template <int AGENT_TYPE>
+__device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x){
 	
 	int index;
     
@@ -317,34 +463,21 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, float x, flo
 
 	//write data to new buffer
 	agents->x[index] = x;
-	agents->y[index] = y;
-	agents->velx[index] = velx;
-	agents->vely[index] = vely;
-	agents->steer_x[index] = steer_x;
-	agents->steer_y[index] = steer_y;
-	agents->height[index] = height;
-	agents->exit_no[index] = exit_no;
-	agents->speed[index] = speed;
-	agents->lod[index] = lod;
-	agents->animate[index] = animate;
-	agents->animate_dir[index] = animate_dir;
-	agents->estado[index] = estado;
-	agents->tick[index] = tick;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick){
-    add_agent_agent<DISCRETE_2D>(agents, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick);
+__device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x){
+    add_medic_agent<DISCRETE_2D>(agents, x);
 }
 
-/** reorder_agent_agents
- * Continuous agent agent areorder function used after key value pairs have been sorted
+/** reorder_medic_agents
+ * Continuous medic agent areorder function used after key value pairs have been sorted
  * @param values sorted index values
  * @param unordered_agents list of unordered agents
  * @ param ordered_agents list used to output ordered agents
  */
-__global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent_list* unordered_agents, xmachine_memory_agent_list* ordered_agents)
+__global__ void reorder_medic_agents(unsigned int* values, xmachine_memory_medic_list* unordered_agents, xmachine_memory_medic_list* ordered_agents)
 {
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
 
@@ -352,19 +485,6 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 
 	//reorder agent data
 	ordered_agents->x[index] = unordered_agents->x[old_pos];
-	ordered_agents->y[index] = unordered_agents->y[old_pos];
-	ordered_agents->velx[index] = unordered_agents->velx[old_pos];
-	ordered_agents->vely[index] = unordered_agents->vely[old_pos];
-	ordered_agents->steer_x[index] = unordered_agents->steer_x[old_pos];
-	ordered_agents->steer_y[index] = unordered_agents->steer_y[old_pos];
-	ordered_agents->height[index] = unordered_agents->height[old_pos];
-	ordered_agents->exit_no[index] = unordered_agents->exit_no[old_pos];
-	ordered_agents->speed[index] = unordered_agents->speed[old_pos];
-	ordered_agents->lod[index] = unordered_agents->lod[old_pos];
-	ordered_agents->animate[index] = unordered_agents->animate[old_pos];
-	ordered_agents->animate_dir[index] = unordered_agents->animate_dir[old_pos];
-	ordered_agents->estado[index] = unordered_agents->estado[old_pos];
-	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1514,6 +1634,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
     
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
+	agent.id = agents->id[index];
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
 	agent.velx = agents->velx[index];
@@ -1537,6 +1658,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_output_pedestrian_location Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
 	agents->velx[index] = agent.velx;
@@ -1571,6 +1693,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
     
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
+	agent.id = agents->id[index];
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
 	agent.velx = agents->velx[index];
@@ -1594,6 +1717,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_avoid_pedestrians Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
 	agents->velx[index] = agent.velx;
@@ -1628,6 +1752,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
     
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
+	agent.id = agents->id[index];
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
 	agent.velx = agents->velx[index];
@@ -1651,6 +1776,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_output_pedestrian_state Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
 	agents->velx[index] = agent.velx;
@@ -1685,6 +1811,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
     
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
+	agent.id = agents->id[index];
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
 	agent.velx = agents->velx[index];
@@ -1708,6 +1835,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_infect_pedestrians Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
 	agents->velx[index] = agent.velx;
@@ -1742,6 +1870,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents){
     
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
+	agent.id = agents->id[index];
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
 	agent.velx = agents->velx[index];
@@ -1765,6 +1894,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents){
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_move Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
 	agents->velx[index] = agent.velx;
@@ -1779,6 +1909,37 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents){
 	agents->animate_dir[index] = agent.animate_dir;
 	agents->estado[index] = agent.estado;
 	agents->tick[index] = agent.tick;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_prueba(xmachine_memory_medic_list* agents){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_medic_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_prueba Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_medic agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.x = agents->x[index];
+
+	//FLAME function call
+	int dead = !prueba(&agent);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_prueba Coalesced memory write (ignore arrays)
+	agents->x[index] = agent.x;
 }
 
 /**
@@ -1810,6 +1971,16 @@ __global__ void GPUFLAME_output_navmap_cells(xmachine_memory_navmap_list* agents
 	agent.exit0_y = agents->exit0_y[index];
 	agent.exit1_x = agents->exit1_x[index];
 	agent.exit1_y = agents->exit1_y[index];
+	agent.exit2_x = agents->exit2_x[index];
+	agent.exit2_y = agents->exit2_y[index];
+	agent.exit3_x = agents->exit3_x[index];
+	agent.exit3_y = agents->exit3_y[index];
+	agent.exit4_x = agents->exit4_x[index];
+	agent.exit4_y = agents->exit4_y[index];
+	agent.exit5_x = agents->exit5_x[index];
+	agent.exit5_y = agents->exit5_y[index];
+	agent.exit6_x = agents->exit6_x[index];
+	agent.exit6_y = agents->exit6_y[index];
 	agent.cant_generados = agents->cant_generados[index];
 
 	//FLAME function call
@@ -1829,6 +2000,16 @@ __global__ void GPUFLAME_output_navmap_cells(xmachine_memory_navmap_list* agents
 	agents->exit0_y[index] = agent.exit0_y;
 	agents->exit1_x[index] = agent.exit1_x;
 	agents->exit1_y[index] = agent.exit1_y;
+	agents->exit2_x[index] = agent.exit2_x;
+	agents->exit2_y[index] = agent.exit2_y;
+	agents->exit3_x[index] = agent.exit3_x;
+	agents->exit3_y[index] = agent.exit3_y;
+	agents->exit4_x[index] = agent.exit4_x;
+	agents->exit4_y[index] = agent.exit4_y;
+	agents->exit5_x[index] = agent.exit5_x;
+	agents->exit5_y[index] = agent.exit5_y;
+	agents->exit6_x[index] = agent.exit6_x;
+	agents->exit6_y[index] = agent.exit6_y;
 	agents->cant_generados[index] = agent.cant_generados;
 }
 
@@ -1861,6 +2042,16 @@ __global__ void GPUFLAME_generate_pedestrians(xmachine_memory_navmap_list* agent
 	agent.exit0_y = agents->exit0_y[index];
 	agent.exit1_x = agents->exit1_x[index];
 	agent.exit1_y = agents->exit1_y[index];
+	agent.exit2_x = agents->exit2_x[index];
+	agent.exit2_y = agents->exit2_y[index];
+	agent.exit3_x = agents->exit3_x[index];
+	agent.exit3_y = agents->exit3_y[index];
+	agent.exit4_x = agents->exit4_x[index];
+	agent.exit4_y = agents->exit4_y[index];
+	agent.exit5_x = agents->exit5_x[index];
+	agent.exit5_y = agents->exit5_y[index];
+	agent.exit6_x = agents->exit6_x[index];
+	agent.exit6_y = agents->exit6_y[index];
 	agent.cant_generados = agents->cant_generados[index];
 
 	//FLAME function call
@@ -1880,6 +2071,87 @@ __global__ void GPUFLAME_generate_pedestrians(xmachine_memory_navmap_list* agent
 	agents->exit0_y[index] = agent.exit0_y;
 	agents->exit1_x[index] = agent.exit1_x;
 	agents->exit1_y[index] = agent.exit1_y;
+	agents->exit2_x[index] = agent.exit2_x;
+	agents->exit2_y[index] = agent.exit2_y;
+	agents->exit3_x[index] = agent.exit3_x;
+	agents->exit3_y[index] = agent.exit3_y;
+	agents->exit4_x[index] = agent.exit4_x;
+	agents->exit4_y[index] = agent.exit4_y;
+	agents->exit5_x[index] = agent.exit5_x;
+	agents->exit5_y[index] = agent.exit5_y;
+	agents->exit6_x[index] = agent.exit6_x;
+	agents->exit6_y[index] = agent.exit6_y;
+	agents->cant_generados[index] = agent.cant_generados;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_generate_medics(xmachine_memory_navmap_list* agents, xmachine_memory_medic_list* medic_agents, RNG_rand48* rand48){
+	
+	
+	//discrete agent: index is position in 2D agent grid
+	int width = (blockDim.x * gridDim.x);
+	glm::ivec2 global_position;
+	global_position.x = (blockIdx.x * blockDim.x) + threadIdx.x;
+	global_position.y = (blockIdx.y * blockDim.y) + threadIdx.y;
+	int index = global_position.x + (global_position.y * width);
+	
+
+	//SoA to AoS - xmachine_memory_generate_medics Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_navmap agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.height = agents->height[index];
+	agent.collision_x = agents->collision_x[index];
+	agent.collision_y = agents->collision_y[index];
+	agent.exit0_x = agents->exit0_x[index];
+	agent.exit0_y = agents->exit0_y[index];
+	agent.exit1_x = agents->exit1_x[index];
+	agent.exit1_y = agents->exit1_y[index];
+	agent.exit2_x = agents->exit2_x[index];
+	agent.exit2_y = agents->exit2_y[index];
+	agent.exit3_x = agents->exit3_x[index];
+	agent.exit3_y = agents->exit3_y[index];
+	agent.exit4_x = agents->exit4_x[index];
+	agent.exit4_y = agents->exit4_y[index];
+	agent.exit5_x = agents->exit5_x[index];
+	agent.exit5_y = agents->exit5_y[index];
+	agent.exit6_x = agents->exit6_x[index];
+	agent.exit6_y = agents->exit6_y[index];
+	agent.cant_generados = agents->cant_generados[index];
+
+	//FLAME function call
+	generate_medics(&agent, medic_agents, rand48);
+	
+
+	
+
+	//AoS to SoA - xmachine_memory_generate_medics Coalesced memory write (ignore arrays)
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->exit_no[index] = agent.exit_no;
+	agents->height[index] = agent.height;
+	agents->collision_x[index] = agent.collision_x;
+	agents->collision_y[index] = agent.collision_y;
+	agents->exit0_x[index] = agent.exit0_x;
+	agents->exit0_y[index] = agent.exit0_y;
+	agents->exit1_x[index] = agent.exit1_x;
+	agents->exit1_y[index] = agent.exit1_y;
+	agents->exit2_x[index] = agent.exit2_x;
+	agents->exit2_y[index] = agent.exit2_y;
+	agents->exit3_x[index] = agent.exit3_x;
+	agents->exit3_y[index] = agent.exit3_y;
+	agents->exit4_x[index] = agent.exit4_x;
+	agents->exit4_y[index] = agent.exit4_y;
+	agents->exit5_x[index] = agent.exit5_x;
+	agents->exit5_y[index] = agent.exit5_y;
+	agents->exit6_x[index] = agent.exit6_x;
+	agents->exit6_y[index] = agent.exit6_y;
 	agents->cant_generados[index] = agent.cant_generados;
 }
 

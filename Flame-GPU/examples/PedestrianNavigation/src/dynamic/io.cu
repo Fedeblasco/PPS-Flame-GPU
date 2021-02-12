@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -128,6 +128,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying agent Agent default State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_medics_default2, d_medics_default2, sizeof(xmachine_memory_medic_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying medic Agent default2 State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_navmaps_static, d_navmaps_static, sizeof(xmachine_memory_navmap_list), cudaMemcpyDeviceToHost);
@@ -293,6 +299,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs("<xagent>\n" , file);
 		fputs("<name>agent</name>\n", file);
         
+		fputs("<id>", file);
+        sprintf(data, "%u", h_agents_default->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
 		fputs("<x>", file);
         sprintf(data, "%f", h_agents_default->x[i]);
 		fputs(data, file);
@@ -365,6 +376,18 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         
 		fputs("</xagent>\n", file);
 	}
+	//Write each medic agent to xml
+	for (int i=0; i<h_xmachine_memory_medic_default2_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>medic</name>\n", file);
+        
+		fputs("<x>", file);
+        sprintf(data, "%d", h_medics_default2->x[i]);
+		fputs(data, file);
+		fputs("</x>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
 	//Write each navmap agent to xml
 	for (int i=0; i<h_xmachine_memory_navmap_static_count; i++){
 		fputs("<xagent>\n" , file);
@@ -420,8 +443,58 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</exit1_y>\n", file);
         
+		fputs("<exit2_x>", file);
+        sprintf(data, "%f", h_navmaps_static->exit2_x[i]);
+		fputs(data, file);
+		fputs("</exit2_x>\n", file);
+        
+		fputs("<exit2_y>", file);
+        sprintf(data, "%f", h_navmaps_static->exit2_y[i]);
+		fputs(data, file);
+		fputs("</exit2_y>\n", file);
+        
+		fputs("<exit3_x>", file);
+        sprintf(data, "%f", h_navmaps_static->exit3_x[i]);
+		fputs(data, file);
+		fputs("</exit3_x>\n", file);
+        
+		fputs("<exit3_y>", file);
+        sprintf(data, "%f", h_navmaps_static->exit3_y[i]);
+		fputs(data, file);
+		fputs("</exit3_y>\n", file);
+        
+		fputs("<exit4_x>", file);
+        sprintf(data, "%f", h_navmaps_static->exit4_x[i]);
+		fputs(data, file);
+		fputs("</exit4_x>\n", file);
+        
+		fputs("<exit4_y>", file);
+        sprintf(data, "%f", h_navmaps_static->exit4_y[i]);
+		fputs(data, file);
+		fputs("</exit4_y>\n", file);
+        
+		fputs("<exit5_x>", file);
+        sprintf(data, "%f", h_navmaps_static->exit5_x[i]);
+		fputs(data, file);
+		fputs("</exit5_x>\n", file);
+        
+		fputs("<exit5_y>", file);
+        sprintf(data, "%f", h_navmaps_static->exit5_y[i]);
+		fputs(data, file);
+		fputs("</exit5_y>\n", file);
+        
+		fputs("<exit6_x>", file);
+        sprintf(data, "%f", h_navmaps_static->exit6_x[i]);
+		fputs(data, file);
+		fputs("</exit6_x>\n", file);
+        
+		fputs("<exit6_y>", file);
+        sprintf(data, "%f", h_navmaps_static->exit6_y[i]);
+		fputs(data, file);
+		fputs("</exit6_y>\n", file);
+        
 		fputs("<cant_generados>", file);
-        sprintf(data, "%d", h_navmaps_static->cant_generados[i]);
+        sprintf(data, "%u", h_navmaps_static->cant_generados[i]);
 		fputs(data, file);
 		fputs("</cant_generados>\n", file);
         
@@ -437,7 +510,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 
 }
 
-void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
+void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
 {
     PROFILE_SCOPED_RANGE("readInitialStates");
 
@@ -457,6 +530,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	/* Variables for checking tags */
 	int reading, i;
 	int in_tag, in_itno, in_xagent, in_name, in_comment;
+    int in_agent_id;
     int in_agent_x;
     int in_agent_y;
     int in_agent_velx;
@@ -471,6 +545,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_animate_dir;
     int in_agent_estado;
     int in_agent_tick;
+    int in_medic_x;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -481,6 +556,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_navmap_exit0_y;
     int in_navmap_exit1_x;
     int in_navmap_exit1_y;
+    int in_navmap_exit2_x;
+    int in_navmap_exit2_y;
+    int in_navmap_exit3_x;
+    int in_navmap_exit3_y;
+    int in_navmap_exit4_x;
+    int in_navmap_exit4_y;
+    int in_navmap_exit5_x;
+    int in_navmap_exit5_y;
+    int in_navmap_exit6_x;
+    int in_navmap_exit6_y;
     int in_navmap_cant_generados;
     
     /* tags for environment global variables */
@@ -553,9 +638,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
 	/* set agent count to zero */
 	*h_xmachine_memory_agent_count = 0;
+	*h_xmachine_memory_medic_count = 0;
 	*h_xmachine_memory_navmap_count = 0;
 	
 	/* Variables for initial state data */
+	unsigned int agent_id;
 	float agent_x;
 	float agent_y;
 	float agent_velx;
@@ -570,6 +657,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int agent_animate_dir;
 	int agent_estado;
 	int agent_tick;
+	int medic_x;
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -580,7 +668,17 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	float navmap_exit0_y;
 	float navmap_exit1_x;
 	float navmap_exit1_y;
-	int navmap_cant_generados;
+	float navmap_exit2_x;
+	float navmap_exit2_y;
+	float navmap_exit3_x;
+	float navmap_exit3_y;
+	float navmap_exit4_x;
+	float navmap_exit4_y;
+	float navmap_exit5_x;
+	float navmap_exit5_y;
+	float navmap_exit6_x;
+	float navmap_exit6_y;
+	unsigned int navmap_cant_generados;
 
     /* Variables for environment variables */
     float env_EMMISION_RATE_EXIT1;
@@ -633,6 +731,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env = 0;
     in_xagent = 0;
 	in_name = 0;
+	in_agent_id = 0;
 	in_agent_x = 0;
 	in_agent_y = 0;
 	in_agent_velx = 0;
@@ -647,6 +746,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_animate_dir = 0;
 	in_agent_estado = 0;
 	in_agent_tick = 0;
+	in_medic_x = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -657,6 +757,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_navmap_exit0_y = 0;
 	in_navmap_exit1_x = 0;
 	in_navmap_exit1_y = 0;
+	in_navmap_exit2_x = 0;
+	in_navmap_exit2_y = 0;
+	in_navmap_exit3_x = 0;
+	in_navmap_exit3_y = 0;
+	in_navmap_exit4_x = 0;
+	in_navmap_exit4_y = 0;
+	in_navmap_exit5_x = 0;
+	in_navmap_exit5_y = 0;
+	in_navmap_exit6_x = 0;
+	in_navmap_exit6_y = 0;
 	in_navmap_cant_generados = 0;
     in_env_EMMISION_RATE_EXIT1 = 0;
     in_env_EMMISION_RATE_EXIT2 = 0;
@@ -695,6 +805,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
 	for (int k=0; k<xmachine_memory_agent_MAX; k++)
 	{	
+		h_agents->id[k] = 0;
 		h_agents->x[k] = 0;
 		h_agents->y[k] = 0;
 		h_agents->velx[k] = 0;
@@ -711,6 +822,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->tick[k] = 0;
 	}
 	
+	//set all medic values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_medic_MAX; k++)
+	{	
+		h_medics->x[k] = 0;
+	}
+	
 	//set all navmap values to 0
 	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
 	for (int k=0; k<xmachine_memory_navmap_MAX; k++)
@@ -725,11 +843,22 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_navmaps->exit0_y[k] = 0;
 		h_navmaps->exit1_x[k] = 0;
 		h_navmaps->exit1_y[k] = 0;
+		h_navmaps->exit2_x[k] = 0;
+		h_navmaps->exit2_y[k] = 0;
+		h_navmaps->exit3_x[k] = 0;
+		h_navmaps->exit3_y[k] = 0;
+		h_navmaps->exit4_x[k] = 0;
+		h_navmaps->exit4_y[k] = 0;
+		h_navmaps->exit5_x[k] = 0;
+		h_navmaps->exit5_y[k] = 0;
+		h_navmaps->exit6_x[k] = 0;
+		h_navmaps->exit6_y[k] = 0;
 		h_navmaps->cant_generados[k] = 0;
 	}
 	
 
 	/* Default variables for memory */
+    agent_id = 0;
     agent_x = 0;
     agent_y = 0;
     agent_velx = 0;
@@ -744,6 +873,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_animate_dir = 0;
     agent_estado = 0;
     agent_tick = 0;
+    medic_x = 0;
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -754,6 +884,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     navmap_exit0_y = 0;
     navmap_exit1_x = 0;
     navmap_exit1_y = 0;
+    navmap_exit2_x = 0;
+    navmap_exit2_y = 0;
+    navmap_exit3_x = 0;
+    navmap_exit3_y = 0;
+    navmap_exit4_x = 0;
+    navmap_exit4_y = 0;
+    navmap_exit5_x = 0;
+    navmap_exit5_y = 0;
+    navmap_exit6_x = 0;
+    navmap_exit6_y = 0;
     navmap_cant_generados = 0;
 
     /* Default variables for environment variables */
@@ -888,6 +1028,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 						exit(EXIT_FAILURE);
 					}
                     
+					h_agents->id[*h_xmachine_memory_agent_count] = agent_id;
 					h_agents->x[*h_xmachine_memory_agent_count] = agent_x;//Check maximum x value
                     if(agent_maximum.x < agent_x)
                         agent_maximum.x = (float)agent_x;
@@ -915,6 +1056,24 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->estado[*h_xmachine_memory_agent_count] = agent_estado;
 					h_agents->tick[*h_xmachine_memory_agent_count] = agent_tick;
 					(*h_xmachine_memory_agent_count) ++;	
+				}
+				else if(strcmp(agentname, "medic") == 0)
+				{
+					if (*h_xmachine_memory_medic_count > xmachine_memory_medic_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent medic exceeded whilst reading data\n", xmachine_memory_medic_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_medics->x[*h_xmachine_memory_medic_count] = medic_x;//Check maximum x value
+                    if(agent_maximum.x < medic_x)
+                        agent_maximum.x = (float)medic_x;
+                    //Check minimum x value
+                    if(agent_minimum.x > medic_x)
+                        agent_minimum.x = (float)medic_x;
+                    
+					(*h_xmachine_memory_medic_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
 				{
@@ -947,6 +1106,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_navmaps->exit0_y[*h_xmachine_memory_navmap_count] = navmap_exit0_y;
 					h_navmaps->exit1_x[*h_xmachine_memory_navmap_count] = navmap_exit1_x;
 					h_navmaps->exit1_y[*h_xmachine_memory_navmap_count] = navmap_exit1_y;
+					h_navmaps->exit2_x[*h_xmachine_memory_navmap_count] = navmap_exit2_x;
+					h_navmaps->exit2_y[*h_xmachine_memory_navmap_count] = navmap_exit2_y;
+					h_navmaps->exit3_x[*h_xmachine_memory_navmap_count] = navmap_exit3_x;
+					h_navmaps->exit3_y[*h_xmachine_memory_navmap_count] = navmap_exit3_y;
+					h_navmaps->exit4_x[*h_xmachine_memory_navmap_count] = navmap_exit4_x;
+					h_navmaps->exit4_y[*h_xmachine_memory_navmap_count] = navmap_exit4_y;
+					h_navmaps->exit5_x[*h_xmachine_memory_navmap_count] = navmap_exit5_x;
+					h_navmaps->exit5_y[*h_xmachine_memory_navmap_count] = navmap_exit5_y;
+					h_navmaps->exit6_x[*h_xmachine_memory_navmap_count] = navmap_exit6_x;
+					h_navmaps->exit6_y[*h_xmachine_memory_navmap_count] = navmap_exit6_y;
 					h_navmaps->cant_generados[*h_xmachine_memory_navmap_count] = navmap_cant_generados;
 					(*h_xmachine_memory_navmap_count) ++;	
 				}
@@ -958,6 +1127,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 
 
 				/* Reset xagent variables */
+                agent_id = 0;
                 agent_x = 0;
                 agent_y = 0;
                 agent_velx = 0;
@@ -972,6 +1142,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_animate_dir = 0;
                 agent_estado = 0;
                 agent_tick = 0;
+                medic_x = 0;
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -982,10 +1153,22 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 navmap_exit0_y = 0;
                 navmap_exit1_x = 0;
                 navmap_exit1_y = 0;
+                navmap_exit2_x = 0;
+                navmap_exit2_y = 0;
+                navmap_exit3_x = 0;
+                navmap_exit3_y = 0;
+                navmap_exit4_x = 0;
+                navmap_exit4_y = 0;
+                navmap_exit5_x = 0;
+                navmap_exit5_y = 0;
+                navmap_exit6_x = 0;
+                navmap_exit6_y = 0;
                 navmap_cant_generados = 0;
                 
                 in_xagent = 0;
 			}
+			if(strcmp(buffer, "id") == 0) in_agent_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_agent_id = 0;
 			if(strcmp(buffer, "x") == 0) in_agent_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_agent_x = 0;
 			if(strcmp(buffer, "y") == 0) in_agent_y = 1;
@@ -1014,6 +1197,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/estado") == 0) in_agent_estado = 0;
 			if(strcmp(buffer, "tick") == 0) in_agent_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_agent_tick = 0;
+			if(strcmp(buffer, "x") == 0) in_medic_x = 1;
+			if(strcmp(buffer, "/x") == 0) in_medic_x = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1034,6 +1219,26 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/exit1_x") == 0) in_navmap_exit1_x = 0;
 			if(strcmp(buffer, "exit1_y") == 0) in_navmap_exit1_y = 1;
 			if(strcmp(buffer, "/exit1_y") == 0) in_navmap_exit1_y = 0;
+			if(strcmp(buffer, "exit2_x") == 0) in_navmap_exit2_x = 1;
+			if(strcmp(buffer, "/exit2_x") == 0) in_navmap_exit2_x = 0;
+			if(strcmp(buffer, "exit2_y") == 0) in_navmap_exit2_y = 1;
+			if(strcmp(buffer, "/exit2_y") == 0) in_navmap_exit2_y = 0;
+			if(strcmp(buffer, "exit3_x") == 0) in_navmap_exit3_x = 1;
+			if(strcmp(buffer, "/exit3_x") == 0) in_navmap_exit3_x = 0;
+			if(strcmp(buffer, "exit3_y") == 0) in_navmap_exit3_y = 1;
+			if(strcmp(buffer, "/exit3_y") == 0) in_navmap_exit3_y = 0;
+			if(strcmp(buffer, "exit4_x") == 0) in_navmap_exit4_x = 1;
+			if(strcmp(buffer, "/exit4_x") == 0) in_navmap_exit4_x = 0;
+			if(strcmp(buffer, "exit4_y") == 0) in_navmap_exit4_y = 1;
+			if(strcmp(buffer, "/exit4_y") == 0) in_navmap_exit4_y = 0;
+			if(strcmp(buffer, "exit5_x") == 0) in_navmap_exit5_x = 1;
+			if(strcmp(buffer, "/exit5_x") == 0) in_navmap_exit5_x = 0;
+			if(strcmp(buffer, "exit5_y") == 0) in_navmap_exit5_y = 1;
+			if(strcmp(buffer, "/exit5_y") == 0) in_navmap_exit5_y = 0;
+			if(strcmp(buffer, "exit6_x") == 0) in_navmap_exit6_x = 1;
+			if(strcmp(buffer, "/exit6_x") == 0) in_navmap_exit6_x = 0;
+			if(strcmp(buffer, "exit6_y") == 0) in_navmap_exit6_y = 1;
+			if(strcmp(buffer, "/exit6_y") == 0) in_navmap_exit6_y = 0;
 			if(strcmp(buffer, "cant_generados") == 0) in_navmap_cant_generados = 1;
 			if(strcmp(buffer, "/cant_generados") == 0) in_navmap_cant_generados = 0;
 			
@@ -1122,6 +1327,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(in_name) strcpy(agentname, buffer);
 			else if (in_xagent)
 			{
+				if(in_agent_id){
+                    agent_id = (unsigned int) fpgu_strtoul(buffer); 
+                }
 				if(in_agent_x){
                     agent_x = (float) fgpu_atof(buffer); 
                 }
@@ -1164,6 +1372,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_agent_tick){
                     agent_tick = (int) fpgu_strtol(buffer); 
                 }
+				if(in_medic_x){
+                    medic_x = (int) fpgu_strtol(buffer); 
+                }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 
                 }
@@ -1194,8 +1405,38 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_navmap_exit1_y){
                     navmap_exit1_y = (float) fgpu_atof(buffer); 
                 }
+				if(in_navmap_exit2_x){
+                    navmap_exit2_x = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit2_y){
+                    navmap_exit2_y = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit3_x){
+                    navmap_exit3_x = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit3_y){
+                    navmap_exit3_y = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit4_x){
+                    navmap_exit4_x = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit4_y){
+                    navmap_exit4_y = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit5_x){
+                    navmap_exit5_x = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit5_y){
+                    navmap_exit5_y = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit6_x){
+                    navmap_exit6_x = (float) fgpu_atof(buffer); 
+                }
+				if(in_navmap_exit6_y){
+                    navmap_exit6_y = (float) fgpu_atof(buffer); 
+                }
 				if(in_navmap_cant_generados){
-                    navmap_cant_generados = (int) fpgu_strtol(buffer); 
+                    navmap_cant_generados = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				
             }

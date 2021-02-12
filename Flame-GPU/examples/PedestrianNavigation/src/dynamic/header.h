@@ -73,6 +73,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_memory_agent
 #define xmachine_memory_agent_MAX 65536
 
+//Maximum population size of xmachine_memory_medic
+#define xmachine_memory_medic_MAX 65536
+
 //Maximum population size of xmachine_memory_navmap
 #define xmachine_memory_navmap_MAX 65536
 
@@ -144,6 +147,7 @@ enum AGENT_TYPE{
  */
 struct __align__(16) xmachine_memory_agent
 {
+    unsigned int id;    /**< X-machine memory variable id of type unsigned int.*/
     float x;    /**< X-machine memory variable x of type float.*/
     float y;    /**< X-machine memory variable y of type float.*/
     float velx;    /**< X-machine memory variable velx of type float.*/
@@ -158,6 +162,15 @@ struct __align__(16) xmachine_memory_agent
     int animate_dir;    /**< X-machine memory variable animate_dir of type int.*/
     int estado;    /**< X-machine memory variable estado of type int.*/
     int tick;    /**< X-machine memory variable tick of type int.*/
+};
+
+/** struct xmachine_memory_medic
+ * continuous valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_medic
+{
+    int x;    /**< X-machine memory variable x of type int.*/
 };
 
 /** struct xmachine_memory_navmap
@@ -176,7 +189,17 @@ struct __align__(16) xmachine_memory_navmap
     float exit0_y;    /**< X-machine memory variable exit0_y of type float.*/
     float exit1_x;    /**< X-machine memory variable exit1_x of type float.*/
     float exit1_y;    /**< X-machine memory variable exit1_y of type float.*/
-    int cant_generados;    /**< X-machine memory variable cant_generados of type int.*/
+    float exit2_x;    /**< X-machine memory variable exit2_x of type float.*/
+    float exit2_y;    /**< X-machine memory variable exit2_y of type float.*/
+    float exit3_x;    /**< X-machine memory variable exit3_x of type float.*/
+    float exit3_y;    /**< X-machine memory variable exit3_y of type float.*/
+    float exit4_x;    /**< X-machine memory variable exit4_x of type float.*/
+    float exit4_y;    /**< X-machine memory variable exit4_y of type float.*/
+    float exit5_x;    /**< X-machine memory variable exit5_x of type float.*/
+    float exit5_y;    /**< X-machine memory variable exit5_y of type float.*/
+    float exit6_x;    /**< X-machine memory variable exit6_x of type float.*/
+    float exit6_y;    /**< X-machine memory variable exit6_y of type float.*/
+    unsigned int cant_generados;    /**< X-machine memory variable cant_generados of type unsigned int.*/
 };
 
 
@@ -251,6 +274,7 @@ struct xmachine_memory_agent_list
     int _position [xmachine_memory_agent_MAX];    /**< Holds agents position in the 1D agent list */
     int _scan_input [xmachine_memory_agent_MAX];  /**< Used during parallel prefix sum */
     
+    unsigned int id [xmachine_memory_agent_MAX];    /**< X-machine memory variable list id of type unsigned int.*/
     float x [xmachine_memory_agent_MAX];    /**< X-machine memory variable list x of type float.*/
     float y [xmachine_memory_agent_MAX];    /**< X-machine memory variable list y of type float.*/
     float velx [xmachine_memory_agent_MAX];    /**< X-machine memory variable list velx of type float.*/
@@ -265,6 +289,19 @@ struct xmachine_memory_agent_list
     int animate_dir [xmachine_memory_agent_MAX];    /**< X-machine memory variable list animate_dir of type int.*/
     int estado [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado of type int.*/
     int tick [xmachine_memory_agent_MAX];    /**< X-machine memory variable list tick of type int.*/
+};
+
+/** struct xmachine_memory_medic_list
+ * continuous valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_medic_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_medic_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_medic_MAX];  /**< Used during parallel prefix sum */
+    
+    int x [xmachine_memory_medic_MAX];    /**< X-machine memory variable list x of type int.*/
 };
 
 /** struct xmachine_memory_navmap_list
@@ -287,7 +324,17 @@ struct xmachine_memory_navmap_list
     float exit0_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit0_y of type float.*/
     float exit1_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_x of type float.*/
     float exit1_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_y of type float.*/
-    int cant_generados [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list cant_generados of type int.*/
+    float exit2_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_x of type float.*/
+    float exit2_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_y of type float.*/
+    float exit3_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_x of type float.*/
+    float exit3_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_y of type float.*/
+    float exit4_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_x of type float.*/
+    float exit4_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_y of type float.*/
+    float exit5_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_x of type float.*/
+    float exit5_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_y of type float.*/
+    float exit6_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_x of type float.*/
+    float exit6_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_y of type float.*/
+    unsigned int cant_generados [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list cant_generados of type unsigned int.*/
 };
 
 
@@ -448,6 +495,13 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent);
 
 /**
+ * prueba FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_medic. This represents a single agent instance and can be modified directly.
+ 
+ */
+__FLAME_GPU_FUNC__ int prueba(xmachine_memory_medic* agent);
+
+/**
  * output_navmap_cells FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
  * @param navmap_cell_messages Pointer to output message list of type xmachine_message_navmap_cell_list. Must be passed as an argument to the add_navmap_cell_message function ??.
@@ -460,6 +514,13 @@ __FLAME_GPU_FUNC__ int output_navmap_cells(xmachine_memory_navmap* agent, xmachi
  * @param agent_agents Pointer to agent list of type xmachine_memory_agent_list. This must be passed as an argument to the add_agent_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
 __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmachine_memory_agent_list* agent_agents, RNG_rand48* rand48);
+
+/**
+ * generate_medics FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
+ * @param medic_agents Pointer to agent list of type xmachine_memory_medic_list. This must be passed as an argument to the add_medic_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_memory_medic_list* medic_agents, RNG_rand48* rand48);
 
   
 /* Message Function Prototypes for Spatially Partitioned pedestrian_location message implemented in FLAMEGPU_Kernels */
@@ -571,6 +632,7 @@ template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_
 /** add_agent_agent
  * Adds a new continuous valued agent agent to the xmachine_memory_agent_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_agent_list agent list
+ * @param id	agent agent variable of type unsigned int
  * @param x	agent agent variable of type float
  * @param y	agent agent variable of type float
  * @param velx	agent agent variable of type float
@@ -586,7 +648,14 @@ template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_
  * @param estado	agent agent variable of type int
  * @param tick	agent agent variable of type int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick);
+
+/** add_medic_agent
+ * Adds a new continuous valued medic agent to the xmachine_memory_medic_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_medic_list agent list
+ * @param x	agent agent variable of type int
+ */
+__FLAME_GPU_FUNC__ void add_medic_agent(xmachine_memory_medic_list* agents, int x);
 
 
 /* Graph loading function prototypes implemented in io.cu */
@@ -622,11 +691,14 @@ extern void singleIteration();
  * @param h_agents Pointer to agent list on the host
  * @param d_agents Pointer to agent list on the GPU device
  * @param h_xmachine_memory_agent_count Pointer to agent counter
+ * @param h_medics Pointer to agent list on the host
+ * @param d_medics Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_medic_count Pointer to agent counter
  * @param h_navmaps Pointer to agent list on the host
  * @param d_navmaps Pointer to agent list on the GPU device
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
+extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
 
 
 /** readInitialStates
@@ -634,10 +706,12 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param	inputpath	file path to XML file used for input of agent data
  * @param h_agents Pointer to agent list on the host
  * @param h_xmachine_memory_agent_count Pointer to agent counter
+ * @param h_medics Pointer to agent list on the host
+ * @param h_xmachine_memory_medic_count Pointer to agent counter
  * @param h_navmaps Pointer to agent list on the host
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
+extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
 
 
 /* Return functions used by external code to get agent data from device */
@@ -683,6 +757,46 @@ void sort_agents_default(void (*generate_key_value_pairs)(unsigned int* keys, un
 
 
     
+/** get_agent_medic_MAX_count
+ * Gets the max agent count for the medic agent type 
+ * @return		the maximum medic agent count
+ */
+extern int get_agent_medic_MAX_count();
+
+
+
+/** get_agent_medic_default2_count
+ * Gets the agent count for the medic agent type in state default2
+ * @return		the current medic agent count in state default2
+ */
+extern int get_agent_medic_default2_count();
+
+/** reset_default2_count
+ * Resets the agent count of the medic in state default2 to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_medic_default2_count();
+
+/** get_device_medic_default2_agents
+ * Gets a pointer to xmachine_memory_medic_list on the GPU device
+ * @return		a xmachine_memory_medic_list on the GPU device
+ */
+extern xmachine_memory_medic_list* get_device_medic_default2_agents();
+
+/** get_host_medic_default2_agents
+ * Gets a pointer to xmachine_memory_medic_list on the CPU host
+ * @return		a xmachine_memory_medic_list on the CPU host
+ */
+extern xmachine_memory_medic_list* get_host_medic_default2_agents();
+
+
+/** sort_medics_default2
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
+ */
+void sort_medics_default2(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_medic_list* agents));
+
+
+    
 /** get_agent_navmap_MAX_count
  * Gets the max agent count for the navmap agent type 
  * @return		the maximum navmap agent count
@@ -723,6 +837,15 @@ extern int get_navmap_population_width();
 
 
 /* Host based access of agent variables*/
+
+/** unsigned int get_agent_default_variable_id(unsigned int index)
+ * Gets the value of the id variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_agent_default_variable_id(unsigned int index);
 
 /** float get_agent_default_variable_x(unsigned int index)
  * Gets the value of the x variable of an agent agent in the default state on the host. 
@@ -850,6 +973,15 @@ __host__ int get_agent_default_variable_estado(unsigned int index);
  */
 __host__ int get_agent_default_variable_tick(unsigned int index);
 
+/** int get_medic_default2_variable_x(unsigned int index)
+ * Gets the value of the x variable of an medic agent in the default2 state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_medic_default2_variable_x(unsigned int index);
+
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -940,14 +1072,104 @@ __host__ float get_navmap_static_variable_exit1_x(unsigned int index);
  */
 __host__ float get_navmap_static_variable_exit1_y(unsigned int index);
 
-/** int get_navmap_static_variable_cant_generados(unsigned int index)
+/** float get_navmap_static_variable_exit2_x(unsigned int index)
+ * Gets the value of the exit2_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit2_x
+ */
+__host__ float get_navmap_static_variable_exit2_x(unsigned int index);
+
+/** float get_navmap_static_variable_exit2_y(unsigned int index)
+ * Gets the value of the exit2_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit2_y
+ */
+__host__ float get_navmap_static_variable_exit2_y(unsigned int index);
+
+/** float get_navmap_static_variable_exit3_x(unsigned int index)
+ * Gets the value of the exit3_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit3_x
+ */
+__host__ float get_navmap_static_variable_exit3_x(unsigned int index);
+
+/** float get_navmap_static_variable_exit3_y(unsigned int index)
+ * Gets the value of the exit3_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit3_y
+ */
+__host__ float get_navmap_static_variable_exit3_y(unsigned int index);
+
+/** float get_navmap_static_variable_exit4_x(unsigned int index)
+ * Gets the value of the exit4_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit4_x
+ */
+__host__ float get_navmap_static_variable_exit4_x(unsigned int index);
+
+/** float get_navmap_static_variable_exit4_y(unsigned int index)
+ * Gets the value of the exit4_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit4_y
+ */
+__host__ float get_navmap_static_variable_exit4_y(unsigned int index);
+
+/** float get_navmap_static_variable_exit5_x(unsigned int index)
+ * Gets the value of the exit5_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit5_x
+ */
+__host__ float get_navmap_static_variable_exit5_x(unsigned int index);
+
+/** float get_navmap_static_variable_exit5_y(unsigned int index)
+ * Gets the value of the exit5_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit5_y
+ */
+__host__ float get_navmap_static_variable_exit5_y(unsigned int index);
+
+/** float get_navmap_static_variable_exit6_x(unsigned int index)
+ * Gets the value of the exit6_x variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit6_x
+ */
+__host__ float get_navmap_static_variable_exit6_x(unsigned int index);
+
+/** float get_navmap_static_variable_exit6_y(unsigned int index)
+ * Gets the value of the exit6_y variable of an navmap agent in the static state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable exit6_y
+ */
+__host__ float get_navmap_static_variable_exit6_y(unsigned int index);
+
+/** unsigned int get_navmap_static_variable_cant_generados(unsigned int index)
  * Gets the value of the cant_generados variable of an navmap agent in the static state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @return value of agent variable cant_generados
  */
-__host__ int get_navmap_static_variable_cant_generados(unsigned int index);
+__host__ unsigned int get_navmap_static_variable_cant_generados(unsigned int index);
 
 
 
@@ -994,6 +1216,47 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent);
  * @param count the number of agents to copy from the host to the device.
  */
 void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int count);
+
+/** h_allocate_agent_medic
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated medic struct.
+ */
+xmachine_memory_medic* h_allocate_agent_medic();
+/** h_free_agent_medic
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_medic(xmachine_memory_medic** agent);
+/** h_allocate_agent_medic_array
+ * Utility function to allocate an array of structs for  medic agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_medic** h_allocate_agent_medic_array(unsigned int count);
+/** h_free_agent_medic_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_medic_array(xmachine_memory_medic*** agents, unsigned int count);
+
+
+/** h_add_agent_medic_default2
+ * Host function to add a single agent of type medic to the default2 state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_medic_default2 instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_medic_default2(xmachine_memory_medic* agent);
+
+/** h_add_agents_medic_default2(
+ * Host function to add multiple agents of type medic to the default2 state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of medic agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_medic_default2(xmachine_memory_medic** agents, unsigned int count);
 
 /** h_allocate_agent_navmap
  * Utility function to allocate and initialise an agent struct on the host.
@@ -1045,6 +1308,32 @@ typedef enum {
   REDUCTION_SUM
 }reduction_operator;
 
+
+/** unsigned int reduce_agent_default_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_id_variable();
+
+
+
+/** unsigned int count_agent_default_id_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_id_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_id_variable();
+/** unsigned int max_agent_default_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_id_variable();
 
 /** float reduce_agent_default_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
@@ -1347,6 +1636,32 @@ int min_agent_default_tick_variable();
  */
 int max_agent_default_tick_variable();
 
+/** int reduce_medic_default2_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_medic_default2_x_variable();
+
+
+
+/** int count_medic_default2_x_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_medic_default2_x_variable(int count_value);
+
+/** int min_medic_default2_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_medic_default2_x_variable();
+/** int max_medic_default2_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_medic_default2_x_variable();
+
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
@@ -1558,31 +1873,221 @@ float min_navmap_static_exit1_y_variable();
  */
 float max_navmap_static_exit1_y_variable();
 
-/** int reduce_navmap_static_cant_generados_variable();
+/** float reduce_navmap_static_exit2_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
  */
-int reduce_navmap_static_cant_generados_variable();
+float reduce_navmap_static_exit2_x_variable();
 
 
 
-/** int count_navmap_static_cant_generados_variable(int count_value){
+/** float min_navmap_static_exit2_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit2_x_variable();
+/** float max_navmap_static_exit2_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit2_x_variable();
+
+/** float reduce_navmap_static_exit2_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit2_y_variable();
+
+
+
+/** float min_navmap_static_exit2_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit2_y_variable();
+/** float max_navmap_static_exit2_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit2_y_variable();
+
+/** float reduce_navmap_static_exit3_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit3_x_variable();
+
+
+
+/** float min_navmap_static_exit3_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit3_x_variable();
+/** float max_navmap_static_exit3_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit3_x_variable();
+
+/** float reduce_navmap_static_exit3_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit3_y_variable();
+
+
+
+/** float min_navmap_static_exit3_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit3_y_variable();
+/** float max_navmap_static_exit3_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit3_y_variable();
+
+/** float reduce_navmap_static_exit4_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit4_x_variable();
+
+
+
+/** float min_navmap_static_exit4_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit4_x_variable();
+/** float max_navmap_static_exit4_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit4_x_variable();
+
+/** float reduce_navmap_static_exit4_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit4_y_variable();
+
+
+
+/** float min_navmap_static_exit4_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit4_y_variable();
+/** float max_navmap_static_exit4_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit4_y_variable();
+
+/** float reduce_navmap_static_exit5_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit5_x_variable();
+
+
+
+/** float min_navmap_static_exit5_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit5_x_variable();
+/** float max_navmap_static_exit5_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit5_x_variable();
+
+/** float reduce_navmap_static_exit5_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit5_y_variable();
+
+
+
+/** float min_navmap_static_exit5_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit5_y_variable();
+/** float max_navmap_static_exit5_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit5_y_variable();
+
+/** float reduce_navmap_static_exit6_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit6_x_variable();
+
+
+
+/** float min_navmap_static_exit6_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit6_x_variable();
+/** float max_navmap_static_exit6_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit6_x_variable();
+
+/** float reduce_navmap_static_exit6_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+float reduce_navmap_static_exit6_y_variable();
+
+
+
+/** float min_navmap_static_exit6_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float min_navmap_static_exit6_y_variable();
+/** float max_navmap_static_exit6_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+float max_navmap_static_exit6_y_variable();
+
+/** unsigned int reduce_navmap_static_cant_generados_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_navmap_static_cant_generados_variable();
+
+
+
+/** unsigned int count_navmap_static_cant_generados_variable(unsigned int count_value){
  * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
  * @param count_value The unique value which should be counted
  * @return The number of unique values of the count_value found in the agent state variable list
  */
-int count_navmap_static_cant_generados_variable(int count_value);
+unsigned int count_navmap_static_cant_generados_variable(unsigned int count_value);
 
-/** int min_navmap_static_cant_generados_variable();
+/** unsigned int min_navmap_static_cant_generados_variable();
  * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-int min_navmap_static_cant_generados_variable();
-/** int max_navmap_static_cant_generados_variable();
+unsigned int min_navmap_static_cant_generados_variable();
+/** unsigned int max_navmap_static_cant_generados_variable();
  * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-int max_navmap_static_cant_generados_variable();
+unsigned int max_navmap_static_cant_generados_variable();
 
 
   
