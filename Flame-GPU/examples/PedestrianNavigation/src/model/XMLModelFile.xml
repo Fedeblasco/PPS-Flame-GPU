@@ -139,6 +139,11 @@
     <gpu:functionFiles>
       <file>functions.c</file>
     </gpu:functionFiles>
+    <gpu:initFunctions>
+      <gpu:initFunction>
+        <gpu:name>inicializarMapa</gpu:name>
+      </gpu:initFunction>
+    </gpu:initFunctions>
   </gpu:environment>
   <xagents>
     <gpu:xagent>
@@ -665,7 +670,7 @@
         <name>move</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>prueba</name>
+        <name>receptionServer</name>
       </gpu:layerFunction>
     </layer>
   </layers>

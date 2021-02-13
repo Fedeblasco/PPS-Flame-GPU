@@ -796,6 +796,19 @@ void initialise(char * inputfile){
 #endif
 
 	
+#if defined(INSTRUMENT_INIT_FUNCTIONS) && INSTRUMENT_INIT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+    inicializarMapa();
+    PROFILE_PUSH_RANGE("inicializarMapa");
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_INIT_FUNCTIONS) && INSTRUMENT_INIT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: inicializarMapa = %f (ms)\n", instrument_milliseconds);
+#endif
+	
   
   /* Init CUDA Streams for function layers */
   
@@ -1201,14 +1214,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("medic_prueba");
-	medic_prueba(stream2);
+    PROFILE_PUSH_RANGE("receptionist_receptionServer");
+	receptionist_receptionServer(stream2);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: medic_prueba = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: receptionist_receptionServer = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   

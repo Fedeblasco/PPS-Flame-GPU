@@ -39,11 +39,24 @@
 #define ticks_portador 50000
 #define ticks_enfermo 50000
 //Cantidad de personas a generar
-#define cant_personas 2
+#define cant_personas 6
 
 #define ir_x 140
 #define ir_y 102
 
+
+//This function creates all the agents requiered to run the hospital
+__FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
+	printf("Inicializando todo");
+
+	// Allocating memory in CPU to save the agent
+	xmachine_memory_receptionist * h_receptionist = h_allocate_agent_receptionist();
+	// Copying the agent from the CPU to GPU
+	h_add_agent_receptionist_defaultReceptionist(h_receptionist);
+	// Freeing the previously allocated memory
+	h_free_agent_receptionist(&h_receptionist);
+
+}
 
 /**
  * output_location FLAMEGPU Agent Function
@@ -271,7 +284,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 		}
 	}
 
-	add_check_in_message(checkInMessage, 10);
+	add_check_in_message(checkInMessage, agent->id);
 
 	//Por cada tick, informo mi posición
 	//printf("%d, ",x);
@@ -367,10 +380,14 @@ __FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_m
 
 
 
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessage, xmachine_message_avisar_paciente_list* patientMessage){
+__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessage){
 	
-	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessage);
-
+	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
+	while(current_message){
+		printf("Recibí el siguiente mensaje: %d\n",current_message->id);
+		current_message = get_next_check_in_message(current_message, checkInMessages);
+	}
+	
 	return 0;
 }
 
