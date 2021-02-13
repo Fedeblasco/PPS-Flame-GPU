@@ -29,6 +29,8 @@ __constant__ int d_xmachine_memory_agent_count;
 
 __constant__ int d_xmachine_memory_medic_count;
 
+__constant__ int d_xmachine_memory_receptionist_count;
+
 __constant__ int d_xmachine_memory_navmap_count;
 
 /* Agent state count constants */
@@ -36,6 +38,8 @@ __constant__ int d_xmachine_memory_navmap_count;
 __constant__ int d_xmachine_memory_agent_default_count;
 
 __constant__ int d_xmachine_memory_medic_default2_count;
+
+__constant__ int d_xmachine_memory_receptionist_defaultReceptionist_count;
 
 __constant__ int d_xmachine_memory_navmap_static_count;
 
@@ -61,6 +65,16 @@ __constant__ glm::vec3 d_message_pedestrian_state_min_bounds;           /**< min
 __constant__ glm::vec3 d_message_pedestrian_state_max_bounds;           /**< max bounds (x,y,z) of partitioning environment */
 __constant__ glm::ivec3 d_message_pedestrian_state_partitionDim;           /**< partition dimensions (x,y,z) of partitioning environment */
 __constant__ float d_message_pedestrian_state_radius;                 /**< partition radius (used to determin the size of the partitions) */
+
+/* check_in Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_check_in_count;         /**< message list counter*/
+__constant__ int d_message_check_in_output_type;   /**< message output type (single or optional)*/
+
+/* avisar_paciente Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_avisar_paciente_count;         /**< message list counter*/
+__constant__ int d_message_avisar_paciente_output_type;   /**< message output type (single or optional)*/
 
 /* navmap_cell Message variables */
 //Discrete Partitioning Variables
@@ -103,6 +117,8 @@ texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_p
 __constant__ int d_tex_xmachine_message_pedestrian_state_pbm_start_offset;
 texture<int, 1, cudaReadModeElementType> tex_xmachine_message_pedestrian_state_pbm_end_or_count;
 __constant__ int d_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset;
+
+
 
 
 /* navmap_cell Message Bindings */texture<int, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_x;
@@ -413,7 +429,8 @@ __global__ void scatter_medic_Agents(xmachine_memory_medic_list* agents_dst, xma
 
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
-		agents_dst->x[output_index] = agents_src->x[index];
+		agents_dst->x[output_index] = agents_src->x[index];        
+		agents_dst->y[output_index] = agents_src->y[index];
 	}
 }
 
@@ -434,6 +451,7 @@ __global__ void append_medic_Agents(xmachine_memory_medic_list* agents_dst, xmac
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->x[output_index] = agents_src->x[index];
+	    agents_dst->y[output_index] = agents_src->y[index];
     }
 }
 
@@ -441,9 +459,10 @@ __global__ void append_medic_Agents(xmachine_memory_medic_list* agents_dst, xmac
  * Continuous medic agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_medic_list to add agents to 
  * @param x agent variable of type int
+ * @param y agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x){
+__device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x, int y){
 	
 	int index;
     
@@ -463,12 +482,13 @@ __device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x){
 
 	//write data to new buffer
 	agents->x[index] = x;
+	agents->y[index] = y;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x){
-    add_medic_agent<DISCRETE_2D>(agents, x);
+__device__ void add_medic_agent(xmachine_memory_medic_list* agents, int x, int y){
+    add_medic_agent<DISCRETE_2D>(agents, x, y);
 }
 
 /** reorder_medic_agents
@@ -485,6 +505,164 @@ __global__ void reorder_medic_agents(unsigned int* values, xmachine_memory_medic
 
 	//reorder agent data
 	ordered_agents->x[index] = unordered_agents->x[old_pos];
+	ordered_agents->y[index] = unordered_agents->y[old_pos];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created receptionist agent functions */
+
+/** reset_receptionist_scan_input
+ * receptionist agent reset scan input function
+ * @param agents The xmachine_memory_receptionist_list agent list
+ */
+__global__ void reset_receptionist_scan_input(xmachine_memory_receptionist_list* agents){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 0;
+}
+
+
+
+/** scatter_receptionist_Agents
+ * receptionist scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_receptionist_list agent list destination
+ * @param agents_src xmachine_memory_receptionist_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* agents_dst, xmachine_memory_receptionist_list* agents_src, int dst_agent_count, int number_to_scatter){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = agents_src->_scan_input[index];
+
+	//if optional message is to be written. 
+	//must check agent is within number to scatter as unused threads may have scan input = 1
+	if ((_scan_input == 1)&&(index < number_to_scatter)){
+		int output_index = agents_src->_position[index] + dst_agent_count;
+
+		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
+        agents_dst->_position[output_index] = output_index;        
+		agents_dst->x[output_index] = agents_src->x[index];        
+		agents_dst->y[output_index] = agents_src->y[index];
+	    for (int i=0; i<200; i++){
+	      agents_dst->colaPacientes[(i*xmachine_memory_receptionist_MAX)+output_index] = agents_src->colaPacientes[(i*xmachine_memory_receptionist_MAX)+index];
+	    }
+	}
+}
+
+/** append_receptionist_Agents
+ * receptionist scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_receptionist_list agent list destination
+ * @param agents_src xmachine_memory_receptionist_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* agents_dst, xmachine_memory_receptionist_list* agents_src, int dst_agent_count, int number_to_append){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//must check agent is within number to append as unused threads may have scan input = 1
+    if (index < number_to_append){
+	    int output_index = index + dst_agent_count;
+
+	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
+	    agents_dst->_position[output_index] = output_index;
+	    agents_dst->x[output_index] = agents_src->x[index];
+	    agents_dst->y[output_index] = agents_src->y[index];
+	    for (int i=0; i<200; i++){
+	      agents_dst->colaPacientes[(i*xmachine_memory_receptionist_MAX)+output_index] = agents_src->colaPacientes[(i*xmachine_memory_receptionist_MAX)+index];
+	    }
+    }
+}
+
+/** add_receptionist_agent
+ * Continuous receptionist agent add agent function writes agent data to agent swap
+ * @param agents xmachine_memory_receptionist_list to add agents to 
+ * @param x agent variable of type int
+ * @param y agent variable of type int
+ * @param colaPacientes agent variable of type int
+ */
+template <int AGENT_TYPE>
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y){
+	
+	int index;
+    
+    //calculate the agents index in global agent list (depends on agent type)
+	if (AGENT_TYPE == DISCRETE_2D){
+		int width = (blockDim.x* gridDim.x);
+		glm::ivec2 global_position;
+		global_position.x = (blockIdx.x*blockDim.x) + threadIdx.x;
+		global_position.y = (blockIdx.y*blockDim.y) + threadIdx.y;
+		index = global_position.x + (global_position.y* width);
+	}else//AGENT_TYPE == CONTINOUS
+		index = threadIdx.x + blockIdx.x*blockDim.x;
+
+	//for prefix sum
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 1;
+
+	//write data to new buffer
+	agents->x[index] = x;
+	agents->y[index] = y;
+
+}
+
+//non templated version assumes DISCRETE_2D but works also for CONTINUOUS
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y){
+    add_receptionist_agent<DISCRETE_2D>(agents, x, y);
+}
+
+/** reorder_receptionist_agents
+ * Continuous receptionist agent areorder function used after key value pairs have been sorted
+ * @param values sorted index values
+ * @param unordered_agents list of unordered agents
+ * @ param ordered_agents list used to output ordered agents
+ */
+__global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memory_receptionist_list* unordered_agents, xmachine_memory_receptionist_list* ordered_agents)
+{
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	uint old_pos = values[index];
+
+	//reorder agent data
+	ordered_agents->x[index] = unordered_agents->x[old_pos];
+	ordered_agents->y[index] = unordered_agents->y[old_pos];
+	for (int i=0; i<200; i++){
+	  ordered_agents->colaPacientes[(i*xmachine_memory_receptionist_MAX)+index] = unordered_agents->colaPacientes[(i*xmachine_memory_receptionist_MAX)+old_pos];
+	}
+}
+
+/** get_receptionist_agent_array_value
+ *  Template function for accessing receptionist agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @return return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ T get_receptionist_agent_array_value(T *array, uint index){
+	// Null check for out of bounds agents (brute force communication. )
+	if(array != nullptr){
+	    return array[index*xmachine_memory_receptionist_MAX];
+    } else {
+    	// Return the default value for this data type 
+	    return 0;
+    }
+}
+
+/** set_receptionist_agent_array_value
+ *  Template function for setting receptionist agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @param return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ void set_receptionist_agent_array_value(T *array, uint index, T value){
+	// Null check for out of bounds agents (brute force communication. )
+	if(array != nullptr){
+	    array[index*xmachine_memory_receptionist_MAX] = value;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1275,6 +1453,298 @@ __device__ xmachine_message_pedestrian_state* get_next_pedestrian_state_message(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created check_in message functions */
+
+
+/** add_check_in_message
+ * Add non partitioned or spatially partitioned check_in message
+ * @param messages xmachine_message_check_in_list message list to add too
+ * @param id agent variable of type unsigned int
+ */
+__device__ void add_check_in_message(xmachine_message_check_in_list* messages, unsigned int id){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_check_in_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_check_in_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_check_in_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_check_in Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned check_in message (for optional messages)
+ * @param messages scatter_optional_check_in_messages Sparse xmachine_message_check_in_list message list
+ * @param message_swap temp xmachine_message_check_in_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_check_in_messages(xmachine_message_check_in_list* messages, xmachine_message_check_in_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_check_in_count;
+
+		//AoS - xmachine_message_check_in Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];				
+	}
+}
+
+/** reset_check_in_swaps
+ * Reset non partitioned or spatially partitioned check_in message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_check_in_swaps(xmachine_message_check_in_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_check_in* get_first_check_in_message(xmachine_message_check_in_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_check_in_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_check_in Coalesced memory read
+	xmachine_message_check_in temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_check_in));
+	xmachine_message_check_in* sm_message = ((xmachine_message_check_in*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_check_in*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_check_in* get_next_check_in_message(xmachine_message_check_in* message, xmachine_message_check_in_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_check_in_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_check_in_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_check_in Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_check_in temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_check_in));
+		xmachine_message_check_in* sm_message = ((xmachine_message_check_in*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_check_in));
+	return ((xmachine_message_check_in*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created avisar_paciente message functions */
+
+
+/** add_avisar_paciente_message
+ * Add non partitioned or spatially partitioned avisar_paciente message
+ * @param messages xmachine_message_avisar_paciente_list message list to add too
+ * @param id agent variable of type unsigned int
+ */
+__device__ void add_avisar_paciente_message(xmachine_message_avisar_paciente_list* messages, unsigned int id){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_avisar_paciente_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_avisar_paciente_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_avisar_paciente_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_avisar_paciente Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned avisar_paciente message (for optional messages)
+ * @param messages scatter_optional_avisar_paciente_messages Sparse xmachine_message_avisar_paciente_list message list
+ * @param message_swap temp xmachine_message_avisar_paciente_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_avisar_paciente_messages(xmachine_message_avisar_paciente_list* messages, xmachine_message_avisar_paciente_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_avisar_paciente_count;
+
+		//AoS - xmachine_message_avisar_paciente Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];				
+	}
+}
+
+/** reset_avisar_paciente_swaps
+ * Reset non partitioned or spatially partitioned avisar_paciente message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_avisar_paciente_swaps(xmachine_message_avisar_paciente_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_avisar_paciente* get_first_avisar_paciente_message(xmachine_message_avisar_paciente_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_avisar_paciente_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_avisar_paciente Coalesced memory read
+	xmachine_message_avisar_paciente temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_avisar_paciente));
+	xmachine_message_avisar_paciente* sm_message = ((xmachine_message_avisar_paciente*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_avisar_paciente*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_avisar_paciente* get_next_avisar_paciente_message(xmachine_message_avisar_paciente* message, xmachine_message_avisar_paciente_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_avisar_paciente_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_avisar_paciente_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_avisar_paciente Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_avisar_paciente temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_avisar_paciente));
+		xmachine_message_avisar_paciente* sm_message = ((xmachine_message_avisar_paciente*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_avisar_paciente));
+	return ((xmachine_message_avisar_paciente*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created navmap_cell message functions */
 
 
@@ -1855,7 +2325,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 /**
  *
  */
-__global__ void GPUFLAME_move(xmachine_memory_agent_list* agents){
+__global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_message_check_in_list* check_in_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -1887,7 +2357,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents){
 	agent.tick = agents->tick[index];
 
 	//FLAME function call
-	int dead = !move(&agent);
+	int dead = !move(&agent, check_in_messages	);
 	
 
 	//continuous agent: set reallocation flag
@@ -1930,6 +2400,7 @@ __global__ void GPUFLAME_prueba(xmachine_memory_medic_list* agents){
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
 	agent.x = agents->x[index];
+	agent.y = agents->y[index];
 
 	//FLAME function call
 	int dead = !prueba(&agent);
@@ -1940,6 +2411,50 @@ __global__ void GPUFLAME_prueba(xmachine_memory_medic_list* agents){
 
 	//AoS to SoA - xmachine_memory_prueba Coalesced memory write (ignore arrays)
 	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agents, xmachine_message_check_in_list* check_in_messages, xmachine_message_avisar_paciente_list* avisar_paciente_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receptionServer Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_receptionist agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_receptionist_count){
+    
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+    agent.colaPacientes = &(agents->colaPacientes[index]);
+	} else {
+	
+	agent.x = 0;
+	agent.y = 0;
+    agent.colaPacientes = nullptr;
+	}
+
+	//FLAME function call
+	int dead = !receptionServer(&agent, check_in_messages, avisar_paciente_messages	);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_receptionist_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receptionServer Coalesced memory write (ignore arrays)
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	}
 }
 
 /**

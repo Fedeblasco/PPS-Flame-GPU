@@ -261,12 +261,17 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
-      
         
         <gpu:function>
           <name>move</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>check_in</messageName>
+              <gpu:type>single_message</gpu:type>
+            </gpu:output>
+          </outputs>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
@@ -288,6 +293,10 @@
           <type>int</type>
           <name>x</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>y</name>
+        </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
@@ -306,6 +315,53 @@
       </states>
       <gpu:type>continuous</gpu:type>
       <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:xagent>
+
+    <gpu:xagent>
+      <name>receptionist</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>x</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>y</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>colaPacientes</name>
+          <arrayLength>200</arrayLength>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>receptionServer</name>
+          <currentState>defaultReceptionist</currentState>
+          <nextState>defaultReceptionist</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>check_in</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>avisar_paciente</messageName>
+              <gpu:type>single_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultReceptionist</name>
+        </gpu:state>
+        <initialState>defaultReceptionist</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>16</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
     </gpu:xagent>
     
     <gpu:xagent>
@@ -516,6 +572,29 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
+    <gpu:message> 
+      <name>check_in</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>avisar_paciente</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
 
     <gpu:message>
       <name>navmap_cell</name>

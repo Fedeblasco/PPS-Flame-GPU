@@ -237,7 +237,7 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, 
  * @param agent Pointer to an agent structre of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  
  */
-__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
+__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessage){
 
 	//glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
 
@@ -271,6 +271,8 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent){
 		}
 	}
 
+	add_check_in_message(checkInMessage, 10);
+
 	//Por cada tick, informo mi posición
 	//printf("%d, ",x);
 	//printf("%d\n",y);
@@ -303,8 +305,6 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				float x = ((agent->x+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				float y = ((agent->y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				
-				float xpalotro = ((agent->x+3.6f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-				
 				//int exit = getNewExitLocation(rand48);
 				float animate = rnd<DISCRETE_2D>(rand48);
 				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;
@@ -320,14 +320,8 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				//add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
+				add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
 				//printf("%d\n",agent->cant_generados);
-				
-				if(agent->cant_generados == 0){
-					add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0);
-				}else{
-					add_agent_agent(agent_agents, agent->cant_generados, xpalotro, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0);
-				}
 
 				//Imprimo que se creo un paciente
 				//printf("Creado\n");
@@ -345,7 +339,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 }
 
 __FLAME_GPU_FUNC__ int prueba(xmachine_memory_medic* agent){
-	printf("Hola soy %d\n",agent->x);
+	//printf("Hola soy %d\n",agent->x);
 	return 0;
 }
 
@@ -369,6 +363,15 @@ __FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_m
 	}*/
 	return 0;
 
+}
+
+
+
+__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessage, xmachine_message_avisar_paciente_list* patientMessage){
+	
+	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessage);
+
+	return 0;
 }
 
 #endif //_FLAMEGPU_FUNCTIONS

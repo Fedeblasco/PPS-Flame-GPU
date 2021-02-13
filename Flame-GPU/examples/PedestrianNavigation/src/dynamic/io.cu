@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -134,6 +134,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying medic Agent default2 State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_receptionists_defaultReceptionist, d_receptionists_defaultReceptionist, sizeof(xmachine_memory_receptionist_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying receptionist Agent defaultReceptionist State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_navmaps_static, d_navmaps_static, sizeof(xmachine_memory_navmap_list), cudaMemcpyDeviceToHost);
@@ -386,6 +392,36 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</x>\n", file);
         
+		fputs("<y>", file);
+        sprintf(data, "%d", h_medics_default2->y[i]);
+		fputs(data, file);
+		fputs("</y>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each receptionist agent to xml
+	for (int i=0; i<h_xmachine_memory_receptionist_defaultReceptionist_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>receptionist</name>\n", file);
+        
+		fputs("<x>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->x[i]);
+		fputs(data, file);
+		fputs("</x>\n", file);
+        
+		fputs("<y>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->y[i]);
+		fputs(data, file);
+		fputs("</y>\n", file);
+        
+		fputs("<colaPacientes>", file);
+        for (int j=0;j<200;j++){
+            fprintf(file, "%d", h_receptionists_defaultReceptionist->colaPacientes[(j*xmachine_memory_receptionist_MAX)+i]);
+            if(j!=(200-1))
+                fprintf(file, ",");
+        }
+		fputs("</colaPacientes>\n", file);
+        
 		fputs("</xagent>\n", file);
 	}
 	//Write each navmap agent to xml
@@ -510,7 +546,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 
 }
 
-void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
+void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
 {
     PROFILE_SCOPED_RANGE("readInitialStates");
 
@@ -546,6 +582,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_estado;
     int in_agent_tick;
     int in_medic_x;
+    int in_medic_y;
+    int in_receptionist_x;
+    int in_receptionist_y;
+    int in_receptionist_colaPacientes;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -639,6 +679,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	/* set agent count to zero */
 	*h_xmachine_memory_agent_count = 0;
 	*h_xmachine_memory_medic_count = 0;
+	*h_xmachine_memory_receptionist_count = 0;
 	*h_xmachine_memory_navmap_count = 0;
 	
 	/* Variables for initial state data */
@@ -658,6 +699,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int agent_estado;
 	int agent_tick;
 	int medic_x;
+	int medic_y;
+	int receptionist_x;
+	int receptionist_y;
+    int receptionist_colaPacientes[200];
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -747,6 +792,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_estado = 0;
 	in_agent_tick = 0;
 	in_medic_x = 0;
+	in_medic_y = 0;
+	in_receptionist_x = 0;
+	in_receptionist_y = 0;
+	in_receptionist_colaPacientes = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -827,6 +876,18 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	for (int k=0; k<xmachine_memory_medic_MAX; k++)
 	{	
 		h_medics->x[k] = 0;
+		h_medics->y[k] = 0;
+	}
+	
+	//set all receptionist values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_receptionist_MAX; k++)
+	{	
+		h_receptionists->x[k] = 0;
+		h_receptionists->y[k] = 0;
+        for (i=0;i<200;i++){
+            h_receptionists->colaPacientes[(i*xmachine_memory_receptionist_MAX)+k] = 0;
+        }
 	}
 	
 	//set all navmap values to 0
@@ -874,6 +935,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_estado = 0;
     agent_tick = 0;
     medic_x = 0;
+    medic_y = 0;
+    receptionist_x = 0;
+    receptionist_y = 0;
+    for (i=0;i<200;i++){
+        receptionist_colaPacientes[i] = 0;
+    }
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -1073,7 +1140,42 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     if(agent_minimum.x > medic_x)
                         agent_minimum.x = (float)medic_x;
                     
+					h_medics->y[*h_xmachine_memory_medic_count] = medic_y;//Check maximum y value
+                    if(agent_maximum.y < medic_y)
+                        agent_maximum.y = (float)medic_y;
+                    //Check minimum y value
+                    if(agent_minimum.y > medic_y)
+                        agent_minimum.y = (float)medic_y;
+                    
 					(*h_xmachine_memory_medic_count) ++;	
+				}
+				else if(strcmp(agentname, "receptionist") == 0)
+				{
+					if (*h_xmachine_memory_receptionist_count > xmachine_memory_receptionist_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent receptionist exceeded whilst reading data\n", xmachine_memory_receptionist_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_receptionists->x[*h_xmachine_memory_receptionist_count] = receptionist_x;//Check maximum x value
+                    if(agent_maximum.x < receptionist_x)
+                        agent_maximum.x = (float)receptionist_x;
+                    //Check minimum x value
+                    if(agent_minimum.x > receptionist_x)
+                        agent_minimum.x = (float)receptionist_x;
+                    
+					h_receptionists->y[*h_xmachine_memory_receptionist_count] = receptionist_y;//Check maximum y value
+                    if(agent_maximum.y < receptionist_y)
+                        agent_maximum.y = (float)receptionist_y;
+                    //Check minimum y value
+                    if(agent_minimum.y > receptionist_y)
+                        agent_minimum.y = (float)receptionist_y;
+                    
+                    for (int k=0;k<200;k++){
+                        h_receptionists->colaPacientes[(k*xmachine_memory_receptionist_MAX)+(*h_xmachine_memory_receptionist_count)] = receptionist_colaPacientes[k];
+                    }
+					(*h_xmachine_memory_receptionist_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
 				{
@@ -1143,6 +1245,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_estado = 0;
                 agent_tick = 0;
                 medic_x = 0;
+                medic_y = 0;
+                receptionist_x = 0;
+                receptionist_y = 0;
+                for (i=0;i<200;i++){
+                    receptionist_colaPacientes[i] = 0;
+                }
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -1199,6 +1307,14 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/tick") == 0) in_agent_tick = 0;
 			if(strcmp(buffer, "x") == 0) in_medic_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_medic_x = 0;
+			if(strcmp(buffer, "y") == 0) in_medic_y = 1;
+			if(strcmp(buffer, "/y") == 0) in_medic_y = 0;
+			if(strcmp(buffer, "x") == 0) in_receptionist_x = 1;
+			if(strcmp(buffer, "/x") == 0) in_receptionist_x = 0;
+			if(strcmp(buffer, "y") == 0) in_receptionist_y = 1;
+			if(strcmp(buffer, "/y") == 0) in_receptionist_y = 0;
+			if(strcmp(buffer, "colaPacientes") == 0) in_receptionist_colaPacientes = 1;
+			if(strcmp(buffer, "/colaPacientes") == 0) in_receptionist_colaPacientes = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1374,6 +1490,18 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_medic_x){
                     medic_x = (int) fpgu_strtol(buffer); 
+                }
+				if(in_medic_y){
+                    medic_y = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_x){
+                    receptionist_x = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_y){
+                    receptionist_y = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_colaPacientes){
+                    readArrayInput<int>(&fpgu_strtol, buffer, receptionist_colaPacientes, 200);    
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 
