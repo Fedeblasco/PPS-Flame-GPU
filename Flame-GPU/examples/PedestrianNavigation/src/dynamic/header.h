@@ -175,6 +175,7 @@ struct __align__(16) xmachine_memory_agent
     int animate_dir;    /**< X-machine memory variable animate_dir of type int.*/
     int estado;    /**< X-machine memory variable estado of type int.*/
     int tick;    /**< X-machine memory variable tick of type int.*/
+    unsigned int estado_movimiento;    /**< X-machine memory variable estado_movimiento of type unsigned int.*/
 };
 
 /** struct xmachine_memory_medic
@@ -338,6 +339,7 @@ struct xmachine_memory_agent_list
     int animate_dir [xmachine_memory_agent_MAX];    /**< X-machine memory variable list animate_dir of type int.*/
     int estado [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado of type int.*/
     int tick [xmachine_memory_agent_MAX];    /**< X-machine memory variable list tick of type int.*/
+    unsigned int estado_movimiento [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado_movimiento of type unsigned int.*/
 };
 
 /** struct xmachine_memory_medic_list
@@ -801,8 +803,9 @@ template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_
  * @param animate_dir	agent agent variable of type int
  * @param estado	agent agent variable of type int
  * @param tick	agent agent variable of type int
+ * @param estado_movimiento	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento);
 
 /** add_medic_agent
  * Adds a new continuous valued medic agent to the xmachine_memory_medic_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -1201,6 +1204,15 @@ __host__ int get_agent_default_variable_estado(unsigned int index);
  * @return value of agent variable tick
  */
 __host__ int get_agent_default_variable_tick(unsigned int index);
+
+/** unsigned int get_agent_default_variable_estado_movimiento(unsigned int index)
+ * Gets the value of the estado_movimiento variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable estado_movimiento
+ */
+__host__ unsigned int get_agent_default_variable_estado_movimiento(unsigned int index);
 
 /** int get_medic_default2_variable_x(unsigned int index)
  * Gets the value of the x variable of an medic agent in the default2 state on the host. 
@@ -1942,6 +1954,32 @@ int min_agent_default_tick_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 int max_agent_default_tick_variable();
+
+/** unsigned int reduce_agent_default_estado_movimiento_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_estado_movimiento_variable();
+
+
+
+/** unsigned int count_agent_default_estado_movimiento_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_estado_movimiento_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_estado_movimiento_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_estado_movimiento_variable();
+/** unsigned int max_agent_default_estado_movimiento_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_estado_movimiento_variable();
 
 /** int reduce_medic_default2_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

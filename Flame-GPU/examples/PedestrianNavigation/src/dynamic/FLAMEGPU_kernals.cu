@@ -262,7 +262,8 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 		agents_dst->animate[output_index] = agents_src->animate[index];        
 		agents_dst->animate_dir[output_index] = agents_src->animate_dir[index];        
 		agents_dst->estado[output_index] = agents_src->estado[index];        
-		agents_dst->tick[output_index] = agents_src->tick[index];
+		agents_dst->tick[output_index] = agents_src->tick[index];        
+		agents_dst->estado_movimiento[output_index] = agents_src->estado_movimiento[index];
 	}
 }
 
@@ -297,6 +298,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 	    agents_dst->animate_dir[output_index] = agents_src->animate_dir[index];
 	    agents_dst->estado[output_index] = agents_src->estado[index];
 	    agents_dst->tick[output_index] = agents_src->tick[index];
+	    agents_dst->estado_movimiento[output_index] = agents_src->estado_movimiento[index];
     }
 }
 
@@ -318,9 +320,10 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param animate_dir agent variable of type int
  * @param estado agent variable of type int
  * @param tick agent variable of type int
+ * @param estado_movimiento agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento){
 	
 	int index;
     
@@ -354,12 +357,13 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int
 	agents->animate_dir[index] = animate_dir;
 	agents->estado[index] = estado;
 	agents->tick[index] = tick;
+	agents->estado_movimiento[index] = estado_movimiento;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick){
-    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick);
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento);
 }
 
 /** reorder_agent_agents
@@ -390,6 +394,7 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 	ordered_agents->animate_dir[index] = unordered_agents->animate_dir[old_pos];
 	ordered_agents->estado[index] = unordered_agents->estado[old_pos];
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
+	ordered_agents->estado_movimiento[index] = unordered_agents->estado_movimiento[old_pos];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2119,6 +2124,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agent.animate_dir = agents->animate_dir[index];
 	agent.estado = agents->estado[index];
 	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
 
 	//FLAME function call
 	int dead = !output_pedestrian_location(&agent, pedestrian_location_messages	);
@@ -2143,6 +2149,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->animate_dir[index] = agent.animate_dir;
 	agents->estado[index] = agent.estado;
 	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
 }
 
 /**
@@ -2178,6 +2185,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agent.animate_dir = agents->animate_dir[index];
 	agent.estado = agents->estado[index];
 	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
 
 	//FLAME function call
 	int dead = !avoid_pedestrians(&agent, pedestrian_location_messages, partition_matrix, rand48);
@@ -2202,6 +2210,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->animate_dir[index] = agent.animate_dir;
 	agents->estado[index] = agent.estado;
 	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
 }
 
 /**
@@ -2237,6 +2246,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agent.animate_dir = agents->animate_dir[index];
 	agent.estado = agents->estado[index];
 	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
 
 	//FLAME function call
 	int dead = !output_pedestrian_state(&agent, pedestrian_state_messages	);
@@ -2261,6 +2271,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->animate_dir[index] = agent.animate_dir;
 	agents->estado[index] = agent.estado;
 	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
 }
 
 /**
@@ -2296,6 +2307,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.animate_dir = agents->animate_dir[index];
 	agent.estado = agents->estado[index];
 	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
 
 	//FLAME function call
 	int dead = !infect_pedestrians(&agent, pedestrian_state_messages, partition_matrix, rand48);
@@ -2320,6 +2332,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->animate_dir[index] = agent.animate_dir;
 	agents->estado[index] = agent.estado;
 	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
 }
 
 /**
@@ -2355,6 +2368,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.animate_dir = agents->animate_dir[index];
 	agent.estado = agents->estado[index];
 	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
 
 	//FLAME function call
 	int dead = !move(&agent, check_in_messages	);
@@ -2379,6 +2393,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agents->animate_dir[index] = agent.animate_dir;
 	agents->estado[index] = agent.estado;
 	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
 }
 
 /**

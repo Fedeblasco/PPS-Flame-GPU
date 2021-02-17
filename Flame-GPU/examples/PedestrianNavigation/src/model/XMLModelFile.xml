@@ -212,6 +212,11 @@
           <type>int</type>
           <name>tick</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>estado_movimiento</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
@@ -669,6 +674,8 @@
       <gpu:layerFunction>
         <name>move</name>
       </gpu:layerFunction>
+    </layer>
+    <layer>
       <gpu:layerFunction>
         <name>receptionServer</name>
       </gpu:layerFunction>

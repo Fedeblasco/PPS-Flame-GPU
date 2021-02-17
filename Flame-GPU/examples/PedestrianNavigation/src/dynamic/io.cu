@@ -380,6 +380,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</tick>\n", file);
         
+		fputs("<estado_movimiento>", file);
+        sprintf(data, "%u", h_agents_default->estado_movimiento[i]);
+		fputs(data, file);
+		fputs("</estado_movimiento>\n", file);
+        
 		fputs("</xagent>\n", file);
 	}
 	//Write each medic agent to xml
@@ -581,6 +586,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_animate_dir;
     int in_agent_estado;
     int in_agent_tick;
+    int in_agent_estado_movimiento;
     int in_medic_x;
     int in_medic_y;
     int in_receptionist_x;
@@ -698,6 +704,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int agent_animate_dir;
 	int agent_estado;
 	int agent_tick;
+	unsigned int agent_estado_movimiento;
 	int medic_x;
 	int medic_y;
 	int receptionist_x;
@@ -791,6 +798,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_animate_dir = 0;
 	in_agent_estado = 0;
 	in_agent_tick = 0;
+	in_agent_estado_movimiento = 0;
 	in_medic_x = 0;
 	in_medic_y = 0;
 	in_receptionist_x = 0;
@@ -869,6 +877,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->animate_dir[k] = 0;
 		h_agents->estado[k] = 0;
 		h_agents->tick[k] = 0;
+		h_agents->estado_movimiento[k] = 0;
 	}
 	
 	//set all medic values to 0
@@ -934,6 +943,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_animate_dir = 0;
     agent_estado = 0;
     agent_tick = 0;
+    agent_estado_movimiento = 0;
     medic_x = 0;
     medic_y = 0;
     receptionist_x = 0;
@@ -1122,6 +1132,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->animate_dir[*h_xmachine_memory_agent_count] = agent_animate_dir;
 					h_agents->estado[*h_xmachine_memory_agent_count] = agent_estado;
 					h_agents->tick[*h_xmachine_memory_agent_count] = agent_tick;
+					h_agents->estado_movimiento[*h_xmachine_memory_agent_count] = agent_estado_movimiento;
 					(*h_xmachine_memory_agent_count) ++;	
 				}
 				else if(strcmp(agentname, "medic") == 0)
@@ -1244,6 +1255,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_animate_dir = 0;
                 agent_estado = 0;
                 agent_tick = 0;
+                agent_estado_movimiento = 0;
                 medic_x = 0;
                 medic_y = 0;
                 receptionist_x = 0;
@@ -1305,6 +1317,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/estado") == 0) in_agent_estado = 0;
 			if(strcmp(buffer, "tick") == 0) in_agent_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_agent_tick = 0;
+			if(strcmp(buffer, "estado_movimiento") == 0) in_agent_estado_movimiento = 1;
+			if(strcmp(buffer, "/estado_movimiento") == 0) in_agent_estado_movimiento = 0;
 			if(strcmp(buffer, "x") == 0) in_medic_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_medic_x = 0;
 			if(strcmp(buffer, "y") == 0) in_medic_y = 1;
@@ -1487,6 +1501,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_agent_tick){
                     agent_tick = (int) fpgu_strtol(buffer); 
+                }
+				if(in_agent_estado_movimiento){
+                    agent_estado_movimiento = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_medic_x){
                     medic_x = (int) fpgu_strtol(buffer); 

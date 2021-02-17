@@ -155,6 +155,7 @@ unsigned int h_agents_default_variable_animate_data_iteration;
 unsigned int h_agents_default_variable_animate_dir_data_iteration;
 unsigned int h_agents_default_variable_estado_data_iteration;
 unsigned int h_agents_default_variable_tick_data_iteration;
+unsigned int h_agents_default_variable_estado_movimiento_data_iteration;
 unsigned int h_medics_default2_variable_x_data_iteration;
 unsigned int h_medics_default2_variable_y_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_x_data_iteration;
@@ -477,6 +478,7 @@ void initialise(char * inputfile){
     h_agents_default_variable_animate_dir_data_iteration = 0;
     h_agents_default_variable_estado_data_iteration = 0;
     h_agents_default_variable_tick_data_iteration = 0;
+    h_agents_default_variable_estado_movimiento_data_iteration = 0;
     h_medics_default2_variable_x_data_iteration = 0;
     h_medics_default2_variable_y_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
@@ -1209,13 +1211,16 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_move = %f (ms)\n", instrument_milliseconds);
 #endif
+	cudaDeviceSynchronize();
+  
+	/* Layer 6*/
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_start);
 #endif
 	
     PROFILE_PUSH_RANGE("receptionist_receptionServer");
-	receptionist_receptionServer(stream2);
+	receptionist_receptionServer(stream1);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -2377,6 +2382,44 @@ __host__ int get_agent_default_variable_tick(unsigned int index){
     }
 }
 
+/** unsigned int get_agent_default_variable_estado_movimiento(unsigned int index)
+ * Gets the value of the estado_movimiento variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable estado_movimiento
+ */
+__host__ unsigned int get_agent_default_variable_estado_movimiento(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_estado_movimiento_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->estado_movimiento,
+                    d_agents_default->estado_movimiento,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_estado_movimiento_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->estado_movimiento[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access estado_movimiento for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 /** int get_medic_default2_variable_x(unsigned int index)
  * Gets the value of the x variable of an medic agent in the default2 state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -3413,6 +3456,8 @@ void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list *
 		gpuErrchk(cudaMemcpy(d_dst->estado, &h_agent->estado, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->estado_movimiento, &h_agent->estado_movimiento, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -3458,6 +3503,8 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
 		gpuErrchk(cudaMemcpy(d_dst->estado, h_src->estado, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->estado_movimiento, h_src->estado_movimiento, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -3544,6 +3591,8 @@ xmachine_memory_agent* h_allocate_agent_agent(){
 	// Memset the whole agent strcuture
     memset(agent, 0, sizeof(xmachine_memory_agent));
 
+    agent->estado_movimiento = 0;
+
 	return agent;
 }
 void h_free_agent_agent(xmachine_memory_agent** agent){
@@ -3599,6 +3648,8 @@ void h_unpack_agents_agent_AoS_to_SoA(xmachine_memory_agent_list * dst, xmachine
 			dst->estado[i] = src[i]->estado;
 			 
 			dst->tick[i] = src[i]->tick;
+			 
+			dst->estado_movimiento[i] = src[i]->estado_movimiento;
 			
 		}
 	}
@@ -3645,6 +3696,7 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent){
     h_agents_default_variable_animate_dir_data_iteration = 0;
     h_agents_default_variable_estado_data_iteration = 0;
     h_agents_default_variable_tick_data_iteration = 0;
+    h_agents_default_variable_estado_movimiento_data_iteration = 0;
     
 
 }
@@ -3691,6 +3743,7 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
         h_agents_default_variable_animate_dir_data_iteration = 0;
         h_agents_default_variable_estado_data_iteration = 0;
         h_agents_default_variable_tick_data_iteration = 0;
+        h_agents_default_variable_estado_movimiento_data_iteration = 0;
         
 
 	}
@@ -4197,6 +4250,27 @@ int min_agent_default_tick_variable(){
 int max_agent_default_tick_variable(){
     //max in default stream
     thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->tick);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_agent_default_estado_movimiento_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->estado_movimiento),  thrust::device_pointer_cast(d_agents_default->estado_movimiento) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_estado_movimiento_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->estado_movimiento),  thrust::device_pointer_cast(d_agents_default->estado_movimiento) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_estado_movimiento_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->estado_movimiento);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_estado_movimiento_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->estado_movimiento);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }

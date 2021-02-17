@@ -39,15 +39,15 @@
 #define ticks_portador 50000
 #define ticks_enfermo 50000
 //Cantidad de personas a generar
-#define cant_personas 6
+#define cant_personas 2
 
-#define ir_x 140
-#define ir_y 102
+#define ir_a_x 150
+#define ir_a_y 80
 
 
 //This function creates all the agents requiered to run the hospital
 __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
-	printf("Inicializando todo");
+	printf("Inicializando todo\n");
 
 	// Allocating memory in CPU to save the agent
 	xmachine_memory_receptionist * h_receptionist = h_allocate_agent_receptionist();
@@ -192,14 +192,21 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, int igriega){
+__FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, int ir_y){
 
+	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+
+	int dest_x = ir_x-x;
+	int dest_y = ir_y-y;
+	
+	if(dest_x!=0 || dest_y!=0){
 		glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
 		glm::vec2 agent_vel = glm::vec2(agent->velx, agent->vely);
 		
-		//printf("%d, %d\n",equis,igriega);
+		//printf("%d, %d\n",dest_x, dest_y);
 		
-		glm::vec2 agent_steer = glm::vec2(equis, igriega);
+		glm::vec2 agent_steer = glm::vec2(dest_x, dest_y);
 
 		float current_speed = length(agent_vel)+0.025f;//(powf(length(agent_vel), 1.75f)*0.01f)+0.025f;
 
@@ -240,7 +247,9 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, 
 			agent->y+=2.0f;
 		if (agent->y > 1.0f)
 			agent->y-=2.0f;
-		
+
+		return 1;
+	}
 	return 0;
 }
 
@@ -250,22 +259,9 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int equis, 
  * @param agent Pointer to an agent structre of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  
  */
-__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessage){
+__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessageList){
 
 	//glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
-
-	//Pruebas de movimiento
-	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-	
-	int equis = ir_x-x;
-	int igriega = ir_y-y;
-
-	if(equis!=0 || igriega!=0){
-		mover_a_destino(agent,equis,igriega);
-	}else{
-		//printf("No me muevo mas che");
-	}
 
     //Como el movimiento se hace cada un tick, se incrementa aca el tick del paciente
 	if(agent->estado==1){//Si el agente es portador
@@ -284,7 +280,20 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 		}
 	}
 
-	add_check_in_message(checkInMessage, agent->id);
+	switch(agent->estado_movimiento){
+		case 0:
+			if(mover_a_destino(agent,ir_a_x,ir_a_y) == 0){
+				printf("Ya llegue, soy %u\n",agent->id);
+				agent->estado_movimiento = 1;
+				add_check_in_message(checkInMessageList, agent->id);
+			}
+			break;
+		case 1:
+			mover_a_destino(agent,130,90);
+			break;
+	}
+	
+	//add_check_in_message(checkInMessageList, agent->id);
 
 	//Por cada tick, informo mi posición
 	//printf("%d, ",x);
@@ -333,7 +342,14 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0);
+				//add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0);
+				
+				if(agent->cant_generados==0){
+					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0, 0);
+				}else{
+					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0, 0);
+				}
+				
 				//printf("%d\n",agent->cant_generados);
 
 				//Imprimo que se creo un paciente
@@ -380,13 +396,23 @@ __FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_m
 
 
 
+//Funciones del recepcionista	
+
+
+//Función que chequea los pacientes que llegan y los atiende
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessage){
 	
 	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
-	while(current_message){
+	while(current_message && current_message->id!=0){
 		printf("Recibí el siguiente mensaje: %d\n",current_message->id);
-		current_message = get_next_check_in_message(current_message, checkInMessages);
+		current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}
+	/*if(current_message2->id==1){
+		printf("Recibí un mensaje del primer paciente\n");
+	}
+	if(current_message2->id==2){
+		printf("Recibí un mensaje del segundo paciente\n");
+	}*/
 	
 	return 0;
 }
