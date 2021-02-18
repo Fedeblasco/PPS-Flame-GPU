@@ -19,6 +19,7 @@
 
 #include "header.h"
 #include "CustomVisualisation.h"
+#include "receptionist.c"
 
 #define SCALE_FACTOR 0.03125
 
@@ -333,14 +334,14 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				
 				//Hago el random e imprimo
 				float rand = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-				int estado;
+				/*int estado;
 				if(rand<=probabilidad_generar_enfermo){
 					estado=2;
 					//printf("Enfermo");
 				}else{
 					estado=0;
 					//printf("Sano");
-				}
+				}*/
 				
 				//add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0);
 				
@@ -392,29 +393,6 @@ __FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_m
 	}*/
 	return 0;
 
-}
-
-
-
-//Funciones del recepcionista	
-
-
-//Función que chequea los pacientes que llegan y los atiende
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessage){
-	
-	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
-	while(current_message && current_message->id!=0){
-		printf("Recibí el siguiente mensaje: %d\n",current_message->id);
-		current_message = get_next_check_in_message(current_message, checkInMessages);	
-	}
-	/*if(current_message2->id==1){
-		printf("Recibí un mensaje del primer paciente\n");
-	}
-	if(current_message2->id==2){
-		printf("Recibí un mensaje del segundo paciente\n");
-	}*/
-	
-	return 0;
 }
 
 #endif //_FLAMEGPU_FUNCTIONS

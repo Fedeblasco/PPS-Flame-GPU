@@ -339,9 +339,21 @@
           <name>y</name>
         </gpu:variable>
         <gpu:variable>
-          <type>int</type>
+          <type>unsigned int</type>
           <name>colaPacientes</name>
-          <arrayLength>200</arrayLength>
+          <arrayLength>2000</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>front</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>rear</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>size</name>
         </gpu:variable>
       </memory>
       <functions>

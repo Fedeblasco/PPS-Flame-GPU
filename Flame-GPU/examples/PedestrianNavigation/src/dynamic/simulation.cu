@@ -161,6 +161,9 @@ unsigned int h_medics_default2_variable_y_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_x_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_y_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_front_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_rear_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_size_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -484,6 +487,9 @@ void initialise(char * inputfile){
     h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -2572,7 +2578,7 @@ __host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
     }
 }
 
-/** int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element)
+/** unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element)
  * Gets the element-th value of the colaPacientes variable array of an receptionist agent in the defaultReceptionist state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
@@ -2580,9 +2586,9 @@ __host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
  * @param element the element index within the variable array
  * @return element-th value of agent variable colaPacientes
  */
-__host__ int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element){
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element){
     unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int numElements = 200;
+    unsigned int numElements = 2000;
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
@@ -2595,7 +2601,7 @@ __host__ int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigne
                     cudaMemcpy(
                         h_receptionists_defaultReceptionist->colaPacientes + (e * xmachine_memory_receptionist_MAX),
                         d_receptionists_defaultReceptionist->colaPacientes + (e * xmachine_memory_receptionist_MAX), 
-                        count * sizeof(int), 
+                        count * sizeof(unsigned int), 
                         cudaMemcpyDeviceToHost
                     )
                 );
@@ -2609,6 +2615,120 @@ __host__ int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigne
 
     } else {
         fprintf(stderr, "Warning: Attempting to access the %u-th element of colaPacientes for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index)
+ * Gets the value of the front variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable front
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_front_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->front,
+                    d_receptionists_defaultReceptionist->front,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_front_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->front[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access front for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_rear_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->rear,
+                    d_receptionists_defaultReceptionist->rear,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_rear_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->rear[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access rear for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index)
+ * Gets the value of the size variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_size_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->size,
+                    d_receptionists_defaultReceptionist->size,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_size_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->size[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access size for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -3555,9 +3675,15 @@ void copy_single_xmachine_memory_receptionist_hostToDevice(xmachine_memory_recep
  
 		gpuErrchk(cudaMemcpy(d_dst->y, &h_agent->y, sizeof(int), cudaMemcpyHostToDevice));
  
-	for(unsigned int i = 0; i < 200; i++){
-		gpuErrchk(cudaMemcpy(d_dst->colaPacientes + (i * xmachine_memory_receptionist_MAX), h_agent->colaPacientes + i, sizeof(int), cudaMemcpyHostToDevice));
+	for(unsigned int i = 0; i < 2000; i++){
+		gpuErrchk(cudaMemcpy(d_dst->colaPacientes + (i * xmachine_memory_receptionist_MAX), h_agent->colaPacientes + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
     }
+ 
+		gpuErrchk(cudaMemcpy(d_dst->front, &h_agent->front, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->rear, &h_agent->rear, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->size, &h_agent->size, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -3578,10 +3704,16 @@ void copy_partial_xmachine_memory_receptionist_hostToDevice(xmachine_memory_rece
  
 		gpuErrchk(cudaMemcpy(d_dst->y, h_src->y, count * sizeof(int), cudaMemcpyHostToDevice));
  
-		for(unsigned int i = 0; i < 200; i++){
-			gpuErrchk(cudaMemcpy(d_dst->colaPacientes + (i * xmachine_memory_receptionist_MAX), h_src->colaPacientes + (i * xmachine_memory_receptionist_MAX), count * sizeof(int), cudaMemcpyHostToDevice));
+		for(unsigned int i = 0; i < 2000; i++){
+			gpuErrchk(cudaMemcpy(d_dst->colaPacientes + (i * xmachine_memory_receptionist_MAX), h_src->colaPacientes + (i * xmachine_memory_receptionist_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
         }
 
+ 
+		gpuErrchk(cudaMemcpy(d_dst->front, h_src->front, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->rear, h_src->rear, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->size, h_src->size, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -3859,10 +3991,10 @@ xmachine_memory_receptionist* h_allocate_agent_receptionist(){
 	// Memset the whole agent strcuture
     memset(agent, 0, sizeof(xmachine_memory_receptionist));
 	// Agent variable arrays must be allocated
-    agent->colaPacientes = (int*)malloc(200 * sizeof(int));
+    agent->colaPacientes = (unsigned int*)malloc(2000 * sizeof(unsigned int));
 	
     // If there is no default value, memset to 0.
-    memset(agent->colaPacientes, 0, sizeof(int)*200);
+    memset(agent->colaPacientes, 0, sizeof(unsigned int)*2000);
 	return agent;
 }
 void h_free_agent_receptionist(xmachine_memory_receptionist** agent){
@@ -3895,9 +4027,15 @@ void h_unpack_agents_receptionist_AoS_to_SoA(xmachine_memory_receptionist_list *
 			 
 			dst->y[i] = src[i]->y;
 			 
-			for(unsigned int j = 0; j < 200; j++){
+			for(unsigned int j = 0; j < 2000; j++){
 				dst->colaPacientes[(j * xmachine_memory_receptionist_MAX) + i] = src[i]->colaPacientes[j];
 			}
+			 
+			dst->front[i] = src[i]->front;
+			 
+			dst->rear[i] = src[i]->rear;
+			 
+			dst->size[i] = src[i]->size;
 			
 		}
 	}
@@ -3932,6 +4070,9 @@ void h_add_agent_receptionist_defaultReceptionist(xmachine_memory_receptionist* 
     h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
     
 
 }
@@ -3966,6 +4107,9 @@ void h_add_agents_receptionist_defaultReceptionist(xmachine_memory_receptionist*
         h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = 0;
+        h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
+        h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
+        h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
         
 
 	}
@@ -4355,6 +4499,69 @@ int min_receptionist_defaultReceptionist_y_variable(){
 int max_receptionist_defaultReceptionist_y_variable(){
     //max in default stream
     thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_front_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_front_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_front_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_rear_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_rear_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_rear_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_size_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_size_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_size_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }

@@ -420,12 +420,27 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs("</y>\n", file);
         
 		fputs("<colaPacientes>", file);
-        for (int j=0;j<200;j++){
-            fprintf(file, "%d", h_receptionists_defaultReceptionist->colaPacientes[(j*xmachine_memory_receptionist_MAX)+i]);
-            if(j!=(200-1))
+        for (int j=0;j<2000;j++){
+            fprintf(file, "%u", h_receptionists_defaultReceptionist->colaPacientes[(j*xmachine_memory_receptionist_MAX)+i]);
+            if(j!=(2000-1))
                 fprintf(file, ",");
         }
 		fputs("</colaPacientes>\n", file);
+        
+		fputs("<front>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->front[i]);
+		fputs(data, file);
+		fputs("</front>\n", file);
+        
+		fputs("<rear>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->rear[i]);
+		fputs(data, file);
+		fputs("</rear>\n", file);
+        
+		fputs("<size>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->size[i]);
+		fputs(data, file);
+		fputs("</size>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -592,6 +607,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_x;
     int in_receptionist_y;
     int in_receptionist_colaPacientes;
+    int in_receptionist_front;
+    int in_receptionist_rear;
+    int in_receptionist_size;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -709,7 +727,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int medic_y;
 	int receptionist_x;
 	int receptionist_y;
-    int receptionist_colaPacientes[200];
+    unsigned int receptionist_colaPacientes[2000];
+	unsigned int receptionist_front;
+	unsigned int receptionist_rear;
+	unsigned int receptionist_size;
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -804,6 +825,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_x = 0;
 	in_receptionist_y = 0;
 	in_receptionist_colaPacientes = 0;
+	in_receptionist_front = 0;
+	in_receptionist_rear = 0;
+	in_receptionist_size = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -894,9 +918,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	{	
 		h_receptionists->x[k] = 0;
 		h_receptionists->y[k] = 0;
-        for (i=0;i<200;i++){
+        for (i=0;i<2000;i++){
             h_receptionists->colaPacientes[(i*xmachine_memory_receptionist_MAX)+k] = 0;
         }
+		h_receptionists->front[k] = 0;
+		h_receptionists->rear[k] = 0;
+		h_receptionists->size[k] = 0;
 	}
 	
 	//set all navmap values to 0
@@ -948,9 +975,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     medic_y = 0;
     receptionist_x = 0;
     receptionist_y = 0;
-    for (i=0;i<200;i++){
+    for (i=0;i<2000;i++){
         receptionist_colaPacientes[i] = 0;
     }
+    receptionist_front = 0;
+    receptionist_rear = 0;
+    receptionist_size = 0;
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -1183,9 +1213,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     if(agent_minimum.y > receptionist_y)
                         agent_minimum.y = (float)receptionist_y;
                     
-                    for (int k=0;k<200;k++){
+                    for (int k=0;k<2000;k++){
                         h_receptionists->colaPacientes[(k*xmachine_memory_receptionist_MAX)+(*h_xmachine_memory_receptionist_count)] = receptionist_colaPacientes[k];
                     }
+					h_receptionists->front[*h_xmachine_memory_receptionist_count] = receptionist_front;
+					h_receptionists->rear[*h_xmachine_memory_receptionist_count] = receptionist_rear;
+					h_receptionists->size[*h_xmachine_memory_receptionist_count] = receptionist_size;
 					(*h_xmachine_memory_receptionist_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
@@ -1260,9 +1293,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 medic_y = 0;
                 receptionist_x = 0;
                 receptionist_y = 0;
-                for (i=0;i<200;i++){
+                for (i=0;i<2000;i++){
                     receptionist_colaPacientes[i] = 0;
                 }
+                receptionist_front = 0;
+                receptionist_rear = 0;
+                receptionist_size = 0;
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -1329,6 +1365,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/y") == 0) in_receptionist_y = 0;
 			if(strcmp(buffer, "colaPacientes") == 0) in_receptionist_colaPacientes = 1;
 			if(strcmp(buffer, "/colaPacientes") == 0) in_receptionist_colaPacientes = 0;
+			if(strcmp(buffer, "front") == 0) in_receptionist_front = 1;
+			if(strcmp(buffer, "/front") == 0) in_receptionist_front = 0;
+			if(strcmp(buffer, "rear") == 0) in_receptionist_rear = 1;
+			if(strcmp(buffer, "/rear") == 0) in_receptionist_rear = 0;
+			if(strcmp(buffer, "size") == 0) in_receptionist_size = 1;
+			if(strcmp(buffer, "/size") == 0) in_receptionist_size = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1518,7 +1560,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     receptionist_y = (int) fpgu_strtol(buffer); 
                 }
 				if(in_receptionist_colaPacientes){
-                    readArrayInput<int>(&fpgu_strtol, buffer, receptionist_colaPacientes, 200);    
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, receptionist_colaPacientes, 2000);    
+                }
+				if(in_receptionist_front){
+                    receptionist_front = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_rear){
+                    receptionist_rear = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_size){
+                    receptionist_size = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 

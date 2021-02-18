@@ -82,7 +82,7 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_memory_navmap
 #define xmachine_memory_navmap_MAX 65536 
 //Agent variable array length for xmachine_memory_receptionist->colaPacientes
-#define xmachine_memory_receptionist_colaPacientes_LENGTH 200
+#define xmachine_memory_receptionist_colaPacientes_LENGTH 2000
 
 
   
@@ -196,7 +196,10 @@ struct __align__(16) xmachine_memory_receptionist
 {
     int x;    /**< X-machine memory variable x of type int.*/
     int y;    /**< X-machine memory variable y of type int.*/
-    int *colaPacientes;    /**< X-machine memory variable colaPacientes of type int.*/
+    unsigned int *colaPacientes;    /**< X-machine memory variable colaPacientes of type unsigned int.*/
+    unsigned int front;    /**< X-machine memory variable front of type unsigned int.*/
+    unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
+    unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap
@@ -368,7 +371,10 @@ struct xmachine_memory_receptionist_list
     
     int x [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list x of type int.*/
     int y [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list y of type int.*/
-    int colaPacientes [xmachine_memory_receptionist_MAX*200];    /**< X-machine memory variable list colaPacientes of type int.*/
+    unsigned int colaPacientes [xmachine_memory_receptionist_MAX*2000];    /**< X-machine memory variable list colaPacientes of type unsigned int.*/
+    unsigned int front [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
+    unsigned int rear [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
+    unsigned int size [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap_list
@@ -820,8 +826,11 @@ __FLAME_GPU_FUNC__ void add_medic_agent(xmachine_memory_medic_list* agents, int 
  * @param agents xmachine_memory_receptionist_list agent list
  * @param x	agent agent variable of type int
  * @param y	agent agent variable of type int
+ * @param front	agent agent variable of type unsigned int
+ * @param rear	agent agent variable of type unsigned int
+ * @param size	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y);
+__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size);
 
 /** get_receptionist_agent_array_value
  *  Template function for accessing receptionist agent array memory variables.
@@ -1250,7 +1259,7 @@ __host__ int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
  */
 __host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index);
 
-/** int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element)
+/** unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element)
  * Gets the element-th value of the colaPacientes variable array of an receptionist agent in the defaultReceptionist state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
@@ -1258,7 +1267,34 @@ __host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
  * @param element the element index within the variable array
  * @return element-th value of agent variable colaPacientes
  */
-__host__ int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element);
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index)
+ * Gets the value of the front variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable front
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index)
+ * Gets the value of the size variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index);
 
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
@@ -2084,6 +2120,84 @@ int min_receptionist_defaultReceptionist_y_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 int max_receptionist_defaultReceptionist_y_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_front_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_front_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_front_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_front_variable();
+/** unsigned int max_receptionist_defaultReceptionist_front_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_front_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_rear_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_rear_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_rear_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_rear_variable();
+/** unsigned int max_receptionist_defaultReceptionist_rear_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_rear_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_size_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_size_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_size_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_size_variable();
+/** unsigned int max_receptionist_defaultReceptionist_size_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_size_variable();
 
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

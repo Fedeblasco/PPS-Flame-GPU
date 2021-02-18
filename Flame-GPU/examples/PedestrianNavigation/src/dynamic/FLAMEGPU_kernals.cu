@@ -552,9 +552,12 @@ __global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* a
         agents_dst->_position[output_index] = output_index;        
 		agents_dst->x[output_index] = agents_src->x[index];        
 		agents_dst->y[output_index] = agents_src->y[index];
-	    for (int i=0; i<200; i++){
+	    for (int i=0; i<2000; i++){
 	      agents_dst->colaPacientes[(i*xmachine_memory_receptionist_MAX)+output_index] = agents_src->colaPacientes[(i*xmachine_memory_receptionist_MAX)+index];
-	    }
+	    }        
+		agents_dst->front[output_index] = agents_src->front[index];        
+		agents_dst->rear[output_index] = agents_src->rear[index];        
+		agents_dst->size[output_index] = agents_src->size[index];
 	}
 }
 
@@ -576,9 +579,12 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->x[output_index] = agents_src->x[index];
 	    agents_dst->y[output_index] = agents_src->y[index];
-	    for (int i=0; i<200; i++){
+	    for (int i=0; i<2000; i++){
 	      agents_dst->colaPacientes[(i*xmachine_memory_receptionist_MAX)+output_index] = agents_src->colaPacientes[(i*xmachine_memory_receptionist_MAX)+index];
 	    }
+	    agents_dst->front[output_index] = agents_src->front[index];
+	    agents_dst->rear[output_index] = agents_src->rear[index];
+	    agents_dst->size[output_index] = agents_src->size[index];
     }
 }
 
@@ -587,10 +593,13 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
  * @param agents xmachine_memory_receptionist_list to add agents to 
  * @param x agent variable of type int
  * @param y agent variable of type int
- * @param colaPacientes agent variable of type int
+ * @param colaPacientes agent variable of type unsigned int
+ * @param front agent variable of type unsigned int
+ * @param rear agent variable of type unsigned int
+ * @param size agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y){
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size){
 	
 	int index;
     
@@ -611,12 +620,15 @@ __device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents
 	//write data to new buffer
 	agents->x[index] = x;
 	agents->y[index] = y;
+	agents->front[index] = front;
+	agents->rear[index] = rear;
+	agents->size[index] = size;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y){
-    add_receptionist_agent<DISCRETE_2D>(agents, x, y);
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size){
+    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size);
 }
 
 /** reorder_receptionist_agents
@@ -634,9 +646,12 @@ __global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memor
 	//reorder agent data
 	ordered_agents->x[index] = unordered_agents->x[old_pos];
 	ordered_agents->y[index] = unordered_agents->y[old_pos];
-	for (int i=0; i<200; i++){
+	for (int i=0; i<2000; i++){
 	  ordered_agents->colaPacientes[(i*xmachine_memory_receptionist_MAX)+index] = unordered_agents->colaPacientes[(i*xmachine_memory_receptionist_MAX)+old_pos];
 	}
+	ordered_agents->front[index] = unordered_agents->front[old_pos];
+	ordered_agents->rear[index] = unordered_agents->rear[old_pos];
+	ordered_agents->size[index] = unordered_agents->size[old_pos];
 }
 
 /** get_receptionist_agent_array_value
@@ -2449,11 +2464,17 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
     agent.colaPacientes = &(agents->colaPacientes[index]);
+	agent.front = agents->front[index];
+	agent.rear = agents->rear[index];
+	agent.size = agents->size[index];
 	} else {
 	
 	agent.x = 0;
 	agent.y = 0;
     agent.colaPacientes = nullptr;
+	agent.front = 0;
+	agent.rear = 0;
+	agent.size = 0;
 	}
 
 	//FLAME function call
@@ -2469,6 +2490,9 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	//AoS to SoA - xmachine_memory_receptionServer Coalesced memory write (ignore arrays)
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
+	agents->front[index] = agent.front;
+	agents->rear[index] = agent.rear;
+	agents->size[index] = agent.size;
 	}
 }
 
