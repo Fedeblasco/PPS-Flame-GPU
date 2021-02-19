@@ -52,15 +52,19 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
 	while(current_message && current_message->id!=0){
         if(current_message->id > agent->last){
             enqueue(agent, current_message->id);
-            //printf("lo encole y el resultado fue %u\n",dequeue(agent));
+            if(current_message->estado >= 1){
+                agent->estado = 1;
+                //printf("Uy me enferme");
+            }
             agent->last = current_message->id;
         }
         current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}
     if(!isEmpty(agent)){
         agent->tick++;
-        if(agent->tick >= 60){
-            add_avisar_paciente_message(patientMessages, dequeue(agent));
+        if(agent->tick >= espera){
+            unsigned int prueba = dequeue(agent);
+            add_avisar_paciente_message(patientMessages, prueba);
             agent->tick = 0;
         }
     }

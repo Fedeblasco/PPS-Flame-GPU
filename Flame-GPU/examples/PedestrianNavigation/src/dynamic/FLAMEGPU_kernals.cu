@@ -559,7 +559,9 @@ __global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* a
 		agents_dst->rear[output_index] = agents_src->rear[index];        
 		agents_dst->size[output_index] = agents_src->size[index];        
 		agents_dst->last[output_index] = agents_src->last[index];        
-		agents_dst->tick[output_index] = agents_src->tick[index];
+		agents_dst->tick[output_index] = agents_src->tick[index];        
+		agents_dst->tick_state[output_index] = agents_src->tick_state[index];        
+		agents_dst->estado[output_index] = agents_src->estado[index];
 	}
 }
 
@@ -589,6 +591,8 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
 	    agents_dst->size[output_index] = agents_src->size[index];
 	    agents_dst->last[output_index] = agents_src->last[index];
 	    agents_dst->tick[output_index] = agents_src->tick[index];
+	    agents_dst->tick_state[output_index] = agents_src->tick_state[index];
+	    agents_dst->estado[output_index] = agents_src->estado[index];
     }
 }
 
@@ -603,9 +607,11 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
  * @param size agent variable of type unsigned int
  * @param last agent variable of type unsigned int
  * @param tick agent variable of type unsigned int
+ * @param tick_state agent variable of type unsigned int
+ * @param estado agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick){
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick, unsigned int tick_state, int estado){
 	
 	int index;
     
@@ -631,12 +637,14 @@ __device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents
 	agents->size[index] = size;
 	agents->last[index] = last;
 	agents->tick[index] = tick;
+	agents->tick_state[index] = tick_state;
+	agents->estado[index] = estado;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick){
-    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size, last, tick);
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick, unsigned int tick_state, int estado){
+    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size, last, tick, tick_state, estado);
 }
 
 /** reorder_receptionist_agents
@@ -662,6 +670,8 @@ __global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memor
 	ordered_agents->size[index] = unordered_agents->size[old_pos];
 	ordered_agents->last[index] = unordered_agents->last[old_pos];
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
+	ordered_agents->tick_state[index] = unordered_agents->tick_state[old_pos];
+	ordered_agents->estado[index] = unordered_agents->estado[old_pos];
 }
 
 /** get_receptionist_agent_array_value
@@ -1490,8 +1500,9 @@ __device__ xmachine_message_pedestrian_state* get_next_pedestrian_state_message(
  * Add non partitioned or spatially partitioned check_in message
  * @param messages xmachine_message_check_in_list message list to add too
  * @param id agent variable of type unsigned int
+ * @param estado agent variable of type int
  */
-__device__ void add_check_in_message(xmachine_message_check_in_list* messages, unsigned int id){
+__device__ void add_check_in_message(xmachine_message_check_in_list* messages, unsigned int id, int estado){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_check_in_count;
@@ -1512,6 +1523,7 @@ __device__ void add_check_in_message(xmachine_message_check_in_list* messages, u
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
+	messages->estado[index] = estado;
 
 }
 
@@ -1532,7 +1544,8 @@ __global__ void scatter_optional_check_in_messages(xmachine_message_check_in_lis
 
 		//AoS - xmachine_message_check_in Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
-		messages->id[output_index] = messages_swap->id[index];				
+		messages->id[output_index] = messages_swap->id[index];
+		messages->estado[output_index] = messages_swap->estado[index];				
 	}
 }
 
@@ -1573,6 +1586,7 @@ __device__ xmachine_message_check_in* get_first_check_in_message(xmachine_messag
 	xmachine_message_check_in temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
+	temp_message.estado = messages->estado[index];
 
 	//AoS to shared memory
 	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_check_in));
@@ -1615,6 +1629,7 @@ __device__ xmachine_message_check_in* get_next_check_in_message(xmachine_message
 		xmachine_message_check_in temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
+		temp_message.estado = messages->estado[index];
 
 		//AoS to shared memory
 		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_check_in));
@@ -2424,7 +2439,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 /**
  *
  */
-__global__ void GPUFLAME_check_receptionist(xmachine_memory_agent_list* agents, xmachine_message_avisar_paciente_list* avisar_paciente_messages){
+__global__ void GPUFLAME_check_messages(xmachine_memory_agent_list* agents, xmachine_message_avisar_paciente_list* avisar_paciente_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -2433,7 +2448,7 @@ __global__ void GPUFLAME_check_receptionist(xmachine_memory_agent_list* agents, 
     //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
     
 
-	//SoA to AoS - xmachine_memory_check_receptionist Coalesced memory read (arrays point to first item for agent index)
+	//SoA to AoS - xmachine_memory_check_messages Coalesced memory read (arrays point to first item for agent index)
 	xmachine_memory_agent agent;
     //No partitioned input may launch more threads than required - only load agent data within bounds. 
     if (index < d_xmachine_memory_agent_count){
@@ -2475,7 +2490,7 @@ __global__ void GPUFLAME_check_receptionist(xmachine_memory_agent_list* agents, 
 	}
 
 	//FLAME function call
-	int dead = !check_receptionist(&agent, avisar_paciente_messages);
+	int dead = !check_messages(&agent, avisar_paciente_messages);
 	
 
 	
@@ -2484,7 +2499,7 @@ __global__ void GPUFLAME_check_receptionist(xmachine_memory_agent_list* agents, 
     //continuous agent: set reallocation flag
 	agents->_scan_input[index]  = dead; 
 
-	//AoS to SoA - xmachine_memory_check_receptionist Coalesced memory write (ignore arrays)
+	//AoS to SoA - xmachine_memory_check_messages Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
@@ -2562,6 +2577,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.size = agents->size[index];
 	agent.last = agents->last[index];
 	agent.tick = agents->tick[index];
+	agent.tick_state = agents->tick_state[index];
+	agent.estado = agents->estado[index];
 	} else {
 	
 	agent.x = 0;
@@ -2572,6 +2589,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.size = 0;
 	agent.last = 0;
 	agent.tick = 0;
+	agent.tick_state = 0;
+	agent.estado = 0;
 	}
 
 	//FLAME function call
@@ -2592,6 +2611,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agents->size[index] = agent.size;
 	agents->last[index] = agent.last;
 	agents->tick[index] = agent.tick;
+	agents->tick_state[index] = agent.tick_state;
+	agents->estado[index] = agent.estado;
 	}
 }
 

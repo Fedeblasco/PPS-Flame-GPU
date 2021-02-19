@@ -287,7 +287,7 @@
         </gpu:function>
 
         <gpu:function>
-          <name>check_receptionist</name>
+          <name>check_messages</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <inputs>
@@ -377,6 +377,16 @@
           <type>unsigned int</type>
           <name>tick</name>
           <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>tick_state</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>estado</name>
+          <description>0=sano,1=portador,2=enfermo</description>
         </gpu:variable>
       </memory>
       <functions>
@@ -624,6 +634,10 @@
           <type>unsigned int</type>
           <name>id</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>estado</name>
+        </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
@@ -717,7 +731,7 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>check_receptionist</name>
+        <name>check_messages</name>
       </gpu:layerFunction>
     </layer>
   </layers>

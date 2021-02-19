@@ -42,9 +42,6 @@
 //Cantidad de personas a generar
 #define cant_personas 5
 
-#define ir_a_x 150
-#define ir_a_y 80
-
 
 //This function creates all the agents requiered to run the hospital
 __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
@@ -254,16 +251,17 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
 	return 0; 
 }
 
-__FLAME_GPU_FUNC__ int check_receptionist(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisarPacienteMessages){
-	 
+__FLAME_GPU_FUNC__ int check_messages(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisarPacienteMessages){
+	
 	xmachine_message_avisar_paciente* current_message = get_first_avisar_paciente_message(avisarPacienteMessages);
 	while(current_message && current_message->id!=0){
-		if(current_message->id == agent->id){
+		//printf("Soy %u y recibi este mensajito: %u\n", agent->id, current_message->id);
+		if((current_message->id == agent->id) && (agent->estado_movimiento == 1)){
 			agent->estado_movimiento = 2;
 		}
-        current_message = get_next_avisar_paciente_message(current_message, avisarPacienteMessages);
+		current_message = get_next_avisar_paciente_message(current_message, avisarPacienteMessages);
 	}
-	 
+
 	return 0;
 }
 
@@ -271,7 +269,7 @@ __FLAME_GPU_FUNC__ int check_receptionist(xmachine_memory_agent* agent, xmachine
  * move FLAMEGPU Agent Function
  * Automatically generated using functions.xslt
  * @param agent Pointer to an agent structre of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- 
+
  */
 __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessages){
 
@@ -296,27 +294,23 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 
 	switch(agent->estado_movimiento){
 		case 0:
-			if(mover_a_destino(agent,ir_a_x,ir_a_y) == 0){
-				printf("Ya llegue, soy %u\n",agent->id);
+			if(mover_a_destino(agent,140,80) == 0){
 				agent->estado_movimiento = 1;
-				add_check_in_message(checkInMessages, agent->id);
+				add_check_in_message(checkInMessages, agent->id, agent->estado);
 			}
 			break;
 		case 1:
 			break;
 		case 2:
-			mover_a_destino(agent,130,90);
+			if(mover_a_destino(agent,130,90) == 0){
+				agent->estado_movimiento = 3;
+			}
+			break;
+		case 3:
+			if(mover_a_destino(agent,88,96) == 0){
+			}
 			break;
 	}
-	
-	//add_check_in_message(checkInMessageList, agent->id);
-
-	//Por cada tick, informo mi posición
-	//printf("%d, ",x);
-	//printf("%d\n",y);
-	
-	//Por cada tick, informo mi estado
-	//printf("%d\n",agent->estado);
 	 
 	return 0; 
 }

@@ -452,6 +452,16 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</tick>\n", file);
         
+		fputs("<tick_state>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->tick_state[i]);
+		fputs(data, file);
+		fputs("</tick_state>\n", file);
+        
+		fputs("<estado>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->estado[i]);
+		fputs(data, file);
+		fputs("</estado>\n", file);
+        
 		fputs("</xagent>\n", file);
 	}
 	//Write each navmap agent to xml
@@ -622,6 +632,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_size;
     int in_receptionist_last;
     int in_receptionist_tick;
+    int in_receptionist_tick_state;
+    int in_receptionist_estado;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -745,6 +757,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int receptionist_size;
 	unsigned int receptionist_last;
 	unsigned int receptionist_tick;
+	unsigned int receptionist_tick_state;
+	int receptionist_estado;
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -844,6 +858,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_size = 0;
 	in_receptionist_last = 0;
 	in_receptionist_tick = 0;
+	in_receptionist_tick_state = 0;
+	in_receptionist_estado = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -942,6 +958,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_receptionists->size[k] = 0;
 		h_receptionists->last[k] = 0;
 		h_receptionists->tick[k] = 0;
+		h_receptionists->tick_state[k] = 0;
+		h_receptionists->estado[k] = 0;
 	}
 	
 	//set all navmap values to 0
@@ -1001,6 +1019,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_size = 0;
     receptionist_last = 0;
     receptionist_tick = 0;
+    receptionist_tick_state = 0;
+    receptionist_estado = 0;
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -1241,6 +1261,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_receptionists->size[*h_xmachine_memory_receptionist_count] = receptionist_size;
 					h_receptionists->last[*h_xmachine_memory_receptionist_count] = receptionist_last;
 					h_receptionists->tick[*h_xmachine_memory_receptionist_count] = receptionist_tick;
+					h_receptionists->tick_state[*h_xmachine_memory_receptionist_count] = receptionist_tick_state;
+					h_receptionists->estado[*h_xmachine_memory_receptionist_count] = receptionist_estado;
 					(*h_xmachine_memory_receptionist_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
@@ -1323,6 +1345,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_size = 0;
                 receptionist_last = 0;
                 receptionist_tick = 0;
+                receptionist_tick_state = 0;
+                receptionist_estado = 0;
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -1399,6 +1423,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/last") == 0) in_receptionist_last = 0;
 			if(strcmp(buffer, "tick") == 0) in_receptionist_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_receptionist_tick = 0;
+			if(strcmp(buffer, "tick_state") == 0) in_receptionist_tick_state = 1;
+			if(strcmp(buffer, "/tick_state") == 0) in_receptionist_tick_state = 0;
+			if(strcmp(buffer, "estado") == 0) in_receptionist_estado = 1;
+			if(strcmp(buffer, "/estado") == 0) in_receptionist_estado = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1604,6 +1632,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_receptionist_tick){
                     receptionist_tick = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_tick_state){
+                    receptionist_tick_state = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_estado){
+                    receptionist_estado = (int) fpgu_strtol(buffer); 
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 
