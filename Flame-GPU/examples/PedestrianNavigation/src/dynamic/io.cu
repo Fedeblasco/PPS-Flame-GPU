@@ -442,6 +442,16 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</size>\n", file);
         
+		fputs("<last>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->last[i]);
+		fputs(data, file);
+		fputs("</last>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
 		fputs("</xagent>\n", file);
 	}
 	//Write each navmap agent to xml
@@ -610,6 +620,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_front;
     int in_receptionist_rear;
     int in_receptionist_size;
+    int in_receptionist_last;
+    int in_receptionist_tick;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -731,6 +743,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int receptionist_front;
 	unsigned int receptionist_rear;
 	unsigned int receptionist_size;
+	unsigned int receptionist_last;
+	unsigned int receptionist_tick;
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -828,6 +842,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_front = 0;
 	in_receptionist_rear = 0;
 	in_receptionist_size = 0;
+	in_receptionist_last = 0;
+	in_receptionist_tick = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -924,6 +940,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_receptionists->front[k] = 0;
 		h_receptionists->rear[k] = 0;
 		h_receptionists->size[k] = 0;
+		h_receptionists->last[k] = 0;
+		h_receptionists->tick[k] = 0;
 	}
 	
 	//set all navmap values to 0
@@ -981,6 +999,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_front = 0;
     receptionist_rear = 0;
     receptionist_size = 0;
+    receptionist_last = 0;
+    receptionist_tick = 0;
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -1219,6 +1239,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_receptionists->front[*h_xmachine_memory_receptionist_count] = receptionist_front;
 					h_receptionists->rear[*h_xmachine_memory_receptionist_count] = receptionist_rear;
 					h_receptionists->size[*h_xmachine_memory_receptionist_count] = receptionist_size;
+					h_receptionists->last[*h_xmachine_memory_receptionist_count] = receptionist_last;
+					h_receptionists->tick[*h_xmachine_memory_receptionist_count] = receptionist_tick;
 					(*h_xmachine_memory_receptionist_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
@@ -1299,6 +1321,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_front = 0;
                 receptionist_rear = 0;
                 receptionist_size = 0;
+                receptionist_last = 0;
+                receptionist_tick = 0;
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -1371,6 +1395,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/rear") == 0) in_receptionist_rear = 0;
 			if(strcmp(buffer, "size") == 0) in_receptionist_size = 1;
 			if(strcmp(buffer, "/size") == 0) in_receptionist_size = 0;
+			if(strcmp(buffer, "last") == 0) in_receptionist_last = 1;
+			if(strcmp(buffer, "/last") == 0) in_receptionist_last = 0;
+			if(strcmp(buffer, "tick") == 0) in_receptionist_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_receptionist_tick = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1570,6 +1598,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_receptionist_size){
                     receptionist_size = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_last){
+                    receptionist_last = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_tick){
+                    receptionist_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 

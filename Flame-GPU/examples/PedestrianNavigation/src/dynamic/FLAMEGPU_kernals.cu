@@ -557,7 +557,9 @@ __global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* a
 	    }        
 		agents_dst->front[output_index] = agents_src->front[index];        
 		agents_dst->rear[output_index] = agents_src->rear[index];        
-		agents_dst->size[output_index] = agents_src->size[index];
+		agents_dst->size[output_index] = agents_src->size[index];        
+		agents_dst->last[output_index] = agents_src->last[index];        
+		agents_dst->tick[output_index] = agents_src->tick[index];
 	}
 }
 
@@ -585,6 +587,8 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
 	    agents_dst->front[output_index] = agents_src->front[index];
 	    agents_dst->rear[output_index] = agents_src->rear[index];
 	    agents_dst->size[output_index] = agents_src->size[index];
+	    agents_dst->last[output_index] = agents_src->last[index];
+	    agents_dst->tick[output_index] = agents_src->tick[index];
     }
 }
 
@@ -597,9 +601,11 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
  * @param front agent variable of type unsigned int
  * @param rear agent variable of type unsigned int
  * @param size agent variable of type unsigned int
+ * @param last agent variable of type unsigned int
+ * @param tick agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size){
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick){
 	
 	int index;
     
@@ -623,12 +629,14 @@ __device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents
 	agents->front[index] = front;
 	agents->rear[index] = rear;
 	agents->size[index] = size;
+	agents->last[index] = last;
+	agents->tick[index] = tick;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size){
-    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size);
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick){
+    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size, last, tick);
 }
 
 /** reorder_receptionist_agents
@@ -652,6 +660,8 @@ __global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memor
 	ordered_agents->front[index] = unordered_agents->front[old_pos];
 	ordered_agents->rear[index] = unordered_agents->rear[old_pos];
 	ordered_agents->size[index] = unordered_agents->size[old_pos];
+	ordered_agents->last[index] = unordered_agents->last[old_pos];
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 }
 
 /** get_receptionist_agent_array_value
@@ -2414,6 +2424,89 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 /**
  *
  */
+__global__ void GPUFLAME_check_receptionist(xmachine_memory_agent_list* agents, xmachine_message_avisar_paciente_list* avisar_paciente_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_check_receptionist Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	} else {
+	
+	agent.id = 0;
+	agent.x = 0;
+	agent.y = 0;
+	agent.velx = 0;
+	agent.vely = 0;
+	agent.steer_x = 0;
+	agent.steer_y = 0;
+	agent.height = 0;
+	agent.exit_no = 0;
+	agent.speed = 0;
+	agent.lod = 0;
+	agent.animate = 0;
+	agent.animate_dir = 0;
+	agent.estado = 0;
+	agent.tick = 0;
+	agent.estado_movimiento = 0;
+	}
+
+	//FLAME function call
+	int dead = !check_receptionist(&agent, avisar_paciente_messages);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_check_receptionist Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	}
+}
+
+/**
+ *
+ */
 __global__ void GPUFLAME_prueba(xmachine_memory_medic_list* agents){
 	
 	//continuous agent: index is agent position in 1D agent list
@@ -2467,6 +2560,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.front = agents->front[index];
 	agent.rear = agents->rear[index];
 	agent.size = agents->size[index];
+	agent.last = agents->last[index];
+	agent.tick = agents->tick[index];
 	} else {
 	
 	agent.x = 0;
@@ -2475,6 +2570,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.front = 0;
 	agent.rear = 0;
 	agent.size = 0;
+	agent.last = 0;
+	agent.tick = 0;
 	}
 
 	//FLAME function call
@@ -2493,6 +2590,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agents->front[index] = agent.front;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;
+	agents->last[index] = agent.last;
+	agents->tick[index] = agent.tick;
 	}
 }
 

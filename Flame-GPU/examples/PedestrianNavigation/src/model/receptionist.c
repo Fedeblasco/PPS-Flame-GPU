@@ -1,6 +1,7 @@
 //Archivo con las funciones del recepcionista	
 
 #define capacity 2000
+#define espera 60
 
 /*---------------------------------IMPLEMENTACIÓN DE LA COLA---------------------------------*/
 
@@ -26,10 +27,9 @@ __FLAME_GPU_FUNC__ int isEmpty(xmachine_memory_receptionist* agent){
 __FLAME_GPU_FUNC__ int enqueue(xmachine_memory_receptionist* agent, unsigned int value){ 
     if (isFull(agent)) 
         return 1; 
-    agent->rear = (agent->rear + 1) % capacity; 
     agent->colaPacientes[agent->rear] = value;
+    agent->rear = (agent->rear + 1) % capacity;
     agent->size = agent->size + 1; 
-    printf("%d enqueued to queue\n", value); 
     
     return 0;
 } 
@@ -46,15 +46,24 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
 } 
 
 //Función que chequea los pacientes que llegan y los atiende
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessage){
+__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessages){
 	
 	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
 	while(current_message && current_message->id!=0){
-		printf("Recibí el siguiente mensaje: %u, ",current_message->id);
-		enqueue(agent, current_message->id);
-        printf("lo encole y el resultado fue %u\n",dequeue(agent));
+        if(current_message->id > agent->last){
+            enqueue(agent, current_message->id);
+            //printf("lo encole y el resultado fue %u\n",dequeue(agent));
+            agent->last = current_message->id;
+        }
         current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}
+    if(!isEmpty(agent)){
+        agent->tick++;
+        if(agent->tick >= 60){
+            add_avisar_paciente_message(patientMessages, dequeue(agent));
+            agent->tick = 0;
+        }
+    }
 	
 	return 0;
 }

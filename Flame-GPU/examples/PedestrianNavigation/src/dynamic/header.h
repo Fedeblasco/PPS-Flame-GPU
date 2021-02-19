@@ -200,6 +200,8 @@ struct __align__(16) xmachine_memory_receptionist
     unsigned int front;    /**< X-machine memory variable front of type unsigned int.*/
     unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
     unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
+    unsigned int last;    /**< X-machine memory variable last of type unsigned int.*/
+    unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap
@@ -375,6 +377,8 @@ struct xmachine_memory_receptionist_list
     unsigned int front [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
     unsigned int rear [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
+    unsigned int last [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list last of type unsigned int.*/
+    unsigned int tick [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap_list
@@ -594,6 +598,13 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
  * @param check_in_messages Pointer to output message list of type xmachine_message_check_in_list. Must be passed as an argument to the add_check_in_message function ??.
  */
 __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* check_in_messages);
+
+/**
+ * check_receptionist FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param avisar_paciente_messages  avisar_paciente_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_avisar_paciente_message and get_next_avisar_paciente_message functions.
+ */
+__FLAME_GPU_FUNC__ int check_receptionist(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
 
 /**
  * prueba FLAMEGPU Agent Function
@@ -829,8 +840,10 @@ __FLAME_GPU_FUNC__ void add_medic_agent(xmachine_memory_medic_list* agents, int 
  * @param front	agent agent variable of type unsigned int
  * @param rear	agent agent variable of type unsigned int
  * @param size	agent agent variable of type unsigned int
+ * @param last	agent agent variable of type unsigned int
+ * @param tick	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size);
+__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick);
 
 /** get_receptionist_agent_array_value
  *  Template function for accessing receptionist agent array memory variables.
@@ -1295,6 +1308,24 @@ __host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigne
  * @return value of agent variable size
  */
 __host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_last(unsigned int index)
+ * Gets the value of the last variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable last
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_last(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index);
 
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
@@ -2198,6 +2229,58 @@ unsigned int min_receptionist_defaultReceptionist_size_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 unsigned int max_receptionist_defaultReceptionist_size_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_last_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_last_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_last_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_last_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_last_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_last_variable();
+/** unsigned int max_receptionist_defaultReceptionist_last_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_last_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_tick_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_tick_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_tick_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_tick_variable();
+/** unsigned int max_receptionist_defaultReceptionist_tick_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_tick_variable();
 
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

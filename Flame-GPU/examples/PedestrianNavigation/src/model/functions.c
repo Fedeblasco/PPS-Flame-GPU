@@ -40,7 +40,7 @@
 #define ticks_portador 50000
 #define ticks_enfermo 50000
 //Cantidad de personas a generar
-#define cant_personas 2
+#define cant_personas 5
 
 #define ir_a_x 150
 #define ir_a_y 80
@@ -251,6 +251,19 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
 
 		return 1;
 	}
+	return 0; 
+}
+
+__FLAME_GPU_FUNC__ int check_receptionist(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisarPacienteMessages){
+	 
+	xmachine_message_avisar_paciente* current_message = get_first_avisar_paciente_message(avisarPacienteMessages);
+	while(current_message && current_message->id!=0){
+		if(current_message->id == agent->id){
+			agent->estado_movimiento = 2;
+		}
+        current_message = get_next_avisar_paciente_message(current_message, avisarPacienteMessages);
+	}
+	 
 	return 0;
 }
 
@@ -260,7 +273,7 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
  * @param agent Pointer to an agent structre of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  
  */
-__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessageList){
+__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessages){
 
 	//glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
 
@@ -269,7 +282,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 		agent->tick++;
 		if(agent->tick>=ticks_portador){//Si paso los ticks de portador, me enfermo
 			agent->tick=0;
-			agent->estado=2;
+			agent->estado=2;	
 		}
 	}
 	if(agent->estado==2){//Si el agente esta enfermo
@@ -286,10 +299,12 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			if(mover_a_destino(agent,ir_a_x,ir_a_y) == 0){
 				printf("Ya llegue, soy %u\n",agent->id);
 				agent->estado_movimiento = 1;
-				add_check_in_message(checkInMessageList, agent->id);
+				add_check_in_message(checkInMessages, agent->id);
 			}
 			break;
 		case 1:
+			break;
+		case 2:
 			mover_a_destino(agent,130,90);
 			break;
 	}
@@ -302,8 +317,8 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 	
 	//Por cada tick, informo mi estado
 	//printf("%d\n",agent->estado);
-	
-	return 0;
+	 
+	return 0; 
 }
 
 /**

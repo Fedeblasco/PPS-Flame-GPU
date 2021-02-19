@@ -285,6 +285,19 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+
+        <gpu:function>
+          <name>check_receptionist</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>avisar_paciente</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
       </functions>
       <states>
         <gpu:state>
@@ -354,6 +367,16 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>size</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>last</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>tick</name>
+          <defaultValue>0</defaultValue>
         </gpu:variable>
       </memory>
       <functions>
@@ -690,6 +713,11 @@
     <layer>
       <gpu:layerFunction>
         <name>receptionServer</name>
+      </gpu:layerFunction>
+    </layer>
+    <layer>
+      <gpu:layerFunction>
+        <name>check_receptionist</name>
       </gpu:layerFunction>
     </layer>
   </layers>
