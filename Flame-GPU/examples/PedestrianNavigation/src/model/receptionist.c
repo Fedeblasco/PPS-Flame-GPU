@@ -41,7 +41,7 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
         return 0; 
     int item = agent->colaPacientes[agent->front];
     agent->front = (agent->front + 1) % capacity; 
-    agent->size = agent->size - 1; 
+    agent->size = agent->size - 1;
     return item;
 } 
 

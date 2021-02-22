@@ -46,7 +46,6 @@
 //This function creates all the agents requiered to run the hospital
 __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
 	printf("Inicializando todo\n");
-
 	// Allocating memory in CPU to save the agent
 	xmachine_memory_receptionist * h_receptionist = h_allocate_agent_receptionist();
 	// Copying the agent from the CPU to GPU
