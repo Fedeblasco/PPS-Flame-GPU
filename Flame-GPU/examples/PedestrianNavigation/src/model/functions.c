@@ -251,9 +251,9 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
 }
 
 __FLAME_GPU_FUNC__ int check_messages(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisarPacienteMessages){
-	
+
 	xmachine_message_avisar_paciente* current_message = get_first_avisar_paciente_message(avisarPacienteMessages);
-	while(current_message && current_message->id!=0){
+	while(current_message){
 		//printf("Soy %u y recibi este mensajito: %u\n", agent->id, current_message->id);
 		if((current_message->id == agent->id) && (agent->estado_movimiento == 1)){
 			agent->estado_movimiento = 2;

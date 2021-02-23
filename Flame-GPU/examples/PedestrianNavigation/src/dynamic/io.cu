@@ -442,11 +442,6 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</size>\n", file);
         
-		fputs("<last>", file);
-        sprintf(data, "%u", h_receptionists_defaultReceptionist->last[i]);
-		fputs(data, file);
-		fputs("</last>\n", file);
-        
 		fputs("<tick>", file);
         sprintf(data, "%u", h_receptionists_defaultReceptionist->tick[i]);
 		fputs(data, file);
@@ -630,7 +625,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_front;
     int in_receptionist_rear;
     int in_receptionist_size;
-    int in_receptionist_last;
     int in_receptionist_tick;
     int in_receptionist_tick_state;
     int in_receptionist_estado;
@@ -755,7 +749,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int receptionist_front;
 	unsigned int receptionist_rear;
 	unsigned int receptionist_size;
-	unsigned int receptionist_last;
 	unsigned int receptionist_tick;
 	unsigned int receptionist_tick_state;
 	int receptionist_estado;
@@ -856,7 +849,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_front = 0;
 	in_receptionist_rear = 0;
 	in_receptionist_size = 0;
-	in_receptionist_last = 0;
 	in_receptionist_tick = 0;
 	in_receptionist_tick_state = 0;
 	in_receptionist_estado = 0;
@@ -956,7 +948,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_receptionists->front[k] = 0;
 		h_receptionists->rear[k] = 0;
 		h_receptionists->size[k] = 0;
-		h_receptionists->last[k] = 0;
 		h_receptionists->tick[k] = 0;
 		h_receptionists->tick_state[k] = 0;
 		h_receptionists->estado[k] = 0;
@@ -1017,7 +1008,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_front = 0;
     receptionist_rear = 0;
     receptionist_size = 0;
-    receptionist_last = 0;
     receptionist_tick = 0;
     receptionist_tick_state = 0;
     receptionist_estado = 0;
@@ -1259,7 +1249,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_receptionists->front[*h_xmachine_memory_receptionist_count] = receptionist_front;
 					h_receptionists->rear[*h_xmachine_memory_receptionist_count] = receptionist_rear;
 					h_receptionists->size[*h_xmachine_memory_receptionist_count] = receptionist_size;
-					h_receptionists->last[*h_xmachine_memory_receptionist_count] = receptionist_last;
 					h_receptionists->tick[*h_xmachine_memory_receptionist_count] = receptionist_tick;
 					h_receptionists->tick_state[*h_xmachine_memory_receptionist_count] = receptionist_tick_state;
 					h_receptionists->estado[*h_xmachine_memory_receptionist_count] = receptionist_estado;
@@ -1343,7 +1332,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_front = 0;
                 receptionist_rear = 0;
                 receptionist_size = 0;
-                receptionist_last = 0;
                 receptionist_tick = 0;
                 receptionist_tick_state = 0;
                 receptionist_estado = 0;
@@ -1419,8 +1407,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/rear") == 0) in_receptionist_rear = 0;
 			if(strcmp(buffer, "size") == 0) in_receptionist_size = 1;
 			if(strcmp(buffer, "/size") == 0) in_receptionist_size = 0;
-			if(strcmp(buffer, "last") == 0) in_receptionist_last = 1;
-			if(strcmp(buffer, "/last") == 0) in_receptionist_last = 0;
 			if(strcmp(buffer, "tick") == 0) in_receptionist_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_receptionist_tick = 0;
 			if(strcmp(buffer, "tick_state") == 0) in_receptionist_tick_state = 1;
@@ -1626,9 +1612,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_receptionist_size){
                     receptionist_size = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_receptionist_last){
-                    receptionist_last = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_receptionist_tick){
                     receptionist_tick = (unsigned int) fpgu_strtoul(buffer); 

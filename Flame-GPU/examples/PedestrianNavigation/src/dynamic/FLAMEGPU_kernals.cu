@@ -558,7 +558,6 @@ __global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* a
 		agents_dst->front[output_index] = agents_src->front[index];        
 		agents_dst->rear[output_index] = agents_src->rear[index];        
 		agents_dst->size[output_index] = agents_src->size[index];        
-		agents_dst->last[output_index] = agents_src->last[index];        
 		agents_dst->tick[output_index] = agents_src->tick[index];        
 		agents_dst->tick_state[output_index] = agents_src->tick_state[index];        
 		agents_dst->estado[output_index] = agents_src->estado[index];
@@ -589,7 +588,6 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
 	    agents_dst->front[output_index] = agents_src->front[index];
 	    agents_dst->rear[output_index] = agents_src->rear[index];
 	    agents_dst->size[output_index] = agents_src->size[index];
-	    agents_dst->last[output_index] = agents_src->last[index];
 	    agents_dst->tick[output_index] = agents_src->tick[index];
 	    agents_dst->tick_state[output_index] = agents_src->tick_state[index];
 	    agents_dst->estado[output_index] = agents_src->estado[index];
@@ -605,13 +603,12 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
  * @param front agent variable of type unsigned int
  * @param rear agent variable of type unsigned int
  * @param size agent variable of type unsigned int
- * @param last agent variable of type unsigned int
  * @param tick agent variable of type unsigned int
  * @param tick_state agent variable of type unsigned int
  * @param estado agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick, unsigned int tick_state, int estado){
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, unsigned int tick_state, int estado){
 	
 	int index;
     
@@ -635,7 +632,6 @@ __device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents
 	agents->front[index] = front;
 	agents->rear[index] = rear;
 	agents->size[index] = size;
-	agents->last[index] = last;
 	agents->tick[index] = tick;
 	agents->tick_state[index] = tick_state;
 	agents->estado[index] = estado;
@@ -643,8 +639,8 @@ __device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int last, unsigned int tick, unsigned int tick_state, int estado){
-    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size, last, tick, tick_state, estado);
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, unsigned int tick_state, int estado){
+    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size, tick, tick_state, estado);
 }
 
 /** reorder_receptionist_agents
@@ -668,7 +664,6 @@ __global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memor
 	ordered_agents->front[index] = unordered_agents->front[old_pos];
 	ordered_agents->rear[index] = unordered_agents->rear[old_pos];
 	ordered_agents->size[index] = unordered_agents->size[old_pos];
-	ordered_agents->last[index] = unordered_agents->last[old_pos];
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 	ordered_agents->tick_state[index] = unordered_agents->tick_state[old_pos];
 	ordered_agents->estado[index] = unordered_agents->estado[old_pos];
@@ -2575,7 +2570,6 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.front = agents->front[index];
 	agent.rear = agents->rear[index];
 	agent.size = agents->size[index];
-	agent.last = agents->last[index];
 	agent.tick = agents->tick[index];
 	agent.tick_state = agents->tick_state[index];
 	agent.estado = agents->estado[index];
@@ -2587,7 +2581,6 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.front = 0;
 	agent.rear = 0;
 	agent.size = 0;
-	agent.last = 0;
 	agent.tick = 0;
 	agent.tick_state = 0;
 	agent.estado = 0;
@@ -2609,7 +2602,6 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agents->front[index] = agent.front;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;
-	agents->last[index] = agent.last;
 	agents->tick[index] = agent.tick;
 	agents->tick_state[index] = agent.tick_state;
 	agents->estado[index] = agent.estado;

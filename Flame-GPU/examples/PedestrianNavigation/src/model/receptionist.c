@@ -49,14 +49,12 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessages){
 	
 	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
-	while(current_message && current_message->id!=0){
-        if(current_message->id > agent->last){
-            enqueue(agent, current_message->id);
-            if(current_message->estado >= 1){
-                agent->estado = 1;
-                //printf("Uy me enferme");
-            }
-            agent->last = current_message->id;
+	while(current_message){
+        enqueue(agent, current_message->id);
+        //printf("Encole al muchacho %u\n", current_message->id);
+        if(current_message->estado >= 1){
+            agent->estado = 1;
+            //printf("Uy me enferme");
         }
         current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}

@@ -279,7 +279,7 @@
           <outputs>
             <gpu:output>
               <messageName>check_in</messageName>
-              <gpu:type>single_message</gpu:type>
+              <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
           <gpu:reallocate>false</gpu:reallocate>
@@ -370,11 +370,6 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>last</name>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
           <name>tick</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
@@ -402,7 +397,7 @@
           <outputs>
             <gpu:output>
               <messageName>avisar_paciente</messageName>
-              <gpu:type>single_message</gpu:type>
+              <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
           <gpu:reallocate>false</gpu:reallocate>
