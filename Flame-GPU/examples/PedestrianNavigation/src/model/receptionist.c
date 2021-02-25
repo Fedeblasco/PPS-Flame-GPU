@@ -48,24 +48,40 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
 /*---------------------------------Atención de pacientes---------------------------------*/
 
 //Función que chequea los pacientes que llegan y los atiende
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessages){
+__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_check_in_done_list* patientMessages){
 	
 	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
 	while(current_message){
-        enqueue(agent, current_message->id);
-        //printf("Encole al muchacho %u\n", current_message->id);
-        if(current_message->estado >= 1){
-            agent->estado = 1;
-            //printf("Uy me enferme");
+        //Si llega el paciente que tengo que atender, prendo el flag de atención
+        if(current_message->id == agent->current_patient){
+            agent->attend_patient = 1;
+        }else{
+            enqueue(agent, current_message->id);
+            if(current_message->estado >= 1){
+                agent->estado = 1;
+            }
         }
         current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}
-    if(!isEmpty(agent)){
-        agent->tick++;
+    
+    //Si tengo algun paciente esperando y no estoy procesando a nadie
+    if((!isEmpty(agent)) && (agent->current_patient == -1)){
+        unsigned int patient = dequeue(agent);
+        add_check_in_done_message(patientMessages, patient);
+        agent->current_patient = patient;
+        /*agent->tick++;
         if(agent->tick >= espera){
             unsigned int prueba = dequeue(agent);
-            add_avisar_paciente_message(patientMessages, prueba);
+            add_check_in_done_message(patientMessages, prueba);
             agent->tick = 0;
+        }*/
+    }else if(agent->attend_patient == 1){
+        agent->tick++;
+        if(agent->tick >= espera){
+            add_check_in_done_message(patientMessages, agent->current_patient);
+            agent->tick = 0;
+            agent->current_patient = -1;
+            agent->attend_patient = 0;
         }
     }
 	

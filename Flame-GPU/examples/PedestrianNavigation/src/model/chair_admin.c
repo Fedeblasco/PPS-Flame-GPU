@@ -15,6 +15,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 		if(index != -1){
 			agent->chairArray[index] = 1;//Marco que esta ocupada
 		}
+		
 		add_chair_response_message(chairResponseMessages, current_message->id, index);
 
         current_message = get_next_chair_petition_message(current_message, chairPetitionMessages);	

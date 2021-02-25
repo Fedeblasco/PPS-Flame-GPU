@@ -310,7 +310,7 @@
             </lhs>
             <operator>==</operator>
             <rhs>
-              <value>4</value>
+              <value>1</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -320,14 +320,23 @@
         <!-- Funciones de chequeo de mensajes -->
 
         <gpu:function>
-          <name>check_messages</name>
+          <name>check_check_in_done</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <inputs>
             <gpu:input>
-              <messageName>avisar_paciente</messageName>
+              <messageName>check_in_done</messageName>
             </gpu:input>
           </inputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+              <value>4 || 7</value>
+            </rhs>
+          </condition>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
@@ -347,10 +356,10 @@
             </lhs>
             <operator>==</operator>
             <rhs>
-              <value>5</value>
+              <value>2</value>
             </rhs>
           </condition>
-          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:reallocate>true</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
 
@@ -431,8 +440,13 @@
           <defaultValue>0</defaultValue>
         </gpu:variable>
         <gpu:variable>
-          <type>unsigned int</type>
-          <name>tick_state</name>
+          <type>int</type>
+          <name>current_patient</name>
+          <defaultValue>-1</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>attend_patient</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
         <gpu:variable>
@@ -453,7 +467,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>avisar_paciente</messageName>
+              <messageName>check_in_done</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -780,7 +794,7 @@
     </gpu:message>
 
     <gpu:message> 
-      <name>avisar_paciente</name>
+      <name>check_in_done</name>
       <variables>
         <gpu:variable>
           <type>unsigned int</type>
@@ -872,7 +886,7 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>check_messages</name>
+        <name>check_check_in_done</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>check_chair_response</name>

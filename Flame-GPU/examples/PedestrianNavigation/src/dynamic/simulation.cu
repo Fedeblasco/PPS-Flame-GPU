@@ -180,7 +180,8 @@ unsigned int h_receptionists_defaultReceptionist_variable_front_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_rear_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_size_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_tick_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_tick_state_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_current_patient_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_estado_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
@@ -293,13 +294,13 @@ xmachine_message_check_in_list* d_check_ins_swap;    /**< Pointer to message swa
 int h_message_check_in_count;         /**< message list counter*/
 int h_message_check_in_output_type;   /**< message output type (single or optional)*/
 
-/* avisar_paciente Message variables */
-xmachine_message_avisar_paciente_list* h_avisar_pacientes;         /**< Pointer to message list on host*/
-xmachine_message_avisar_paciente_list* d_avisar_pacientes;         /**< Pointer to message list on device*/
-xmachine_message_avisar_paciente_list* d_avisar_pacientes_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* check_in_done Message variables */
+xmachine_message_check_in_done_list* h_check_in_dones;         /**< Pointer to message list on host*/
+xmachine_message_check_in_done_list* d_check_in_dones;         /**< Pointer to message list on device*/
+xmachine_message_check_in_done_list* d_check_in_dones_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
 /* Non partitioned and spatial partitioned message variables  */
-int h_message_avisar_paciente_count;         /**< message list counter*/
-int h_message_avisar_paciente_output_type;   /**< message output type (single or optional)*/
+int h_message_check_in_done_count;         /**< message list counter*/
+int h_message_check_in_done_output_type;   /**< message output type (single or optional)*/
 
 /* chair_petition Message variables */
 xmachine_message_chair_petition_list* h_chair_petitions;         /**< Pointer to message list on host*/
@@ -394,10 +395,10 @@ void agent_move(cudaStream_t &stream);
  */
 void agent_output_chair_petition(cudaStream_t &stream);
 
-/** agent_check_messages
- * Agent function prototype for check_messages function of agent agent
+/** agent_check_check_in_done
+ * Agent function prototype for check_check_in_done function of agent agent
  */
-void agent_check_messages(cudaStream_t &stream);
+void agent_check_check_in_done(cudaStream_t &stream);
 
 /** agent_check_chair_response
  * Agent function prototype for check_chair_response function of agent agent
@@ -553,7 +554,8 @@ void initialise(char * inputfile){
     h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_tick_state_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
@@ -605,8 +607,8 @@ void initialise(char * inputfile){
 	h_navmap_cells = (xmachine_message_navmap_cell_list*)malloc(message_navmap_cell_SoA_size);
 	int message_check_in_SoA_size = sizeof(xmachine_message_check_in_list);
 	h_check_ins = (xmachine_message_check_in_list*)malloc(message_check_in_SoA_size);
-	int message_avisar_paciente_SoA_size = sizeof(xmachine_message_avisar_paciente_list);
-	h_avisar_pacientes = (xmachine_message_avisar_paciente_list*)malloc(message_avisar_paciente_SoA_size);
+	int message_check_in_done_SoA_size = sizeof(xmachine_message_check_in_done_list);
+	h_check_in_dones = (xmachine_message_check_in_done_list*)malloc(message_check_in_done_SoA_size);
 	int message_chair_petition_SoA_size = sizeof(xmachine_message_chair_petition_list);
 	h_chair_petitions = (xmachine_message_chair_petition_list*)malloc(message_chair_petition_SoA_size);
 	int message_chair_response_SoA_size = sizeof(xmachine_message_chair_response_list);
@@ -784,10 +786,10 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_check_ins_swap, message_check_in_SoA_size));
 	gpuErrchk( cudaMemcpy( d_check_ins, h_check_ins, message_check_in_SoA_size, cudaMemcpyHostToDevice));
 	
-	/* avisar_paciente Message memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_avisar_pacientes, message_avisar_paciente_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_avisar_pacientes_swap, message_avisar_paciente_SoA_size));
-	gpuErrchk( cudaMemcpy( d_avisar_pacientes, h_avisar_pacientes, message_avisar_paciente_SoA_size, cudaMemcpyHostToDevice));
+	/* check_in_done Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_check_in_dones, message_check_in_done_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_check_in_dones_swap, message_check_in_done_SoA_size));
+	gpuErrchk( cudaMemcpy( d_check_in_dones, h_check_in_dones, message_check_in_done_SoA_size, cudaMemcpyHostToDevice));
 	
 	/* chair_petition Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_chair_petitions, message_chair_petition_SoA_size));
@@ -1153,10 +1155,10 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_check_ins));
 	gpuErrchk(cudaFree(d_check_ins_swap));
 	
-	/* avisar_paciente Message variables */
-	free( h_avisar_pacientes);
-	gpuErrchk(cudaFree(d_avisar_pacientes));
-	gpuErrchk(cudaFree(d_avisar_pacientes_swap));
+	/* check_in_done Message variables */
+	free( h_check_in_dones);
+	gpuErrchk(cudaFree(d_check_in_dones));
+	gpuErrchk(cudaFree(d_check_in_dones_swap));
 	
 	/* chair_petition Message variables */
 	free( h_chair_petitions);
@@ -1246,9 +1248,9 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_check_in_count, &h_message_check_in_count, sizeof(int)));
 	
-	h_message_avisar_paciente_count = 0;
+	h_message_check_in_done_count = 0;
 	//upload to device constant
-	gpuErrchk(cudaMemcpyToSymbol( d_message_avisar_paciente_count, &h_message_avisar_paciente_count, sizeof(int)));
+	gpuErrchk(cudaMemcpyToSymbol( d_message_check_in_done_count, &h_message_check_in_done_count, sizeof(int)));
 	
 	h_message_chair_petition_count = 0;
 	//upload to device constant
@@ -1442,14 +1444,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_check_messages");
-	agent_check_messages(stream1);
+    PROFILE_PUSH_RANGE("agent_check_check_in_done");
+	agent_check_check_in_done(stream1);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_check_messages = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: agent_check_check_in_done = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
@@ -3102,38 +3104,76 @@ __host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigne
     }
 }
 
-/** unsigned int get_receptionist_defaultReceptionist_variable_tick_state(unsigned int index)
- * Gets the value of the tick_state variable of an receptionist agent in the defaultReceptionist state on the host. 
+/** int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index)
+ * Gets the value of the current_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable tick_state
+ * @return value of agent variable current_patient
  */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick_state(unsigned int index){
+__host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index){
     unsigned int count = get_agent_receptionist_defaultReceptionist_count();
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_tick_state_data_iteration != currentIteration){
+        if(h_receptionists_defaultReceptionist_variable_current_patient_data_iteration != currentIteration){
             gpuErrchk(
                 cudaMemcpy(
-                    h_receptionists_defaultReceptionist->tick_state,
-                    d_receptionists_defaultReceptionist->tick_state,
-                    count * sizeof(unsigned int),
+                    h_receptionists_defaultReceptionist->current_patient,
+                    d_receptionists_defaultReceptionist->current_patient,
+                    count * sizeof(int),
                     cudaMemcpyDeviceToHost
                 )
             );
             // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_tick_state_data_iteration = currentIteration;
+            h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = currentIteration;
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->tick_state[index];
+        return h_receptionists_defaultReceptionist->current_patient[index];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access tick_state for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access current_patient for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index)
+ * Gets the value of the attend_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable attend_patient
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->attend_patient,
+                    d_receptionists_defaultReceptionist->attend_patient,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->attend_patient[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access attend_patient for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -4219,7 +4259,9 @@ void copy_single_xmachine_memory_receptionist_hostToDevice(xmachine_memory_recep
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->tick_state, &h_agent->tick_state, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->current_patient, &h_agent->current_patient, sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->attend_patient, &h_agent->attend_patient, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->estado, &h_agent->estado, sizeof(int), cudaMemcpyHostToDevice));
 
@@ -4255,7 +4297,9 @@ void copy_partial_xmachine_memory_receptionist_hostToDevice(xmachine_memory_rece
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->tick_state, h_src->tick_state, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->current_patient, h_src->current_patient, count * sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->attend_patient, h_src->attend_patient, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->estado, h_src->estado, count * sizeof(int), cudaMemcpyHostToDevice));
 
@@ -4588,7 +4632,9 @@ xmachine_memory_receptionist* h_allocate_agent_receptionist(){
     memset(agent->colaPacientes, 0, sizeof(unsigned int)*2000);
     agent->tick = 0;
 
-    agent->tick_state = 0;
+    agent->current_patient = -1;
+
+    agent->attend_patient = 0;
 
 	return agent;
 }
@@ -4634,7 +4680,9 @@ void h_unpack_agents_receptionist_AoS_to_SoA(xmachine_memory_receptionist_list *
 			 
 			dst->tick[i] = src[i]->tick;
 			 
-			dst->tick_state[i] = src[i]->tick_state;
+			dst->current_patient[i] = src[i]->current_patient;
+			 
+			dst->attend_patient[i] = src[i]->attend_patient;
 			 
 			dst->estado[i] = src[i]->estado;
 			
@@ -4675,7 +4723,8 @@ void h_add_agent_receptionist_defaultReceptionist(xmachine_memory_receptionist* 
     h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_tick_state_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
     
 
@@ -4715,7 +4764,8 @@ void h_add_agents_receptionist_defaultReceptionist(xmachine_memory_receptionist*
         h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
-        h_receptionists_defaultReceptionist_variable_tick_state_data_iteration = 0;
+        h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = 0;
+        h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
         
 
@@ -5351,24 +5401,45 @@ unsigned int max_receptionist_defaultReceptionist_tick_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int reduce_receptionist_defaultReceptionist_tick_state_variable(){
+int reduce_receptionist_defaultReceptionist_current_patient_variable(){
     //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick_state),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick_state) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count);
 }
 
-unsigned int count_receptionist_defaultReceptionist_tick_state_variable(unsigned int count_value){
+int count_receptionist_defaultReceptionist_current_patient_variable(int count_value){
     //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick_state),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick_state) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
 }
-unsigned int min_receptionist_defaultReceptionist_tick_state_variable(){
+int min_receptionist_defaultReceptionist_current_patient_variable(){
     //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick_state);
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient);
     size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int max_receptionist_defaultReceptionist_tick_state_variable(){
+int max_receptionist_defaultReceptionist_current_patient_variable(){
     //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick_state);
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_receptionist_defaultReceptionist_attend_patient_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+int min_receptionist_defaultReceptionist_attend_patient_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_receptionist_defaultReceptionist_attend_patient_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -6792,11 +6863,11 @@ void agent_output_chair_petition(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int agent_check_messages_sm_size(int blockSize){
+int agent_check_check_in_done_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   //Continuous agent and message input has no partitioning
-	sm_size += (blockSize * sizeof(xmachine_message_avisar_paciente));
+	sm_size += (blockSize * sizeof(xmachine_message_check_in_done));
 	
 	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
 	sm_size += (blockSize * PADDING);
@@ -6804,10 +6875,10 @@ int agent_check_messages_sm_size(int blockSize){
 	return sm_size;
 }
 
-/** agent_check_messages
- * Agent function prototype for check_messages function of agent agent
+/** agent_check_check_in_done
+ * Agent function prototype for check_check_in_done function of agent agent
  */
-void agent_check_messages(cudaStream_t &stream){
+void agent_check_check_in_done(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -6833,17 +6904,95 @@ void agent_check_messages(cudaStream_t &stream){
 	
 
 	//******************************** AGENT FUNCTION CONDITION *********************
-	//THERE IS NOT A FUNCTION CONDITION
-	//currentState maps to working list
-	xmachine_memory_agent_list* agents_default_temp = d_agents;
-	d_agents = d_agents_default;
-	d_agents_default = agents_default_temp;
-	//set working count to current state count
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
 	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
-	//set current state count to 0
-	h_xmachine_memory_agent_default_count = 0;
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, check_check_in_done_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	check_check_in_done_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
 	
  
 
@@ -6852,24 +7001,24 @@ void agent_check_messages(cudaStream_t &stream){
 	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_check_messages, agent_check_messages_sm_size, state_list_size);
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_check_check_in_done, agent_check_check_in_done_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
 	b.x = blockSize;
 	g.x = gridSize;
 	
-	sm_size = agent_check_messages_sm_size(blockSize);
+	sm_size = agent_check_check_in_done_sm_size(blockSize);
 	
 	
 	
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (check_messages)
+	//MAIN XMACHINE FUNCTION CALL (check_check_in_done)
 	//Reallocate   : false
-	//Input        : avisar_paciente
+	//Input        : check_in_done
 	//Output       : 
 	//Agent Output : 
-	GPUFLAME_check_messages<<<g, b, sm_size, stream>>>(d_agents, d_avisar_pacientes);
+	GPUFLAME_check_check_in_done<<<g, b, sm_size, stream>>>(d_agents, d_check_in_dones);
 	gpuErrchkLaunch();
 	
 	
@@ -6880,14 +7029,15 @@ void agent_check_messages(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of check_messages agents in state default will be exceeded moving working agents to next state in function check_messages\n");
+		printf("Error: Buffer size of check_check_in_done agents in state default will be exceeded moving working agents to next state in function check_check_in_done\n");
       exit(EXIT_FAILURE);
       }
       
-  //pointer swap the updated data
-  agents_default_temp = d_agents;
-  d_agents = d_agents_default;
-  d_agents_default = agents_default_temp;
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
         
 	//update new state agent size
 	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
@@ -7049,9 +7199,15 @@ void agent_check_chair_response(cudaStream_t &stream){
 	
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
+	//IF CONTINUOUS AGENT CAN REALLOCATE (process dead agents) THEN RESET AGENT SWAPS	
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+	
 	
 	//MAIN XMACHINE FUNCTION CALL (check_chair_response)
-	//Reallocate   : false
+	//Reallocate   : true
 	//Input        : chair_response
 	//Output       : 
 	//Agent Output : 
@@ -7060,6 +7216,35 @@ void agent_check_chair_response(cudaStream_t &stream){
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	//FOR CONTINUOUS AGENTS WITH REALLOCATION REMOVE POSSIBLE DEAD AGENTS	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer to make swap default
+	xmachine_memory_agent_list* check_chair_response_agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = check_chair_response_agents_temp;
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else
+		h_xmachine_memory_agent_count = scan_last_sum;
+	//Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
@@ -7245,8 +7430,8 @@ void receptionist_receptionServer(cudaStream_t &stream){
 
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_avisar_paciente_count + h_xmachine_memory_receptionist_count > xmachine_message_avisar_paciente_MAX){
-		printf("Error: Buffer size of avisar_paciente message will be exceeded in function receptionServer\n");
+	if (h_message_check_in_done_count + h_xmachine_memory_receptionist_count > xmachine_message_check_in_done_MAX){
+		printf("Error: Buffer size of check_in_done message will be exceeded in function receptionServer\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -7265,60 +7450,60 @@ void receptionist_receptionServer(cudaStream_t &stream){
 	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
-	h_message_avisar_paciente_output_type = optional_message;
-	gpuErrchk( cudaMemcpyToSymbol( d_message_avisar_paciente_output_type, &h_message_avisar_paciente_output_type, sizeof(int)));
+	h_message_check_in_done_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_done_output_type, &h_message_check_in_done_output_type, sizeof(int)));
 	//message is optional so reset the swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_avisar_paciente_swaps, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_check_in_done_swaps, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_avisar_paciente_swaps<<<gridSize, blockSize, 0, stream>>>(d_avisar_pacientes); 
+	reset_check_in_done_swaps<<<gridSize, blockSize, 0, stream>>>(d_check_in_dones); 
 	gpuErrchkLaunch();
 	
 	
 	//MAIN XMACHINE FUNCTION CALL (receptionServer)
 	//Reallocate   : false
 	//Input        : check_in
-	//Output       : avisar_paciente
+	//Output       : check_in_done
 	//Agent Output : 
-	GPUFLAME_receptionServer<<<g, b, sm_size, stream>>>(d_receptionists, d_check_ins, d_avisar_pacientes);
+	GPUFLAME_receptionServer<<<g, b, sm_size, stream>>>(d_receptionists, d_check_ins, d_check_in_dones);
 	gpuErrchkLaunch();
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
-	//avisar_paciente Message Type Prefix Sum
+	//check_in_done Message Type Prefix Sum
 	
 	//swap output
-	xmachine_message_avisar_paciente_list* d_avisar_pacientes_scanswap_temp = d_avisar_pacientes;
-	d_avisar_pacientes = d_avisar_pacientes_swap;
-	d_avisar_pacientes_swap = d_avisar_pacientes_scanswap_temp;
+	xmachine_message_check_in_done_list* d_check_in_dones_scanswap_temp = d_check_in_dones;
+	d_check_in_dones = d_check_in_dones_swap;
+	d_check_in_dones_swap = d_check_in_dones_scanswap_temp;
 	
     cub::DeviceScan::ExclusiveSum(
         d_temp_scan_storage_receptionist, 
         temp_scan_storage_bytes_receptionist, 
-        d_avisar_pacientes_swap->_scan_input,
-        d_avisar_pacientes_swap->_position,
+        d_check_in_dones_swap->_scan_input,
+        d_check_in_dones_swap->_position,
         h_xmachine_memory_receptionist_count, 
         stream
     );
 
 	//Scatter
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_avisar_paciente_messages, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_check_in_done_messages, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_optional_avisar_paciente_messages<<<gridSize, blockSize, 0, stream>>>(d_avisar_pacientes, d_avisar_pacientes_swap);
+	scatter_optional_check_in_done_messages<<<gridSize, blockSize, 0, stream>>>(d_check_in_dones, d_check_in_dones_swap);
 	gpuErrchkLaunch();
 	
 	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_avisar_pacientes_swap->_position[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_avisar_pacientes_swap->_scan_input[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_check_in_dones_swap->_position[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_check_in_dones_swap->_scan_input[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	//If last item in prefix sum was 1 then increase its index to get the count
 	if (scan_last_included == 1){
-		h_message_avisar_paciente_count += scan_last_sum+1;
+		h_message_check_in_done_count += scan_last_sum+1;
 	}else{
-		h_message_avisar_paciente_count += scan_last_sum;
+		h_message_check_in_done_count += scan_last_sum;
 	}
     //Copy count to device
-	gpuErrchk( cudaMemcpyToSymbol( d_message_avisar_paciente_count, &h_message_avisar_paciente_count, sizeof(int)));	
+	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_done_count, &h_message_check_in_done_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************

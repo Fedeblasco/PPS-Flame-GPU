@@ -463,10 +463,15 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</tick>\n", file);
         
-		fputs("<tick_state>", file);
-        sprintf(data, "%u", h_receptionists_defaultReceptionist->tick_state[i]);
+		fputs("<current_patient>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->current_patient[i]);
 		fputs(data, file);
-		fputs("</tick_state>\n", file);
+		fputs("</current_patient>\n", file);
+        
+		fputs("<attend_patient>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->attend_patient[i]);
+		fputs(data, file);
+		fputs("</attend_patient>\n", file);
         
 		fputs("<estado>", file);
         sprintf(data, "%d", h_receptionists_defaultReceptionist->estado[i]);
@@ -664,7 +669,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_rear;
     int in_receptionist_size;
     int in_receptionist_tick;
-    int in_receptionist_tick_state;
+    int in_receptionist_current_patient;
+    int in_receptionist_attend_patient;
     int in_receptionist_estado;
     int in_chair_admin_id;
     int in_chair_admin_chairArray;
@@ -793,7 +799,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int receptionist_rear;
 	unsigned int receptionist_size;
 	unsigned int receptionist_tick;
-	unsigned int receptionist_tick_state;
+	int receptionist_current_patient;
+	int receptionist_attend_patient;
 	int receptionist_estado;
 	unsigned int chair_admin_id;
     unsigned int chair_admin_chairArray[35];
@@ -897,7 +904,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_rear = 0;
 	in_receptionist_size = 0;
 	in_receptionist_tick = 0;
-	in_receptionist_tick_state = 0;
+	in_receptionist_current_patient = 0;
+	in_receptionist_attend_patient = 0;
 	in_receptionist_estado = 0;
 	in_chair_admin_id = 0;
 	in_chair_admin_chairArray = 0;
@@ -1000,7 +1008,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_receptionists->rear[k] = 0;
 		h_receptionists->size[k] = 0;
 		h_receptionists->tick[k] = 0;
-		h_receptionists->tick_state[k] = 0;
+		h_receptionists->current_patient[k] = -1;
+		h_receptionists->attend_patient[k] = 0;
 		h_receptionists->estado[k] = 0;
 	}
 	
@@ -1072,7 +1081,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_rear = 0;
     receptionist_size = 0;
     receptionist_tick = 0;
-    receptionist_tick_state = 0;
+    receptionist_current_patient = -1;
+    receptionist_attend_patient = 0;
     receptionist_estado = 0;
     chair_admin_id = 0;
     for (i=0;i<35;i++){
@@ -1319,7 +1329,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_receptionists->rear[*h_xmachine_memory_receptionist_count] = receptionist_rear;
 					h_receptionists->size[*h_xmachine_memory_receptionist_count] = receptionist_size;
 					h_receptionists->tick[*h_xmachine_memory_receptionist_count] = receptionist_tick;
-					h_receptionists->tick_state[*h_xmachine_memory_receptionist_count] = receptionist_tick_state;
+					h_receptionists->current_patient[*h_xmachine_memory_receptionist_count] = receptionist_current_patient;
+					h_receptionists->attend_patient[*h_xmachine_memory_receptionist_count] = receptionist_attend_patient;
 					h_receptionists->estado[*h_xmachine_memory_receptionist_count] = receptionist_estado;
 					(*h_xmachine_memory_receptionist_count) ++;	
 				}
@@ -1419,7 +1430,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_rear = 0;
                 receptionist_size = 0;
                 receptionist_tick = 0;
-                receptionist_tick_state = 0;
+                receptionist_current_patient = -1;
+                receptionist_attend_patient = 0;
                 receptionist_estado = 0;
                 chair_admin_id = 0;
                 for (i=0;i<35;i++){
@@ -1503,8 +1515,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/size") == 0) in_receptionist_size = 0;
 			if(strcmp(buffer, "tick") == 0) in_receptionist_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_receptionist_tick = 0;
-			if(strcmp(buffer, "tick_state") == 0) in_receptionist_tick_state = 1;
-			if(strcmp(buffer, "/tick_state") == 0) in_receptionist_tick_state = 0;
+			if(strcmp(buffer, "current_patient") == 0) in_receptionist_current_patient = 1;
+			if(strcmp(buffer, "/current_patient") == 0) in_receptionist_current_patient = 0;
+			if(strcmp(buffer, "attend_patient") == 0) in_receptionist_attend_patient = 1;
+			if(strcmp(buffer, "/attend_patient") == 0) in_receptionist_attend_patient = 0;
 			if(strcmp(buffer, "estado") == 0) in_receptionist_estado = 1;
 			if(strcmp(buffer, "/estado") == 0) in_receptionist_estado = 0;
 			if(strcmp(buffer, "id") == 0) in_chair_admin_id = 1;
@@ -1720,8 +1734,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_receptionist_tick){
                     receptionist_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_receptionist_tick_state){
-                    receptionist_tick_state = (unsigned int) fpgu_strtoul(buffer); 
+				if(in_receptionist_current_patient){
+                    receptionist_current_patient = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_attend_patient){
+                    receptionist_attend_patient = (int) fpgu_strtol(buffer); 
                 }
 				if(in_receptionist_estado){
                     receptionist_estado = (int) fpgu_strtol(buffer); 

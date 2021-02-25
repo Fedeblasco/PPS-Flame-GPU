@@ -105,8 +105,8 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_check_in
 #define xmachine_message_check_in_MAX 65536
 
-//Maximum population size of xmachine_mmessage_avisar_paciente
-#define xmachine_message_avisar_paciente_MAX 65536
+//Maximum population size of xmachine_mmessage_check_in_done
+#define xmachine_message_check_in_done_MAX 65536
 
 //Maximum population size of xmachine_mmessage_chair_petition
 #define xmachine_message_chair_petition_MAX 65536
@@ -121,7 +121,7 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_pedestrian_state_partitioningSpatial
 #define xmachine_message_navmap_cell_partitioningDiscrete
 #define xmachine_message_check_in_partitioningNone
-#define xmachine_message_avisar_paciente_partitioningNone
+#define xmachine_message_check_in_done_partitioningNone
 #define xmachine_message_chair_petition_partitioningNone
 #define xmachine_message_chair_response_partitioningNone
 
@@ -216,7 +216,8 @@ struct __align__(16) xmachine_memory_receptionist
     unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
     unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
     unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
-    unsigned int tick_state;    /**< X-machine memory variable tick_state of type unsigned int.*/
+    int current_patient;    /**< X-machine memory variable current_patient of type int.*/
+    int attend_patient;    /**< X-machine memory variable attend_patient of type int.*/
     int estado;    /**< X-machine memory variable estado of type int.*/
 };
 
@@ -330,11 +331,11 @@ struct __align__(16) xmachine_message_check_in
     int estado;        /**< Message variable estado of type int.*/
 };
 
-/** struct xmachine_message_avisar_paciente
+/** struct xmachine_message_check_in_done
  * Brute force: No Partitioning
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
  */
-struct __align__(16) xmachine_message_avisar_paciente
+struct __align__(16) xmachine_message_check_in_done
 {	
     /* Brute force Partitioning Variables */
     int _position;          /**< 1D position of message in linear message list */   
@@ -432,7 +433,8 @@ struct xmachine_memory_receptionist_list
     unsigned int rear [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
     unsigned int tick [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
-    unsigned int tick_state [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list tick_state of type unsigned int.*/
+    int current_patient [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list current_patient of type int.*/
+    int attend_patient [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list attend_patient of type int.*/
     int estado [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list estado of type int.*/
 };
 
@@ -551,17 +553,17 @@ struct xmachine_message_check_in_list
     
 };
 
-/** struct xmachine_message_avisar_paciente_list
+/** struct xmachine_message_check_in_done_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
  */
-struct xmachine_message_avisar_paciente_list
+struct xmachine_message_check_in_done_list
 {
     /* Non discrete messages have temp variables used for reductions with optional message outputs */
-    int _position [xmachine_message_avisar_paciente_MAX];    /**< Holds agents position in the 1D agent list */
-    int _scan_input [xmachine_message_avisar_paciente_MAX];  /**< Used during parallel prefix sum */
+    int _position [xmachine_message_check_in_done_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_check_in_done_MAX];  /**< Used during parallel prefix sum */
     
-    unsigned int id [xmachine_message_avisar_paciente_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    unsigned int id [xmachine_message_check_in_done_MAX];    /**< Message memory variable list id of type unsigned int.*/
     
 };
 
@@ -706,11 +708,11 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 __FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmachine_message_chair_petition_list* chair_petition_messages);
 
 /**
- * check_messages FLAMEGPU Agent Function
+ * check_check_in_done FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param avisar_paciente_messages  avisar_paciente_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_avisar_paciente_message and get_next_avisar_paciente_message functions.
+ * @param check_in_done_messages  check_in_done_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_done_message and get_next_check_in_done_message functions.
  */
-__FLAME_GPU_FUNC__ int check_messages(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
+__FLAME_GPU_FUNC__ int check_check_in_done(xmachine_memory_agent* agent, xmachine_message_check_in_done_list* check_in_done_messages);
 
 /**
  * check_chair_response FLAMEGPU Agent Function
@@ -729,9 +731,9 @@ __FLAME_GPU_FUNC__ int prueba(xmachine_memory_medic* agent);
 /**
  * receptionServer FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_receptionist. This represents a single agent instance and can be modified directly.
- * @param check_in_messages  check_in_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_message and get_next_check_in_message functions.* @param avisar_paciente_messages Pointer to output message list of type xmachine_message_avisar_paciente_list. Must be passed as an argument to the add_avisar_paciente_message function ??.
+ * @param check_in_messages  check_in_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_message and get_next_check_in_message functions.* @param check_in_done_messages Pointer to output message list of type xmachine_message_check_in_done_list. Must be passed as an argument to the add_check_in_done_message function ??.
  */
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
+__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_done_list* check_in_done_messages);
 
 /**
  * attend_chair_petitions FLAMEGPU Agent Function
@@ -894,31 +896,31 @@ __FLAME_GPU_FUNC__ xmachine_message_check_in * get_first_check_in_message(xmachi
 __FLAME_GPU_FUNC__ xmachine_message_check_in * get_next_check_in_message(xmachine_message_check_in* current, xmachine_message_check_in_list* check_in_messages);
 
   
-/* Message Function Prototypes for Brute force (No Partitioning) avisar_paciente message implemented in FLAMEGPU_Kernels */
+/* Message Function Prototypes for Brute force (No Partitioning) check_in_done message implemented in FLAMEGPU_Kernels */
 
-/** add_avisar_paciente_message
+/** add_check_in_done_message
  * Function for all types of message partitioning
- * Adds a new avisar_paciente agent to the xmachine_memory_avisar_paciente_list list using a linear mapping
- * @param agents	xmachine_memory_avisar_paciente_list agent list
+ * Adds a new check_in_done agent to the xmachine_memory_check_in_done_list list using a linear mapping
+ * @param agents	xmachine_memory_check_in_done_list agent list
  * @param id	message variable of type unsigned int
  */
  
- __FLAME_GPU_FUNC__ void add_avisar_paciente_message(xmachine_message_avisar_paciente_list* avisar_paciente_messages, unsigned int id);
+ __FLAME_GPU_FUNC__ void add_check_in_done_message(xmachine_message_check_in_done_list* check_in_done_messages, unsigned int id);
  
-/** get_first_avisar_paciente_message
+/** get_first_check_in_done_message
  * Get first message function for non partitioned (brute force) messages
- * @param avisar_paciente_messages message list
+ * @param check_in_done_messages message list
  * @return        returns the first message from the message list (offset depending on agent block)
  */
-__FLAME_GPU_FUNC__ xmachine_message_avisar_paciente * get_first_avisar_paciente_message(xmachine_message_avisar_paciente_list* avisar_paciente_messages);
+__FLAME_GPU_FUNC__ xmachine_message_check_in_done * get_first_check_in_done_message(xmachine_message_check_in_done_list* check_in_done_messages);
 
-/** get_next_avisar_paciente_message
+/** get_next_check_in_done_message
  * Get first message function for non partitioned (brute force) messages
  * @param current the current message struct
- * @param avisar_paciente_messages message list
+ * @param check_in_done_messages message list
  * @return        returns the first message from the message list (offset depending on agent block)
  */
-__FLAME_GPU_FUNC__ xmachine_message_avisar_paciente * get_next_avisar_paciente_message(xmachine_message_avisar_paciente* current, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
+__FLAME_GPU_FUNC__ xmachine_message_check_in_done * get_next_check_in_done_message(xmachine_message_check_in_done* current, xmachine_message_check_in_done_list* check_in_done_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) chair_petition message implemented in FLAMEGPU_Kernels */
@@ -1019,10 +1021,11 @@ __FLAME_GPU_FUNC__ void add_medic_agent(xmachine_memory_medic_list* agents, int 
  * @param rear	agent agent variable of type unsigned int
  * @param size	agent agent variable of type unsigned int
  * @param tick	agent agent variable of type unsigned int
- * @param tick_state	agent agent variable of type unsigned int
+ * @param current_patient	agent agent variable of type int
+ * @param attend_patient	agent agent variable of type int
  * @param estado	agent agent variable of type int
  */
-__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, unsigned int tick_state, int estado);
+__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient, int estado);
 
 /** get_receptionist_agent_array_value
  *  Template function for accessing receptionist agent array memory variables.
@@ -1588,14 +1591,23 @@ __host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigne
  */
 __host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index);
 
-/** unsigned int get_receptionist_defaultReceptionist_variable_tick_state(unsigned int index)
- * Gets the value of the tick_state variable of an receptionist agent in the defaultReceptionist state on the host. 
+/** int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index)
+ * Gets the value of the current_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable tick_state
+ * @return value of agent variable current_patient
  */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick_state(unsigned int index);
+__host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index);
+
+/** int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index)
+ * Gets the value of the attend_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable attend_patient
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index);
 
 /** int get_receptionist_defaultReceptionist_variable_estado(unsigned int index)
  * Gets the value of the estado variable of an receptionist agent in the defaultReceptionist state on the host. 
@@ -2647,31 +2659,57 @@ unsigned int min_receptionist_defaultReceptionist_tick_variable();
  */
 unsigned int max_receptionist_defaultReceptionist_tick_variable();
 
-/** unsigned int reduce_receptionist_defaultReceptionist_tick_state_variable();
+/** int reduce_receptionist_defaultReceptionist_current_patient_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
  */
-unsigned int reduce_receptionist_defaultReceptionist_tick_state_variable();
+int reduce_receptionist_defaultReceptionist_current_patient_variable();
 
 
 
-/** unsigned int count_receptionist_defaultReceptionist_tick_state_variable(unsigned int count_value){
+/** int count_receptionist_defaultReceptionist_current_patient_variable(int count_value){
  * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
  * @param count_value The unique value which should be counted
  * @return The number of unique values of the count_value found in the agent state variable list
  */
-unsigned int count_receptionist_defaultReceptionist_tick_state_variable(unsigned int count_value);
+int count_receptionist_defaultReceptionist_current_patient_variable(int count_value);
 
-/** unsigned int min_receptionist_defaultReceptionist_tick_state_variable();
+/** int min_receptionist_defaultReceptionist_current_patient_variable();
  * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int min_receptionist_defaultReceptionist_tick_state_variable();
-/** unsigned int max_receptionist_defaultReceptionist_tick_state_variable();
+int min_receptionist_defaultReceptionist_current_patient_variable();
+/** int max_receptionist_defaultReceptionist_current_patient_variable();
  * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int max_receptionist_defaultReceptionist_tick_state_variable();
+int max_receptionist_defaultReceptionist_current_patient_variable();
+
+/** int reduce_receptionist_defaultReceptionist_attend_patient_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_receptionist_defaultReceptionist_attend_patient_variable();
+
+
+
+/** int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value);
+
+/** int min_receptionist_defaultReceptionist_attend_patient_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_receptionist_defaultReceptionist_attend_patient_variable();
+/** int max_receptionist_defaultReceptionist_attend_patient_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_receptionist_defaultReceptionist_attend_patient_variable();
 
 /** int reduce_receptionist_defaultReceptionist_estado_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
