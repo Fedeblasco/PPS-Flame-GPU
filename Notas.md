@@ -13,6 +13,9 @@
    1. Tomando los valores x e y de la función generate pedestrians se le puede
       hacer lo de la función floor y ver el tamaño real del piso
 4. Para generar personas, tiene que ser una vez por tick, sino no te deja
+5. Si se usa defaultValue en arreglos, modifica solo el primer valor del arreglo (pos 0)
+6. No hay persistencia de datos al cambiar de estado en los agentes (o por lo menos no hay persistencia en los arreglos)
+7. Al final se optó por ponerles condiciones a cada una de las funciones y que se ejecuten si cumplen estas condiciones
 
 # Cosas de Flame-GPU
 

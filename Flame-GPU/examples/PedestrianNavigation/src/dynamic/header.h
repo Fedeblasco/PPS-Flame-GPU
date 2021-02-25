@@ -79,10 +79,15 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_memory_receptionist
 #define xmachine_memory_receptionist_MAX 16
 
+//Maximum population size of xmachine_memory_chair_admin
+#define xmachine_memory_chair_admin_MAX 65536
+
 //Maximum population size of xmachine_memory_navmap
 #define xmachine_memory_navmap_MAX 65536 
 //Agent variable array length for xmachine_memory_receptionist->colaPacientes
-#define xmachine_memory_receptionist_colaPacientes_LENGTH 2000
+#define xmachine_memory_receptionist_colaPacientes_LENGTH 2000 
+//Agent variable array length for xmachine_memory_chair_admin->chairArray
+#define xmachine_memory_chair_admin_chairArray_LENGTH 35
 
 
   
@@ -94,23 +99,31 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_pedestrian_state
 #define xmachine_message_pedestrian_state_MAX 65536
 
+//Maximum population size of xmachine_mmessage_navmap_cell
+#define xmachine_message_navmap_cell_MAX 65536
+
 //Maximum population size of xmachine_mmessage_check_in
 #define xmachine_message_check_in_MAX 65536
 
 //Maximum population size of xmachine_mmessage_avisar_paciente
 #define xmachine_message_avisar_paciente_MAX 65536
 
-//Maximum population size of xmachine_mmessage_navmap_cell
-#define xmachine_message_navmap_cell_MAX 65536
+//Maximum population size of xmachine_mmessage_chair_petition
+#define xmachine_message_chair_petition_MAX 65536
+
+//Maximum population size of xmachine_mmessage_chair_response
+#define xmachine_message_chair_response_MAX 65536
 
 
 /* Define preprocessor symbols for each message to specify the type, to simplify / improve portability */
 
 #define xmachine_message_pedestrian_location_partitioningSpatial
 #define xmachine_message_pedestrian_state_partitioningSpatial
+#define xmachine_message_navmap_cell_partitioningDiscrete
 #define xmachine_message_check_in_partitioningNone
 #define xmachine_message_avisar_paciente_partitioningNone
-#define xmachine_message_navmap_cell_partitioningDiscrete
+#define xmachine_message_chair_petition_partitioningNone
+#define xmachine_message_chair_response_partitioningNone
 
 /* Spatial partitioning grid size definitions */
 //xmachine_message_pedestrian_location partition grid size (gridDim.X*gridDim.Y*gridDim.Z)
@@ -176,6 +189,8 @@ struct __align__(16) xmachine_memory_agent
     int estado;    /**< X-machine memory variable estado of type int.*/
     int tick;    /**< X-machine memory variable tick of type int.*/
     unsigned int estado_movimiento;    /**< X-machine memory variable estado_movimiento of type unsigned int.*/
+    unsigned int go_to_x;    /**< X-machine memory variable go_to_x of type unsigned int.*/
+    unsigned int go_to_y;    /**< X-machine memory variable go_to_y of type unsigned int.*/
 };
 
 /** struct xmachine_memory_medic
@@ -203,6 +218,16 @@ struct __align__(16) xmachine_memory_receptionist
     unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
     unsigned int tick_state;    /**< X-machine memory variable tick_state of type unsigned int.*/
     int estado;    /**< X-machine memory variable estado of type int.*/
+};
+
+/** struct xmachine_memory_chair_admin
+ * continuous valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_chair_admin
+{
+    unsigned int id;    /**< X-machine memory variable id of type unsigned int.*/
+    unsigned int *chairArray;    /**< X-machine memory variable chairArray of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap
@@ -274,6 +299,24 @@ struct __align__(16) xmachine_message_pedestrian_state
     int estado;        /**< Message variable estado of type int.*/
 };
 
+/** struct xmachine_message_navmap_cell
+ * Discrete Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_navmap_cell
+{	
+    /* Discrete Partitioning Variables */
+    glm::ivec2 _position;         /**< 2D position of message*/
+    glm::ivec2 _relative;         /**< 2D position of message relative to the agent (range +- radius) */  
+      
+    int x;        /**< Message variable x of type int.*/  
+    int y;        /**< Message variable y of type int.*/  
+    int exit_no;        /**< Message variable exit_no of type int.*/  
+    float height;        /**< Message variable height of type float.*/  
+    float collision_x;        /**< Message variable collision_x of type float.*/  
+    float collision_y;        /**< Message variable collision_y of type float.*/
+};
+
 /** struct xmachine_message_check_in
  * Brute force: No Partitioning
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
@@ -299,22 +342,29 @@ struct __align__(16) xmachine_message_avisar_paciente
     unsigned int id;        /**< Message variable id of type unsigned int.*/
 };
 
-/** struct xmachine_message_navmap_cell
- * Discrete Partitioning
+/** struct xmachine_message_chair_petition
+ * Brute force: No Partitioning
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
  */
-struct __align__(16) xmachine_message_navmap_cell
+struct __align__(16) xmachine_message_chair_petition
 {	
-    /* Discrete Partitioning Variables */
-    glm::ivec2 _position;         /**< 2D position of message*/
-    glm::ivec2 _relative;         /**< 2D position of message relative to the agent (range +- radius) */  
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
       
-    int x;        /**< Message variable x of type int.*/  
-    int y;        /**< Message variable y of type int.*/  
-    int exit_no;        /**< Message variable exit_no of type int.*/  
-    float height;        /**< Message variable height of type float.*/  
-    float collision_x;        /**< Message variable collision_x of type float.*/  
-    float collision_y;        /**< Message variable collision_y of type float.*/
+    unsigned int id;        /**< Message variable id of type unsigned int.*/
+};
+
+/** struct xmachine_message_chair_response
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_chair_response
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    int chair_no;        /**< Message variable chair_no of type int.*/
 };
 
 
@@ -347,6 +397,8 @@ struct xmachine_memory_agent_list
     int estado [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado of type int.*/
     int tick [xmachine_memory_agent_MAX];    /**< X-machine memory variable list tick of type int.*/
     unsigned int estado_movimiento [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado_movimiento of type unsigned int.*/
+    unsigned int go_to_x [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_x of type unsigned int.*/
+    unsigned int go_to_y [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_y of type unsigned int.*/
 };
 
 /** struct xmachine_memory_medic_list
@@ -382,6 +434,20 @@ struct xmachine_memory_receptionist_list
     unsigned int tick [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
     unsigned int tick_state [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list tick_state of type unsigned int.*/
     int estado [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list estado of type int.*/
+};
+
+/** struct xmachine_memory_chair_admin_list
+ * continuous valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_chair_admin_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_chair_admin_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_chair_admin_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_memory_chair_admin_MAX];    /**< X-machine memory variable list id of type unsigned int.*/
+    unsigned int chairArray [xmachine_memory_chair_admin_MAX*35];    /**< X-machine memory variable list chairArray of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap_list
@@ -455,6 +521,21 @@ struct xmachine_message_pedestrian_state_list
     
 };
 
+/** struct xmachine_message_navmap_cell_list
+ * Discrete Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_navmap_cell_list
+{
+    int x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list x of type int.*/
+    int y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list y of type int.*/
+    int exit_no [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit_no of type int.*/
+    float height [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list height of type float.*/
+    float collision_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list collision_x of type float.*/
+    float collision_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list collision_y of type float.*/
+    
+};
+
 /** struct xmachine_message_check_in_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -484,18 +565,32 @@ struct xmachine_message_avisar_paciente_list
     
 };
 
-/** struct xmachine_message_navmap_cell_list
- * Discrete Partitioning
+/** struct xmachine_message_chair_petition_list
+ * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
  */
-struct xmachine_message_navmap_cell_list
+struct xmachine_message_chair_petition_list
 {
-    int x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list x of type int.*/
-    int y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list y of type int.*/
-    int exit_no [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list exit_no of type int.*/
-    float height [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list height of type float.*/
-    float collision_x [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list collision_x of type float.*/
-    float collision_y [xmachine_message_navmap_cell_MAX];    /**< Message memory variable list collision_y of type float.*/
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_chair_petition_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_chair_petition_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_chair_petition_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_chair_response_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_chair_response_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_chair_response_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_chair_response_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_chair_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    int chair_no [xmachine_message_chair_response_MAX];    /**< Message memory variable list chair_no of type int.*/
     
 };
 
@@ -604,11 +699,25 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* check_in_messages);
 
 /**
+ * output_chair_petition FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmachine_message_chair_petition_list* chair_petition_messages);
+
+/**
  * check_messages FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param avisar_paciente_messages  avisar_paciente_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_avisar_paciente_message and get_next_avisar_paciente_message functions.
  */
 __FLAME_GPU_FUNC__ int check_messages(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
+
+/**
+ * check_chair_response FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param chair_response_messages  chair_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_response_message and get_next_chair_response_message functions.
+ */
+__FLAME_GPU_FUNC__ int check_chair_response(xmachine_memory_agent* agent, xmachine_message_chair_response_list* chair_response_messages);
 
 /**
  * prueba FLAMEGPU Agent Function
@@ -623,6 +732,13 @@ __FLAME_GPU_FUNC__ int prueba(xmachine_memory_medic* agent);
  * @param check_in_messages  check_in_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_message and get_next_check_in_message functions.* @param avisar_paciente_messages Pointer to output message list of type xmachine_message_avisar_paciente_list. Must be passed as an argument to the add_avisar_paciente_message function ??.
  */
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
+
+/**
+ * attend_chair_petitions FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_chair_admin. This represents a single agent instance and can be modified directly.
+ * @param chair_petition_messages  chair_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_petition_message and get_next_chair_petition_message functions.* @param chair_response_messages Pointer to output message list of type xmachine_message_chair_response_list. Must be passed as an argument to the add_chair_response_message function ??.
+ */
+__FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages);
 
 /**
  * output_navmap_cells FLAMEGPU Agent Function
@@ -716,6 +832,40 @@ __FLAME_GPU_FUNC__ xmachine_message_pedestrian_state * get_first_pedestrian_stat
 __FLAME_GPU_FUNC__ xmachine_message_pedestrian_state * get_next_pedestrian_state_message(xmachine_message_pedestrian_state* current, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix);
 
   
+/* Message Function Prototypes for Discrete Partitioned navmap_cell message implemented in FLAMEGPU_Kernels */
+
+/** add_navmap_cell_message
+ * Function for all types of message partitioning
+ * Adds a new navmap_cell agent to the xmachine_memory_navmap_cell_list list using a linear mapping
+ * @param agents	xmachine_memory_navmap_cell_list agent list
+ * @param x	message variable of type int
+ * @param y	message variable of type int
+ * @param exit_no	message variable of type int
+ * @param height	message variable of type float
+ * @param collision_x	message variable of type float
+ * @param collision_y	message variable of type float
+ */
+ template <int AGENT_TYPE>
+ __FLAME_GPU_FUNC__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* navmap_cell_messages, int x, int y, int exit_no, float height, float collision_x, float collision_y);
+ 
+/** get_first_navmap_cell_message
+ * Get first message function for discrete partitioned messages. Template function will call either shared memory or texture cache implementation depending on AGENT_TYPE
+ * @param navmap_cell_messages message list
+ * @param agentx x position of the agent
+ * @param agenty y position of the agent
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_first_navmap_cell_message(xmachine_message_navmap_cell_list* navmap_cell_messages, int agentx, int agent_y);
+
+/** get_next_navmap_cell_message
+ * Get first message function for discrete partitioned messages. Template function will call either shared memory or texture cache implementation depending on AGENT_TYPE
+ * @param current the current message struct
+ * @param navmap_cell_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_next_navmap_cell_message(xmachine_message_navmap_cell* current, xmachine_message_navmap_cell_list* navmap_cell_messages);
+
+  
 /* Message Function Prototypes for Brute force (No Partitioning) check_in message implemented in FLAMEGPU_Kernels */
 
 /** add_check_in_message
@@ -771,38 +921,59 @@ __FLAME_GPU_FUNC__ xmachine_message_avisar_paciente * get_first_avisar_paciente_
 __FLAME_GPU_FUNC__ xmachine_message_avisar_paciente * get_next_avisar_paciente_message(xmachine_message_avisar_paciente* current, xmachine_message_avisar_paciente_list* avisar_paciente_messages);
 
   
-/* Message Function Prototypes for Discrete Partitioned navmap_cell message implemented in FLAMEGPU_Kernels */
+/* Message Function Prototypes for Brute force (No Partitioning) chair_petition message implemented in FLAMEGPU_Kernels */
 
-/** add_navmap_cell_message
+/** add_chair_petition_message
  * Function for all types of message partitioning
- * Adds a new navmap_cell agent to the xmachine_memory_navmap_cell_list list using a linear mapping
- * @param agents	xmachine_memory_navmap_cell_list agent list
- * @param x	message variable of type int
- * @param y	message variable of type int
- * @param exit_no	message variable of type int
- * @param height	message variable of type float
- * @param collision_x	message variable of type float
- * @param collision_y	message variable of type float
+ * Adds a new chair_petition agent to the xmachine_memory_chair_petition_list list using a linear mapping
+ * @param agents	xmachine_memory_chair_petition_list agent list
+ * @param id	message variable of type unsigned int
  */
- template <int AGENT_TYPE>
- __FLAME_GPU_FUNC__ void add_navmap_cell_message(xmachine_message_navmap_cell_list* navmap_cell_messages, int x, int y, int exit_no, float height, float collision_x, float collision_y);
  
-/** get_first_navmap_cell_message
- * Get first message function for discrete partitioned messages. Template function will call either shared memory or texture cache implementation depending on AGENT_TYPE
- * @param navmap_cell_messages message list
- * @param agentx x position of the agent
- * @param agenty y position of the agent
+ __FLAME_GPU_FUNC__ void add_chair_petition_message(xmachine_message_chair_petition_list* chair_petition_messages, unsigned int id);
+ 
+/** get_first_chair_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param chair_petition_messages message list
  * @return        returns the first message from the message list (offset depending on agent block)
  */
-template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_first_navmap_cell_message(xmachine_message_navmap_cell_list* navmap_cell_messages, int agentx, int agent_y);
+__FLAME_GPU_FUNC__ xmachine_message_chair_petition * get_first_chair_petition_message(xmachine_message_chair_petition_list* chair_petition_messages);
 
-/** get_next_navmap_cell_message
- * Get first message function for discrete partitioned messages. Template function will call either shared memory or texture cache implementation depending on AGENT_TYPE
+/** get_next_chair_petition_message
+ * Get first message function for non partitioned (brute force) messages
  * @param current the current message struct
- * @param navmap_cell_messages message list
+ * @param chair_petition_messages message list
  * @return        returns the first message from the message list (offset depending on agent block)
  */
-template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_next_navmap_cell_message(xmachine_message_navmap_cell* current, xmachine_message_navmap_cell_list* navmap_cell_messages);
+__FLAME_GPU_FUNC__ xmachine_message_chair_petition * get_next_chair_petition_message(xmachine_message_chair_petition* current, xmachine_message_chair_petition_list* chair_petition_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) chair_response message implemented in FLAMEGPU_Kernels */
+
+/** add_chair_response_message
+ * Function for all types of message partitioning
+ * Adds a new chair_response agent to the xmachine_memory_chair_response_list list using a linear mapping
+ * @param agents	xmachine_memory_chair_response_list agent list
+ * @param id	message variable of type unsigned int
+ * @param chair_no	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_chair_response_message(xmachine_message_chair_response_list* chair_response_messages, unsigned int id, int chair_no);
+ 
+/** get_first_chair_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param chair_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_chair_response * get_first_chair_response_message(xmachine_message_chair_response_list* chair_response_messages);
+
+/** get_next_chair_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param chair_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_chair_response * get_next_chair_response_message(xmachine_message_chair_response* current, xmachine_message_chair_response_list* chair_response_messages);
 
   
 /* Agent Function Prototypes implemented in FLAMEGPU_Kernels */
@@ -826,8 +997,10 @@ template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_
  * @param estado	agent agent variable of type int
  * @param tick	agent agent variable of type int
  * @param estado_movimiento	agent agent variable of type unsigned int
+ * @param go_to_x	agent agent variable of type unsigned int
+ * @param go_to_y	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y);
 
 /** add_medic_agent
  * Adds a new continuous valued medic agent to the xmachine_memory_medic_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -872,6 +1045,34 @@ __FLAME_GPU_FUNC__ void set_receptionist_agent_array_value(T *array, unsigned in
 
   
 
+/** add_chair_admin_agent
+ * Adds a new continuous valued chair_admin agent to the xmachine_memory_chair_admin_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_chair_admin_list agent list
+ * @param id	agent agent variable of type unsigned int
+ */
+__FLAME_GPU_FUNC__ void add_chair_admin_agent(xmachine_memory_chair_admin_list* agents, unsigned int id);
+
+/** get_chair_admin_agent_array_value
+ *  Template function for accessing chair_admin agent array memory variables.
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @return return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ T get_chair_admin_agent_array_value(T *array, unsigned int index);
+
+/** set_chair_admin_agent_array_value
+ *  Template function for setting chair_admin agent array memory variables.
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @param return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ void set_chair_admin_agent_array_value(T *array, unsigned int index, T value);
+
+
+  
+
 
 /* Graph loading function prototypes implemented in io.cu */
 
@@ -912,11 +1113,14 @@ extern void singleIteration();
  * @param h_receptionists Pointer to agent list on the host
  * @param d_receptionists Pointer to agent list on the GPU device
  * @param h_xmachine_memory_receptionist_count Pointer to agent counter
+ * @param h_chair_admins Pointer to agent list on the host
+ * @param d_chair_admins Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_chair_admin_count Pointer to agent counter
  * @param h_navmaps Pointer to agent list on the host
  * @param d_navmaps Pointer to agent list on the GPU device
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
+extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
 
 
 /** readInitialStates
@@ -928,10 +1132,12 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param h_xmachine_memory_medic_count Pointer to agent counter
  * @param h_receptionists Pointer to agent list on the host
  * @param h_xmachine_memory_receptionist_count Pointer to agent counter
+ * @param h_chair_admins Pointer to agent list on the host
+ * @param h_xmachine_memory_chair_admin_count Pointer to agent counter
  * @param h_navmaps Pointer to agent list on the host
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
+extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
 
 
 /* Return functions used by external code to get agent data from device */
@@ -1054,6 +1260,46 @@ extern xmachine_memory_receptionist_list* get_host_receptionist_defaultReception
  * @param		a pointer CUDA kernal function to generate key value pairs
  */
 void sort_receptionists_defaultReceptionist(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_receptionist_list* agents));
+
+
+    
+/** get_agent_chair_admin_MAX_count
+ * Gets the max agent count for the chair_admin agent type 
+ * @return		the maximum chair_admin agent count
+ */
+extern int get_agent_chair_admin_MAX_count();
+
+
+
+/** get_agent_chair_admin_defaultAdmin_count
+ * Gets the agent count for the chair_admin agent type in state defaultAdmin
+ * @return		the current chair_admin agent count in state defaultAdmin
+ */
+extern int get_agent_chair_admin_defaultAdmin_count();
+
+/** reset_defaultAdmin_count
+ * Resets the agent count of the chair_admin in state defaultAdmin to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_chair_admin_defaultAdmin_count();
+
+/** get_device_chair_admin_defaultAdmin_agents
+ * Gets a pointer to xmachine_memory_chair_admin_list on the GPU device
+ * @return		a xmachine_memory_chair_admin_list on the GPU device
+ */
+extern xmachine_memory_chair_admin_list* get_device_chair_admin_defaultAdmin_agents();
+
+/** get_host_chair_admin_defaultAdmin_agents
+ * Gets a pointer to xmachine_memory_chair_admin_list on the CPU host
+ * @return		a xmachine_memory_chair_admin_list on the CPU host
+ */
+extern xmachine_memory_chair_admin_list* get_host_chair_admin_defaultAdmin_agents();
+
+
+/** sort_chair_admins_defaultAdmin
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
+ */
+void sort_chair_admins_defaultAdmin(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_chair_admin_list* agents));
 
 
     
@@ -1242,6 +1488,24 @@ __host__ int get_agent_default_variable_tick(unsigned int index);
  */
 __host__ unsigned int get_agent_default_variable_estado_movimiento(unsigned int index);
 
+/** unsigned int get_agent_default_variable_go_to_x(unsigned int index)
+ * Gets the value of the go_to_x variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable go_to_x
+ */
+__host__ unsigned int get_agent_default_variable_go_to_x(unsigned int index);
+
+/** unsigned int get_agent_default_variable_go_to_y(unsigned int index)
+ * Gets the value of the go_to_y variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable go_to_y
+ */
+__host__ unsigned int get_agent_default_variable_go_to_y(unsigned int index);
+
 /** int get_medic_default2_variable_x(unsigned int index)
  * Gets the value of the x variable of an medic agent in the default2 state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -1341,6 +1605,25 @@ __host__ unsigned int get_receptionist_defaultReceptionist_variable_tick_state(u
  * @return value of agent variable estado
  */
 __host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index);
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index);
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element)
+ * Gets the element-th value of the chairArray variable array of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable chairArray
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element);
 
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
@@ -1658,6 +1941,47 @@ void h_add_agent_receptionist_defaultReceptionist(xmachine_memory_receptionist* 
  * @param count the number of agents to copy from the host to the device.
  */
 void h_add_agents_receptionist_defaultReceptionist(xmachine_memory_receptionist** agents, unsigned int count);
+
+/** h_allocate_agent_chair_admin
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated chair_admin struct.
+ */
+xmachine_memory_chair_admin* h_allocate_agent_chair_admin();
+/** h_free_agent_chair_admin
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_chair_admin(xmachine_memory_chair_admin** agent);
+/** h_allocate_agent_chair_admin_array
+ * Utility function to allocate an array of structs for  chair_admin agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_chair_admin** h_allocate_agent_chair_admin_array(unsigned int count);
+/** h_free_agent_chair_admin_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_chair_admin_array(xmachine_memory_chair_admin*** agents, unsigned int count);
+
+
+/** h_add_agent_chair_admin_defaultAdmin
+ * Host function to add a single agent of type chair_admin to the defaultAdmin state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_chair_admin_defaultAdmin instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_chair_admin_defaultAdmin(xmachine_memory_chair_admin* agent);
+
+/** h_add_agents_chair_admin_defaultAdmin(
+ * Host function to add multiple agents of type chair_admin to the defaultAdmin state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of chair_admin agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_chair_admin_defaultAdmin(xmachine_memory_chair_admin** agents, unsigned int count);
 
 /** h_allocate_agent_navmap
  * Utility function to allocate and initialise an agent struct on the host.
@@ -2063,6 +2387,58 @@ unsigned int min_agent_default_estado_movimiento_variable();
  */
 unsigned int max_agent_default_estado_movimiento_variable();
 
+/** unsigned int reduce_agent_default_go_to_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_go_to_x_variable();
+
+
+
+/** unsigned int count_agent_default_go_to_x_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_go_to_x_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_go_to_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_go_to_x_variable();
+/** unsigned int max_agent_default_go_to_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_go_to_x_variable();
+
+/** unsigned int reduce_agent_default_go_to_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_go_to_y_variable();
+
+
+
+/** unsigned int count_agent_default_go_to_y_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_go_to_y_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_go_to_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_go_to_y_variable();
+/** unsigned int max_agent_default_go_to_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_go_to_y_variable();
+
 /** int reduce_medic_default2_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
@@ -2322,6 +2698,32 @@ int min_receptionist_defaultReceptionist_estado_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 int max_receptionist_defaultReceptionist_estado_variable();
+
+/** unsigned int reduce_chair_admin_defaultAdmin_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_chair_admin_defaultAdmin_id_variable();
+
+
+
+/** unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value);
+
+/** unsigned int min_chair_admin_defaultAdmin_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_chair_admin_defaultAdmin_id_variable();
+/** unsigned int max_chair_admin_defaultAdmin_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_chair_admin_defaultAdmin_id_variable();
 
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

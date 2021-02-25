@@ -122,6 +122,19 @@ xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist;      /**
 xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist;      /**< Pointer to agent list (population) on the device*/
 int h_xmachine_memory_receptionist_defaultReceptionist_count;   /**< Agent population size counter */ 
 
+/* chair_admin Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
+xmachine_memory_chair_admin_list* d_chair_admins;      /**< Pointer to agent list (population) on the device*/
+xmachine_memory_chair_admin_list* d_chair_admins_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
+xmachine_memory_chair_admin_list* d_chair_admins_new;  /**< Pointer to new agent list on the device (used to hold new agents before they are appended to the population)*/
+int h_xmachine_memory_chair_admin_count;   /**< Agent population size counter */ 
+uint * d_xmachine_memory_chair_admin_keys;	  /**< Agent sort identifiers keys*/
+uint * d_xmachine_memory_chair_admin_values;  /**< Agent sort identifiers value */
+
+/* chair_admin state variables */
+xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin;      /**< Pointer to agent list (population) on host*/
+xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin;      /**< Pointer to agent list (population) on the device*/
+int h_xmachine_memory_chair_admin_defaultAdmin_count;   /**< Agent population size counter */ 
+
 /* navmap Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
 xmachine_memory_navmap_list* d_navmaps;      /**< Pointer to agent list (population) on the device*/
 xmachine_memory_navmap_list* d_navmaps_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
@@ -156,6 +169,8 @@ unsigned int h_agents_default_variable_animate_dir_data_iteration;
 unsigned int h_agents_default_variable_estado_data_iteration;
 unsigned int h_agents_default_variable_tick_data_iteration;
 unsigned int h_agents_default_variable_estado_movimiento_data_iteration;
+unsigned int h_agents_default_variable_go_to_x_data_iteration;
+unsigned int h_agents_default_variable_go_to_y_data_iteration;
 unsigned int h_medics_default2_variable_x_data_iteration;
 unsigned int h_medics_default2_variable_y_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_x_data_iteration;
@@ -167,6 +182,8 @@ unsigned int h_receptionists_defaultReceptionist_variable_size_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_tick_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_tick_state_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_estado_data_iteration;
+unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
+unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -254,6 +271,20 @@ int h_tex_xmachine_message_pedestrian_state_estado_offset;
 int h_tex_xmachine_message_pedestrian_state_pbm_start_offset;
 int h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset;
 
+/* navmap_cell Message variables */
+xmachine_message_navmap_cell_list* h_navmap_cells;         /**< Pointer to message list on host*/
+xmachine_message_navmap_cell_list* d_navmap_cells;         /**< Pointer to message list on device*/
+xmachine_message_navmap_cell_list* d_navmap_cells_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Discrete Partitioning Variables*/
+int h_message_navmap_cell_range;     /**< range of the discrete message*/
+int h_message_navmap_cell_width;     /**< with of the message grid*/
+/* Texture offset values for host */
+int h_tex_xmachine_message_navmap_cell_x_offset;
+int h_tex_xmachine_message_navmap_cell_y_offset;
+int h_tex_xmachine_message_navmap_cell_exit_no_offset;
+int h_tex_xmachine_message_navmap_cell_height_offset;
+int h_tex_xmachine_message_navmap_cell_collision_x_offset;
+int h_tex_xmachine_message_navmap_cell_collision_y_offset;
 /* check_in Message variables */
 xmachine_message_check_in_list* h_check_ins;         /**< Pointer to message list on host*/
 xmachine_message_check_in_list* d_check_ins;         /**< Pointer to message list on device*/
@@ -270,25 +301,28 @@ xmachine_message_avisar_paciente_list* d_avisar_pacientes_swap;    /**< Pointer 
 int h_message_avisar_paciente_count;         /**< message list counter*/
 int h_message_avisar_paciente_output_type;   /**< message output type (single or optional)*/
 
-/* navmap_cell Message variables */
-xmachine_message_navmap_cell_list* h_navmap_cells;         /**< Pointer to message list on host*/
-xmachine_message_navmap_cell_list* d_navmap_cells;         /**< Pointer to message list on device*/
-xmachine_message_navmap_cell_list* d_navmap_cells_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
-/* Discrete Partitioning Variables*/
-int h_message_navmap_cell_range;     /**< range of the discrete message*/
-int h_message_navmap_cell_width;     /**< with of the message grid*/
-/* Texture offset values for host */
-int h_tex_xmachine_message_navmap_cell_x_offset;
-int h_tex_xmachine_message_navmap_cell_y_offset;
-int h_tex_xmachine_message_navmap_cell_exit_no_offset;
-int h_tex_xmachine_message_navmap_cell_height_offset;
-int h_tex_xmachine_message_navmap_cell_collision_x_offset;
-int h_tex_xmachine_message_navmap_cell_collision_y_offset;
+/* chair_petition Message variables */
+xmachine_message_chair_petition_list* h_chair_petitions;         /**< Pointer to message list on host*/
+xmachine_message_chair_petition_list* d_chair_petitions;         /**< Pointer to message list on device*/
+xmachine_message_chair_petition_list* d_chair_petitions_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_chair_petition_count;         /**< message list counter*/
+int h_message_chair_petition_output_type;   /**< message output type (single or optional)*/
+
+/* chair_response Message variables */
+xmachine_message_chair_response_list* h_chair_responses;         /**< Pointer to message list on host*/
+xmachine_message_chair_response_list* d_chair_responses;         /**< Pointer to message list on device*/
+xmachine_message_chair_response_list* d_chair_responses_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_chair_response_count;         /**< message list counter*/
+int h_message_chair_response_output_type;   /**< message output type (single or optional)*/
+
   
 /* CUDA Streams for function layers */
 cudaStream_t stream1;
 cudaStream_t stream2;
 cudaStream_t stream3;
+cudaStream_t stream4;
 
 /* Device memory and sizes for CUB values */
 
@@ -300,6 +334,9 @@ size_t temp_scan_storage_bytes_medic;
 
 void * d_temp_scan_storage_receptionist;
 size_t temp_scan_storage_bytes_receptionist;
+
+void * d_temp_scan_storage_chair_admin;
+size_t temp_scan_storage_bytes_chair_admin;
 
 void * d_temp_scan_storage_navmap;
 size_t temp_scan_storage_bytes_navmap;
@@ -352,10 +389,20 @@ void agent_infect_pedestrians(cudaStream_t &stream);
  */
 void agent_move(cudaStream_t &stream);
 
+/** agent_output_chair_petition
+ * Agent function prototype for output_chair_petition function of agent agent
+ */
+void agent_output_chair_petition(cudaStream_t &stream);
+
 /** agent_check_messages
  * Agent function prototype for check_messages function of agent agent
  */
 void agent_check_messages(cudaStream_t &stream);
+
+/** agent_check_chair_response
+ * Agent function prototype for check_chair_response function of agent agent
+ */
+void agent_check_chair_response(cudaStream_t &stream);
 
 /** medic_prueba
  * Agent function prototype for prueba function of medic agent
@@ -366,6 +413,11 @@ void medic_prueba(cudaStream_t &stream);
  * Agent function prototype for receptionServer function of receptionist agent
  */
 void receptionist_receptionServer(cudaStream_t &stream);
+
+/** chair_admin_attend_chair_petitions
+ * Agent function prototype for attend_chair_petitions function of chair_admin agent
+ */
+void chair_admin_attend_chair_petitions(cudaStream_t &stream);
 
 /** navmap_output_navmap_cells
  * Agent function prototype for output_navmap_cells function of navmap agent
@@ -490,6 +542,8 @@ void initialise(char * inputfile){
     h_agents_default_variable_estado_data_iteration = 0;
     h_agents_default_variable_tick_data_iteration = 0;
     h_agents_default_variable_estado_movimiento_data_iteration = 0;
+    h_agents_default_variable_go_to_x_data_iteration = 0;
+    h_agents_default_variable_go_to_y_data_iteration = 0;
     h_medics_default2_variable_x_data_iteration = 0;
     h_medics_default2_variable_y_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
@@ -501,6 +555,8 @@ void initialise(char * inputfile){
     h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_tick_state_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
+    h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
+    h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -535,6 +591,8 @@ void initialise(char * inputfile){
 	h_medics_default2 = (xmachine_memory_medic_list*)malloc(xmachine_medic_SoA_size);
 	int xmachine_receptionist_SoA_size = sizeof(xmachine_memory_receptionist_list);
 	h_receptionists_defaultReceptionist = (xmachine_memory_receptionist_list*)malloc(xmachine_receptionist_SoA_size);
+	int xmachine_chair_admin_SoA_size = sizeof(xmachine_memory_chair_admin_list);
+	h_chair_admins_defaultAdmin = (xmachine_memory_chair_admin_list*)malloc(xmachine_chair_admin_SoA_size);
 	int xmachine_navmap_SoA_size = sizeof(xmachine_memory_navmap_list);
 	h_navmaps_static = (xmachine_memory_navmap_list*)malloc(xmachine_navmap_SoA_size);
 
@@ -543,12 +601,16 @@ void initialise(char * inputfile){
 	h_pedestrian_locations = (xmachine_message_pedestrian_location_list*)malloc(message_pedestrian_location_SoA_size);
 	int message_pedestrian_state_SoA_size = sizeof(xmachine_message_pedestrian_state_list);
 	h_pedestrian_states = (xmachine_message_pedestrian_state_list*)malloc(message_pedestrian_state_SoA_size);
+	int message_navmap_cell_SoA_size = sizeof(xmachine_message_navmap_cell_list);
+	h_navmap_cells = (xmachine_message_navmap_cell_list*)malloc(message_navmap_cell_SoA_size);
 	int message_check_in_SoA_size = sizeof(xmachine_message_check_in_list);
 	h_check_ins = (xmachine_message_check_in_list*)malloc(message_check_in_SoA_size);
 	int message_avisar_paciente_SoA_size = sizeof(xmachine_message_avisar_paciente_list);
 	h_avisar_pacientes = (xmachine_message_avisar_paciente_list*)malloc(message_avisar_paciente_SoA_size);
-	int message_navmap_cell_SoA_size = sizeof(xmachine_message_navmap_cell_list);
-	h_navmap_cells = (xmachine_message_navmap_cell_list*)malloc(message_navmap_cell_SoA_size);
+	int message_chair_petition_SoA_size = sizeof(xmachine_message_chair_petition_list);
+	h_chair_petitions = (xmachine_message_chair_petition_list*)malloc(message_chair_petition_SoA_size);
+	int message_chair_response_SoA_size = sizeof(xmachine_message_chair_response_list);
+	h_chair_responses = (xmachine_message_chair_response_list*)malloc(message_chair_response_SoA_size);
 
 	//Exit if agent or message buffer sizes are to small for function outputs
 
@@ -604,7 +666,7 @@ void initialise(char * inputfile){
 	
 
 	//read initial states
-	readInitialStates(inputfile, h_agents_default, &h_xmachine_memory_agent_default_count, h_medics_default2, &h_xmachine_memory_medic_default2_count, h_receptionists_defaultReceptionist, &h_xmachine_memory_receptionist_defaultReceptionist_count, h_navmaps_static, &h_xmachine_memory_navmap_static_count);
+	readInitialStates(inputfile, h_agents_default, &h_xmachine_memory_agent_default_count, h_medics_default2, &h_xmachine_memory_medic_default2_count, h_receptionists_defaultReceptionist, &h_xmachine_memory_receptionist_defaultReceptionist_count, h_chair_admins_defaultAdmin, &h_xmachine_memory_chair_admin_defaultAdmin_count, h_navmaps_static, &h_xmachine_memory_navmap_static_count);
 
   // Read graphs from disk
   
@@ -643,6 +705,17 @@ void initialise(char * inputfile){
 	/* defaultReceptionist memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_receptionists_defaultReceptionist, xmachine_receptionist_SoA_size));
 	gpuErrchk( cudaMemcpy( d_receptionists_defaultReceptionist, h_receptionists_defaultReceptionist, xmachine_receptionist_SoA_size, cudaMemcpyHostToDevice));
+    
+	/* chair_admin Agent memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_chair_admins, xmachine_chair_admin_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_chair_admins_swap, xmachine_chair_admin_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_chair_admins_new, xmachine_chair_admin_SoA_size));
+    //continuous agent sort identifiers
+  gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_chair_admin_keys, xmachine_memory_chair_admin_MAX* sizeof(uint)));
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_chair_admin_values, xmachine_memory_chair_admin_MAX* sizeof(uint)));
+	/* defaultAdmin memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_chair_admins_defaultAdmin, xmachine_chair_admin_SoA_size));
+	gpuErrchk( cudaMemcpy( d_chair_admins_defaultAdmin, h_chair_admins_defaultAdmin, xmachine_chair_admin_SoA_size, cudaMemcpyHostToDevice));
     
 	/* navmap Agent memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_navmaps, xmachine_navmap_SoA_size));
@@ -701,6 +774,11 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_xmachine_message_pedestrian_state_values, xmachine_message_pedestrian_state_MAX* sizeof(uint)));
 #endif
 	
+	/* navmap_cell Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_navmap_cells, message_navmap_cell_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_navmap_cells_swap, message_navmap_cell_SoA_size));
+	gpuErrchk( cudaMemcpy( d_navmap_cells, h_navmap_cells, message_navmap_cell_SoA_size, cudaMemcpyHostToDevice));
+	
 	/* check_in Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_check_ins, message_check_in_SoA_size));
 	gpuErrchk( cudaMalloc( (void**) &d_check_ins_swap, message_check_in_SoA_size));
@@ -711,10 +789,15 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_avisar_pacientes_swap, message_avisar_paciente_SoA_size));
 	gpuErrchk( cudaMemcpy( d_avisar_pacientes, h_avisar_pacientes, message_avisar_paciente_SoA_size, cudaMemcpyHostToDevice));
 	
-	/* navmap_cell Message memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_navmap_cells, message_navmap_cell_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_navmap_cells_swap, message_navmap_cell_SoA_size));
-	gpuErrchk( cudaMemcpy( d_navmap_cells, h_navmap_cells, message_navmap_cell_SoA_size, cudaMemcpyHostToDevice));
+	/* chair_petition Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_chair_petitions, message_chair_petition_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_chair_petitions_swap, message_chair_petition_SoA_size));
+	gpuErrchk( cudaMemcpy( d_chair_petitions, h_chair_petitions, message_chair_petition_SoA_size, cudaMemcpyHostToDevice));
+	
+	/* chair_response Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_chair_responses, message_chair_response_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_chair_responses_swap, message_chair_response_SoA_size));
+	gpuErrchk( cudaMemcpy( d_chair_responses, h_chair_responses, message_chair_response_SoA_size, cudaMemcpyHostToDevice));
 		
 
 
@@ -757,6 +840,17 @@ void initialise(char * inputfile){
         xmachine_memory_receptionist_MAX
     );
     gpuErrchk(cudaMalloc(&d_temp_scan_storage_receptionist, temp_scan_storage_bytes_receptionist));
+    
+    d_temp_scan_storage_chair_admin = nullptr;
+    temp_scan_storage_bytes_chair_admin = 0;
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_chair_admin, 
+        temp_scan_storage_bytes_chair_admin, 
+        (int*) nullptr, 
+        (int*) nullptr, 
+        xmachine_memory_chair_admin_MAX
+    );
+    gpuErrchk(cudaMalloc(&d_temp_scan_storage_chair_admin, temp_scan_storage_bytes_chair_admin));
     
     d_temp_scan_storage_navmap = nullptr;
     temp_scan_storage_bytes_navmap = 0;
@@ -834,6 +928,7 @@ void initialise(char * inputfile){
   gpuErrchk(cudaStreamCreate(&stream1));
   gpuErrchk(cudaStreamCreate(&stream2));
   gpuErrchk(cudaStreamCreate(&stream3));
+  gpuErrchk(cudaStreamCreate(&stream4));
 
 #if defined(OUTPUT_POPULATION_PER_ITERATION) && OUTPUT_POPULATION_PER_ITERATION
 	// Print the agent population size of all agents in all states
@@ -843,6 +938,8 @@ void initialise(char * inputfile){
 		printf("Init agent_medic_default2_count: %u\n",get_agent_medic_default2_count());
 	
 		printf("Init agent_receptionist_defaultReceptionist_count: %u\n",get_agent_receptionist_defaultReceptionist_count());
+	
+		printf("Init agent_chair_admin_defaultAdmin_count: %u\n",get_agent_chair_admin_defaultAdmin_count());
 	
 		printf("Init agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
@@ -934,6 +1031,34 @@ void sort_receptionists_defaultReceptionist(void (*generate_key_value_pairs)(uns
 	d_receptionists_swap = d_receptionists_temp;	
 }
 
+void sort_chair_admins_defaultAdmin(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_chair_admin_list* agents))
+{
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+
+	//generate sort keys
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_key_value_pairs, no_sm, h_xmachine_memory_chair_admin_defaultAdmin_count); 
+	gridSize = (h_xmachine_memory_chair_admin_defaultAdmin_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	generate_key_value_pairs<<<gridSize, blockSize>>>(d_xmachine_memory_chair_admin_keys, d_xmachine_memory_chair_admin_values, d_chair_admins_defaultAdmin);
+	gpuErrchkLaunch();
+
+	//updated Thrust sort
+	thrust::sort_by_key( thrust::device_pointer_cast(d_xmachine_memory_chair_admin_keys),  thrust::device_pointer_cast(d_xmachine_memory_chair_admin_keys) + h_xmachine_memory_chair_admin_defaultAdmin_count,  thrust::device_pointer_cast(d_xmachine_memory_chair_admin_values));
+	gpuErrchkLaunch();
+
+	//reorder agents
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_chair_admin_agents, no_sm, h_xmachine_memory_chair_admin_defaultAdmin_count); 
+	gridSize = (h_xmachine_memory_chair_admin_defaultAdmin_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	reorder_chair_admin_agents<<<gridSize, blockSize>>>(d_xmachine_memory_chair_admin_values, d_chair_admins_defaultAdmin, d_chair_admins_swap);
+	gpuErrchkLaunch();
+
+	//swap
+	xmachine_memory_chair_admin_list* d_chair_admins_temp = d_chair_admins_defaultAdmin;
+	d_chair_admins_defaultAdmin = d_chair_admins_swap;
+	d_chair_admins_swap = d_chair_admins_temp;	
+}
+
 
 void cleanup(){
     PROFILE_SCOPED_RANGE("cleanup");
@@ -966,6 +1091,14 @@ void cleanup(){
 	
 	free( h_receptionists_defaultReceptionist);
 	gpuErrchk(cudaFree(d_receptionists_defaultReceptionist));
+	
+	/* chair_admin Agent variables */
+	gpuErrchk(cudaFree(d_chair_admins));
+	gpuErrchk(cudaFree(d_chair_admins_swap));
+	gpuErrchk(cudaFree(d_chair_admins_new));
+	
+	free( h_chair_admins_defaultAdmin);
+	gpuErrchk(cudaFree(d_chair_admins_defaultAdmin));
 	
 	/* navmap Agent variables */
 	gpuErrchk(cudaFree(d_navmaps));
@@ -1010,6 +1143,11 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_xmachine_message_pedestrian_state_values));
 #endif
 	
+	/* navmap_cell Message variables */
+	free( h_navmap_cells);
+	gpuErrchk(cudaFree(d_navmap_cells));
+	gpuErrchk(cudaFree(d_navmap_cells_swap));
+	
 	/* check_in Message variables */
 	free( h_check_ins);
 	gpuErrchk(cudaFree(d_check_ins));
@@ -1020,10 +1158,15 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_avisar_pacientes));
 	gpuErrchk(cudaFree(d_avisar_pacientes_swap));
 	
-	/* navmap_cell Message variables */
-	free( h_navmap_cells);
-	gpuErrchk(cudaFree(d_navmap_cells));
-	gpuErrchk(cudaFree(d_navmap_cells_swap));
+	/* chair_petition Message variables */
+	free( h_chair_petitions);
+	gpuErrchk(cudaFree(d_chair_petitions));
+	gpuErrchk(cudaFree(d_chair_petitions_swap));
+	
+	/* chair_response Message variables */
+	free( h_chair_responses);
+	gpuErrchk(cudaFree(d_chair_responses));
+	gpuErrchk(cudaFree(d_chair_responses_swap));
 	
 
     /* Free temporary CUB memory if required. */
@@ -1046,6 +1189,12 @@ void cleanup(){
       temp_scan_storage_bytes_receptionist = 0;
     }
     
+    if(d_temp_scan_storage_chair_admin != nullptr){
+      gpuErrchk(cudaFree(d_temp_scan_storage_chair_admin));
+      d_temp_scan_storage_chair_admin = nullptr;
+      temp_scan_storage_bytes_chair_admin = 0;
+    }
+    
     if(d_temp_scan_storage_navmap != nullptr){
       gpuErrchk(cudaFree(d_temp_scan_storage_navmap));
       d_temp_scan_storage_navmap = nullptr;
@@ -1061,6 +1210,7 @@ void cleanup(){
   gpuErrchk(cudaStreamDestroy(stream1));
   gpuErrchk(cudaStreamDestroy(stream2));
   gpuErrchk(cudaStreamDestroy(stream3));
+  gpuErrchk(cudaStreamDestroy(stream4));
 
   /* CUDA Event Timers for Instrumentation */
 #if defined(INSTRUMENT_ITERATIONS) && INSTRUMENT_ITERATIONS
@@ -1099,6 +1249,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	h_message_avisar_paciente_count = 0;
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_avisar_paciente_count, &h_message_avisar_paciente_count, sizeof(int)));
+	
+	h_message_chair_petition_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_chair_petition_count, &h_message_chair_petition_count, sizeof(int)));
+	
+	h_message_chair_response_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_chair_response_count, &h_message_chair_response_count, sizeof(int)));
 	
 
 	/* Call agent functions in order iterating through the layer functions */
@@ -1177,6 +1335,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_output_pedestrian_state = %f (ms)\n", instrument_milliseconds);
 #endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_output_chair_petition");
+	agent_output_chair_petition(stream4);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_output_chair_petition = %f (ms)\n", instrument_milliseconds);
+#endif
 	cudaDeviceSynchronize();
   
 	/* Layer 3*/
@@ -1253,6 +1425,23 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
+    PROFILE_PUSH_RANGE("chair_admin_attend_chair_petitions");
+	chair_admin_attend_chair_petitions(stream1);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: chair_admin_attend_chair_petitions = %f (ms)\n", instrument_milliseconds);
+#endif
+	cudaDeviceSynchronize();
+  
+	/* Layer 8*/
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
     PROFILE_PUSH_RANGE("agent_check_messages");
 	agent_check_messages(stream1);
     PROFILE_POP_RANGE();
@@ -1261,6 +1450,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_check_messages = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_check_chair_response");
+	agent_check_chair_response(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_check_chair_response = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -1276,6 +1479,8 @@ PROFILE_SCOPED_RANGE("singleIteration");
 		printf("agent_medic_default2_count: %u\n",get_agent_medic_default2_count());
 	
 		printf("agent_receptionist_defaultReceptionist_count: %u\n",get_agent_receptionist_defaultReceptionist_count());
+	
+		printf("agent_chair_admin_defaultAdmin_count: %u\n",get_agent_chair_admin_defaultAdmin_count());
 	
 		printf("agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
@@ -1817,6 +2022,26 @@ xmachine_memory_receptionist_list* get_device_receptionist_defaultReceptionist_a
 
 xmachine_memory_receptionist_list* get_host_receptionist_defaultReceptionist_agents(){
 	return h_receptionists_defaultReceptionist;
+}
+
+    
+int get_agent_chair_admin_MAX_count(){
+    return xmachine_memory_chair_admin_MAX;
+}
+
+
+int get_agent_chair_admin_defaultAdmin_count(){
+	//continuous agent
+	return h_xmachine_memory_chair_admin_defaultAdmin_count;
+	
+}
+
+xmachine_memory_chair_admin_list* get_device_chair_admin_defaultAdmin_agents(){
+	return d_chair_admins_defaultAdmin;
+}
+
+xmachine_memory_chair_admin_list* get_host_chair_admin_defaultAdmin_agents(){
+	return h_chair_admins_defaultAdmin;
 }
 
     
@@ -2454,6 +2679,82 @@ __host__ unsigned int get_agent_default_variable_estado_movimiento(unsigned int 
     }
 }
 
+/** unsigned int get_agent_default_variable_go_to_x(unsigned int index)
+ * Gets the value of the go_to_x variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable go_to_x
+ */
+__host__ unsigned int get_agent_default_variable_go_to_x(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_go_to_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->go_to_x,
+                    d_agents_default->go_to_x,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_go_to_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->go_to_x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access go_to_x for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_agent_default_variable_go_to_y(unsigned int index)
+ * Gets the value of the go_to_y variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable go_to_y
+ */
+__host__ unsigned int get_agent_default_variable_go_to_y(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_go_to_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->go_to_y,
+                    d_agents_default->go_to_y,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_go_to_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->go_to_y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access go_to_y for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 /** int get_medic_default2_variable_x(unsigned int index)
  * Gets the value of the x variable of an medic agent in the default2 state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -2871,6 +3172,87 @@ __host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int i
 
     } else {
         fprintf(stderr, "Warning: Attempting to access estado for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index){
+    unsigned int count = get_agent_chair_admin_defaultAdmin_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chair_admins_defaultAdmin_variable_id_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chair_admins_defaultAdmin->id,
+                    d_chair_admins_defaultAdmin->id,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chair_admins_defaultAdmin_variable_id_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chair_admins_defaultAdmin->id[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access id for the %u th member of chair_admin_defaultAdmin. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element)
+ * Gets the element-th value of the chairArray variable array of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable chairArray
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_chair_admin_defaultAdmin_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chair_admins_defaultAdmin_variable_chairArray_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_chair_admins_defaultAdmin->chairArray + (e * xmachine_memory_chair_admin_MAX),
+                        d_chair_admins_defaultAdmin->chairArray + (e * xmachine_memory_chair_admin_MAX), 
+                        count * sizeof(unsigned int), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chair_admins_defaultAdmin->chairArray[index + (element * xmachine_memory_chair_admin_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of chairArray for the %u th member of chair_admin_defaultAdmin. count is %u at iteration %u\n", element, index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -3720,6 +4102,10 @@ void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list *
 		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->estado_movimiento, &h_agent->estado_movimiento, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->go_to_x, &h_agent->go_to_x, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->go_to_y, &h_agent->go_to_y, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -3767,6 +4153,10 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
 		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->estado_movimiento, h_src->estado_movimiento, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->go_to_x, h_src->go_to_x, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->go_to_y, h_src->go_to_y, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -3872,6 +4262,45 @@ void copy_partial_xmachine_memory_receptionist_hostToDevice(xmachine_memory_rece
     }
 }
 
+
+/* copy_single_xmachine_memory_chair_admin_hostToDevice
+ * Private function to copy a host agent struct into a device SoA agent list.
+ * @param d_dst destination agent state list
+ * @param h_agent agent struct
+ */
+void copy_single_xmachine_memory_chair_admin_hostToDevice(xmachine_memory_chair_admin_list * d_dst, xmachine_memory_chair_admin * h_agent){
+ 
+		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->chairArray + (i * xmachine_memory_chair_admin_MAX), h_agent->chairArray + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+    }
+
+}
+/*
+ * Private function to copy some elements from a host based struct of arrays to a device based struct of arrays for a single agent state.
+ * Individual copies of `count` elements are performed for each agent variable or each component of agent array variables, to avoid wasted data transfer.
+ * There will be a point at which a single cudaMemcpy will outperform many smaller memcpys, however host based agent creation should typically only populate a fraction of the maximum buffer size, so this should be more efficient.
+ * @optimisation - experimentally find the proportion at which transferring the whole SoA would be better and incorporate this. The same will apply to agent variable arrays.
+ * 
+ * @param d_dst device destination SoA
+ * @oaram h_src host source SoA
+ * @param count the number of agents to transfer data for
+ */
+void copy_partial_xmachine_memory_chair_admin_hostToDevice(xmachine_memory_chair_admin_list * d_dst, xmachine_memory_chair_admin_list * h_src, unsigned int count){
+    // Only copy elements if there is data to move.
+    if (count > 0){
+	 
+		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->chairArray + (i * xmachine_memory_chair_admin_MAX), h_src->chairArray + (i * xmachine_memory_chair_admin_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+        }
+
+
+    }
+}
+
 xmachine_memory_agent* h_allocate_agent_agent(){
 	xmachine_memory_agent* agent = (xmachine_memory_agent*)malloc(sizeof(xmachine_memory_agent));
 	// Memset the whole agent strcuture
@@ -3936,6 +4365,10 @@ void h_unpack_agents_agent_AoS_to_SoA(xmachine_memory_agent_list * dst, xmachine
 			dst->tick[i] = src[i]->tick;
 			 
 			dst->estado_movimiento[i] = src[i]->estado_movimiento;
+			 
+			dst->go_to_x[i] = src[i]->go_to_x;
+			 
+			dst->go_to_y[i] = src[i]->go_to_y;
 			
 		}
 	}
@@ -3983,6 +4416,8 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent){
     h_agents_default_variable_estado_data_iteration = 0;
     h_agents_default_variable_tick_data_iteration = 0;
     h_agents_default_variable_estado_movimiento_data_iteration = 0;
+    h_agents_default_variable_go_to_x_data_iteration = 0;
+    h_agents_default_variable_go_to_y_data_iteration = 0;
     
 
 }
@@ -4030,6 +4465,8 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
         h_agents_default_variable_estado_data_iteration = 0;
         h_agents_default_variable_tick_data_iteration = 0;
         h_agents_default_variable_estado_movimiento_data_iteration = 0;
+        h_agents_default_variable_go_to_x_data_iteration = 0;
+        h_agents_default_variable_go_to_y_data_iteration = 0;
         
 
 	}
@@ -4280,6 +4717,122 @@ void h_add_agents_receptionist_defaultReceptionist(xmachine_memory_receptionist*
         h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_tick_state_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
+        
+
+	}
+}
+
+xmachine_memory_chair_admin* h_allocate_agent_chair_admin(){
+	xmachine_memory_chair_admin* agent = (xmachine_memory_chair_admin*)malloc(sizeof(xmachine_memory_chair_admin));
+	// Memset the whole agent strcuture
+    memset(agent, 0, sizeof(xmachine_memory_chair_admin));
+
+    agent->id = 0;
+	// Agent variable arrays must be allocated
+    agent->chairArray = (unsigned int*)malloc(35 * sizeof(unsigned int));
+	// If we have a default value, set each element correctly.
+	for(unsigned int index = 0; index < 35; index++){
+		agent->chairArray[index] = 0;
+	}
+	return agent;
+}
+void h_free_agent_chair_admin(xmachine_memory_chair_admin** agent){
+
+    free((*agent)->chairArray);
+ 
+	free((*agent));
+	(*agent) = NULL;
+}
+xmachine_memory_chair_admin** h_allocate_agent_chair_admin_array(unsigned int count){
+	xmachine_memory_chair_admin ** agents = (xmachine_memory_chair_admin**)malloc(count * sizeof(xmachine_memory_chair_admin*));
+	for (unsigned int i = 0; i < count; i++) {
+		agents[i] = h_allocate_agent_chair_admin();
+	}
+	return agents;
+}
+void h_free_agent_chair_admin_array(xmachine_memory_chair_admin*** agents, unsigned int count){
+	for (unsigned int i = 0; i < count; i++) {
+		h_free_agent_chair_admin(&((*agents)[i]));
+	}
+	free((*agents));
+	(*agents) = NULL;
+}
+
+void h_unpack_agents_chair_admin_AoS_to_SoA(xmachine_memory_chair_admin_list * dst, xmachine_memory_chair_admin** src, unsigned int count){
+	if(count > 0){
+		for(unsigned int i = 0; i < count; i++){
+			 
+			dst->id[i] = src[i]->id;
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->chairArray[(j * xmachine_memory_chair_admin_MAX) + i] = src[i]->chairArray[j];
+			}
+			
+		}
+	}
+}
+
+
+void h_add_agent_chair_admin_defaultAdmin(xmachine_memory_chair_admin* agent){
+	if (h_xmachine_memory_chair_admin_count + 1 > xmachine_memory_chair_admin_MAX){
+		printf("Error: Buffer size of chair_admin agents in state defaultAdmin will be exceeded by h_add_agent_chair_admin_defaultAdmin\n");
+		exit(EXIT_FAILURE);
+	}	
+
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+	unsigned int count = 1;
+	
+	// Copy data from host struct to device SoA for target state
+	copy_single_xmachine_memory_chair_admin_hostToDevice(d_chair_admins_new, agent);
+
+	// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_chair_admin_Agents, no_sm, count);
+	gridSize = (count + blockSize - 1) / blockSize;
+	append_chair_admin_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_chair_admins_defaultAdmin, d_chair_admins_new, h_xmachine_memory_chair_admin_defaultAdmin_count, count);
+	gpuErrchkLaunch();
+	// Update the number of agents in this state.
+	h_xmachine_memory_chair_admin_defaultAdmin_count += count;
+	gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_chair_admin_defaultAdmin_count, &h_xmachine_memory_chair_admin_defaultAdmin_count, sizeof(int)));
+	cudaDeviceSynchronize();
+
+    // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+    h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
+    h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
+    
+
+}
+void h_add_agents_chair_admin_defaultAdmin(xmachine_memory_chair_admin** agents, unsigned int count){
+	if(count > 0){
+		int blockSize;
+		int minGridSize;
+		int gridSize;
+
+		if (h_xmachine_memory_chair_admin_count + count > xmachine_memory_chair_admin_MAX){
+			printf("Error: Buffer size of chair_admin agents in state defaultAdmin will be exceeded by h_add_agents_chair_admin_defaultAdmin\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// Unpack data from AoS into the pre-existing SoA
+		h_unpack_agents_chair_admin_AoS_to_SoA(h_chair_admins_defaultAdmin, agents, count);
+
+		// Copy data from the host SoA to the device SoA for the target state
+		copy_partial_xmachine_memory_chair_admin_hostToDevice(d_chair_admins_new, h_chair_admins_defaultAdmin, count);
+
+		// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+		cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_chair_admin_Agents, no_sm, count);
+		gridSize = (count + blockSize - 1) / blockSize;
+		append_chair_admin_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_chair_admins_defaultAdmin, d_chair_admins_new, h_xmachine_memory_chair_admin_defaultAdmin_count, count);
+		gpuErrchkLaunch();
+		// Update the number of agents in this state.
+		h_xmachine_memory_chair_admin_defaultAdmin_count += count;
+		gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_chair_admin_defaultAdmin_count, &h_xmachine_memory_chair_admin_defaultAdmin_count, sizeof(int)));
+		cudaDeviceSynchronize();
+
+        // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+        h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
+        h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
         
 
 	}
@@ -4588,6 +5141,48 @@ unsigned int max_agent_default_estado_movimiento_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
+unsigned int reduce_agent_default_go_to_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->go_to_x),  thrust::device_pointer_cast(d_agents_default->go_to_x) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_go_to_x_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->go_to_x),  thrust::device_pointer_cast(d_agents_default->go_to_x) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_go_to_x_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->go_to_x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_go_to_x_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->go_to_x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_agent_default_go_to_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->go_to_y),  thrust::device_pointer_cast(d_agents_default->go_to_y) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_go_to_y_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->go_to_y),  thrust::device_pointer_cast(d_agents_default->go_to_y) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_go_to_y_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->go_to_y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_go_to_y_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->go_to_y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
 int reduce_medic_default2_x_variable(){
     //reduce in default stream
     return thrust::reduce(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count);
@@ -4796,6 +5391,27 @@ int max_receptionist_defaultReceptionist_estado_variable(){
     //max in default stream
     thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_chair_admin_defaultAdmin_id_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id),  thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id) + h_xmachine_memory_chair_admin_defaultAdmin_count);
+}
+
+unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id),  thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id) + h_xmachine_memory_chair_admin_defaultAdmin_count, count_value);
+}
+unsigned int min_chair_admin_defaultAdmin_id_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_admin_defaultAdmin_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_chair_admin_defaultAdmin_id_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_admin_defaultAdmin_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
 int reduce_navmap_static_x_variable(){
@@ -5947,6 +6563,235 @@ void agent_move(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
+int agent_output_chair_petition_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** agent_output_chair_petition
+ * Agent function prototype for output_chair_petition function of agent agent
+ */
+void agent_output_chair_petition(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, output_chair_petition_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	output_chair_petition_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_chair_petition_count + h_xmachine_memory_agent_count > xmachine_message_chair_petition_MAX){
+		printf("Error: Buffer size of chair_petition message will be exceeded in function output_chair_petition\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_output_chair_petition, agent_output_chair_petition_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_output_chair_petition_sm_size(blockSize);
+	
+	
+	
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_chair_petition_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_output_type, &h_message_chair_petition_output_type, sizeof(int)));
+	//message is optional so reset the swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_chair_petition_swaps, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_chair_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions); 
+	gpuErrchkLaunch();
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (output_chair_petition)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : chair_petition
+	//Agent Output : 
+	GPUFLAME_output_chair_petition<<<g, b, sm_size, stream>>>(d_agents, d_chair_petitions);
+	gpuErrchkLaunch();
+	
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	//chair_petition Message Type Prefix Sum
+	
+	//swap output
+	xmachine_message_chair_petition_list* d_chair_petitions_scanswap_temp = d_chair_petitions;
+	d_chair_petitions = d_chair_petitions_swap;
+	d_chair_petitions_swap = d_chair_petitions_scanswap_temp;
+	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_chair_petitions_swap->_scan_input,
+        d_chair_petitions_swap->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//Scatter
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_chair_petition_messages, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_optional_chair_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions, d_chair_petitions_swap);
+	gpuErrchkLaunch();
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_chair_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_chair_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//If last item in prefix sum was 1 then increase its index to get the count
+	if (scan_last_included == 1){
+		h_message_chair_petition_count += scan_last_sum+1;
+	}else{
+		h_message_chair_petition_count += scan_last_sum;
+	}
+    //Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_count, &h_message_chair_petition_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of output_chair_petition agents in state default will be exceeded moving working agents to next state in function output_chair_petition\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
 int agent_check_messages_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
@@ -6043,6 +6888,193 @@ void agent_check_messages(cudaStream_t &stream){
   agents_default_temp = d_agents;
   d_agents = d_agents_default;
   d_agents_default = agents_default_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_check_chair_response_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input has no partitioning
+	sm_size += (blockSize * sizeof(xmachine_message_chair_response));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** agent_check_chair_response
+ * Agent function prototype for check_chair_response function of agent agent
+ */
+void agent_check_chair_response(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, check_chair_response_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	check_chair_response_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_check_chair_response, agent_check_chair_response_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_check_chair_response_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (check_chair_response)
+	//Reallocate   : false
+	//Input        : chair_response
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_check_chair_response<<<g, b, sm_size, stream>>>(d_agents, d_chair_responses);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of check_chair_response agents in state default will be exceeded moving working agents to next state in function check_chair_response\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
         
 	//update new state agent size
 	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
@@ -6305,6 +7337,165 @@ void receptionist_receptionServer(cudaStream_t &stream){
 	//update new state agent size
 	h_xmachine_memory_receptionist_defaultReceptionist_count += h_xmachine_memory_receptionist_count;
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_receptionist_defaultReceptionist_count, &h_xmachine_memory_receptionist_defaultReceptionist_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int chair_admin_attend_chair_petitions_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input has no partitioning
+	sm_size += (blockSize * sizeof(xmachine_message_chair_petition));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** chair_admin_attend_chair_petitions
+ * Agent function prototype for attend_chair_petitions function of chair_admin agent
+ */
+void chair_admin_attend_chair_petitions(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_chair_admin_defaultAdmin_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_chair_admin_defaultAdmin_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_chair_admin_list* chair_admins_defaultAdmin_temp = d_chair_admins;
+	d_chair_admins = d_chair_admins_defaultAdmin;
+	d_chair_admins_defaultAdmin = chair_admins_defaultAdmin_temp;
+	//set working count to current state count
+	h_xmachine_memory_chair_admin_count = h_xmachine_memory_chair_admin_defaultAdmin_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_chair_admin_count, &h_xmachine_memory_chair_admin_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_chair_admin_defaultAdmin_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_chair_admin_defaultAdmin_count, &h_xmachine_memory_chair_admin_defaultAdmin_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_chair_response_count + h_xmachine_memory_chair_admin_count > xmachine_message_chair_response_MAX){
+		printf("Error: Buffer size of chair_response message will be exceeded in function attend_chair_petitions\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_attend_chair_petitions, chair_admin_attend_chair_petitions_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = chair_admin_attend_chair_petitions_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_chair_response_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_response_output_type, &h_message_chair_response_output_type, sizeof(int)));
+	//message is optional so reset the swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_chair_response_swaps, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_chair_response_swaps<<<gridSize, blockSize, 0, stream>>>(d_chair_responses); 
+	gpuErrchkLaunch();
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (attend_chair_petitions)
+	//Reallocate   : false
+	//Input        : chair_petition
+	//Output       : chair_response
+	//Agent Output : 
+	GPUFLAME_attend_chair_petitions<<<g, b, sm_size, stream>>>(d_chair_admins, d_chair_petitions, d_chair_responses);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	//chair_response Message Type Prefix Sum
+	
+	//swap output
+	xmachine_message_chair_response_list* d_chair_responses_scanswap_temp = d_chair_responses;
+	d_chair_responses = d_chair_responses_swap;
+	d_chair_responses_swap = d_chair_responses_scanswap_temp;
+	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_chair_admin, 
+        temp_scan_storage_bytes_chair_admin, 
+        d_chair_responses_swap->_scan_input,
+        d_chair_responses_swap->_position,
+        h_xmachine_memory_chair_admin_count, 
+        stream
+    );
+
+	//Scatter
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_chair_response_messages, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_optional_chair_response_messages<<<gridSize, blockSize, 0, stream>>>(d_chair_responses, d_chair_responses_swap);
+	gpuErrchkLaunch();
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_chair_responses_swap->_position[h_xmachine_memory_chair_admin_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_chair_responses_swap->_scan_input[h_xmachine_memory_chair_admin_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//If last item in prefix sum was 1 then increase its index to get the count
+	if (scan_last_included == 1){
+		h_message_chair_response_count += scan_last_sum+1;
+	}else{
+		h_message_chair_response_count += scan_last_sum;
+	}
+    //Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_response_count, &h_message_chair_response_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_chair_admin_defaultAdmin_count+h_xmachine_memory_chair_admin_count > xmachine_memory_chair_admin_MAX){
+		printf("Error: Buffer size of attend_chair_petitions agents in state defaultAdmin will be exceeded moving working agents to next state in function attend_chair_petitions\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  chair_admins_defaultAdmin_temp = d_chair_admins;
+  d_chair_admins = d_chair_admins_defaultAdmin;
+  d_chair_admins_defaultAdmin = chair_admins_defaultAdmin_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_chair_admin_defaultAdmin_count += h_xmachine_memory_chair_admin_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_chair_admin_defaultAdmin_count, &h_xmachine_memory_chair_admin_defaultAdmin_count, sizeof(int)));	
 	
 	
 }
@@ -6695,6 +7886,11 @@ extern void reset_medic_default2_count()
 extern void reset_receptionist_defaultReceptionist_count()
 {
     h_xmachine_memory_receptionist_defaultReceptionist_count = 0;
+}
+ 
+extern void reset_chair_admin_defaultAdmin_count()
+{
+    h_xmachine_memory_chair_admin_defaultAdmin_count = 0;
 }
  
 extern void reset_navmap_static_count()

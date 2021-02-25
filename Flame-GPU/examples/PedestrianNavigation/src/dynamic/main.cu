@@ -362,14 +362,14 @@ void runConsoleWithXMLOutput(int iterations, int outputFrequency){
 		singleIteration();
 		// Save the iteration data to disk
 		if((i+1) % outputFrequency == 0){
-			saveIterationData(outputpath, i+1, get_host_agent_default_agents(), get_device_agent_default_agents(), get_agent_agent_default_count(),get_host_medic_default2_agents(), get_device_medic_default2_agents(), get_agent_medic_default2_count(),get_host_receptionist_defaultReceptionist_agents(), get_device_receptionist_defaultReceptionist_agents(), get_agent_receptionist_defaultReceptionist_count(),get_host_navmap_static_agents(), get_device_navmap_static_agents(), get_agent_navmap_static_count());
+			saveIterationData(outputpath, i+1, get_host_agent_default_agents(), get_device_agent_default_agents(), get_agent_agent_default_count(),get_host_medic_default2_agents(), get_device_medic_default2_agents(), get_agent_medic_default2_count(),get_host_receptionist_defaultReceptionist_agents(), get_device_receptionist_defaultReceptionist_agents(), get_agent_receptionist_defaultReceptionist_count(),get_host_chair_admin_defaultAdmin_agents(), get_device_chair_admin_defaultAdmin_agents(), get_agent_chair_admin_defaultAdmin_count(),get_host_navmap_static_agents(), get_device_navmap_static_agents(), get_agent_navmap_static_count());
 			printf("Iteration %i Saved to XML\n", i+1);
 		}
 	}
 
 	// If we did not yet output the final iteration, output the final iteration.
 	if(iterations % outputFrequency != 0){
-		saveIterationData(outputpath, iterations, get_host_agent_default_agents(), get_device_agent_default_agents(), get_agent_agent_default_count(),get_host_medic_default2_agents(), get_device_medic_default2_agents(), get_agent_medic_default2_count(),get_host_receptionist_defaultReceptionist_agents(), get_device_receptionist_defaultReceptionist_agents(), get_agent_receptionist_defaultReceptionist_count(),get_host_navmap_static_agents(), get_device_navmap_static_agents(), get_agent_navmap_static_count());
+		saveIterationData(outputpath, iterations, get_host_agent_default_agents(), get_device_agent_default_agents(), get_agent_agent_default_count(),get_host_medic_default2_agents(), get_device_medic_default2_agents(), get_agent_medic_default2_count(),get_host_receptionist_defaultReceptionist_agents(), get_device_receptionist_defaultReceptionist_agents(), get_agent_receptionist_defaultReceptionist_count(),get_host_chair_admin_defaultAdmin_agents(), get_device_chair_admin_defaultAdmin_agents(), get_agent_chair_admin_defaultAdmin_count(),get_host_navmap_static_agents(), get_device_navmap_static_agents(), get_agent_navmap_static_count());
 		printf("Iteration %i Saved to XML\n", iterations);
 	}
 

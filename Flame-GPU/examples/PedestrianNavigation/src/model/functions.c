@@ -20,6 +20,7 @@
 #include "header.h"
 #include "CustomVisualisation.h"
 #include "receptionist.c"
+#include "chair_admin.c"
 
 #define SCALE_FACTOR 0.03125
 
@@ -40,18 +41,32 @@
 #define ticks_portador 50000
 #define ticks_enfermo 50000
 //Cantidad de personas a generar
-#define cant_personas 5
+#define cant_personas 40
 
+//Manejo de las sillas
+#define firstChair_x 50
+#define firstChair_y 85
+#define space_between 3
 
 //This function creates all the agents requiered to run the hospital
 __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
 	printf("Inicializando todo\n");
+	
+	//Agregado del recepcionista
 	// Allocating memory in CPU to save the agent
 	xmachine_memory_receptionist * h_receptionist = h_allocate_agent_receptionist();
 	// Copying the agent from the CPU to GPU
 	h_add_agent_receptionist_defaultReceptionist(h_receptionist);
 	// Freeing the previously allocated memory
 	h_free_agent_receptionist(&h_receptionist);
+
+	//Agregado del administrador de sillas
+	// Allocating memory in CPU to save the agent
+	xmachine_memory_chair_admin * h_chair_admin = h_allocate_agent_chair_admin();
+	// Copying the agent from the CPU to GPU
+	h_add_agent_chair_admin_defaultAdmin(h_chair_admin);
+	// Freeing the previously allocated memory
+	h_free_agent_chair_admin(&h_chair_admin);
 
 }
 
@@ -178,7 +193,7 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 						agent->estado = 1;
 						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-						printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
+						//printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
 					}
 				}	
 			}			
@@ -250,16 +265,10 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
 	return 0; 
 }
 
-__FLAME_GPU_FUNC__ int check_messages(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisarPacienteMessages){
+__FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmachine_message_chair_petition_list* chairPetitionMessages){
 
-	xmachine_message_avisar_paciente* current_message = get_first_avisar_paciente_message(avisarPacienteMessages);
-	while(current_message){
-		//printf("Soy %u y recibi este mensajito: %u\n", agent->id, current_message->id);
-		if((current_message->id == agent->id) && (agent->estado_movimiento == 1)){
-			agent->estado_movimiento = 2;
-		}
-		current_message = get_next_avisar_paciente_message(current_message, avisarPacienteMessages);
-	}
+	add_chair_petition_message(chairPetitionMessages, agent->id);
+	agent->estado_movimiento = 5;
 
 	return 0;
 }
@@ -307,6 +316,12 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			break;
 		case 3:
 			if(mover_a_destino(agent,88,96) == 0){
+				agent->estado_movimiento = 4;
+			}
+			break;
+		case 6:
+			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+				agent->estado_movimiento = 7;
 			}
 			break;
 	}
@@ -354,9 +369,9 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				//add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0);
 				
 				if(agent->cant_generados==0){
-					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0, 0);
+					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0, 0, 0, 0);
 				}else{
-					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0, 0);
+					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0, 0, 0, 0);
 				}
 				
 				//printf("%d\n",agent->cant_generados);
@@ -401,6 +416,42 @@ __FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_m
 	}*/
 	return 0;
 
+}
+
+/*---------------------------------Recepción de mensajes---------------------------------*/
+
+__FLAME_GPU_FUNC__ int check_messages(xmachine_memory_agent* agent, xmachine_message_avisar_paciente_list* avisarPacienteMessages){
+
+	xmachine_message_avisar_paciente* current_message = get_first_avisar_paciente_message(avisarPacienteMessages);
+	while(current_message){
+		//printf("Soy %u y recibi este mensajito: %u\n", agent->id, current_message->id);
+		if((current_message->id == agent->id) && (agent->estado_movimiento == 1)){
+			agent->estado_movimiento = 2;
+		}
+		current_message = get_next_avisar_paciente_message(current_message, avisarPacienteMessages);
+	}
+
+	return 0;
+}
+
+
+__FLAME_GPU_FUNC__ int check_chair_response(xmachine_memory_agent* agent, xmachine_message_chair_response_list* chairResponseMessages){
+
+	xmachine_message_chair_response* current_message = get_first_chair_response_message(chairResponseMessages);
+	while(current_message){
+		if((current_message->id == agent->id) && (current_message->chair_no != -1)){
+			agent->go_to_x = firstChair_x + (space_between * ((current_message->chair_no+7)%7));
+			agent->go_to_y = firstChair_y - (space_between * int(current_message->chair_no/7));
+			agent->estado_movimiento = 6;
+			printf("Soy %d y me voy a sentar en la silla %d, posX %d, posY %d\n\n",agent->id,current_message->chair_no,agent->go_to_x,agent->go_to_y);
+		}else{
+			printf("Me muero");
+			agent->estado_movimiento = 7;
+		}
+		current_message = get_next_chair_response_message(current_message, chairResponseMessages);
+	}
+
+	return 0;
 }
 
 #endif //_FLAMEGPU_FUNCTIONS

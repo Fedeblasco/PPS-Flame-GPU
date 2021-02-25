@@ -217,6 +217,14 @@
           <name>estado_movimiento</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>go_to_x</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>go_to_y</name>
+        </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
@@ -287,6 +295,31 @@
         </gpu:function>
 
         <gpu:function>
+          <name>output_chair_petition</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_petition</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+              <value>4</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <!-- Funciones de chequeo de mensajes -->
+
+        <gpu:function>
           <name>check_messages</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
@@ -298,6 +331,30 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+
+        <gpu:function>
+          <name>check_chair_response</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_response</messageName>
+            </gpu:input>
+          </inputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+              <value>5</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+
       </functions>
       <states>
         <gpu:state>
@@ -412,6 +469,54 @@
       </states>
       <gpu:type>continuous</gpu:type>
       <gpu:bufferSize>16</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+    </gpu:xagent>
+    
+    <!-- Agente chair_admin -->
+
+    <gpu:xagent>
+      <name>chair_admin</name>
+      <memory>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name><!-- Agregada porque sino falla la compilación -->
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>chairArray</name>
+          <description>Arreglo que guarda si cada silla está disponible o no</description>
+          <arrayLength>35</arrayLength>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>attend_chair_petitions</name>
+          <currentState>defaultAdmin</currentState>
+          <nextState>defaultAdmin</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_petition</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_response</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultAdmin</name>
+        </gpu:state>
+        <initialState>defaultAdmin</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
     </gpu:xagent>
     
     <gpu:xagent>
@@ -622,34 +727,6 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
-    <gpu:message> 
-      <name>check_in</name>
-      <variables>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>id</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>estado</name>
-        </gpu:variable>
-      </variables>
-      <gpu:partitioningNone/>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:message>
-
-    <gpu:message> 
-      <name>avisar_paciente</name>
-      <variables>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>id</name>
-        </gpu:variable>
-      </variables>
-      <gpu:partitioningNone/>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:message>
-
     <gpu:message>
       <name>navmap_cell</name>
       <variables>
@@ -683,6 +760,67 @@
       </gpu:partitioningDiscrete>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
+
+    <!-- Mensajes del recepcionista -->
+
+    <gpu:message> 
+      <name>check_in</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>estado</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>avisar_paciente</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <!-- Mensajes del administrador de sillas -->
+
+    <gpu:message> 
+      <name>chair_petition</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>chair_response</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>chair_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
   </messages>
   <layers>
     <layer>
@@ -702,6 +840,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>output_pedestrian_state</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>output_chair_petition</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -726,7 +867,15 @@
     </layer>
     <layer>
       <gpu:layerFunction>
+        <name>attend_chair_petitions</name>
+      </gpu:layerFunction>
+    </layer>
+    <layer>
+      <gpu:layerFunction>
         <name>check_messages</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>check_chair_response</name>
       </gpu:layerFunction>
     </layer>
   </layers>

@@ -45,6 +45,8 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
     return item;
 } 
 
+/*---------------------------------Atención de pacientes---------------------------------*/
+
 //Función que chequea los pacientes que llegan y los atiende
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_avisar_paciente_list* patientMessages){
 	

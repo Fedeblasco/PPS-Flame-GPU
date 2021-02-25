@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -140,6 +140,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying receptionist Agent defaultReceptionist State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_chair_admins_defaultAdmin, d_chair_admins_defaultAdmin, sizeof(xmachine_memory_chair_admin_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying chair_admin Agent defaultAdmin State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_navmaps_static, d_navmaps_static, sizeof(xmachine_memory_navmap_list), cudaMemcpyDeviceToHost);
@@ -385,6 +391,16 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</estado_movimiento>\n", file);
         
+		fputs("<go_to_x>", file);
+        sprintf(data, "%u", h_agents_default->go_to_x[i]);
+		fputs(data, file);
+		fputs("</go_to_x>\n", file);
+        
+		fputs("<go_to_y>", file);
+        sprintf(data, "%u", h_agents_default->go_to_y[i]);
+		fputs(data, file);
+		fputs("</go_to_y>\n", file);
+        
 		fputs("</xagent>\n", file);
 	}
 	//Write each medic agent to xml
@@ -456,6 +472,26 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         sprintf(data, "%d", h_receptionists_defaultReceptionist->estado[i]);
 		fputs(data, file);
 		fputs("</estado>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each chair_admin agent to xml
+	for (int i=0; i<h_xmachine_memory_chair_admin_defaultAdmin_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>chair_admin</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%u", h_chair_admins_defaultAdmin->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<chairArray>", file);
+        for (int j=0;j<35;j++){
+            fprintf(file, "%u", h_chair_admins_defaultAdmin->chairArray[(j*xmachine_memory_chair_admin_MAX)+i]);
+            if(j!=(35-1))
+                fprintf(file, ",");
+        }
+		fputs("</chairArray>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -581,7 +617,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 
 }
 
-void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
+void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
 {
     PROFILE_SCOPED_RANGE("readInitialStates");
 
@@ -617,6 +653,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_estado;
     int in_agent_tick;
     int in_agent_estado_movimiento;
+    int in_agent_go_to_x;
+    int in_agent_go_to_y;
     int in_medic_x;
     int in_medic_y;
     int in_receptionist_x;
@@ -628,6 +666,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_tick;
     int in_receptionist_tick_state;
     int in_receptionist_estado;
+    int in_chair_admin_id;
+    int in_chair_admin_chairArray;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -722,6 +762,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	*h_xmachine_memory_agent_count = 0;
 	*h_xmachine_memory_medic_count = 0;
 	*h_xmachine_memory_receptionist_count = 0;
+	*h_xmachine_memory_chair_admin_count = 0;
 	*h_xmachine_memory_navmap_count = 0;
 	
 	/* Variables for initial state data */
@@ -741,6 +782,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int agent_estado;
 	int agent_tick;
 	unsigned int agent_estado_movimiento;
+	unsigned int agent_go_to_x;
+	unsigned int agent_go_to_y;
 	int medic_x;
 	int medic_y;
 	int receptionist_x;
@@ -752,6 +795,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int receptionist_tick;
 	unsigned int receptionist_tick_state;
 	int receptionist_estado;
+	unsigned int chair_admin_id;
+    unsigned int chair_admin_chairArray[35];
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -841,6 +886,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_estado = 0;
 	in_agent_tick = 0;
 	in_agent_estado_movimiento = 0;
+	in_agent_go_to_x = 0;
+	in_agent_go_to_y = 0;
 	in_medic_x = 0;
 	in_medic_y = 0;
 	in_receptionist_x = 0;
@@ -852,6 +899,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_tick = 0;
 	in_receptionist_tick_state = 0;
 	in_receptionist_estado = 0;
+	in_chair_admin_id = 0;
+	in_chair_admin_chairArray = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -926,6 +975,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->estado[k] = 0;
 		h_agents->tick[k] = 0;
 		h_agents->estado_movimiento[k] = 0;
+		h_agents->go_to_x[k] = 0;
+		h_agents->go_to_y[k] = 0;
 	}
 	
 	//set all medic values to 0
@@ -951,6 +1002,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_receptionists->tick[k] = 0;
 		h_receptionists->tick_state[k] = 0;
 		h_receptionists->estado[k] = 0;
+	}
+	
+	//set all chair_admin values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_chair_admin_MAX; k++)
+	{	
+		h_chair_admins->id[k] = 0;
+        for (i=0;i<35;i++){
+            h_chair_admins->chairArray[(i*xmachine_memory_chair_admin_MAX)+k] = 0;
+        }
 	}
 	
 	//set all navmap values to 0
@@ -998,6 +1059,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_estado = 0;
     agent_tick = 0;
     agent_estado_movimiento = 0;
+    agent_go_to_x = 0;
+    agent_go_to_y = 0;
     medic_x = 0;
     medic_y = 0;
     receptionist_x = 0;
@@ -1011,6 +1074,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_tick = 0;
     receptionist_tick_state = 0;
     receptionist_estado = 0;
+    chair_admin_id = 0;
+    for (i=0;i<35;i++){
+        chair_admin_chairArray[i] = 0;
+    }
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -1193,6 +1260,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->estado[*h_xmachine_memory_agent_count] = agent_estado;
 					h_agents->tick[*h_xmachine_memory_agent_count] = agent_tick;
 					h_agents->estado_movimiento[*h_xmachine_memory_agent_count] = agent_estado_movimiento;
+					h_agents->go_to_x[*h_xmachine_memory_agent_count] = agent_go_to_x;
+					h_agents->go_to_y[*h_xmachine_memory_agent_count] = agent_go_to_y;
 					(*h_xmachine_memory_agent_count) ++;	
 				}
 				else if(strcmp(agentname, "medic") == 0)
@@ -1253,6 +1322,21 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_receptionists->tick_state[*h_xmachine_memory_receptionist_count] = receptionist_tick_state;
 					h_receptionists->estado[*h_xmachine_memory_receptionist_count] = receptionist_estado;
 					(*h_xmachine_memory_receptionist_count) ++;	
+				}
+				else if(strcmp(agentname, "chair_admin") == 0)
+				{
+					if (*h_xmachine_memory_chair_admin_count > xmachine_memory_chair_admin_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent chair_admin exceeded whilst reading data\n", xmachine_memory_chair_admin_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_chair_admins->id[*h_xmachine_memory_chair_admin_count] = chair_admin_id;
+                    for (int k=0;k<35;k++){
+                        h_chair_admins->chairArray[(k*xmachine_memory_chair_admin_MAX)+(*h_xmachine_memory_chair_admin_count)] = chair_admin_chairArray[k];
+                    }
+					(*h_xmachine_memory_chair_admin_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
 				{
@@ -1322,6 +1406,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_estado = 0;
                 agent_tick = 0;
                 agent_estado_movimiento = 0;
+                agent_go_to_x = 0;
+                agent_go_to_y = 0;
                 medic_x = 0;
                 medic_y = 0;
                 receptionist_x = 0;
@@ -1335,6 +1421,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_tick = 0;
                 receptionist_tick_state = 0;
                 receptionist_estado = 0;
+                chair_admin_id = 0;
+                for (i=0;i<35;i++){
+                    chair_admin_chairArray[i] = 0;
+                }
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -1391,6 +1481,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/tick") == 0) in_agent_tick = 0;
 			if(strcmp(buffer, "estado_movimiento") == 0) in_agent_estado_movimiento = 1;
 			if(strcmp(buffer, "/estado_movimiento") == 0) in_agent_estado_movimiento = 0;
+			if(strcmp(buffer, "go_to_x") == 0) in_agent_go_to_x = 1;
+			if(strcmp(buffer, "/go_to_x") == 0) in_agent_go_to_x = 0;
+			if(strcmp(buffer, "go_to_y") == 0) in_agent_go_to_y = 1;
+			if(strcmp(buffer, "/go_to_y") == 0) in_agent_go_to_y = 0;
 			if(strcmp(buffer, "x") == 0) in_medic_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_medic_x = 0;
 			if(strcmp(buffer, "y") == 0) in_medic_y = 1;
@@ -1413,6 +1507,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/tick_state") == 0) in_receptionist_tick_state = 0;
 			if(strcmp(buffer, "estado") == 0) in_receptionist_estado = 1;
 			if(strcmp(buffer, "/estado") == 0) in_receptionist_estado = 0;
+			if(strcmp(buffer, "id") == 0) in_chair_admin_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_chair_admin_id = 0;
+			if(strcmp(buffer, "chairArray") == 0) in_chair_admin_chairArray = 1;
+			if(strcmp(buffer, "/chairArray") == 0) in_chair_admin_chairArray = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1589,6 +1687,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_agent_estado_movimiento){
                     agent_estado_movimiento = (unsigned int) fpgu_strtoul(buffer); 
                 }
+				if(in_agent_go_to_x){
+                    agent_go_to_x = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_agent_go_to_y){
+                    agent_go_to_y = (unsigned int) fpgu_strtoul(buffer); 
+                }
 				if(in_medic_x){
                     medic_x = (int) fpgu_strtol(buffer); 
                 }
@@ -1621,6 +1725,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_receptionist_estado){
                     receptionist_estado = (int) fpgu_strtol(buffer); 
+                }
+				if(in_chair_admin_id){
+                    chair_admin_id = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_chair_admin_chairArray){
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, chair_admin_chairArray, 35);    
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 
