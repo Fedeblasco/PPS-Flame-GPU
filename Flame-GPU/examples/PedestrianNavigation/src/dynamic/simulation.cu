@@ -415,6 +415,11 @@ void medic_prueba(cudaStream_t &stream);
  */
 void receptionist_receptionServer(cudaStream_t &stream);
 
+/** receptionist_infect_receptionist
+ * Agent function prototype for infect_receptionist function of receptionist agent
+ */
+void receptionist_infect_receptionist(cudaStream_t &stream);
+
 /** chair_admin_attend_chair_petitions
  * Agent function prototype for attend_chair_petitions function of chair_admin agent
  */
@@ -1384,6 +1389,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_infect_pedestrians = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("receptionist_infect_receptionist");
+	receptionist_infect_receptionist(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: receptionist_infect_receptionist = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -4625,6 +4644,10 @@ xmachine_memory_receptionist* h_allocate_agent_receptionist(){
 	xmachine_memory_receptionist* agent = (xmachine_memory_receptionist*)malloc(sizeof(xmachine_memory_receptionist));
 	// Memset the whole agent strcuture
     memset(agent, 0, sizeof(xmachine_memory_receptionist));
+
+    agent->x = 0.093750;
+
+    agent->y = -0.375000;
 	// Agent variable arrays must be allocated
     agent->colaPacientes = (unsigned int*)malloc(2000 * sizeof(unsigned int));
 	
@@ -4635,6 +4658,8 @@ xmachine_memory_receptionist* h_allocate_agent_receptionist(){
     agent->current_patient = -1;
 
     agent->attend_patient = 0;
+
+    agent->estado = 0;
 
 	return agent;
 }
@@ -7511,6 +7536,149 @@ void receptionist_receptionServer(cudaStream_t &stream){
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_receptionist_defaultReceptionist_count+h_xmachine_memory_receptionist_count > xmachine_memory_receptionist_MAX){
 		printf("Error: Buffer size of receptionServer agents in state defaultReceptionist will be exceeded moving working agents to next state in function receptionServer\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  receptionists_defaultReceptionist_temp = d_receptionists;
+  d_receptionists = d_receptionists_defaultReceptionist;
+  d_receptionists_defaultReceptionist = receptionists_defaultReceptionist_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_receptionist_defaultReceptionist_count += h_xmachine_memory_receptionist_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_receptionist_defaultReceptionist_count, &h_xmachine_memory_receptionist_defaultReceptionist_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int receptionist_infect_receptionist_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input is spatially partitioned
+	sm_size += (blockSize * sizeof(xmachine_message_pedestrian_state));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** receptionist_infect_receptionist
+ * Agent function prototype for infect_receptionist function of receptionist agent
+ */
+void receptionist_infect_receptionist(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_receptionist_defaultReceptionist_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_receptionist_defaultReceptionist_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_receptionist_list* receptionists_defaultReceptionist_temp = d_receptionists;
+	d_receptionists = d_receptionists_defaultReceptionist;
+	d_receptionists_defaultReceptionist = receptionists_defaultReceptionist_temp;
+	//set working count to current state count
+	h_xmachine_memory_receptionist_count = h_xmachine_memory_receptionist_defaultReceptionist_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_receptionist_count, &h_xmachine_memory_receptionist_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_receptionist_defaultReceptionist_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_receptionist_defaultReceptionist_count, &h_xmachine_memory_receptionist_defaultReceptionist_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_infect_receptionist, receptionist_infect_receptionist_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = receptionist_infect_receptionist_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	//any agent with discrete or partitioned message input uses texture caching
+	size_t tex_xmachine_message_pedestrian_state_x_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_x_byte_offset, tex_xmachine_message_pedestrian_state_x, d_pedestrian_states->x, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_x_offset = (int)tex_xmachine_message_pedestrian_state_x_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_x_offset, &h_tex_xmachine_message_pedestrian_state_x_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_y_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_y_byte_offset, tex_xmachine_message_pedestrian_state_y, d_pedestrian_states->y, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_y_offset = (int)tex_xmachine_message_pedestrian_state_y_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_y_offset, &h_tex_xmachine_message_pedestrian_state_y_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_z_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_z_byte_offset, tex_xmachine_message_pedestrian_state_z, d_pedestrian_states->z, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_z_offset = (int)tex_xmachine_message_pedestrian_state_z_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_z_offset, &h_tex_xmachine_message_pedestrian_state_z_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_estado_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_estado_byte_offset, tex_xmachine_message_pedestrian_state_estado, d_pedestrian_states->estado, sizeof(int)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_estado_offset = (int)tex_xmachine_message_pedestrian_state_estado_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_estado_offset, &h_tex_xmachine_message_pedestrian_state_estado_offset, sizeof(int)));
+	//bind pbm start and end indices to textures
+	size_t tex_xmachine_message_pedestrian_state_pbm_start_byte_offset;
+	size_t tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset;
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_pbm_start_byte_offset, tex_xmachine_message_pedestrian_state_pbm_start, d_pedestrian_state_partition_matrix->start, sizeof(int)*xmachine_message_pedestrian_state_grid_size));
+	h_tex_xmachine_message_pedestrian_state_pbm_start_offset = (int)tex_xmachine_message_pedestrian_state_pbm_start_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_pbm_start_offset, &h_tex_xmachine_message_pedestrian_state_pbm_start_offset, sizeof(int)));
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset, tex_xmachine_message_pedestrian_state_pbm_end_or_count, d_pedestrian_state_partition_matrix->end_or_count, sizeof(int)*xmachine_message_pedestrian_state_grid_size));
+  h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset = (int)tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset, &h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset, sizeof(int)));
+
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (infect_receptionist)
+	//Reallocate   : false
+	//Input        : pedestrian_state
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_infect_receptionist<<<g, b, sm_size, stream>>>(d_receptionists, d_pedestrian_states, d_pedestrian_state_partition_matrix, d_rand48);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	//any agent with discrete or partitioned message input uses texture caching
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_x));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_y));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_z));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_estado));
+	//unbind pbm indices
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_pbm_start));
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_pbm_end_or_count));
+    
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_receptionist_defaultReceptionist_count+h_xmachine_memory_receptionist_count > xmachine_memory_receptionist_MAX){
+		printf("Error: Buffer size of infect_receptionist agents in state defaultReceptionist will be exceeded moving working agents to next state in function infect_receptionist\n");
       exit(EXIT_FAILURE);
       }
       

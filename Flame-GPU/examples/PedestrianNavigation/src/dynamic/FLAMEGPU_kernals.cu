@@ -241,7 +241,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if (currentState->estado_movimiento[index]==1)
+		if (((currentState->estado_movimiento[index]==1)||(currentState->estado_movimiento[index]==5))||(currentState->estado_movimiento[index]==12))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -287,7 +287,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if (currentState->estado_movimiento[index]==4 || 7)
+		if ((currentState->estado_movimiento[index]==4)||(currentState->estado_movimiento[index]==9))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -333,7 +333,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if (currentState->estado_movimiento[index]==2)
+		if ((currentState->estado_movimiento[index]==2)||(currentState->estado_movimiento[index]==13))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -2152,9 +2152,8 @@ __device__ xmachine_message_navmap_cell* get_next_navmap_cell_message(xmachine_m
  * Add non partitioned or spatially partitioned check_in message
  * @param messages xmachine_message_check_in_list message list to add too
  * @param id agent variable of type unsigned int
- * @param estado agent variable of type int
  */
-__device__ void add_check_in_message(xmachine_message_check_in_list* messages, unsigned int id, int estado){
+__device__ void add_check_in_message(xmachine_message_check_in_list* messages, unsigned int id){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_check_in_count;
@@ -2175,7 +2174,6 @@ __device__ void add_check_in_message(xmachine_message_check_in_list* messages, u
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
-	messages->estado[index] = estado;
 
 }
 
@@ -2196,8 +2194,7 @@ __global__ void scatter_optional_check_in_messages(xmachine_message_check_in_lis
 
 		//AoS - xmachine_message_check_in Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
-		messages->id[output_index] = messages_swap->id[index];
-		messages->estado[output_index] = messages_swap->estado[index];				
+		messages->id[output_index] = messages_swap->id[index];				
 	}
 }
 
@@ -2238,7 +2235,6 @@ __device__ xmachine_message_check_in* get_first_check_in_message(xmachine_messag
 	xmachine_message_check_in temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
-	temp_message.estado = messages->estado[index];
 
 	//AoS to shared memory
 	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_check_in));
@@ -2281,7 +2277,6 @@ __device__ xmachine_message_check_in* get_next_check_in_message(xmachine_message
 		xmachine_message_check_in temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
-		temp_message.estado = messages->estado[index];
 
 		//AoS to shared memory
 		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_check_in));
@@ -3374,8 +3369,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.estado = agents->estado[index];
 	} else {
 	
-	agent.x = 0;
-	agent.y = 0;
+	agent.x = 0.093750;
+	agent.y = -0.375000;
     agent.colaPacientes = nullptr;
 	agent.front = 0;
 	agent.rear = 0;
@@ -3407,6 +3402,54 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agents->attend_patient[index] = agent.attend_patient;
 	agents->estado[index] = agent.estado;
 	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_infect_receptionist(xmachine_memory_receptionist_list* agents, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_receptionist_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_infect_receptionist Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_receptionist agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+    agent.colaPacientes = &(agents->colaPacientes[index]);
+	agent.front = agents->front[index];
+	agent.rear = agents->rear[index];
+	agent.size = agents->size[index];
+	agent.tick = agents->tick[index];
+	agent.current_patient = agents->current_patient[index];
+	agent.attend_patient = agents->attend_patient[index];
+	agent.estado = agents->estado[index];
+
+	//FLAME function call
+	int dead = !infect_receptionist(&agent, pedestrian_state_messages, partition_matrix, rand48);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_infect_receptionist Coalesced memory write (ignore arrays)
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->front[index] = agent.front;
+	agents->rear[index] = agent.rear;
+	agents->size[index] = agent.size;
+	agents->tick[index] = agent.tick;
+	agents->current_patient[index] = agent.current_patient;
+	agents->attend_patient[index] = agent.attend_patient;
+	agents->estado[index] = agent.estado;
 }
 
 /**

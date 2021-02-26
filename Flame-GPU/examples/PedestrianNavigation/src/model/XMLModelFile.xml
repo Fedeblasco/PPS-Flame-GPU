@@ -306,11 +306,43 @@
           </outputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>estado_movimiento</agentVariable>
+                    </lhs>
+                    <operator>==</operator>
+                    <rhs>
+                        <value>1</value>
+                    </rhs>
+                  </condition>
+                </lhs>
+                <operator>||</operator>
+                <rhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>estado_movimiento</agentVariable>
+                    </lhs>
+                    <operator>==</operator>
+                    <rhs>
+                        <value>5</value>
+                    </rhs>
+                  </condition>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>||</operator>
             <rhs>
-              <value>1</value>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>12</value>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -330,11 +362,27 @@
           </inputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>4</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>||</operator>
             <rhs>
-              <value>4 || 7</value>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>9</value>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -352,11 +400,27 @@
           </inputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>2</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>||</operator>
             <rhs>
-              <value>2</value>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>13</value>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>true</gpu:reallocate>
@@ -412,10 +476,12 @@
         <gpu:variable>
           <type>int</type>
           <name>x</name>
+          <defaultValue>0.093750</defaultValue>
         </gpu:variable>
         <gpu:variable>
           <type>int</type>
           <name>y</name>
+          <defaultValue>-0.375000</defaultValue>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
@@ -453,6 +519,7 @@
           <type>int</type>
           <name>estado</name>
           <description>0=sano,1=portador,2=enfermo</description>
+          <defaultValue>0</defaultValue>
         </gpu:variable>
       </memory>
       <functions>
@@ -474,6 +541,19 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+        
+        <gpu:function>
+          <name>infect_receptionist</name>
+          <currentState>defaultReceptionist</currentState>
+          <nextState>defaultReceptionist</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>pedestrian_state</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
       </functions>
       <states>
         <gpu:state>
@@ -482,7 +562,7 @@
         <initialState>defaultReceptionist</initialState>
       </states>
       <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>16</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
     </gpu:xagent>
     
     <!-- Agente chair_admin -->
@@ -784,10 +864,6 @@
           <type>unsigned int</type>
           <name>id</name>
         </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>estado</name>
-        </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
@@ -867,6 +943,9 @@
     <layer>
       <gpu:layerFunction>
         <name>infect_pedestrians</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>infect_receptionist</name>
       </gpu:layerFunction>
     </layer>
     <layer>

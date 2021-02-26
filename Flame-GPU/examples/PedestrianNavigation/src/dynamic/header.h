@@ -77,7 +77,7 @@ typedef glm::dvec4 dvec4;
 #define xmachine_memory_medic_MAX 65536
 
 //Maximum population size of xmachine_memory_receptionist
-#define xmachine_memory_receptionist_MAX 16
+#define xmachine_memory_receptionist_MAX 65536
 
 //Maximum population size of xmachine_memory_chair_admin
 #define xmachine_memory_chair_admin_MAX 65536
@@ -327,8 +327,7 @@ struct __align__(16) xmachine_message_check_in
     /* Brute force Partitioning Variables */
     int _position;          /**< 1D position of message in linear message list */   
       
-    unsigned int id;        /**< Message variable id of type unsigned int.*/  
-    int estado;        /**< Message variable estado of type int.*/
+    unsigned int id;        /**< Message variable id of type unsigned int.*/
 };
 
 /** struct xmachine_message_check_in_done
@@ -549,7 +548,6 @@ struct xmachine_message_check_in_list
     int _scan_input [xmachine_message_check_in_MAX];  /**< Used during parallel prefix sum */
     
     unsigned int id [xmachine_message_check_in_MAX];    /**< Message memory variable list id of type unsigned int.*/
-    int estado [xmachine_message_check_in_MAX];    /**< Message memory variable list estado of type int.*/
     
 };
 
@@ -736,6 +734,13 @@ __FLAME_GPU_FUNC__ int prueba(xmachine_memory_medic* agent);
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_done_list* check_in_done_messages);
 
 /**
+ * infect_receptionist FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_receptionist. This represents a single agent instance and can be modified directly.
+ * @param pedestrian_state_messages  pedestrian_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_state_message and get_next_pedestrian_state_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_state_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
+
+/**
  * attend_chair_petitions FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_chair_admin. This represents a single agent instance and can be modified directly.
  * @param chair_petition_messages  chair_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_petition_message and get_next_chair_petition_message functions.* @param chair_response_messages Pointer to output message list of type xmachine_message_chair_response_list. Must be passed as an argument to the add_chair_response_message function ??.
@@ -875,10 +880,9 @@ template <int AGENT_TYPE> __FLAME_GPU_FUNC__ xmachine_message_navmap_cell * get_
  * Adds a new check_in agent to the xmachine_memory_check_in_list list using a linear mapping
  * @param agents	xmachine_memory_check_in_list agent list
  * @param id	message variable of type unsigned int
- * @param estado	message variable of type int
  */
  
- __FLAME_GPU_FUNC__ void add_check_in_message(xmachine_message_check_in_list* check_in_messages, unsigned int id, int estado);
+ __FLAME_GPU_FUNC__ void add_check_in_message(xmachine_message_check_in_list* check_in_messages, unsigned int id);
  
 /** get_first_check_in_message
  * Get first message function for non partitioned (brute force) messages

@@ -999,8 +999,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
 	for (int k=0; k<xmachine_memory_receptionist_MAX; k++)
 	{	
-		h_receptionists->x[k] = 0;
-		h_receptionists->y[k] = 0;
+		h_receptionists->x[k] = 0.093750;
+		h_receptionists->y[k] = -0.375000;
         for (i=0;i<2000;i++){
             h_receptionists->colaPacientes[(i*xmachine_memory_receptionist_MAX)+k] = 0;
         }
@@ -1072,8 +1072,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_go_to_y = 0;
     medic_x = 0;
     medic_y = 0;
-    receptionist_x = 0;
-    receptionist_y = 0;
+    receptionist_x = 0.093750;
+    receptionist_y = -0.375000;
     for (i=0;i<2000;i++){
         receptionist_colaPacientes[i] = 0;
     }
@@ -1421,8 +1421,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_go_to_y = 0;
                 medic_x = 0;
                 medic_y = 0;
-                receptionist_x = 0;
-                receptionist_y = 0;
+                receptionist_x = 0.093750;
+                receptionist_y = -0.375000;
                 for (i=0;i<2000;i++){
                     receptionist_colaPacientes[i] = 0;
                 }

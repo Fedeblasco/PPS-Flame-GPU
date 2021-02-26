@@ -28,7 +28,7 @@
 #define MESSAGE_RADIUS d_message_pedestrian_location_radius
 #define MIN_DISTANCE 0.0001f
 
-//#define NUM_EXITS 7
+//#define NUM_EXITS 7  
 
 #define PI 3.1415f
 #define RADIANS(x) (PI / 180.0f) * x
@@ -36,10 +36,10 @@
 //Probabilidades usadas para manejar la cantidad de enfermos
 #define probabilidad_estornudar 1.0
 #define probabilidad_contagio 1.0
-#define probabilidad_generar_enfermo 0.5
+#define probabilidad_generar_enfermo 0.2
 //Cantidad de ticks enfermo y portador 
-#define ticks_portador 50000
-#define ticks_enfermo 50000
+#define ticks_portador 10000
+#define ticks_enfermo 10000
 //Cantidad de personas a generar
 #define cant_personas 40
  
@@ -182,7 +182,7 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 		glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
 		glm::vec2 message_pos = glm::vec2(current_message->x, current_message->y);
 		float separation = length(agent_pos - message_pos);
-		//Si la distancia entre uno y el otro es menor a la distancia minima
+		//Si la distancia entre uno y el otro es mayor a la distancia minima y menor al radio definido
 		if ((separation < MESSAGE_RADIUS)&&(separation>MIN_DISTANCE)){
 
 			//Si estoy sano, y me cruce con un paciente que esta enfermo o es portador, cambio mi estado a portador
@@ -191,14 +191,14 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
 					if(temp<probabilidad_estornudar*probabilidad_contagio){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
 						agent->estado = 1;
-						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+						//int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
+						//int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						//printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
 					}
 				}	
 			}			
 		}
-		 current_message = get_next_pedestrian_state_message(current_message, pedestrian_state_messages, partition_matrix);
+		current_message = get_next_pedestrian_state_message(current_message, pedestrian_state_messages, partition_matrix);
 	}
 
 	return 0;
@@ -304,36 +304,41 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			if(mover_a_destino(agent,88,96) == 0){
 				agent->estado_movimiento++;
 			}
-			break;
+			break; 
 		case 3:
 			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
-				add_check_in_message(checkInMessages, agent->id, agent->estado);
-				agent->estado_movimiento++;
-			}
-			break;
-		case 5:
-			if(mover_a_destino(agent,88,96) == 0){
+				add_check_in_message(checkInMessages, agent->id);
 				agent->estado_movimiento++;
 			}
 			break;
 		case 6:
-			if(mover_a_destino(agent,130,90) == 0){
+			if(mover_a_destino(agent,88,96) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 7:
-			if(mover_a_destino(agent,140,80) == 0){
-				agent->estado_movimiento ++;
-				add_check_in_message(checkInMessages, agent->id, agent->estado);
-			}
-			break;
-		case 8:
 			if(mover_a_destino(agent,130,90) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
-		case 9:
+		case 8:
+			if(mover_a_destino(agent,140,80) == 0){
+				agent->estado_movimiento ++;
+				add_check_in_message(checkInMessages, agent->id);
+			}
+			break;
+		case 10:
+			if(mover_a_destino(agent,130,90) == 0){
+				agent->estado_movimiento++;
+			}
+			break;
+		case 11:
 			if(mover_a_destino(agent,88,96) == 0){
+				agent->estado_movimiento++;
+			}
+			break;
+		case 14:
+			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
@@ -383,7 +388,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 		
 		if ((agent->exit_no == 1)&&((random < EMMISION_RATE_EXIT1*TIME_SCALER)))
 			emit_agent = true;
-
+			
 		if (agent->cant_generados<cant_personas){ 
 			if (emit_agent){
 				float x = ((agent->x+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
@@ -395,22 +400,22 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				
 				//Hago el random e imprimo
 				float rand = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-				/*int estado;
+				int estado;
 				if(rand<=probabilidad_generar_enfermo){
 					estado=2;
 					//printf("Enfermo");
 				}else{
 					estado=0;
 					//printf("Sano");
-				}*/
-				
-				//add_agent_agent(agent_agents, agent->cant_generados, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0);
-				
-				if(agent->cant_generados==0){
-					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 0, 0, 0, 0, 0);
-				}else{
-					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, 2, 0, 0, 0, 0);
 				}
+				
+				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0);
+				
+				/*if(agent->cant_generados==0){
+					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 0, 0, 0, 0, 0);
+				}else{
+					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 2, 0, 0, 0, 0);
+				}*/
 				
 				//printf("%d\n",agent->cant_generados);
 
