@@ -41,7 +41,7 @@
 #define ticks_portador 10000
 #define ticks_enfermo 10000
 //Cantidad de personas a generar
-#define cant_personas 40
+#define cant_personas 1000
  
 //Manejo de las sillas
 #define firstChair_x 50
@@ -271,7 +271,7 @@ __FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmach
 	agent->estado_movimiento++;
 
 	return 0;
-}
+} 
 
 /**
  * move FLAMEGPU Agent Function
@@ -424,7 +424,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				agent->cant_generados++;
 				
 				if(agent->cant_generados==cant_personas){
-					//printf("Termine de generar personas");
+					printf("Termine de generar personas");
 				}
 			}
 		}

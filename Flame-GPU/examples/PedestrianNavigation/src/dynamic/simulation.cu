@@ -7791,7 +7791,7 @@ void chair_admin_attend_chair_petitions(cudaStream_t &stream){
 	//Input        : chair_petition
 	//Output       : chair_response
 	//Agent Output : 
-	GPUFLAME_attend_chair_petitions<<<g, b, sm_size, stream>>>(d_chair_admins, d_chair_petitions, d_chair_responses);
+	GPUFLAME_attend_chair_petitions<<<g, b, sm_size, stream>>>(d_chair_admins, d_chair_petitions, d_chair_responses, d_rand48);
 	gpuErrchkLaunch();
 	
 	

@@ -600,7 +600,7 @@
             </gpu:output>
           </outputs>
           <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
+          <gpu:RNG>true</gpu:RNG>
         </gpu:function>
       </functions>
       <states>

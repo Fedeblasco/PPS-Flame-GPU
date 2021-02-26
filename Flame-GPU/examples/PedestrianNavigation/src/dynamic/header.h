@@ -743,9 +743,9 @@ __FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, 
 /**
  * attend_chair_petitions FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_chair_admin. This represents a single agent instance and can be modified directly.
- * @param chair_petition_messages  chair_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_petition_message and get_next_chair_petition_message functions.* @param chair_response_messages Pointer to output message list of type xmachine_message_chair_response_list. Must be passed as an argument to the add_chair_response_message function ??.
+ * @param chair_petition_messages  chair_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_petition_message and get_next_chair_petition_message functions.* @param chair_response_messages Pointer to output message list of type xmachine_message_chair_response_list. Must be passed as an argument to the add_chair_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
-__FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages);
+__FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages, RNG_rand48* rand48);
 
 /**
  * output_navmap_cells FLAMEGPU Agent Function

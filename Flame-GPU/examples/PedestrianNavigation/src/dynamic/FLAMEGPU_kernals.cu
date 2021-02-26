@@ -3455,7 +3455,7 @@ __global__ void GPUFLAME_infect_receptionist(xmachine_memory_receptionist_list* 
 /**
  *
  */
-__global__ void GPUFLAME_attend_chair_petitions(xmachine_memory_chair_admin_list* agents, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages){
+__global__ void GPUFLAME_attend_chair_petitions(xmachine_memory_chair_admin_list* agents, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages, RNG_rand48* rand48){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -3478,7 +3478,7 @@ __global__ void GPUFLAME_attend_chair_petitions(xmachine_memory_chair_admin_list
 	}
 
 	//FLAME function call
-	int dead = !attend_chair_petitions(&agent, chair_petition_messages, chair_response_messages	);
+	int dead = !attend_chair_petitions(&agent, chair_petition_messages, chair_response_messages	, rand48);
 	
 
 	
