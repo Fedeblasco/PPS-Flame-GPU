@@ -73,11 +73,17 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_memory_agent
 #define xmachine_memory_agent_MAX 65536
 
+//Maximum population size of xmachine_memory_chair
+#define xmachine_memory_chair_MAX 65536
+
 //Maximum population size of xmachine_memory_medic
 #define xmachine_memory_medic_MAX 65536
 
 //Maximum population size of xmachine_memory_receptionist
 #define xmachine_memory_receptionist_MAX 65536
+
+//Maximum population size of xmachine_memory_agent_generator
+#define xmachine_memory_agent_generator_MAX 65536
 
 //Maximum population size of xmachine_memory_chair_admin
 #define xmachine_memory_chair_admin_MAX 65536
@@ -114,6 +120,12 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_chair_response
 #define xmachine_message_chair_response_MAX 65536
 
+//Maximum population size of xmachine_mmessage_chair_state
+#define xmachine_message_chair_state_MAX 65536
+
+//Maximum population size of xmachine_mmessage_chair_contact
+#define xmachine_message_chair_contact_MAX 65536
+
 
 /* Define preprocessor symbols for each message to specify the type, to simplify / improve portability */
 
@@ -124,6 +136,8 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_check_in_done_partitioningNone
 #define xmachine_message_chair_petition_partitioningNone
 #define xmachine_message_chair_response_partitioningNone
+#define xmachine_message_chair_state_partitioningNone
+#define xmachine_message_chair_contact_partitioningNone
 
 /* Spatial partitioning grid size definitions */
 //xmachine_message_pedestrian_location partition grid size (gridDim.X*gridDim.Y*gridDim.Z)
@@ -191,6 +205,19 @@ struct __align__(16) xmachine_memory_agent
     unsigned int estado_movimiento;    /**< X-machine memory variable estado_movimiento of type unsigned int.*/
     unsigned int go_to_x;    /**< X-machine memory variable go_to_x of type unsigned int.*/
     unsigned int go_to_y;    /**< X-machine memory variable go_to_y of type unsigned int.*/
+    unsigned int chair_no;    /**< X-machine memory variable chair_no of type unsigned int.*/
+};
+
+/** struct xmachine_memory_chair
+ * continuous valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_chair
+{
+    int id;    /**< X-machine memory variable id of type int.*/
+    int x;    /**< X-machine memory variable x of type int.*/
+    int y;    /**< X-machine memory variable y of type int.*/
+    int state;    /**< X-machine memory variable state of type int.*/
 };
 
 /** struct xmachine_memory_medic
@@ -219,6 +246,15 @@ struct __align__(16) xmachine_memory_receptionist
     int current_patient;    /**< X-machine memory variable current_patient of type int.*/
     int attend_patient;    /**< X-machine memory variable attend_patient of type int.*/
     int estado;    /**< X-machine memory variable estado of type int.*/
+};
+
+/** struct xmachine_memory_agent_generator
+ * continuous valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_agent_generator
+{
+    int chairs_generated;    /**< X-machine memory variable chairs_generated of type int.*/
 };
 
 /** struct xmachine_memory_chair_admin
@@ -367,6 +403,33 @@ struct __align__(16) xmachine_message_chair_response
     int chair_no;        /**< Message variable chair_no of type int.*/
 };
 
+/** struct xmachine_message_chair_state
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_chair_state
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    int state;        /**< Message variable state of type int.*/
+};
+
+/** struct xmachine_message_chair_contact
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_chair_contact
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int chair_no;        /**< Message variable chair_no of type unsigned int.*/  
+    int state;        /**< Message variable state of type int.*/
+};
+
 
 
 /* Agent lists. Structure of Array (SoA) for memory coalescing on GPU */
@@ -399,6 +462,23 @@ struct xmachine_memory_agent_list
     unsigned int estado_movimiento [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado_movimiento of type unsigned int.*/
     unsigned int go_to_x [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_x of type unsigned int.*/
     unsigned int go_to_y [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_y of type unsigned int.*/
+    unsigned int chair_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list chair_no of type unsigned int.*/
+};
+
+/** struct xmachine_memory_chair_list
+ * continuous valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_chair_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_chair_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_chair_MAX];  /**< Used during parallel prefix sum */
+    
+    int id [xmachine_memory_chair_MAX];    /**< X-machine memory variable list id of type int.*/
+    int x [xmachine_memory_chair_MAX];    /**< X-machine memory variable list x of type int.*/
+    int y [xmachine_memory_chair_MAX];    /**< X-machine memory variable list y of type int.*/
+    int state [xmachine_memory_chair_MAX];    /**< X-machine memory variable list state of type int.*/
 };
 
 /** struct xmachine_memory_medic_list
@@ -435,6 +515,19 @@ struct xmachine_memory_receptionist_list
     int current_patient [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list current_patient of type int.*/
     int attend_patient [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list attend_patient of type int.*/
     int estado [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list estado of type int.*/
+};
+
+/** struct xmachine_memory_agent_generator_list
+ * continuous valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_agent_generator_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_agent_generator_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_agent_generator_MAX];  /**< Used during parallel prefix sum */
+    
+    int chairs_generated [xmachine_memory_agent_generator_MAX];    /**< X-machine memory variable list chairs_generated of type int.*/
 };
 
 /** struct xmachine_memory_chair_admin_list
@@ -594,6 +687,37 @@ struct xmachine_message_chair_response_list
     
 };
 
+/** struct xmachine_message_chair_state_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_chair_state_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_chair_state_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_chair_state_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_chair_state_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    int state [xmachine_message_chair_state_MAX];    /**< Message memory variable list state of type int.*/
+    
+};
+
+/** struct xmachine_message_chair_contact_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_chair_contact_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_chair_contact_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_chair_contact_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_chair_contact_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    unsigned int chair_no [xmachine_message_chair_contact_MAX];    /**< Message memory variable list chair_no of type unsigned int.*/
+    int state [xmachine_message_chair_contact_MAX];    /**< Message memory variable list state of type int.*/
+    
+};
+
 
 
 /* Spatially Partitioned Message boundary Matrices */
@@ -699,6 +823,20 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* check_in_messages);
 
 /**
+ * receive_chair_state FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param chair_state_messages  chair_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_state_message and get_next_chair_state_message functions.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int receive_chair_state(xmachine_memory_agent* agent, xmachine_message_chair_state_list* chair_state_messages, RNG_rand48* rand48);
+
+/**
+ * output_chair_contact FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param chair_contact_messages Pointer to output message list of type xmachine_message_chair_contact_list. Must be passed as an argument to the add_chair_contact_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_chair_contact(xmachine_memory_agent* agent, xmachine_message_chair_contact_list* chair_contact_messages);
+
+/**
  * output_chair_petition FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
@@ -706,18 +844,25 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 __FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmachine_message_chair_petition_list* chair_petition_messages);
 
 /**
- * check_check_in_done FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param check_in_done_messages  check_in_done_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_done_message and get_next_check_in_done_message functions.
- */
-__FLAME_GPU_FUNC__ int check_check_in_done(xmachine_memory_agent* agent, xmachine_message_check_in_done_list* check_in_done_messages);
-
-/**
- * check_chair_response FLAMEGPU Agent Function
+ * receive_chair_response FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param chair_response_messages  chair_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_response_message and get_next_chair_response_message functions.
  */
-__FLAME_GPU_FUNC__ int check_chair_response(xmachine_memory_agent* agent, xmachine_message_chair_response_list* chair_response_messages);
+__FLAME_GPU_FUNC__ int receive_chair_response(xmachine_memory_agent* agent, xmachine_message_chair_response_list* chair_response_messages);
+
+/**
+ * receive_check_in_done FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param check_in_done_messages  check_in_done_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_done_message and get_next_check_in_done_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_check_in_done(xmachine_memory_agent* agent, xmachine_message_check_in_done_list* check_in_done_messages);
+
+/**
+ * output_chair_state FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_chair. This represents a single agent instance and can be modified directly.
+ * @param chair_contact_messages  chair_contact_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_contact_message and get_next_chair_contact_message functions.* @param chair_state_messages Pointer to output message list of type xmachine_message_chair_state_list. Must be passed as an argument to the add_chair_state_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine_message_chair_contact_list* chair_contact_messages, xmachine_message_chair_state_list* chair_state_messages, RNG_rand48* rand48);
 
 /**
  * prueba FLAMEGPU Agent Function
@@ -739,6 +884,13 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
  * @param pedestrian_state_messages  pedestrian_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_state_message and get_next_pedestrian_state_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_state_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
 __FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
+
+/**
+ * generate_chairs FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent_generator. This represents a single agent instance and can be modified directly.
+ * @param chair_agents Pointer to agent list of type xmachine_memory_chair_list. This must be passed as an argument to the add_chair_agent function to add a new agent.
+ */
+__FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, xmachine_memory_chair_list* chair_agents);
 
 /**
  * attend_chair_petitions FLAMEGPU Agent Function
@@ -982,6 +1134,63 @@ __FLAME_GPU_FUNC__ xmachine_message_chair_response * get_first_chair_response_me
 __FLAME_GPU_FUNC__ xmachine_message_chair_response * get_next_chair_response_message(xmachine_message_chair_response* current, xmachine_message_chair_response_list* chair_response_messages);
 
   
+/* Message Function Prototypes for Brute force (No Partitioning) chair_state message implemented in FLAMEGPU_Kernels */
+
+/** add_chair_state_message
+ * Function for all types of message partitioning
+ * Adds a new chair_state agent to the xmachine_memory_chair_state_list list using a linear mapping
+ * @param agents	xmachine_memory_chair_state_list agent list
+ * @param id	message variable of type unsigned int
+ * @param state	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_chair_state_message(xmachine_message_chair_state_list* chair_state_messages, unsigned int id, int state);
+ 
+/** get_first_chair_state_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param chair_state_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_chair_state * get_first_chair_state_message(xmachine_message_chair_state_list* chair_state_messages);
+
+/** get_next_chair_state_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param chair_state_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_chair_state * get_next_chair_state_message(xmachine_message_chair_state* current, xmachine_message_chair_state_list* chair_state_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) chair_contact message implemented in FLAMEGPU_Kernels */
+
+/** add_chair_contact_message
+ * Function for all types of message partitioning
+ * Adds a new chair_contact agent to the xmachine_memory_chair_contact_list list using a linear mapping
+ * @param agents	xmachine_memory_chair_contact_list agent list
+ * @param id	message variable of type unsigned int
+ * @param chair_no	message variable of type unsigned int
+ * @param state	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_chair_contact_message(xmachine_message_chair_contact_list* chair_contact_messages, unsigned int id, unsigned int chair_no, int state);
+ 
+/** get_first_chair_contact_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param chair_contact_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_chair_contact * get_first_chair_contact_message(xmachine_message_chair_contact_list* chair_contact_messages);
+
+/** get_next_chair_contact_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param chair_contact_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_chair_contact * get_next_chair_contact_message(xmachine_message_chair_contact* current, xmachine_message_chair_contact_list* chair_contact_messages);
+
+  
 /* Agent Function Prototypes implemented in FLAMEGPU_Kernels */
 
 /** add_agent_agent
@@ -1005,8 +1214,19 @@ __FLAME_GPU_FUNC__ xmachine_message_chair_response * get_next_chair_response_mes
  * @param estado_movimiento	agent agent variable of type unsigned int
  * @param go_to_x	agent agent variable of type unsigned int
  * @param go_to_y	agent agent variable of type unsigned int
+ * @param chair_no	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int chair_no);
+
+/** add_chair_agent
+ * Adds a new continuous valued chair agent to the xmachine_memory_chair_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_chair_list agent list
+ * @param id	agent agent variable of type int
+ * @param x	agent agent variable of type int
+ * @param y	agent agent variable of type int
+ * @param state	agent agent variable of type int
+ */
+__FLAME_GPU_FUNC__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int x, int y, int state);
 
 /** add_medic_agent
  * Adds a new continuous valued medic agent to the xmachine_memory_medic_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -1051,6 +1271,13 @@ __FLAME_GPU_FUNC__ void set_receptionist_agent_array_value(T *array, unsigned in
 
 
   
+
+/** add_agent_generator_agent
+ * Adds a new continuous valued agent_generator agent to the xmachine_memory_agent_generator_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_agent_generator_list agent list
+ * @param chairs_generated	agent agent variable of type int
+ */
+__FLAME_GPU_FUNC__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated);
 
 /** add_chair_admin_agent
  * Adds a new continuous valued chair_admin agent to the xmachine_memory_chair_admin_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -1114,12 +1341,18 @@ extern void singleIteration();
  * @param h_agents Pointer to agent list on the host
  * @param d_agents Pointer to agent list on the GPU device
  * @param h_xmachine_memory_agent_count Pointer to agent counter
+ * @param h_chairs Pointer to agent list on the host
+ * @param d_chairs Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_chair_count Pointer to agent counter
  * @param h_medics Pointer to agent list on the host
  * @param d_medics Pointer to agent list on the GPU device
  * @param h_xmachine_memory_medic_count Pointer to agent counter
  * @param h_receptionists Pointer to agent list on the host
  * @param d_receptionists Pointer to agent list on the GPU device
  * @param h_xmachine_memory_receptionist_count Pointer to agent counter
+ * @param h_agent_generators Pointer to agent list on the host
+ * @param d_agent_generators Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_agent_generator_count Pointer to agent counter
  * @param h_chair_admins Pointer to agent list on the host
  * @param d_chair_admins Pointer to agent list on the GPU device
  * @param h_xmachine_memory_chair_admin_count Pointer to agent counter
@@ -1127,7 +1360,7 @@ extern void singleIteration();
  * @param d_navmaps Pointer to agent list on the GPU device
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
+extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
 
 
 /** readInitialStates
@@ -1135,16 +1368,20 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param	inputpath	file path to XML file used for input of agent data
  * @param h_agents Pointer to agent list on the host
  * @param h_xmachine_memory_agent_count Pointer to agent counter
+ * @param h_chairs Pointer to agent list on the host
+ * @param h_xmachine_memory_chair_count Pointer to agent counter
  * @param h_medics Pointer to agent list on the host
  * @param h_xmachine_memory_medic_count Pointer to agent counter
  * @param h_receptionists Pointer to agent list on the host
  * @param h_xmachine_memory_receptionist_count Pointer to agent counter
+ * @param h_agent_generators Pointer to agent list on the host
+ * @param h_xmachine_memory_agent_generator_count Pointer to agent counter
  * @param h_chair_admins Pointer to agent list on the host
  * @param h_xmachine_memory_chair_admin_count Pointer to agent counter
  * @param h_navmaps Pointer to agent list on the host
  * @param h_xmachine_memory_navmap_count Pointer to agent counter
  */
-extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
+extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
 
 
 /* Return functions used by external code to get agent data from device */
@@ -1187,6 +1424,46 @@ extern xmachine_memory_agent_list* get_host_agent_default_agents();
  * @param		a pointer CUDA kernal function to generate key value pairs
  */
 void sort_agents_default(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents));
+
+
+    
+/** get_agent_chair_MAX_count
+ * Gets the max agent count for the chair agent type 
+ * @return		the maximum chair agent count
+ */
+extern int get_agent_chair_MAX_count();
+
+
+
+/** get_agent_chair_defaultChair_count
+ * Gets the agent count for the chair agent type in state defaultChair
+ * @return		the current chair agent count in state defaultChair
+ */
+extern int get_agent_chair_defaultChair_count();
+
+/** reset_defaultChair_count
+ * Resets the agent count of the chair in state defaultChair to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_chair_defaultChair_count();
+
+/** get_device_chair_defaultChair_agents
+ * Gets a pointer to xmachine_memory_chair_list on the GPU device
+ * @return		a xmachine_memory_chair_list on the GPU device
+ */
+extern xmachine_memory_chair_list* get_device_chair_defaultChair_agents();
+
+/** get_host_chair_defaultChair_agents
+ * Gets a pointer to xmachine_memory_chair_list on the CPU host
+ * @return		a xmachine_memory_chair_list on the CPU host
+ */
+extern xmachine_memory_chair_list* get_host_chair_defaultChair_agents();
+
+
+/** sort_chairs_defaultChair
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
+ */
+void sort_chairs_defaultChair(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_chair_list* agents));
 
 
     
@@ -1267,6 +1544,46 @@ extern xmachine_memory_receptionist_list* get_host_receptionist_defaultReception
  * @param		a pointer CUDA kernal function to generate key value pairs
  */
 void sort_receptionists_defaultReceptionist(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_receptionist_list* agents));
+
+
+    
+/** get_agent_agent_generator_MAX_count
+ * Gets the max agent count for the agent_generator agent type 
+ * @return		the maximum agent_generator agent count
+ */
+extern int get_agent_agent_generator_MAX_count();
+
+
+
+/** get_agent_agent_generator_defaultGenerator_count
+ * Gets the agent count for the agent_generator agent type in state defaultGenerator
+ * @return		the current agent_generator agent count in state defaultGenerator
+ */
+extern int get_agent_agent_generator_defaultGenerator_count();
+
+/** reset_defaultGenerator_count
+ * Resets the agent count of the agent_generator in state defaultGenerator to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_agent_generator_defaultGenerator_count();
+
+/** get_device_agent_generator_defaultGenerator_agents
+ * Gets a pointer to xmachine_memory_agent_generator_list on the GPU device
+ * @return		a xmachine_memory_agent_generator_list on the GPU device
+ */
+extern xmachine_memory_agent_generator_list* get_device_agent_generator_defaultGenerator_agents();
+
+/** get_host_agent_generator_defaultGenerator_agents
+ * Gets a pointer to xmachine_memory_agent_generator_list on the CPU host
+ * @return		a xmachine_memory_agent_generator_list on the CPU host
+ */
+extern xmachine_memory_agent_generator_list* get_host_agent_generator_defaultGenerator_agents();
+
+
+/** sort_agent_generators_defaultGenerator
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
+ */
+void sort_agent_generators_defaultGenerator(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_generator_list* agents));
 
 
     
@@ -1513,6 +1830,51 @@ __host__ unsigned int get_agent_default_variable_go_to_x(unsigned int index);
  */
 __host__ unsigned int get_agent_default_variable_go_to_y(unsigned int index);
 
+/** unsigned int get_agent_default_variable_chair_no(unsigned int index)
+ * Gets the value of the chair_no variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable chair_no
+ */
+__host__ unsigned int get_agent_default_variable_chair_no(unsigned int index);
+
+/** int get_chair_defaultChair_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ int get_chair_defaultChair_variable_id(unsigned int index);
+
+/** int get_chair_defaultChair_variable_x(unsigned int index)
+ * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_chair_defaultChair_variable_x(unsigned int index);
+
+/** int get_chair_defaultChair_variable_y(unsigned int index)
+ * Gets the value of the y variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_chair_defaultChair_variable_y(unsigned int index);
+
+/** int get_chair_defaultChair_variable_state(unsigned int index)
+ * Gets the value of the state variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable state
+ */
+__host__ int get_chair_defaultChair_variable_state(unsigned int index);
+
 /** int get_medic_default2_variable_x(unsigned int index)
  * Gets the value of the x variable of an medic agent in the default2 state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -1621,6 +1983,15 @@ __host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsign
  * @return value of agent variable estado
  */
 __host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index);
+
+/** int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index)
+ * Gets the value of the chairs_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable chairs_generated
+ */
+__host__ int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index);
 
 /** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
  * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
@@ -1876,6 +2247,47 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent);
  */
 void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int count);
 
+/** h_allocate_agent_chair
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated chair struct.
+ */
+xmachine_memory_chair* h_allocate_agent_chair();
+/** h_free_agent_chair
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_chair(xmachine_memory_chair** agent);
+/** h_allocate_agent_chair_array
+ * Utility function to allocate an array of structs for  chair agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_chair** h_allocate_agent_chair_array(unsigned int count);
+/** h_free_agent_chair_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_chair_array(xmachine_memory_chair*** agents, unsigned int count);
+
+
+/** h_add_agent_chair_defaultChair
+ * Host function to add a single agent of type chair to the defaultChair state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_chair_defaultChair instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_chair_defaultChair(xmachine_memory_chair* agent);
+
+/** h_add_agents_chair_defaultChair(
+ * Host function to add multiple agents of type chair to the defaultChair state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of chair agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_chair_defaultChair(xmachine_memory_chair** agents, unsigned int count);
+
 /** h_allocate_agent_medic
  * Utility function to allocate and initialise an agent struct on the host.
  * @return address of a host-allocated medic struct.
@@ -1957,6 +2369,47 @@ void h_add_agent_receptionist_defaultReceptionist(xmachine_memory_receptionist* 
  * @param count the number of agents to copy from the host to the device.
  */
 void h_add_agents_receptionist_defaultReceptionist(xmachine_memory_receptionist** agents, unsigned int count);
+
+/** h_allocate_agent_agent_generator
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated agent_generator struct.
+ */
+xmachine_memory_agent_generator* h_allocate_agent_agent_generator();
+/** h_free_agent_agent_generator
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_agent_generator(xmachine_memory_agent_generator** agent);
+/** h_allocate_agent_agent_generator_array
+ * Utility function to allocate an array of structs for  agent_generator agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_agent_generator** h_allocate_agent_agent_generator_array(unsigned int count);
+/** h_free_agent_agent_generator_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_agent_generator_array(xmachine_memory_agent_generator*** agents, unsigned int count);
+
+
+/** h_add_agent_agent_generator_defaultGenerator
+ * Host function to add a single agent of type agent_generator to the defaultGenerator state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_agent_generator_defaultGenerator instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_agent_generator_defaultGenerator(xmachine_memory_agent_generator* agent);
+
+/** h_add_agents_agent_generator_defaultGenerator(
+ * Host function to add multiple agents of type agent_generator to the defaultGenerator state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of agent_generator agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_agent_generator_defaultGenerator(xmachine_memory_agent_generator** agents, unsigned int count);
 
 /** h_allocate_agent_chair_admin
  * Utility function to allocate and initialise an agent struct on the host.
@@ -2455,6 +2908,136 @@ unsigned int min_agent_default_go_to_y_variable();
  */
 unsigned int max_agent_default_go_to_y_variable();
 
+/** unsigned int reduce_agent_default_chair_no_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_chair_no_variable();
+
+
+
+/** unsigned int count_agent_default_chair_no_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_chair_no_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_chair_no_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_chair_no_variable();
+/** unsigned int max_agent_default_chair_no_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_chair_no_variable();
+
+/** int reduce_chair_defaultChair_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_id_variable();
+
+
+
+/** int count_chair_defaultChair_id_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_id_variable(int count_value);
+
+/** int min_chair_defaultChair_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_id_variable();
+/** int max_chair_defaultChair_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_id_variable();
+
+/** int reduce_chair_defaultChair_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_x_variable();
+
+
+
+/** int count_chair_defaultChair_x_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_x_variable(int count_value);
+
+/** int min_chair_defaultChair_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_x_variable();
+/** int max_chair_defaultChair_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_x_variable();
+
+/** int reduce_chair_defaultChair_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_y_variable();
+
+
+
+/** int count_chair_defaultChair_y_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_y_variable(int count_value);
+
+/** int min_chair_defaultChair_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_y_variable();
+/** int max_chair_defaultChair_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_y_variable();
+
+/** int reduce_chair_defaultChair_state_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_state_variable();
+
+
+
+/** int count_chair_defaultChair_state_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_state_variable(int count_value);
+
+/** int min_chair_defaultChair_state_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_state_variable();
+/** int max_chair_defaultChair_state_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_state_variable();
+
 /** int reduce_medic_default2_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
@@ -2740,6 +3323,32 @@ int min_receptionist_defaultReceptionist_estado_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 int max_receptionist_defaultReceptionist_estado_variable();
+
+/** int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
+
+
+
+/** int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value);
+
+/** int min_agent_generator_defaultGenerator_chairs_generated_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_agent_generator_defaultGenerator_chairs_generated_variable();
+/** int max_agent_generator_defaultGenerator_chairs_generated_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_agent_generator_defaultGenerator_chairs_generated_variable();
 
 /** unsigned int reduce_chair_admin_defaultAdmin_id_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

@@ -225,6 +225,10 @@
           <type>unsigned int</type>
           <name>go_to_y</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>chair_no</name>
+        </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
@@ -279,7 +283,7 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
-        
+
         <gpu:function>
           <name>move</name>
           <currentState>default</currentState>
@@ -290,6 +294,44 @@
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+        
+        <!-- Funciones de manejo de sillas-->
+
+        <gpu:function>
+          <name>receive_chair_state</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_state</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>output_chair_contact</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_contact</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>4</value>
+            </rhs>
+          </condition>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
@@ -349,10 +391,48 @@
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
 
-        <!-- Funciones de chequeo de mensajes -->
+        <gpu:function>
+          <name>receive_chair_response</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_response</messageName>
+            </gpu:input>
+          </inputs>
+          <condition>
+            <lhs>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>2</value>
+                </rhs>
+              </condition>
+            </lhs>
+            <operator>||</operator>
+            <rhs>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>13</value>
+                </rhs>
+              </condition>
+            </rhs>
+          </condition>
+          <gpu:reallocate>true</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+        
+        <!-- Funciones del recepcionista -->
 
         <gpu:function>
-          <name>check_check_in_done</name>
+          <name>receive_check_in_done</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <inputs>
@@ -389,51 +469,63 @@
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
 
-        <gpu:function>
-          <name>check_chair_response</name>
-          <currentState>default</currentState>
-          <nextState>default</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>chair_response</messageName>
-            </gpu:input>
-          </inputs>
-          <condition>
-            <lhs>
-              <condition>
-                <lhs>
-                  <agentVariable>estado_movimiento</agentVariable>
-                </lhs>
-                <operator>==</operator>
-                <rhs>
-                    <value>2</value>
-                </rhs>
-              </condition>
-            </lhs>
-            <operator>||</operator>
-            <rhs>
-              <condition>
-                <lhs>
-                  <agentVariable>estado_movimiento</agentVariable>
-                </lhs>
-                <operator>==</operator>
-                <rhs>
-                    <value>13</value>
-                </rhs>
-              </condition>
-            </rhs>
-          </condition>
-          <gpu:reallocate>true</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
-
-
       </functions>
       <states>
         <gpu:state>
           <name>default</name>
         </gpu:state>
         <initialState>default</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:xagent>
+    
+    <gpu:xagent>
+      <name>chair</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>x</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>y</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>state</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>output_chair_state</name>
+          <currentState>defaultChair</currentState>
+          <nextState>defaultChair</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_contact</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_state</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultChair</name>
+        </gpu:state>
+        <initialState>defaultChair</initialState>
       </states>
       <gpu:type>continuous</gpu:type>
       <gpu:bufferSize>65536</gpu:bufferSize>
@@ -565,7 +657,52 @@
       <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
     </gpu:xagent>
     
-    <!-- Agente chair_admin -->
+<!-- Agente agent_generator -->
+
+    <gpu:xagent>
+      <name>agent_generator</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>chairs_generated</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>generate_chairs</name>
+          <currentState>defaultGenerator</currentState>
+          <nextState>defaultGenerator</nextState>
+          <xagentOutputs>
+            <gpu:xagentOutput>
+              <xagentName>chair</xagentName>
+              <state>defaultChair</state>
+            </gpu:xagentOutput>
+          </xagentOutputs>
+          <condition>
+            <lhs>
+              <agentVariable>chairs_generated</agentVariable>
+            </lhs>
+            <operator>&lt;</operator>
+            <rhs>
+                <value>35</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultGenerator</name>
+        </gpu:state>
+        <initialState>defaultGenerator</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:xagent>
+    
+<!-- Agente chair_admin -->
 
     <gpu:xagent>
       <name>chair_admin</name>
@@ -911,6 +1048,44 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
+    <!-- Mensajes de las sillas -->
+
+    <gpu:message> 
+      <name>chair_state</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>state</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>chair_contact</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>chair_no</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>state</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
   </messages>
   <layers>
     <layer>
@@ -919,6 +1094,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>generate_medics</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>generate_chairs</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -932,12 +1110,18 @@
         <name>output_pedestrian_state</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
+        <name>output_chair_contact</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
         <name>output_chair_petition</name>
       </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
         <name>avoid_pedestrians</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>output_chair_state</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -946,6 +1130,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>infect_receptionist</name>
+      </gpu:layerFunction>
+       <gpu:layerFunction>
+        <name>receive_chair_state</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -965,10 +1152,10 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>check_check_in_done</name>
+        <name>receive_check_in_done</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>check_chair_response</name>
+        <name>receive_chair_response</name>
       </gpu:layerFunction>
     </layer>
   </layers>
