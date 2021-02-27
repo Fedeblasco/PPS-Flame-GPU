@@ -1,5 +1,5 @@
-#define probabilidad_contagiar_silla 1.0
 
+#include "parameters.h"
 
 __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine_message_chair_contact_list* chairContactMessages, xmachine_message_chair_state_list* chairStateMessages, RNG_rand48* rand48){
     

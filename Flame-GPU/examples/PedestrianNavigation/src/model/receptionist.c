@@ -1,20 +1,6 @@
 //Archivo con las funciones del recepcionista	
 
-#define capacity 2000
-#define espera 60
-#define probabilidad_contagio_personal 1.0
-
-#ifndef MESSAGE_RADIUS
-#define MESSAGE_RADIUS d_message_pedestrian_location_radius
-#endif
-
-#ifndef MIN_DISTANCE
-#define MIN_DISTANCE 0.0001f
-#endif
-
-#ifndef probabilidad_estornudar
-#define probabilidad_estornudar 1.0
-#endif
+#include "parameters.h"
 
 /*---------------------------------IMPLEMENTACIÓN DE LA COLA---------------------------------*/
 

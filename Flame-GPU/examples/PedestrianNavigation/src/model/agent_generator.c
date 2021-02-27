@@ -1,14 +1,6 @@
 
 //Manejo de las sillas
-#ifndef firstChair_x
-#define firstChair_x 50
-#endif
-#ifndef firstChair_y
-#define firstChair_y 85
-#endif
-#ifndef space_between
-#define space_between 3
-#endif
+#include "parameters.h"
 
 __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, xmachine_memory_chair_list* chair_agents){
     
