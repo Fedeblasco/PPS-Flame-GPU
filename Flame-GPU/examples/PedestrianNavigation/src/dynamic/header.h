@@ -73,6 +73,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_memory_agent
 #define xmachine_memory_agent_MAX 65536
 
+//Maximum population size of xmachine_memory_navmap
+#define xmachine_memory_navmap_MAX 65536
+
 //Maximum population size of xmachine_memory_chair
 #define xmachine_memory_chair_MAX 65536
 
@@ -86,14 +89,21 @@ typedef glm::dvec4 dvec4;
 #define xmachine_memory_agent_generator_MAX 65536
 
 //Maximum population size of xmachine_memory_chair_admin
-#define xmachine_memory_chair_admin_MAX 65536
+#define xmachine_memory_chair_admin_MAX 16
 
-//Maximum population size of xmachine_memory_navmap
-#define xmachine_memory_navmap_MAX 65536 
-//Agent variable array length for xmachine_memory_receptionist->colaPacientes
-#define xmachine_memory_receptionist_colaPacientes_LENGTH 2000 
+//Maximum population size of xmachine_memory_box
+#define xmachine_memory_box_MAX 65536
+
+//Maximum population size of xmachine_memory_triage
+#define xmachine_memory_triage_MAX 65536 
+//Agent variable array length for xmachine_memory_receptionist->patientQueue
+#define xmachine_memory_receptionist_patientQueue_LENGTH 2000 
 //Agent variable array length for xmachine_memory_chair_admin->chairArray
-#define xmachine_memory_chair_admin_chairArray_LENGTH 35
+#define xmachine_memory_chair_admin_chairArray_LENGTH 35 
+//Agent variable array length for xmachine_memory_triage->boxArray
+#define xmachine_memory_triage_boxArray_LENGTH 3 
+//Agent variable array length for xmachine_memory_triage->patientQueue
+#define xmachine_memory_triage_patientQueue_LENGTH 100
 
 
   
@@ -126,6 +136,18 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_chair_contact
 #define xmachine_message_chair_contact_MAX 65536
 
+//Maximum population size of xmachine_mmessage_box_petition
+#define xmachine_message_box_petition_MAX 65536
+
+//Maximum population size of xmachine_mmessage_box_response
+#define xmachine_message_box_response_MAX 65536
+
+//Maximum population size of xmachine_mmessage_triage_petition
+#define xmachine_message_triage_petition_MAX 65536
+
+//Maximum population size of xmachine_mmessage_triage_response
+#define xmachine_message_triage_response_MAX 65536
+
 
 /* Define preprocessor symbols for each message to specify the type, to simplify / improve portability */
 
@@ -138,6 +160,10 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_chair_response_partitioningNone
 #define xmachine_message_chair_state_partitioningNone
 #define xmachine_message_chair_contact_partitioningNone
+#define xmachine_message_box_petition_partitioningNone
+#define xmachine_message_box_response_partitioningNone
+#define xmachine_message_triage_petition_partitioningNone
+#define xmachine_message_triage_response_partitioningNone
 
 /* Spatial partitioning grid size definitions */
 //xmachine_message_pedestrian_location partition grid size (gridDim.X*gridDim.Y*gridDim.Z)
@@ -206,6 +232,36 @@ struct __align__(16) xmachine_memory_agent
     unsigned int go_to_x;    /**< X-machine memory variable go_to_x of type unsigned int.*/
     unsigned int go_to_y;    /**< X-machine memory variable go_to_y of type unsigned int.*/
     unsigned int chair_no;    /**< X-machine memory variable chair_no of type unsigned int.*/
+    unsigned int box_no;    /**< X-machine memory variable box_no of type unsigned int.*/
+};
+
+/** struct xmachine_memory_navmap
+ * discrete valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_navmap
+{
+    int x;    /**< X-machine memory variable x of type int.*/
+    int y;    /**< X-machine memory variable y of type int.*/
+    int exit_no;    /**< X-machine memory variable exit_no of type int.*/
+    float height;    /**< X-machine memory variable height of type float.*/
+    float collision_x;    /**< X-machine memory variable collision_x of type float.*/
+    float collision_y;    /**< X-machine memory variable collision_y of type float.*/
+    float exit0_x;    /**< X-machine memory variable exit0_x of type float.*/
+    float exit0_y;    /**< X-machine memory variable exit0_y of type float.*/
+    float exit1_x;    /**< X-machine memory variable exit1_x of type float.*/
+    float exit1_y;    /**< X-machine memory variable exit1_y of type float.*/
+    float exit2_x;    /**< X-machine memory variable exit2_x of type float.*/
+    float exit2_y;    /**< X-machine memory variable exit2_y of type float.*/
+    float exit3_x;    /**< X-machine memory variable exit3_x of type float.*/
+    float exit3_y;    /**< X-machine memory variable exit3_y of type float.*/
+    float exit4_x;    /**< X-machine memory variable exit4_x of type float.*/
+    float exit4_y;    /**< X-machine memory variable exit4_y of type float.*/
+    float exit5_x;    /**< X-machine memory variable exit5_x of type float.*/
+    float exit5_y;    /**< X-machine memory variable exit5_y of type float.*/
+    float exit6_x;    /**< X-machine memory variable exit6_x of type float.*/
+    float exit6_y;    /**< X-machine memory variable exit6_y of type float.*/
+    unsigned int cant_generados;    /**< X-machine memory variable cant_generados of type unsigned int.*/
 };
 
 /** struct xmachine_memory_chair
@@ -238,7 +294,7 @@ struct __align__(16) xmachine_memory_receptionist
 {
     int x;    /**< X-machine memory variable x of type int.*/
     int y;    /**< X-machine memory variable y of type int.*/
-    unsigned int *colaPacientes;    /**< X-machine memory variable colaPacientes of type unsigned int.*/
+    unsigned int *patientQueue;    /**< X-machine memory variable patientQueue of type unsigned int.*/
     unsigned int front;    /**< X-machine memory variable front of type unsigned int.*/
     unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
     unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
@@ -255,6 +311,7 @@ struct __align__(16) xmachine_memory_receptionist
 struct __align__(16) xmachine_memory_agent_generator
 {
     int chairs_generated;    /**< X-machine memory variable chairs_generated of type int.*/
+    int triage_generated;    /**< X-machine memory variable triage_generated of type int.*/
 };
 
 /** struct xmachine_memory_chair_admin
@@ -267,33 +324,29 @@ struct __align__(16) xmachine_memory_chair_admin
     unsigned int *chairArray;    /**< X-machine memory variable chairArray of type unsigned int.*/
 };
 
-/** struct xmachine_memory_navmap
- * discrete valued agent
+/** struct xmachine_memory_box
+ * continuous valued agent
  * Holds all agent variables and is aligned to help with coalesced reads on the GPU
  */
-struct __align__(16) xmachine_memory_navmap
+struct __align__(16) xmachine_memory_box
 {
-    int x;    /**< X-machine memory variable x of type int.*/
-    int y;    /**< X-machine memory variable y of type int.*/
-    int exit_no;    /**< X-machine memory variable exit_no of type int.*/
-    float height;    /**< X-machine memory variable height of type float.*/
-    float collision_x;    /**< X-machine memory variable collision_x of type float.*/
-    float collision_y;    /**< X-machine memory variable collision_y of type float.*/
-    float exit0_x;    /**< X-machine memory variable exit0_x of type float.*/
-    float exit0_y;    /**< X-machine memory variable exit0_y of type float.*/
-    float exit1_x;    /**< X-machine memory variable exit1_x of type float.*/
-    float exit1_y;    /**< X-machine memory variable exit1_y of type float.*/
-    float exit2_x;    /**< X-machine memory variable exit2_x of type float.*/
-    float exit2_y;    /**< X-machine memory variable exit2_y of type float.*/
-    float exit3_x;    /**< X-machine memory variable exit3_x of type float.*/
-    float exit3_y;    /**< X-machine memory variable exit3_y of type float.*/
-    float exit4_x;    /**< X-machine memory variable exit4_x of type float.*/
-    float exit4_y;    /**< X-machine memory variable exit4_y of type float.*/
-    float exit5_x;    /**< X-machine memory variable exit5_x of type float.*/
-    float exit5_y;    /**< X-machine memory variable exit5_y of type float.*/
-    float exit6_x;    /**< X-machine memory variable exit6_x of type float.*/
-    float exit6_y;    /**< X-machine memory variable exit6_y of type float.*/
-    unsigned int cant_generados;    /**< X-machine memory variable cant_generados of type unsigned int.*/
+    unsigned int id;    /**< X-machine memory variable id of type unsigned int.*/
+    unsigned int occupied;    /**< X-machine memory variable occupied of type unsigned int.*/
+};
+
+/** struct xmachine_memory_triage
+ * continuous valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_triage
+{
+    unsigned int id;    /**< X-machine memory variable id of type unsigned int.*/
+    unsigned int *boxArray;    /**< X-machine memory variable boxArray of type unsigned int.*/
+    unsigned int *patientQueue;    /**< X-machine memory variable patientQueue of type unsigned int.*/
+    unsigned int front;    /**< X-machine memory variable front of type unsigned int.*/
+    unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
+    unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
+    unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
 };
 
 
@@ -430,6 +483,56 @@ struct __align__(16) xmachine_message_chair_contact
     int state;        /**< Message variable state of type int.*/
 };
 
+/** struct xmachine_message_box_petition
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_box_petition
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/
+};
+
+/** struct xmachine_message_box_response
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_box_response
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int priority;        /**< Message variable priority of type unsigned int.*/
+};
+
+/** struct xmachine_message_triage_petition
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_triage_petition
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/
+};
+
+/** struct xmachine_message_triage_response
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_triage_response
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    int box_no;        /**< Message variable box_no of type int.*/
+};
+
 
 
 /* Agent lists. Structure of Array (SoA) for memory coalescing on GPU */
@@ -463,6 +566,40 @@ struct xmachine_memory_agent_list
     unsigned int go_to_x [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_x of type unsigned int.*/
     unsigned int go_to_y [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_y of type unsigned int.*/
     unsigned int chair_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list chair_no of type unsigned int.*/
+    unsigned int box_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list box_no of type unsigned int.*/
+};
+
+/** struct xmachine_memory_navmap_list
+ * discrete valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_navmap_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_navmap_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_navmap_MAX];  /**< Used during parallel prefix sum */
+    
+    int x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list x of type int.*/
+    int y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list y of type int.*/
+    int exit_no [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit_no of type int.*/
+    float height [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list height of type float.*/
+    float collision_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list collision_x of type float.*/
+    float collision_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list collision_y of type float.*/
+    float exit0_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit0_x of type float.*/
+    float exit0_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit0_y of type float.*/
+    float exit1_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_x of type float.*/
+    float exit1_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_y of type float.*/
+    float exit2_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_x of type float.*/
+    float exit2_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_y of type float.*/
+    float exit3_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_x of type float.*/
+    float exit3_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_y of type float.*/
+    float exit4_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_x of type float.*/
+    float exit4_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_y of type float.*/
+    float exit5_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_x of type float.*/
+    float exit5_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_y of type float.*/
+    float exit6_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_x of type float.*/
+    float exit6_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_y of type float.*/
+    unsigned int cant_generados [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list cant_generados of type unsigned int.*/
 };
 
 /** struct xmachine_memory_chair_list
@@ -507,7 +644,7 @@ struct xmachine_memory_receptionist_list
     
     int x [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list x of type int.*/
     int y [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list y of type int.*/
-    unsigned int colaPacientes [xmachine_memory_receptionist_MAX*2000];    /**< X-machine memory variable list colaPacientes of type unsigned int.*/
+    unsigned int patientQueue [xmachine_memory_receptionist_MAX*2000];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
     unsigned int front [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
     unsigned int rear [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
@@ -528,6 +665,7 @@ struct xmachine_memory_agent_generator_list
     int _scan_input [xmachine_memory_agent_generator_MAX];  /**< Used during parallel prefix sum */
     
     int chairs_generated [xmachine_memory_agent_generator_MAX];    /**< X-machine memory variable list chairs_generated of type int.*/
+    int triage_generated [xmachine_memory_agent_generator_MAX];    /**< X-machine memory variable list triage_generated of type int.*/
 };
 
 /** struct xmachine_memory_chair_admin_list
@@ -544,37 +682,37 @@ struct xmachine_memory_chair_admin_list
     unsigned int chairArray [xmachine_memory_chair_admin_MAX*35];    /**< X-machine memory variable list chairArray of type unsigned int.*/
 };
 
-/** struct xmachine_memory_navmap_list
- * discrete valued agent
+/** struct xmachine_memory_box_list
+ * continuous valued agent
  * Variables lists for all agent variables
  */
-struct xmachine_memory_navmap_list
+struct xmachine_memory_box_list
 {	
     /* Temp variables for agents. Used for parallel operations such as prefix sum */
-    int _position [xmachine_memory_navmap_MAX];    /**< Holds agents position in the 1D agent list */
-    int _scan_input [xmachine_memory_navmap_MAX];  /**< Used during parallel prefix sum */
+    int _position [xmachine_memory_box_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_box_MAX];  /**< Used during parallel prefix sum */
     
-    int x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list x of type int.*/
-    int y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list y of type int.*/
-    int exit_no [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit_no of type int.*/
-    float height [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list height of type float.*/
-    float collision_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list collision_x of type float.*/
-    float collision_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list collision_y of type float.*/
-    float exit0_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit0_x of type float.*/
-    float exit0_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit0_y of type float.*/
-    float exit1_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_x of type float.*/
-    float exit1_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit1_y of type float.*/
-    float exit2_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_x of type float.*/
-    float exit2_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit2_y of type float.*/
-    float exit3_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_x of type float.*/
-    float exit3_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit3_y of type float.*/
-    float exit4_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_x of type float.*/
-    float exit4_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit4_y of type float.*/
-    float exit5_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_x of type float.*/
-    float exit5_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit5_y of type float.*/
-    float exit6_x [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_x of type float.*/
-    float exit6_y [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list exit6_y of type float.*/
-    unsigned int cant_generados [xmachine_memory_navmap_MAX];    /**< X-machine memory variable list cant_generados of type unsigned int.*/
+    unsigned int id [xmachine_memory_box_MAX];    /**< X-machine memory variable list id of type unsigned int.*/
+    unsigned int occupied [xmachine_memory_box_MAX];    /**< X-machine memory variable list occupied of type unsigned int.*/
+};
+
+/** struct xmachine_memory_triage_list
+ * continuous valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_triage_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_triage_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_triage_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_memory_triage_MAX];    /**< X-machine memory variable list id of type unsigned int.*/
+    unsigned int boxArray [xmachine_memory_triage_MAX*3];    /**< X-machine memory variable list boxArray of type unsigned int.*/
+    unsigned int patientQueue [xmachine_memory_triage_MAX*100];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
+    unsigned int front [xmachine_memory_triage_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
+    unsigned int rear [xmachine_memory_triage_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
+    unsigned int size [xmachine_memory_triage_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
+    unsigned int tick [xmachine_memory_triage_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
 };
 
 
@@ -718,6 +856,64 @@ struct xmachine_message_chair_contact_list
     
 };
 
+/** struct xmachine_message_box_petition_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_box_petition_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_box_petition_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_box_petition_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_box_petition_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_box_response_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_box_response_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_box_response_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_box_response_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_box_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    unsigned int priority [xmachine_message_box_response_MAX];    /**< Message memory variable list priority of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_triage_petition_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_triage_petition_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_triage_petition_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_triage_petition_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_triage_petition_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_triage_response_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_triage_response_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_triage_response_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_triage_response_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_triage_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    int box_no [xmachine_message_triage_response_MAX];    /**< Message memory variable list box_no of type int.*/
+    
+};
+
 
 
 /* Spatially Partitioned Message boundary Matrices */
@@ -858,6 +1054,41 @@ __FLAME_GPU_FUNC__ int receive_chair_response(xmachine_memory_agent* agent, xmac
 __FLAME_GPU_FUNC__ int receive_check_in_done(xmachine_memory_agent* agent, xmachine_message_check_in_done_list* check_in_done_messages);
 
 /**
+ * output_triage_petition FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param triage_petition_messages Pointer to output message list of type xmachine_message_triage_petition_list. Must be passed as an argument to the add_triage_petition_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmachine_message_triage_petition_list* triage_petition_messages);
+
+/**
+ * receive_triage_response FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param triage_response_messages  triage_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_triage_response_message and get_next_triage_response_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xmachine_message_triage_response_list* triage_response_messages);
+
+/**
+ * output_navmap_cells FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
+ * @param navmap_cell_messages Pointer to output message list of type xmachine_message_navmap_cell_list. Must be passed as an argument to the add_navmap_cell_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_navmap_cells(xmachine_memory_navmap* agent, xmachine_message_navmap_cell_list* navmap_cell_messages);
+
+/**
+ * generate_pedestrians FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
+ * @param agent_agents Pointer to agent list of type xmachine_memory_agent_list. This must be passed as an argument to the add_agent_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmachine_memory_agent_list* agent_agents, RNG_rand48* rand48);
+
+/**
+ * generate_medics FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
+ * @param medic_agents Pointer to agent list of type xmachine_memory_medic_list. This must be passed as an argument to the add_medic_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_memory_medic_list* medic_agents, RNG_rand48* rand48);
+
+/**
  * output_chair_state FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_chair. This represents a single agent instance and can be modified directly.
  * @param chair_contact_messages  chair_contact_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_contact_message and get_next_chair_contact_message functions.* @param chair_state_messages Pointer to output message list of type xmachine_message_chair_state_list. Must be passed as an argument to the add_chair_state_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
@@ -893,6 +1124,13 @@ __FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, 
 __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, xmachine_memory_chair_list* chair_agents);
 
 /**
+ * generate_triage FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent_generator. This represents a single agent instance and can be modified directly.
+ * @param triage_agents Pointer to agent list of type xmachine_memory_triage_list. This must be passed as an argument to the add_triage_agent function to add a new agent.
+ */
+__FLAME_GPU_FUNC__ int generate_triage(xmachine_memory_agent_generator* agent, xmachine_memory_triage_list* triage_agents);
+
+/**
  * attend_chair_petitions FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_chair_admin. This represents a single agent instance and can be modified directly.
  * @param chair_petition_messages  chair_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_petition_message and get_next_chair_petition_message functions.* @param chair_response_messages Pointer to output message list of type xmachine_message_chair_response_list. Must be passed as an argument to the add_chair_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
@@ -900,25 +1138,18 @@ __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, x
 __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages, RNG_rand48* rand48);
 
 /**
- * output_navmap_cells FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
- * @param navmap_cell_messages Pointer to output message list of type xmachine_message_navmap_cell_list. Must be passed as an argument to the add_navmap_cell_message function ??.
+ * box_server FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_box. This represents a single agent instance and can be modified directly.
+ * @param box_petition_messages  box_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_box_petition_message and get_next_box_petition_message functions.* @param box_response_messages Pointer to output message list of type xmachine_message_box_response_list. Must be passed as an argument to the add_box_response_message function ??.
  */
-__FLAME_GPU_FUNC__ int output_navmap_cells(xmachine_memory_navmap* agent, xmachine_message_navmap_cell_list* navmap_cell_messages);
+__FLAME_GPU_FUNC__ int box_server(xmachine_memory_box* agent, xmachine_message_box_petition_list* box_petition_messages, xmachine_message_box_response_list* box_response_messages);
 
 /**
- * generate_pedestrians FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
- * @param agent_agents Pointer to agent list of type xmachine_memory_agent_list. This must be passed as an argument to the add_agent_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ * receive_triage_petitions FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_triage. This represents a single agent instance and can be modified directly.
+ * @param triage_petition_messages  triage_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_triage_petition_message and get_next_triage_petition_message functions.* @param triage_response_messages Pointer to output message list of type xmachine_message_triage_response_list. Must be passed as an argument to the add_triage_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
-__FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmachine_memory_agent_list* agent_agents, RNG_rand48* rand48);
-
-/**
- * generate_medics FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_navmap. This represents a single agent instance and can be modified directly.
- * @param medic_agents Pointer to agent list of type xmachine_memory_medic_list. This must be passed as an argument to the add_medic_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
- */
-__FLAME_GPU_FUNC__ int generate_medics(xmachine_memory_navmap* agent, xmachine_memory_medic_list* medic_agents, RNG_rand48* rand48);
+__FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, xmachine_message_triage_petition_list* triage_petition_messages, xmachine_message_triage_response_list* triage_response_messages, RNG_rand48* rand48);
 
   
 /* Message Function Prototypes for Spatially Partitioned pedestrian_location message implemented in FLAMEGPU_Kernels */
@@ -1191,6 +1422,116 @@ __FLAME_GPU_FUNC__ xmachine_message_chair_contact * get_first_chair_contact_mess
 __FLAME_GPU_FUNC__ xmachine_message_chair_contact * get_next_chair_contact_message(xmachine_message_chair_contact* current, xmachine_message_chair_contact_list* chair_contact_messages);
 
   
+/* Message Function Prototypes for Brute force (No Partitioning) box_petition message implemented in FLAMEGPU_Kernels */
+
+/** add_box_petition_message
+ * Function for all types of message partitioning
+ * Adds a new box_petition agent to the xmachine_memory_box_petition_list list using a linear mapping
+ * @param agents	xmachine_memory_box_petition_list agent list
+ * @param id	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_box_petition_message(xmachine_message_box_petition_list* box_petition_messages, unsigned int id);
+ 
+/** get_first_box_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param box_petition_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_box_petition * get_first_box_petition_message(xmachine_message_box_petition_list* box_petition_messages);
+
+/** get_next_box_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param box_petition_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_box_petition * get_next_box_petition_message(xmachine_message_box_petition* current, xmachine_message_box_petition_list* box_petition_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) box_response message implemented in FLAMEGPU_Kernels */
+
+/** add_box_response_message
+ * Function for all types of message partitioning
+ * Adds a new box_response agent to the xmachine_memory_box_response_list list using a linear mapping
+ * @param agents	xmachine_memory_box_response_list agent list
+ * @param id	message variable of type unsigned int
+ * @param priority	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_box_response_message(xmachine_message_box_response_list* box_response_messages, unsigned int id, unsigned int priority);
+ 
+/** get_first_box_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param box_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_box_response * get_first_box_response_message(xmachine_message_box_response_list* box_response_messages);
+
+/** get_next_box_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param box_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_box_response * get_next_box_response_message(xmachine_message_box_response* current, xmachine_message_box_response_list* box_response_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) triage_petition message implemented in FLAMEGPU_Kernels */
+
+/** add_triage_petition_message
+ * Function for all types of message partitioning
+ * Adds a new triage_petition agent to the xmachine_memory_triage_petition_list list using a linear mapping
+ * @param agents	xmachine_memory_triage_petition_list agent list
+ * @param id	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_triage_petition_message(xmachine_message_triage_petition_list* triage_petition_messages, unsigned int id);
+ 
+/** get_first_triage_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param triage_petition_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_triage_petition * get_first_triage_petition_message(xmachine_message_triage_petition_list* triage_petition_messages);
+
+/** get_next_triage_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param triage_petition_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_triage_petition * get_next_triage_petition_message(xmachine_message_triage_petition* current, xmachine_message_triage_petition_list* triage_petition_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) triage_response message implemented in FLAMEGPU_Kernels */
+
+/** add_triage_response_message
+ * Function for all types of message partitioning
+ * Adds a new triage_response agent to the xmachine_memory_triage_response_list list using a linear mapping
+ * @param agents	xmachine_memory_triage_response_list agent list
+ * @param id	message variable of type unsigned int
+ * @param box_no	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_triage_response_message(xmachine_message_triage_response_list* triage_response_messages, unsigned int id, int box_no);
+ 
+/** get_first_triage_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param triage_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_triage_response * get_first_triage_response_message(xmachine_message_triage_response_list* triage_response_messages);
+
+/** get_next_triage_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param triage_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_triage_response * get_next_triage_response_message(xmachine_message_triage_response* current, xmachine_message_triage_response_list* triage_response_messages);
+
+  
 /* Agent Function Prototypes implemented in FLAMEGPU_Kernels */
 
 /** add_agent_agent
@@ -1215,8 +1556,9 @@ __FLAME_GPU_FUNC__ xmachine_message_chair_contact * get_next_chair_contact_messa
  * @param go_to_x	agent agent variable of type unsigned int
  * @param go_to_y	agent agent variable of type unsigned int
  * @param chair_no	agent agent variable of type unsigned int
+ * @param box_no	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int chair_no);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int chair_no, unsigned int box_no);
 
 /** add_chair_agent
  * Adds a new continuous valued chair agent to the xmachine_memory_chair_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -1276,8 +1618,9 @@ __FLAME_GPU_FUNC__ void set_receptionist_agent_array_value(T *array, unsigned in
  * Adds a new continuous valued agent_generator agent to the xmachine_memory_agent_generator_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_agent_generator_list agent list
  * @param chairs_generated	agent agent variable of type int
+ * @param triage_generated	agent agent variable of type int
  */
-__FLAME_GPU_FUNC__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated);
+__FLAME_GPU_FUNC__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int triage_generated);
 
 /** add_chair_admin_agent
  * Adds a new continuous valued chair_admin agent to the xmachine_memory_chair_admin_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -1303,6 +1646,46 @@ __FLAME_GPU_FUNC__ T get_chair_admin_agent_array_value(T *array, unsigned int in
  */
 template<typename T>
 __FLAME_GPU_FUNC__ void set_chair_admin_agent_array_value(T *array, unsigned int index, T value);
+
+
+  
+
+/** add_box_agent
+ * Adds a new continuous valued box agent to the xmachine_memory_box_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_box_list agent list
+ * @param id	agent agent variable of type unsigned int
+ * @param occupied	agent agent variable of type unsigned int
+ */
+__FLAME_GPU_FUNC__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int occupied);
+
+/** add_triage_agent
+ * Adds a new continuous valued triage agent to the xmachine_memory_triage_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_triage_list agent list
+ * @param id	agent agent variable of type unsigned int
+ * @param front	agent agent variable of type unsigned int
+ * @param rear	agent agent variable of type unsigned int
+ * @param size	agent agent variable of type unsigned int
+ * @param tick	agent agent variable of type unsigned int
+ */
+__FLAME_GPU_FUNC__ void add_triage_agent(xmachine_memory_triage_list* agents, unsigned int id, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick);
+
+/** get_triage_agent_array_value
+ *  Template function for accessing triage agent array memory variables.
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @return return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ T get_triage_agent_array_value(T *array, unsigned int index);
+
+/** set_triage_agent_array_value
+ *  Template function for setting triage agent array memory variables.
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @param return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ void set_triage_agent_array_value(T *array, unsigned int index, T value);
 
 
   
@@ -1341,6 +1724,9 @@ extern void singleIteration();
  * @param h_agents Pointer to agent list on the host
  * @param d_agents Pointer to agent list on the GPU device
  * @param h_xmachine_memory_agent_count Pointer to agent counter
+ * @param h_navmaps Pointer to agent list on the host
+ * @param d_navmaps Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_navmap_count Pointer to agent counter
  * @param h_chairs Pointer to agent list on the host
  * @param d_chairs Pointer to agent list on the GPU device
  * @param h_xmachine_memory_chair_count Pointer to agent counter
@@ -1356,11 +1742,14 @@ extern void singleIteration();
  * @param h_chair_admins Pointer to agent list on the host
  * @param d_chair_admins Pointer to agent list on the GPU device
  * @param h_xmachine_memory_chair_admin_count Pointer to agent counter
- * @param h_navmaps Pointer to agent list on the host
- * @param d_navmaps Pointer to agent list on the GPU device
- * @param h_xmachine_memory_navmap_count Pointer to agent counter
+ * @param h_boxs Pointer to agent list on the host
+ * @param d_boxs Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_box_count Pointer to agent counter
+ * @param h_triages Pointer to agent list on the host
+ * @param d_triages Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_triage_count Pointer to agent counter
  */
-extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count);
+extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count);
 
 
 /** readInitialStates
@@ -1368,6 +1757,8 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param	inputpath	file path to XML file used for input of agent data
  * @param h_agents Pointer to agent list on the host
  * @param h_xmachine_memory_agent_count Pointer to agent counter
+ * @param h_navmaps Pointer to agent list on the host
+ * @param h_xmachine_memory_navmap_count Pointer to agent counter
  * @param h_chairs Pointer to agent list on the host
  * @param h_xmachine_memory_chair_count Pointer to agent counter
  * @param h_medics Pointer to agent list on the host
@@ -1378,10 +1769,12 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param h_xmachine_memory_agent_generator_count Pointer to agent counter
  * @param h_chair_admins Pointer to agent list on the host
  * @param h_xmachine_memory_chair_admin_count Pointer to agent counter
- * @param h_navmaps Pointer to agent list on the host
- * @param h_xmachine_memory_navmap_count Pointer to agent counter
+ * @param h_boxs Pointer to agent list on the host
+ * @param h_xmachine_memory_box_count Pointer to agent counter
+ * @param h_triages Pointer to agent list on the host
+ * @param h_xmachine_memory_triage_count Pointer to agent counter
  */
-extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count);
+extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count);
 
 
 /* Return functions used by external code to get agent data from device */
@@ -1425,6 +1818,45 @@ extern xmachine_memory_agent_list* get_host_agent_default_agents();
  */
 void sort_agents_default(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_agent_list* agents));
 
+
+    
+/** get_agent_navmap_MAX_count
+ * Gets the max agent count for the navmap agent type 
+ * @return		the maximum navmap agent count
+ */
+extern int get_agent_navmap_MAX_count();
+
+
+
+/** get_agent_navmap_static_count
+ * Gets the agent count for the navmap agent type in state static
+ * @return		the current navmap agent count in state static
+ */
+extern int get_agent_navmap_static_count();
+
+/** reset_static_count
+ * Resets the agent count of the navmap in state static to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_navmap_static_count();
+
+/** get_device_navmap_static_agents
+ * Gets a pointer to xmachine_memory_navmap_list on the GPU device
+ * @return		a xmachine_memory_navmap_list on the GPU device
+ */
+extern xmachine_memory_navmap_list* get_device_navmap_static_agents();
+
+/** get_host_navmap_static_agents
+ * Gets a pointer to xmachine_memory_navmap_list on the CPU host
+ * @return		a xmachine_memory_navmap_list on the CPU host
+ */
+extern xmachine_memory_navmap_list* get_host_navmap_static_agents();
+
+
+/** get_navmap_population_width
+ * Gets an int value representing the xmachine_memory_navmap population width.
+ * @return		xmachine_memory_navmap population width
+ */
+extern int get_navmap_population_width();
 
     
 /** get_agent_chair_MAX_count
@@ -1627,43 +2059,84 @@ void sort_chair_admins_defaultAdmin(void (*generate_key_value_pairs)(unsigned in
 
 
     
-/** get_agent_navmap_MAX_count
- * Gets the max agent count for the navmap agent type 
- * @return		the maximum navmap agent count
+/** get_agent_box_MAX_count
+ * Gets the max agent count for the box agent type 
+ * @return		the maximum box agent count
  */
-extern int get_agent_navmap_MAX_count();
+extern int get_agent_box_MAX_count();
 
 
 
-/** get_agent_navmap_static_count
- * Gets the agent count for the navmap agent type in state static
- * @return		the current navmap agent count in state static
+/** get_agent_box_defaultBox_count
+ * Gets the agent count for the box agent type in state defaultBox
+ * @return		the current box agent count in state defaultBox
  */
-extern int get_agent_navmap_static_count();
+extern int get_agent_box_defaultBox_count();
 
-/** reset_static_count
- * Resets the agent count of the navmap in state static to 0. This is useful for interacting with some visualisations.
+/** reset_defaultBox_count
+ * Resets the agent count of the box in state defaultBox to 0. This is useful for interacting with some visualisations.
  */
-extern void reset_navmap_static_count();
+extern void reset_box_defaultBox_count();
 
-/** get_device_navmap_static_agents
- * Gets a pointer to xmachine_memory_navmap_list on the GPU device
- * @return		a xmachine_memory_navmap_list on the GPU device
+/** get_device_box_defaultBox_agents
+ * Gets a pointer to xmachine_memory_box_list on the GPU device
+ * @return		a xmachine_memory_box_list on the GPU device
  */
-extern xmachine_memory_navmap_list* get_device_navmap_static_agents();
+extern xmachine_memory_box_list* get_device_box_defaultBox_agents();
 
-/** get_host_navmap_static_agents
- * Gets a pointer to xmachine_memory_navmap_list on the CPU host
- * @return		a xmachine_memory_navmap_list on the CPU host
+/** get_host_box_defaultBox_agents
+ * Gets a pointer to xmachine_memory_box_list on the CPU host
+ * @return		a xmachine_memory_box_list on the CPU host
  */
-extern xmachine_memory_navmap_list* get_host_navmap_static_agents();
+extern xmachine_memory_box_list* get_host_box_defaultBox_agents();
 
 
-/** get_navmap_population_width
- * Gets an int value representing the xmachine_memory_navmap population width.
- * @return		xmachine_memory_navmap population width
+/** sort_boxs_defaultBox
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
  */
-extern int get_navmap_population_width();
+void sort_boxs_defaultBox(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_box_list* agents));
+
+
+    
+/** get_agent_triage_MAX_count
+ * Gets the max agent count for the triage agent type 
+ * @return		the maximum triage agent count
+ */
+extern int get_agent_triage_MAX_count();
+
+
+
+/** get_agent_triage_defaultTriage_count
+ * Gets the agent count for the triage agent type in state defaultTriage
+ * @return		the current triage agent count in state defaultTriage
+ */
+extern int get_agent_triage_defaultTriage_count();
+
+/** reset_defaultTriage_count
+ * Resets the agent count of the triage in state defaultTriage to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_triage_defaultTriage_count();
+
+/** get_device_triage_defaultTriage_agents
+ * Gets a pointer to xmachine_memory_triage_list on the GPU device
+ * @return		a xmachine_memory_triage_list on the GPU device
+ */
+extern xmachine_memory_triage_list* get_device_triage_defaultTriage_agents();
+
+/** get_host_triage_defaultTriage_agents
+ * Gets a pointer to xmachine_memory_triage_list on the CPU host
+ * @return		a xmachine_memory_triage_list on the CPU host
+ */
+extern xmachine_memory_triage_list* get_host_triage_defaultTriage_agents();
+
+
+/** sort_triages_defaultTriage
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
+ */
+void sort_triages_defaultTriage(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_triage_list* agents));
+
 
 
 /* Host based access of agent variables*/
@@ -1839,178 +2312,14 @@ __host__ unsigned int get_agent_default_variable_go_to_y(unsigned int index);
  */
 __host__ unsigned int get_agent_default_variable_chair_no(unsigned int index);
 
-/** int get_chair_defaultChair_variable_id(unsigned int index)
- * Gets the value of the id variable of an chair agent in the defaultChair state on the host. 
+/** unsigned int get_agent_default_variable_box_no(unsigned int index)
+ * Gets the value of the box_no variable of an agent agent in the default state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable id
+ * @return value of agent variable box_no
  */
-__host__ int get_chair_defaultChair_variable_id(unsigned int index);
-
-/** int get_chair_defaultChair_variable_x(unsigned int index)
- * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_chair_defaultChair_variable_x(unsigned int index);
-
-/** int get_chair_defaultChair_variable_y(unsigned int index)
- * Gets the value of the y variable of an chair agent in the defaultChair state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_chair_defaultChair_variable_y(unsigned int index);
-
-/** int get_chair_defaultChair_variable_state(unsigned int index)
- * Gets the value of the state variable of an chair agent in the defaultChair state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable state
- */
-__host__ int get_chair_defaultChair_variable_state(unsigned int index);
-
-/** int get_medic_default2_variable_x(unsigned int index)
- * Gets the value of the x variable of an medic agent in the default2 state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_medic_default2_variable_x(unsigned int index);
-
-/** int get_medic_default2_variable_y(unsigned int index)
- * Gets the value of the y variable of an medic agent in the default2 state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_medic_default2_variable_y(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
- * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_receptionist_defaultReceptionist_variable_x(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
- * Gets the value of the y variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index);
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element)
- * Gets the element-th value of the colaPacientes variable array of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable colaPacientes
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element);
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index)
- * Gets the value of the front variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable front
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index);
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index)
- * Gets the value of the rear variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable rear
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index);
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index)
- * Gets the value of the size variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable size
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index);
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index)
- * Gets the value of the tick variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable tick
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index)
- * Gets the value of the current_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable current_patient
- */
-__host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index)
- * Gets the value of the attend_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable attend_patient
- */
-__host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index);
-
-/** int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index)
- * Gets the value of the chairs_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable chairs_generated
- */
-__host__ int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index);
-
-/** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
- * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable id
- */
-__host__ unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index);
-
-/** unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element)
- * Gets the element-th value of the chairArray variable array of an chair_admin agent in the defaultAdmin state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable chairArray
- */
-__host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element);
+__host__ unsigned int get_agent_default_variable_box_no(unsigned int index);
 
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
@@ -2201,6 +2510,271 @@ __host__ float get_navmap_static_variable_exit6_y(unsigned int index);
  */
 __host__ unsigned int get_navmap_static_variable_cant_generados(unsigned int index);
 
+/** int get_chair_defaultChair_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ int get_chair_defaultChair_variable_id(unsigned int index);
+
+/** int get_chair_defaultChair_variable_x(unsigned int index)
+ * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_chair_defaultChair_variable_x(unsigned int index);
+
+/** int get_chair_defaultChair_variable_y(unsigned int index)
+ * Gets the value of the y variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_chair_defaultChair_variable_y(unsigned int index);
+
+/** int get_chair_defaultChair_variable_state(unsigned int index)
+ * Gets the value of the state variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable state
+ */
+__host__ int get_chair_defaultChair_variable_state(unsigned int index);
+
+/** int get_medic_default2_variable_x(unsigned int index)
+ * Gets the value of the x variable of an medic agent in the default2 state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_medic_default2_variable_x(unsigned int index);
+
+/** int get_medic_default2_variable_y(unsigned int index)
+ * Gets the value of the y variable of an medic agent in the default2 state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_medic_default2_variable_y(unsigned int index);
+
+/** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
+ * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_x(unsigned int index);
+
+/** int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
+ * Gets the value of the y variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_patientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the patientQueue variable array of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable patientQueue
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_patientQueue(unsigned int index, unsigned int element);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index)
+ * Gets the value of the front variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable front
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index)
+ * Gets the value of the size variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index);
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index);
+
+/** int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index)
+ * Gets the value of the current_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable current_patient
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index);
+
+/** int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index)
+ * Gets the value of the attend_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable attend_patient
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index);
+
+/** int get_receptionist_defaultReceptionist_variable_estado(unsigned int index)
+ * Gets the value of the estado variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable estado
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index);
+
+/** int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index)
+ * Gets the value of the chairs_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable chairs_generated
+ */
+__host__ int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index);
+
+/** int get_agent_generator_defaultGenerator_variable_triage_generated(unsigned int index)
+ * Gets the value of the triage_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable triage_generated
+ */
+__host__ int get_agent_generator_defaultGenerator_variable_triage_generated(unsigned int index);
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index);
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element)
+ * Gets the element-th value of the chairArray variable array of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable chairArray
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element);
+
+/** unsigned int get_box_defaultBox_variable_id(unsigned int index)
+ * Gets the value of the id variable of an box agent in the defaultBox state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_box_defaultBox_variable_id(unsigned int index);
+
+/** unsigned int get_box_defaultBox_variable_occupied(unsigned int index)
+ * Gets the value of the occupied variable of an box agent in the defaultBox state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable occupied
+ */
+__host__ unsigned int get_box_defaultBox_variable_occupied(unsigned int index);
+
+/** unsigned int get_triage_defaultTriage_variable_id(unsigned int index)
+ * Gets the value of the id variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_id(unsigned int index);
+
+/** unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element)
+ * Gets the element-th value of the boxArray variable array of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable boxArray
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element);
+
+/** unsigned int get_triage_defaultTriage_variable_patientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the patientQueue variable array of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable patientQueue
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_patientQueue(unsigned int index, unsigned int element);
+
+/** unsigned int get_triage_defaultTriage_variable_front(unsigned int index)
+ * Gets the value of the front variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable front
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_front(unsigned int index);
+
+/** unsigned int get_triage_defaultTriage_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_rear(unsigned int index);
+
+/** unsigned int get_triage_defaultTriage_variable_size(unsigned int index)
+ * Gets the value of the size variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_size(unsigned int index);
+
+/** unsigned int get_triage_defaultTriage_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_tick(unsigned int index);
+
 
 
 
@@ -2246,6 +2820,47 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent);
  * @param count the number of agents to copy from the host to the device.
  */
 void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int count);
+
+/** h_allocate_agent_navmap
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated navmap struct.
+ */
+xmachine_memory_navmap* h_allocate_agent_navmap();
+/** h_free_agent_navmap
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_navmap(xmachine_memory_navmap** agent);
+/** h_allocate_agent_navmap_array
+ * Utility function to allocate an array of structs for  navmap agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_navmap** h_allocate_agent_navmap_array(unsigned int count);
+/** h_free_agent_navmap_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_navmap_array(xmachine_memory_navmap*** agents, unsigned int count);
+
+
+/** h_add_agent_navmap_static
+ * Host function to add a single agent of type navmap to the static state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_navmap_static instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_navmap_static(xmachine_memory_navmap* agent);
+
+/** h_add_agents_navmap_static(
+ * Host function to add multiple agents of type navmap to the static state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of navmap agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_navmap_static(xmachine_memory_navmap** agents, unsigned int count);
 
 /** h_allocate_agent_chair
  * Utility function to allocate and initialise an agent struct on the host.
@@ -2452,46 +3067,87 @@ void h_add_agent_chair_admin_defaultAdmin(xmachine_memory_chair_admin* agent);
  */
 void h_add_agents_chair_admin_defaultAdmin(xmachine_memory_chair_admin** agents, unsigned int count);
 
-/** h_allocate_agent_navmap
+/** h_allocate_agent_box
  * Utility function to allocate and initialise an agent struct on the host.
- * @return address of a host-allocated navmap struct.
+ * @return address of a host-allocated box struct.
  */
-xmachine_memory_navmap* h_allocate_agent_navmap();
-/** h_free_agent_navmap
+xmachine_memory_box* h_allocate_agent_box();
+/** h_free_agent_box
  * Utility function to free a host-allocated agent struct.
  * This also deallocates any agent variable arrays, and sets the pointer to null
  * @param agent address of pointer to the host allocated struct
  */
-void h_free_agent_navmap(xmachine_memory_navmap** agent);
-/** h_allocate_agent_navmap_array
- * Utility function to allocate an array of structs for  navmap agents.
+void h_free_agent_box(xmachine_memory_box** agent);
+/** h_allocate_agent_box_array
+ * Utility function to allocate an array of structs for  box agents.
  * @param count the number of structs to allocate memory for.
  * @return pointer to the allocated array of structs
  */
-xmachine_memory_navmap** h_allocate_agent_navmap_array(unsigned int count);
-/** h_free_agent_navmap_array(
+xmachine_memory_box** h_allocate_agent_box_array(unsigned int count);
+/** h_free_agent_box_array(
  * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
  * @param agents the address of the pointer to the host array of structs.
  * @param count the number of elements in the AoS, to deallocate individual elements.
  */
-void h_free_agent_navmap_array(xmachine_memory_navmap*** agents, unsigned int count);
+void h_free_agent_box_array(xmachine_memory_box*** agents, unsigned int count);
 
 
-/** h_add_agent_navmap_static
- * Host function to add a single agent of type navmap to the static state on the device.
+/** h_add_agent_box_defaultBox
+ * Host function to add a single agent of type box to the defaultBox state on the device.
  * This invokes many cudaMempcy, and an append kernel launch. 
- * If multiple agents are to be created in a single iteration, consider h_add_agent_navmap_static instead.
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_box_defaultBox instead.
  * @param agent pointer to agent struct on the host. Agent member arrays are supported.
  */
-void h_add_agent_navmap_static(xmachine_memory_navmap* agent);
+void h_add_agent_box_defaultBox(xmachine_memory_box* agent);
 
-/** h_add_agents_navmap_static(
- * Host function to add multiple agents of type navmap to the static state on the device if possible.
+/** h_add_agents_box_defaultBox(
+ * Host function to add multiple agents of type box to the defaultBox state on the device if possible.
  * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
- * @param agents pointer to host struct of arrays of navmap agents
+ * @param agents pointer to host struct of arrays of box agents
  * @param count the number of agents to copy from the host to the device.
  */
-void h_add_agents_navmap_static(xmachine_memory_navmap** agents, unsigned int count);
+void h_add_agents_box_defaultBox(xmachine_memory_box** agents, unsigned int count);
+
+/** h_allocate_agent_triage
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated triage struct.
+ */
+xmachine_memory_triage* h_allocate_agent_triage();
+/** h_free_agent_triage
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_triage(xmachine_memory_triage** agent);
+/** h_allocate_agent_triage_array
+ * Utility function to allocate an array of structs for  triage agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_triage** h_allocate_agent_triage_array(unsigned int count);
+/** h_free_agent_triage_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_triage_array(xmachine_memory_triage*** agents, unsigned int count);
+
+
+/** h_add_agent_triage_defaultTriage
+ * Host function to add a single agent of type triage to the defaultTriage state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_triage_defaultTriage instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_triage_defaultTriage(xmachine_memory_triage* agent);
+
+/** h_add_agents_triage_defaultTriage(
+ * Host function to add multiple agents of type triage to the defaultTriage state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of triage agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_triage_defaultTriage(xmachine_memory_triage** agents, unsigned int count);
 
   
   
@@ -2934,447 +3590,31 @@ unsigned int min_agent_default_chair_no_variable();
  */
 unsigned int max_agent_default_chair_no_variable();
 
-/** int reduce_chair_defaultChair_id_variable();
+/** unsigned int reduce_agent_default_box_no_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
  */
-int reduce_chair_defaultChair_id_variable();
+unsigned int reduce_agent_default_box_no_variable();
 
 
 
-/** int count_chair_defaultChair_id_variable(int count_value){
+/** unsigned int count_agent_default_box_no_variable(unsigned int count_value){
  * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
  * @param count_value The unique value which should be counted
  * @return The number of unique values of the count_value found in the agent state variable list
  */
-int count_chair_defaultChair_id_variable(int count_value);
+unsigned int count_agent_default_box_no_variable(unsigned int count_value);
 
-/** int min_chair_defaultChair_id_variable();
+/** unsigned int min_agent_default_box_no_variable();
  * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-int min_chair_defaultChair_id_variable();
-/** int max_chair_defaultChair_id_variable();
+unsigned int min_agent_default_box_no_variable();
+/** unsigned int max_agent_default_box_no_variable();
  * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-int max_chair_defaultChair_id_variable();
-
-/** int reduce_chair_defaultChair_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_chair_defaultChair_x_variable();
-
-
-
-/** int count_chair_defaultChair_x_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_chair_defaultChair_x_variable(int count_value);
-
-/** int min_chair_defaultChair_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_chair_defaultChair_x_variable();
-/** int max_chair_defaultChair_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_chair_defaultChair_x_variable();
-
-/** int reduce_chair_defaultChair_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_chair_defaultChair_y_variable();
-
-
-
-/** int count_chair_defaultChair_y_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_chair_defaultChair_y_variable(int count_value);
-
-/** int min_chair_defaultChair_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_chair_defaultChair_y_variable();
-/** int max_chair_defaultChair_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_chair_defaultChair_y_variable();
-
-/** int reduce_chair_defaultChair_state_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_chair_defaultChair_state_variable();
-
-
-
-/** int count_chair_defaultChair_state_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_chair_defaultChair_state_variable(int count_value);
-
-/** int min_chair_defaultChair_state_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_chair_defaultChair_state_variable();
-/** int max_chair_defaultChair_state_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_chair_defaultChair_state_variable();
-
-/** int reduce_medic_default2_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_medic_default2_x_variable();
-
-
-
-/** int count_medic_default2_x_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_medic_default2_x_variable(int count_value);
-
-/** int min_medic_default2_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_medic_default2_x_variable();
-/** int max_medic_default2_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_medic_default2_x_variable();
-
-/** int reduce_medic_default2_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_medic_default2_y_variable();
-
-
-
-/** int count_medic_default2_y_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_medic_default2_y_variable(int count_value);
-
-/** int min_medic_default2_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_medic_default2_y_variable();
-/** int max_medic_default2_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_medic_default2_y_variable();
-
-/** int reduce_receptionist_defaultReceptionist_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_x_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_x_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_x_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_x_variable();
-/** int max_receptionist_defaultReceptionist_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_x_variable();
-
-/** int reduce_receptionist_defaultReceptionist_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_y_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_y_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_y_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_y_variable();
-/** int max_receptionist_defaultReceptionist_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_y_variable();
-
-/** unsigned int reduce_receptionist_defaultReceptionist_front_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_receptionist_defaultReceptionist_front_variable();
-
-
-
-/** unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value);
-
-/** unsigned int min_receptionist_defaultReceptionist_front_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_receptionist_defaultReceptionist_front_variable();
-/** unsigned int max_receptionist_defaultReceptionist_front_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_receptionist_defaultReceptionist_front_variable();
-
-/** unsigned int reduce_receptionist_defaultReceptionist_rear_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_receptionist_defaultReceptionist_rear_variable();
-
-
-
-/** unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value);
-
-/** unsigned int min_receptionist_defaultReceptionist_rear_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_receptionist_defaultReceptionist_rear_variable();
-/** unsigned int max_receptionist_defaultReceptionist_rear_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_receptionist_defaultReceptionist_rear_variable();
-
-/** unsigned int reduce_receptionist_defaultReceptionist_size_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_receptionist_defaultReceptionist_size_variable();
-
-
-
-/** unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value);
-
-/** unsigned int min_receptionist_defaultReceptionist_size_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_receptionist_defaultReceptionist_size_variable();
-/** unsigned int max_receptionist_defaultReceptionist_size_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_receptionist_defaultReceptionist_size_variable();
-
-/** unsigned int reduce_receptionist_defaultReceptionist_tick_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_receptionist_defaultReceptionist_tick_variable();
-
-
-
-/** unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value);
-
-/** unsigned int min_receptionist_defaultReceptionist_tick_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_receptionist_defaultReceptionist_tick_variable();
-/** unsigned int max_receptionist_defaultReceptionist_tick_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_receptionist_defaultReceptionist_tick_variable();
-
-/** int reduce_receptionist_defaultReceptionist_current_patient_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_current_patient_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_current_patient_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_current_patient_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_current_patient_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_current_patient_variable();
-/** int max_receptionist_defaultReceptionist_current_patient_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_current_patient_variable();
-
-/** int reduce_receptionist_defaultReceptionist_attend_patient_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_attend_patient_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_attend_patient_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_attend_patient_variable();
-/** int max_receptionist_defaultReceptionist_attend_patient_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_attend_patient_variable();
-
-/** int reduce_receptionist_defaultReceptionist_estado_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_estado_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_estado_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_estado_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_estado_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_estado_variable();
-/** int max_receptionist_defaultReceptionist_estado_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_estado_variable();
-
-/** int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
-
-
-
-/** int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value);
-
-/** int min_agent_generator_defaultGenerator_chairs_generated_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_agent_generator_defaultGenerator_chairs_generated_variable();
-/** int max_agent_generator_defaultGenerator_chairs_generated_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_agent_generator_defaultGenerator_chairs_generated_variable();
-
-/** unsigned int reduce_chair_admin_defaultAdmin_id_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_chair_admin_defaultAdmin_id_variable();
-
-
-
-/** unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value);
-
-/** unsigned int min_chair_admin_defaultAdmin_id_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_chair_admin_defaultAdmin_id_variable();
-/** unsigned int max_chair_admin_defaultAdmin_id_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_chair_admin_defaultAdmin_id_variable();
+unsigned int max_agent_default_box_no_variable();
 
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
@@ -3802,6 +4042,656 @@ unsigned int min_navmap_static_cant_generados_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 unsigned int max_navmap_static_cant_generados_variable();
+
+/** int reduce_chair_defaultChair_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_id_variable();
+
+
+
+/** int count_chair_defaultChair_id_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_id_variable(int count_value);
+
+/** int min_chair_defaultChair_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_id_variable();
+/** int max_chair_defaultChair_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_id_variable();
+
+/** int reduce_chair_defaultChair_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_x_variable();
+
+
+
+/** int count_chair_defaultChair_x_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_x_variable(int count_value);
+
+/** int min_chair_defaultChair_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_x_variable();
+/** int max_chair_defaultChair_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_x_variable();
+
+/** int reduce_chair_defaultChair_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_y_variable();
+
+
+
+/** int count_chair_defaultChair_y_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_y_variable(int count_value);
+
+/** int min_chair_defaultChair_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_y_variable();
+/** int max_chair_defaultChair_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_y_variable();
+
+/** int reduce_chair_defaultChair_state_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_state_variable();
+
+
+
+/** int count_chair_defaultChair_state_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_state_variable(int count_value);
+
+/** int min_chair_defaultChair_state_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_state_variable();
+/** int max_chair_defaultChair_state_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_state_variable();
+
+/** int reduce_medic_default2_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_medic_default2_x_variable();
+
+
+
+/** int count_medic_default2_x_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_medic_default2_x_variable(int count_value);
+
+/** int min_medic_default2_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_medic_default2_x_variable();
+/** int max_medic_default2_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_medic_default2_x_variable();
+
+/** int reduce_medic_default2_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_medic_default2_y_variable();
+
+
+
+/** int count_medic_default2_y_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_medic_default2_y_variable(int count_value);
+
+/** int min_medic_default2_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_medic_default2_y_variable();
+/** int max_medic_default2_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_medic_default2_y_variable();
+
+/** int reduce_receptionist_defaultReceptionist_x_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_receptionist_defaultReceptionist_x_variable();
+
+
+
+/** int count_receptionist_defaultReceptionist_x_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_receptionist_defaultReceptionist_x_variable(int count_value);
+
+/** int min_receptionist_defaultReceptionist_x_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_receptionist_defaultReceptionist_x_variable();
+/** int max_receptionist_defaultReceptionist_x_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_receptionist_defaultReceptionist_x_variable();
+
+/** int reduce_receptionist_defaultReceptionist_y_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_receptionist_defaultReceptionist_y_variable();
+
+
+
+/** int count_receptionist_defaultReceptionist_y_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_receptionist_defaultReceptionist_y_variable(int count_value);
+
+/** int min_receptionist_defaultReceptionist_y_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_receptionist_defaultReceptionist_y_variable();
+/** int max_receptionist_defaultReceptionist_y_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_receptionist_defaultReceptionist_y_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_front_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_front_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_front_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_front_variable();
+/** unsigned int max_receptionist_defaultReceptionist_front_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_front_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_rear_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_rear_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_rear_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_rear_variable();
+/** unsigned int max_receptionist_defaultReceptionist_rear_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_rear_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_size_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_size_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_size_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_size_variable();
+/** unsigned int max_receptionist_defaultReceptionist_size_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_size_variable();
+
+/** unsigned int reduce_receptionist_defaultReceptionist_tick_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_receptionist_defaultReceptionist_tick_variable();
+
+
+
+/** unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value);
+
+/** unsigned int min_receptionist_defaultReceptionist_tick_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_receptionist_defaultReceptionist_tick_variable();
+/** unsigned int max_receptionist_defaultReceptionist_tick_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_receptionist_defaultReceptionist_tick_variable();
+
+/** int reduce_receptionist_defaultReceptionist_current_patient_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_receptionist_defaultReceptionist_current_patient_variable();
+
+
+
+/** int count_receptionist_defaultReceptionist_current_patient_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_receptionist_defaultReceptionist_current_patient_variable(int count_value);
+
+/** int min_receptionist_defaultReceptionist_current_patient_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_receptionist_defaultReceptionist_current_patient_variable();
+/** int max_receptionist_defaultReceptionist_current_patient_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_receptionist_defaultReceptionist_current_patient_variable();
+
+/** int reduce_receptionist_defaultReceptionist_attend_patient_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_receptionist_defaultReceptionist_attend_patient_variable();
+
+
+
+/** int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value);
+
+/** int min_receptionist_defaultReceptionist_attend_patient_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_receptionist_defaultReceptionist_attend_patient_variable();
+/** int max_receptionist_defaultReceptionist_attend_patient_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_receptionist_defaultReceptionist_attend_patient_variable();
+
+/** int reduce_receptionist_defaultReceptionist_estado_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_receptionist_defaultReceptionist_estado_variable();
+
+
+
+/** int count_receptionist_defaultReceptionist_estado_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_receptionist_defaultReceptionist_estado_variable(int count_value);
+
+/** int min_receptionist_defaultReceptionist_estado_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_receptionist_defaultReceptionist_estado_variable();
+/** int max_receptionist_defaultReceptionist_estado_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_receptionist_defaultReceptionist_estado_variable();
+
+/** int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
+
+
+
+/** int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value);
+
+/** int min_agent_generator_defaultGenerator_chairs_generated_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_agent_generator_defaultGenerator_chairs_generated_variable();
+/** int max_agent_generator_defaultGenerator_chairs_generated_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_agent_generator_defaultGenerator_chairs_generated_variable();
+
+/** int reduce_agent_generator_defaultGenerator_triage_generated_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_agent_generator_defaultGenerator_triage_generated_variable();
+
+
+
+/** int count_agent_generator_defaultGenerator_triage_generated_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_agent_generator_defaultGenerator_triage_generated_variable(int count_value);
+
+/** int min_agent_generator_defaultGenerator_triage_generated_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_agent_generator_defaultGenerator_triage_generated_variable();
+/** int max_agent_generator_defaultGenerator_triage_generated_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_agent_generator_defaultGenerator_triage_generated_variable();
+
+/** unsigned int reduce_chair_admin_defaultAdmin_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_chair_admin_defaultAdmin_id_variable();
+
+
+
+/** unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value);
+
+/** unsigned int min_chair_admin_defaultAdmin_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_chair_admin_defaultAdmin_id_variable();
+/** unsigned int max_chair_admin_defaultAdmin_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_chair_admin_defaultAdmin_id_variable();
+
+/** unsigned int reduce_box_defaultBox_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_box_defaultBox_id_variable();
+
+
+
+/** unsigned int count_box_defaultBox_id_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_box_defaultBox_id_variable(unsigned int count_value);
+
+/** unsigned int min_box_defaultBox_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_box_defaultBox_id_variable();
+/** unsigned int max_box_defaultBox_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_box_defaultBox_id_variable();
+
+/** unsigned int reduce_box_defaultBox_occupied_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_box_defaultBox_occupied_variable();
+
+
+
+/** unsigned int count_box_defaultBox_occupied_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_box_defaultBox_occupied_variable(unsigned int count_value);
+
+/** unsigned int min_box_defaultBox_occupied_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_box_defaultBox_occupied_variable();
+/** unsigned int max_box_defaultBox_occupied_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_box_defaultBox_occupied_variable();
+
+/** unsigned int reduce_triage_defaultTriage_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_triage_defaultTriage_id_variable();
+
+
+
+/** unsigned int count_triage_defaultTriage_id_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_triage_defaultTriage_id_variable(unsigned int count_value);
+
+/** unsigned int min_triage_defaultTriage_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_triage_defaultTriage_id_variable();
+/** unsigned int max_triage_defaultTriage_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_triage_defaultTriage_id_variable();
+
+/** unsigned int reduce_triage_defaultTriage_front_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_triage_defaultTriage_front_variable();
+
+
+
+/** unsigned int count_triage_defaultTriage_front_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_triage_defaultTriage_front_variable(unsigned int count_value);
+
+/** unsigned int min_triage_defaultTriage_front_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_triage_defaultTriage_front_variable();
+/** unsigned int max_triage_defaultTriage_front_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_triage_defaultTriage_front_variable();
+
+/** unsigned int reduce_triage_defaultTriage_rear_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_triage_defaultTriage_rear_variable();
+
+
+
+/** unsigned int count_triage_defaultTriage_rear_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_triage_defaultTriage_rear_variable(unsigned int count_value);
+
+/** unsigned int min_triage_defaultTriage_rear_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_triage_defaultTriage_rear_variable();
+/** unsigned int max_triage_defaultTriage_rear_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_triage_defaultTriage_rear_variable();
+
+/** unsigned int reduce_triage_defaultTriage_size_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_triage_defaultTriage_size_variable();
+
+
+
+/** unsigned int count_triage_defaultTriage_size_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_triage_defaultTriage_size_variable(unsigned int count_value);
+
+/** unsigned int min_triage_defaultTriage_size_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_triage_defaultTriage_size_variable();
+/** unsigned int max_triage_defaultTriage_size_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_triage_defaultTriage_size_variable();
+
+/** unsigned int reduce_triage_defaultTriage_tick_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_triage_defaultTriage_tick_variable();
+
+
+
+/** unsigned int count_triage_defaultTriage_tick_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_triage_defaultTriage_tick_variable(unsigned int count_value);
+
+/** unsigned int min_triage_defaultTriage_tick_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_triage_defaultTriage_tick_variable();
+/** unsigned int max_triage_defaultTriage_tick_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_triage_defaultTriage_tick_variable();
 
 
   

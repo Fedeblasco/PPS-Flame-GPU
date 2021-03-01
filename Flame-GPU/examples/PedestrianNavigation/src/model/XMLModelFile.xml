@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <gpu:xmodel xmlns:gpu="http://www.dcs.shef.ac.uk/~paul/XMMLGPU" xmlns="http://www.dcs.shef.ac.uk/~paul/XMML">
   <name>Optional </name>
+<!-- Variables de entorno -->
   <gpu:environment>
     <gpu:constants>
       <gpu:variable>
@@ -146,8 +147,10 @@
     </gpu:initFunctions>
   </gpu:environment>
   <xagents>
+<!-- Agente paciente -->
     <gpu:xagent>
       <name>agent</name>
+  <!-- Variables -->
       <memory>
         <gpu:variable>
           <type>unsigned int</type>
@@ -189,7 +192,7 @@
           <type>float</type>
           <name>speed</name>
         </gpu:variable>
-        <!-- rendering and animation variables-->
+  <!-- rendering and animation variables-->
         <gpu:variable>
           <type>int</type>
           <name>lod</name>
@@ -202,7 +205,7 @@
           <type>int</type>
           <name>animate_dir</name>
         </gpu:variable>
-        <!-- Variables agregadas a mano-->
+  <!-- Variables agregadas -->
         <gpu:variable>
           <type>int</type>
           <name>estado</name>
@@ -229,7 +232,12 @@
           <type>unsigned int</type>
           <name>chair_no</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>box_no</name>
+        </gpu:variable>
       </memory>
+  <!-- Funciones -->
       <functions>
         <gpu:function>
           <name>output_pedestrian_location</name>
@@ -298,7 +306,7 @@
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
         
-        <!-- Funciones de manejo de sillas-->
+  <!-- Funciones de manejo de sillas-->
 
         <gpu:function>
           <name>receive_chair_state</name>
@@ -429,8 +437,7 @@
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
         
-        <!-- Funciones del recepcionista -->
-
+  <!-- Funciones del recepcionista -->
         <gpu:function>
           <name>receive_check_in_done</name>
           <currentState>default</currentState>
@@ -468,7 +475,51 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
-
+  <!-- Funciones del triage -->
+        <gpu:function>
+          <name>output_triage_petition</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>triage_petition</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>15</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+        
+        <gpu:function>
+          <name>receive_triage_response</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>triage_response</messageName>
+            </gpu:input>
+          </inputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>16</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
       </functions>
       <states>
         <gpu:state>
@@ -480,276 +531,8 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:xagent>
     
-    <gpu:xagent>
-      <name>chair</name>
-      <memory>
-        <gpu:variable>
-          <type>int</type>
-          <name>id</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>y</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>state</name>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-      </memory>
-      <functions>
-        <gpu:function>
-          <name>output_chair_state</name>
-          <currentState>defaultChair</currentState>
-          <nextState>defaultChair</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>chair_contact</messageName>
-            </gpu:input>
-          </inputs>
-          <outputs>
-            <gpu:output>
-              <messageName>chair_state</messageName>
-              <gpu:type>optional_message</gpu:type>
-            </gpu:output>
-          </outputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>true</gpu:RNG>
-        </gpu:function>
-      </functions>
-      <states>
-        <gpu:state>
-          <name>defaultChair</name>
-        </gpu:state>
-        <initialState>defaultChair</initialState>
-      </states>
-      <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:xagent>
-    
-    <gpu:xagent>
-      <name>medic</name>
-      <memory>
-        <gpu:variable>
-          <type>int</type>
-          <name>x</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>y</name>
-        </gpu:variable>
-      </memory>
-      <functions>
-        <gpu:function>
-          <name>prueba</name>
-          <currentState>default2</currentState>
-          <nextState>default2</nextState>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
-      </functions>
-      <states>
-        <gpu:state>
-          <name>default2</name>
-        </gpu:state>
-        <initialState>default2</initialState>
-      </states>
-      <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:xagent>
+<!-- Agente navmap -->
 
-    <gpu:xagent>
-      <name>receptionist</name>
-      <memory>
-        <gpu:variable>
-          <type>int</type>
-          <name>x</name>
-          <defaultValue>0.093750</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>y</name>
-          <defaultValue>-0.375000</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>colaPacientes</name>
-          <arrayLength>2000</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>front</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>rear</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>size</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>tick</name>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>current_patient</name>
-          <defaultValue>-1</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>attend_patient</name>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>estado</name>
-          <description>0=sano,1=portador,2=enfermo</description>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-      </memory>
-      <functions>
-        <gpu:function>
-          <name>receptionServer</name>
-          <currentState>defaultReceptionist</currentState>
-          <nextState>defaultReceptionist</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>check_in</messageName>
-            </gpu:input>
-          </inputs>
-          <outputs>
-            <gpu:output>
-              <messageName>check_in_done</messageName>
-              <gpu:type>optional_message</gpu:type>
-            </gpu:output>
-          </outputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
-        
-        <gpu:function>
-          <name>infect_receptionist</name>
-          <currentState>defaultReceptionist</currentState>
-          <nextState>defaultReceptionist</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>pedestrian_state</messageName>
-            </gpu:input>
-          </inputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>true</gpu:RNG>
-        </gpu:function>
-      </functions>
-      <states>
-        <gpu:state>
-          <name>defaultReceptionist</name>
-        </gpu:state>
-        <initialState>defaultReceptionist</initialState>
-      </states>
-      <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
-    </gpu:xagent>
-    
-<!-- Agente agent_generator -->
-
-    <gpu:xagent>
-      <name>agent_generator</name>
-      <memory>
-        <gpu:variable>
-          <type>int</type>
-          <name>chairs_generated</name>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-      </memory>
-      <functions>
-        <gpu:function>
-          <name>generate_chairs</name>
-          <currentState>defaultGenerator</currentState>
-          <nextState>defaultGenerator</nextState>
-          <xagentOutputs>
-            <gpu:xagentOutput>
-              <xagentName>chair</xagentName>
-              <state>defaultChair</state>
-            </gpu:xagentOutput>
-          </xagentOutputs>
-          <condition>
-            <lhs>
-              <agentVariable>chairs_generated</agentVariable>
-            </lhs>
-            <operator>&lt;</operator>
-            <rhs>
-                <value>35</value>
-            </rhs>
-          </condition>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
-      </functions>
-      <states>
-        <gpu:state>
-          <name>defaultGenerator</name>
-        </gpu:state>
-        <initialState>defaultGenerator</initialState>
-      </states>
-      <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:xagent>
-    
-<!-- Agente chair_admin -->
-
-    <gpu:xagent>
-      <name>chair_admin</name>
-      <memory>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>id</name><!-- Agregada porque sino falla la compilación -->
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>chairArray</name>
-          <description>Arreglo que guarda si cada silla está disponible o no</description>
-          <arrayLength>35</arrayLength>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-      </memory>
-      <functions>
-        <gpu:function>
-          <name>attend_chair_petitions</name>
-          <currentState>defaultAdmin</currentState>
-          <nextState>defaultAdmin</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>chair_petition</messageName>
-            </gpu:input>
-          </inputs>
-          <outputs>
-            <gpu:output>
-              <messageName>chair_response</messageName>
-              <gpu:type>optional_message</gpu:type>
-            </gpu:output>
-          </outputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>true</gpu:RNG>
-        </gpu:function>
-      </functions>
-      <states>
-        <gpu:state>
-          <name>defaultAdmin</name>
-        </gpu:state>
-        <initialState>defaultAdmin</initialState>
-      </states>
-      <gpu:type>continuous</gpu:type>
-      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
-    </gpu:xagent>
-    
     <gpu:xagent>
       <name>navmap</name>
       <memory>
@@ -891,9 +674,418 @@
       <gpu:type>discrete</gpu:type>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:xagent>
+    
+<!-- Agente chair -->  
+    <gpu:xagent>
+      <name>chair</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>x</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>y</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>state</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>output_chair_state</name>
+          <currentState>defaultChair</currentState>
+          <nextState>defaultChair</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_contact</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_state</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultChair</name>
+        </gpu:state>
+        <initialState>defaultChair</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:xagent>
+<!-- Agente medic -->   
+    <gpu:xagent>
+      <name>medic</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>x</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>y</name>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>prueba</name>
+          <currentState>default2</currentState>
+          <nextState>default2</nextState>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>default2</name>
+        </gpu:state>
+        <initialState>default2</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:xagent>
+<!-- Agente receptionist -->
+    <gpu:xagent>
+      <name>receptionist</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>x</name>
+          <defaultValue>0.093750</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>y</name>
+          <defaultValue>-0.375000</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>patientQueue</name>
+          <arrayLength>2000</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>front</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>rear</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>size</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>tick</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>current_patient</name>
+          <defaultValue>-1</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>attend_patient</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>estado</name>
+          <description>0=sano,1=portador,2=enfermo</description>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>receptionServer</name>
+          <currentState>defaultReceptionist</currentState>
+          <nextState>defaultReceptionist</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>check_in</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>check_in_done</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+        
+        <gpu:function>
+          <name>infect_receptionist</name>
+          <currentState>defaultReceptionist</currentState>
+          <nextState>defaultReceptionist</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>pedestrian_state</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultReceptionist</name>
+        </gpu:state>
+        <initialState>defaultReceptionist</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+    </gpu:xagent>
+    
+<!-- Agente agent_generator -->
 
+    <gpu:xagent>
+      <name>agent_generator</name>
+      <memory>
+        <gpu:variable>
+          <type>int</type>
+          <name>chairs_generated</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>triage_generated</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>generate_chairs</name>
+          <currentState>defaultGenerator</currentState>
+          <nextState>defaultGenerator</nextState>
+          <xagentOutputs>
+            <gpu:xagentOutput>
+              <xagentName>chair</xagentName>
+              <state>defaultChair</state>
+            </gpu:xagentOutput>
+          </xagentOutputs>
+          <condition>
+            <lhs>
+              <agentVariable>chairs_generated</agentVariable>
+            </lhs>
+            <operator>&lt;</operator>
+            <rhs>
+                <value>35</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+        
+        <gpu:function>
+          <name>generate_triage</name>
+          <currentState>defaultGenerator</currentState>
+          <nextState>defaultGenerator</nextState>
+          <xagentOutputs>
+            <gpu:xagentOutput>
+              <xagentName>triage</xagentName>
+              <state>defaultTriage</state>
+            </gpu:xagentOutput>
+          </xagentOutputs>
+          <condition>
+            <lhs>
+              <agentVariable>triage_generated</agentVariable>
+            </lhs>
+            <operator>&lt;</operator>
+            <rhs>
+                <value>1</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultGenerator</name>
+        </gpu:state>
+        <initialState>defaultGenerator</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:xagent>
+    
+<!-- Agente chair_admin -->
+    <gpu:xagent>
+      <name>chair_admin</name>
+      <memory>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name><!-- Agregada porque sino falla la compilación -->
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>chairArray</name>
+          <description>Arreglo que guarda si cada silla está disponible o no</description>
+          <arrayLength>35</arrayLength>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>attend_chair_petitions</name>
+          <currentState>defaultAdmin</currentState>
+          <nextState>defaultAdmin</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>chair_petition</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_response</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultAdmin</name>
+        </gpu:state>
+        <initialState>defaultAdmin</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>16</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+    </gpu:xagent>
+<!-- Agente box -->
+  <gpu:xagent>
+      <name>box</name>
+      <memory>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>occupied</name>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>box_server</name>
+          <currentState>defaultBox</currentState>
+          <nextState>defaultBox</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>box_petition</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>box_response</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultBox</name>
+        </gpu:state>
+        <initialState>defaultBox</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+    </gpu:xagent>
+<!-- Agente triage -->
+    <gpu:xagent>
+      <name>triage</name>
+      <memory>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name><!-- Agregada porque sino falla la compilación -->
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>boxArray</name>
+          <description>Arreglo que maneja si cada box está disponible o no</description>
+          <arrayLength>3</arrayLength>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>patientQueue</name>
+          <arrayLength>100</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>front</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>rear</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>size</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>tick</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>receive_triage_petitions</name>
+          <currentState>defaultTriage</currentState>
+          <nextState>defaultTriage</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>triage_petition</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>triage_response</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultTriage</name>
+        </gpu:state>
+        <initialState>defaultTriage</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+    </gpu:xagent>
   </xagents>
+<!-- Mensajes -->
   <messages>
+  <!-- Mensajes de los pacientes -->
     <gpu:message>
       <name>pedestrian_location</name>
       <variables>
@@ -957,7 +1149,7 @@
       </gpu:partitioningSpatial>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
-
+  <!-- Mensajes del navmap -->
     <gpu:message>
       <name>navmap_cell</name>
       <variables>
@@ -992,7 +1184,7 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
-    <!-- Mensajes del recepcionista -->
+  <!-- Mensajes del recepcionista -->
 
     <gpu:message> 
       <name>check_in</name>
@@ -1018,7 +1210,7 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
-    <!-- Mensajes del administrador de sillas -->
+  <!-- Mensajes del administrador de sillas -->
 
     <gpu:message> 
       <name>chair_petition</name>
@@ -1048,8 +1240,7 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
-    <!-- Mensajes de las sillas -->
-
+  <!-- Mensajes de las sillas -->
     <gpu:message> 
       <name>chair_state</name>
       <variables>
@@ -1085,8 +1276,64 @@
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
+  <!-- Mensajes del box -->
+    <gpu:message> 
+      <name>box_petition</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
 
-  </messages>
+    <gpu:message> 
+      <name>box_response</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>priority</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+  <!-- Mensajes del triage -->
+    <gpu:message> 
+        <name>triage_petition</name>
+        <variables>
+          <gpu:variable>
+            <type>unsigned int</type>
+            <name>id</name>
+          </gpu:variable>
+        </variables>
+        <gpu:partitioningNone/>
+        <gpu:bufferSize>65536</gpu:bufferSize>
+      </gpu:message>
+
+      <gpu:message> 
+        <name>triage_response</name>
+        <variables>
+          <gpu:variable>
+            <type>unsigned int</type>
+            <name>id</name>
+          </gpu:variable>
+          <gpu:variable>
+            <type>int</type>
+            <name>box_no</name>
+          </gpu:variable>
+        </variables>
+        <gpu:partitioningNone/>
+        <gpu:bufferSize>65536</gpu:bufferSize>
+      </gpu:message>
+    </messages>
+<!-- Layers -->
   <layers>
     <layer>
       <gpu:layerFunction>
@@ -1097,6 +1344,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>generate_chairs</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>generate_triage</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1114,6 +1364,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>output_chair_petition</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>output_triage_petition</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1149,6 +1402,9 @@
       <gpu:layerFunction>
         <name>attend_chair_petitions</name>
       </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_triage_petitions</name>
+      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
@@ -1156,6 +1412,12 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_chair_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_chair_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_triage_response</name>
       </gpu:layerFunction>
     </layer>
   </layers>

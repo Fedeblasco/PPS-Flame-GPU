@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_medic_list* h_medics_default2, xmachine_memory_medic_list* d_medics_default2, int h_xmachine_memory_medic_default2_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -128,6 +128,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying agent Agent default State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_navmaps_static, d_navmaps_static, sizeof(xmachine_memory_navmap_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying navmap Agent static State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_chairs_defaultChair, d_chairs_defaultChair, sizeof(xmachine_memory_chair_list), cudaMemcpyDeviceToHost);
@@ -160,10 +166,16 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fprintf(stderr,"Error Copying chair_admin Agent defaultAdmin State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
-	cudaStatus = cudaMemcpy( h_navmaps_static, d_navmaps_static, sizeof(xmachine_memory_navmap_list), cudaMemcpyDeviceToHost);
+	cudaStatus = cudaMemcpy( h_boxs_defaultBox, d_boxs_defaultBox, sizeof(xmachine_memory_box_list), cudaMemcpyDeviceToHost);
 	if (cudaStatus != cudaSuccess)
 	{
-		fprintf(stderr,"Error Copying navmap Agent static State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		fprintf(stderr,"Error Copying box Agent defaultBox State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_triages_defaultTriage, d_triages_defaultTriage, sizeof(xmachine_memory_triage_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying triage Agent defaultTriage State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	
@@ -418,141 +430,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</chair_no>\n", file);
         
-		fputs("</xagent>\n", file);
-	}
-	//Write each chair agent to xml
-	for (int i=0; i<h_xmachine_memory_chair_defaultChair_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>chair</name>\n", file);
-        
-		fputs("<id>", file);
-        sprintf(data, "%d", h_chairs_defaultChair->id[i]);
+		fputs("<box_no>", file);
+        sprintf(data, "%u", h_agents_default->box_no[i]);
 		fputs(data, file);
-		fputs("</id>\n", file);
-        
-		fputs("<x>", file);
-        sprintf(data, "%d", h_chairs_defaultChair->x[i]);
-		fputs(data, file);
-		fputs("</x>\n", file);
-        
-		fputs("<y>", file);
-        sprintf(data, "%d", h_chairs_defaultChair->y[i]);
-		fputs(data, file);
-		fputs("</y>\n", file);
-        
-		fputs("<state>", file);
-        sprintf(data, "%d", h_chairs_defaultChair->state[i]);
-		fputs(data, file);
-		fputs("</state>\n", file);
-        
-		fputs("</xagent>\n", file);
-	}
-	//Write each medic agent to xml
-	for (int i=0; i<h_xmachine_memory_medic_default2_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>medic</name>\n", file);
-        
-		fputs("<x>", file);
-        sprintf(data, "%d", h_medics_default2->x[i]);
-		fputs(data, file);
-		fputs("</x>\n", file);
-        
-		fputs("<y>", file);
-        sprintf(data, "%d", h_medics_default2->y[i]);
-		fputs(data, file);
-		fputs("</y>\n", file);
-        
-		fputs("</xagent>\n", file);
-	}
-	//Write each receptionist agent to xml
-	for (int i=0; i<h_xmachine_memory_receptionist_defaultReceptionist_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>receptionist</name>\n", file);
-        
-		fputs("<x>", file);
-        sprintf(data, "%d", h_receptionists_defaultReceptionist->x[i]);
-		fputs(data, file);
-		fputs("</x>\n", file);
-        
-		fputs("<y>", file);
-        sprintf(data, "%d", h_receptionists_defaultReceptionist->y[i]);
-		fputs(data, file);
-		fputs("</y>\n", file);
-        
-		fputs("<colaPacientes>", file);
-        for (int j=0;j<2000;j++){
-            fprintf(file, "%u", h_receptionists_defaultReceptionist->colaPacientes[(j*xmachine_memory_receptionist_MAX)+i]);
-            if(j!=(2000-1))
-                fprintf(file, ",");
-        }
-		fputs("</colaPacientes>\n", file);
-        
-		fputs("<front>", file);
-        sprintf(data, "%u", h_receptionists_defaultReceptionist->front[i]);
-		fputs(data, file);
-		fputs("</front>\n", file);
-        
-		fputs("<rear>", file);
-        sprintf(data, "%u", h_receptionists_defaultReceptionist->rear[i]);
-		fputs(data, file);
-		fputs("</rear>\n", file);
-        
-		fputs("<size>", file);
-        sprintf(data, "%u", h_receptionists_defaultReceptionist->size[i]);
-		fputs(data, file);
-		fputs("</size>\n", file);
-        
-		fputs("<tick>", file);
-        sprintf(data, "%u", h_receptionists_defaultReceptionist->tick[i]);
-		fputs(data, file);
-		fputs("</tick>\n", file);
-        
-		fputs("<current_patient>", file);
-        sprintf(data, "%d", h_receptionists_defaultReceptionist->current_patient[i]);
-		fputs(data, file);
-		fputs("</current_patient>\n", file);
-        
-		fputs("<attend_patient>", file);
-        sprintf(data, "%d", h_receptionists_defaultReceptionist->attend_patient[i]);
-		fputs(data, file);
-		fputs("</attend_patient>\n", file);
-        
-		fputs("<estado>", file);
-        sprintf(data, "%d", h_receptionists_defaultReceptionist->estado[i]);
-		fputs(data, file);
-		fputs("</estado>\n", file);
-        
-		fputs("</xagent>\n", file);
-	}
-	//Write each agent_generator agent to xml
-	for (int i=0; i<h_xmachine_memory_agent_generator_defaultGenerator_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>agent_generator</name>\n", file);
-        
-		fputs("<chairs_generated>", file);
-        sprintf(data, "%d", h_agent_generators_defaultGenerator->chairs_generated[i]);
-		fputs(data, file);
-		fputs("</chairs_generated>\n", file);
-        
-		fputs("</xagent>\n", file);
-	}
-	//Write each chair_admin agent to xml
-	for (int i=0; i<h_xmachine_memory_chair_admin_defaultAdmin_count; i++){
-		fputs("<xagent>\n" , file);
-		fputs("<name>chair_admin</name>\n", file);
-        
-		fputs("<id>", file);
-        sprintf(data, "%u", h_chair_admins_defaultAdmin->id[i]);
-		fputs(data, file);
-		fputs("</id>\n", file);
-        
-		fputs("<chairArray>", file);
-        for (int j=0;j<35;j++){
-            fprintf(file, "%u", h_chair_admins_defaultAdmin->chairArray[(j*xmachine_memory_chair_admin_MAX)+i]);
-            if(j!=(35-1))
-                fprintf(file, ",");
-        }
-		fputs("</chairArray>\n", file);
+		fputs("</box_no>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -668,6 +549,212 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         
 		fputs("</xagent>\n", file);
 	}
+	//Write each chair agent to xml
+	for (int i=0; i<h_xmachine_memory_chair_defaultChair_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>chair</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%d", h_chairs_defaultChair->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<x>", file);
+        sprintf(data, "%d", h_chairs_defaultChair->x[i]);
+		fputs(data, file);
+		fputs("</x>\n", file);
+        
+		fputs("<y>", file);
+        sprintf(data, "%d", h_chairs_defaultChair->y[i]);
+		fputs(data, file);
+		fputs("</y>\n", file);
+        
+		fputs("<state>", file);
+        sprintf(data, "%d", h_chairs_defaultChair->state[i]);
+		fputs(data, file);
+		fputs("</state>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each medic agent to xml
+	for (int i=0; i<h_xmachine_memory_medic_default2_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>medic</name>\n", file);
+        
+		fputs("<x>", file);
+        sprintf(data, "%d", h_medics_default2->x[i]);
+		fputs(data, file);
+		fputs("</x>\n", file);
+        
+		fputs("<y>", file);
+        sprintf(data, "%d", h_medics_default2->y[i]);
+		fputs(data, file);
+		fputs("</y>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each receptionist agent to xml
+	for (int i=0; i<h_xmachine_memory_receptionist_defaultReceptionist_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>receptionist</name>\n", file);
+        
+		fputs("<x>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->x[i]);
+		fputs(data, file);
+		fputs("</x>\n", file);
+        
+		fputs("<y>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->y[i]);
+		fputs(data, file);
+		fputs("</y>\n", file);
+        
+		fputs("<patientQueue>", file);
+        for (int j=0;j<2000;j++){
+            fprintf(file, "%u", h_receptionists_defaultReceptionist->patientQueue[(j*xmachine_memory_receptionist_MAX)+i]);
+            if(j!=(2000-1))
+                fprintf(file, ",");
+        }
+		fputs("</patientQueue>\n", file);
+        
+		fputs("<front>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->front[i]);
+		fputs(data, file);
+		fputs("</front>\n", file);
+        
+		fputs("<rear>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->rear[i]);
+		fputs(data, file);
+		fputs("</rear>\n", file);
+        
+		fputs("<size>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->size[i]);
+		fputs(data, file);
+		fputs("</size>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_receptionists_defaultReceptionist->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
+		fputs("<current_patient>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->current_patient[i]);
+		fputs(data, file);
+		fputs("</current_patient>\n", file);
+        
+		fputs("<attend_patient>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->attend_patient[i]);
+		fputs(data, file);
+		fputs("</attend_patient>\n", file);
+        
+		fputs("<estado>", file);
+        sprintf(data, "%d", h_receptionists_defaultReceptionist->estado[i]);
+		fputs(data, file);
+		fputs("</estado>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each agent_generator agent to xml
+	for (int i=0; i<h_xmachine_memory_agent_generator_defaultGenerator_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>agent_generator</name>\n", file);
+        
+		fputs("<chairs_generated>", file);
+        sprintf(data, "%d", h_agent_generators_defaultGenerator->chairs_generated[i]);
+		fputs(data, file);
+		fputs("</chairs_generated>\n", file);
+        
+		fputs("<triage_generated>", file);
+        sprintf(data, "%d", h_agent_generators_defaultGenerator->triage_generated[i]);
+		fputs(data, file);
+		fputs("</triage_generated>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each chair_admin agent to xml
+	for (int i=0; i<h_xmachine_memory_chair_admin_defaultAdmin_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>chair_admin</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%u", h_chair_admins_defaultAdmin->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<chairArray>", file);
+        for (int j=0;j<35;j++){
+            fprintf(file, "%u", h_chair_admins_defaultAdmin->chairArray[(j*xmachine_memory_chair_admin_MAX)+i]);
+            if(j!=(35-1))
+                fprintf(file, ",");
+        }
+		fputs("</chairArray>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each box agent to xml
+	for (int i=0; i<h_xmachine_memory_box_defaultBox_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>box</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%u", h_boxs_defaultBox->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<occupied>", file);
+        sprintf(data, "%u", h_boxs_defaultBox->occupied[i]);
+		fputs(data, file);
+		fputs("</occupied>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each triage agent to xml
+	for (int i=0; i<h_xmachine_memory_triage_defaultTriage_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>triage</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%u", h_triages_defaultTriage->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<boxArray>", file);
+        for (int j=0;j<3;j++){
+            fprintf(file, "%u", h_triages_defaultTriage->boxArray[(j*xmachine_memory_triage_MAX)+i]);
+            if(j!=(3-1))
+                fprintf(file, ",");
+        }
+		fputs("</boxArray>\n", file);
+        
+		fputs("<patientQueue>", file);
+        for (int j=0;j<100;j++){
+            fprintf(file, "%u", h_triages_defaultTriage->patientQueue[(j*xmachine_memory_triage_MAX)+i]);
+            if(j!=(100-1))
+                fprintf(file, ",");
+        }
+		fputs("</patientQueue>\n", file);
+        
+		fputs("<front>", file);
+        sprintf(data, "%u", h_triages_defaultTriage->front[i]);
+		fputs(data, file);
+		fputs("</front>\n", file);
+        
+		fputs("<rear>", file);
+        sprintf(data, "%u", h_triages_defaultTriage->rear[i]);
+		fputs(data, file);
+		fputs("</rear>\n", file);
+        
+		fputs("<size>", file);
+        sprintf(data, "%u", h_triages_defaultTriage->size[i]);
+		fputs(data, file);
+		fputs("</size>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_triages_defaultTriage->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
 	
 	
 
@@ -678,7 +765,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 
 }
 
-void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count)
+void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_medic_list* h_medics, int* h_xmachine_memory_medic_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count)
 {
     PROFILE_SCOPED_RANGE("readInitialStates");
 
@@ -717,25 +804,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_go_to_x;
     int in_agent_go_to_y;
     int in_agent_chair_no;
-    int in_chair_id;
-    int in_chair_x;
-    int in_chair_y;
-    int in_chair_state;
-    int in_medic_x;
-    int in_medic_y;
-    int in_receptionist_x;
-    int in_receptionist_y;
-    int in_receptionist_colaPacientes;
-    int in_receptionist_front;
-    int in_receptionist_rear;
-    int in_receptionist_size;
-    int in_receptionist_tick;
-    int in_receptionist_current_patient;
-    int in_receptionist_attend_patient;
-    int in_receptionist_estado;
-    int in_agent_generator_chairs_generated;
-    int in_chair_admin_id;
-    int in_chair_admin_chairArray;
+    int in_agent_box_no;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -757,6 +826,35 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_navmap_exit6_x;
     int in_navmap_exit6_y;
     int in_navmap_cant_generados;
+    int in_chair_id;
+    int in_chair_x;
+    int in_chair_y;
+    int in_chair_state;
+    int in_medic_x;
+    int in_medic_y;
+    int in_receptionist_x;
+    int in_receptionist_y;
+    int in_receptionist_patientQueue;
+    int in_receptionist_front;
+    int in_receptionist_rear;
+    int in_receptionist_size;
+    int in_receptionist_tick;
+    int in_receptionist_current_patient;
+    int in_receptionist_attend_patient;
+    int in_receptionist_estado;
+    int in_agent_generator_chairs_generated;
+    int in_agent_generator_triage_generated;
+    int in_chair_admin_id;
+    int in_chair_admin_chairArray;
+    int in_box_id;
+    int in_box_occupied;
+    int in_triage_id;
+    int in_triage_boxArray;
+    int in_triage_patientQueue;
+    int in_triage_front;
+    int in_triage_rear;
+    int in_triage_size;
+    int in_triage_tick;
     
     /* tags for environment global variables */
     int in_env;
@@ -828,12 +926,14 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
 	/* set agent count to zero */
 	*h_xmachine_memory_agent_count = 0;
+	*h_xmachine_memory_navmap_count = 0;
 	*h_xmachine_memory_chair_count = 0;
 	*h_xmachine_memory_medic_count = 0;
 	*h_xmachine_memory_receptionist_count = 0;
 	*h_xmachine_memory_agent_generator_count = 0;
 	*h_xmachine_memory_chair_admin_count = 0;
-	*h_xmachine_memory_navmap_count = 0;
+	*h_xmachine_memory_box_count = 0;
+	*h_xmachine_memory_triage_count = 0;
 	
 	/* Variables for initial state data */
 	unsigned int agent_id;
@@ -855,25 +955,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int agent_go_to_x;
 	unsigned int agent_go_to_y;
 	unsigned int agent_chair_no;
-	int chair_id;
-	int chair_x;
-	int chair_y;
-	int chair_state;
-	int medic_x;
-	int medic_y;
-	int receptionist_x;
-	int receptionist_y;
-    unsigned int receptionist_colaPacientes[2000];
-	unsigned int receptionist_front;
-	unsigned int receptionist_rear;
-	unsigned int receptionist_size;
-	unsigned int receptionist_tick;
-	int receptionist_current_patient;
-	int receptionist_attend_patient;
-	int receptionist_estado;
-	int agent_generator_chairs_generated;
-	unsigned int chair_admin_id;
-    unsigned int chair_admin_chairArray[35];
+	unsigned int agent_box_no;
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -895,6 +977,35 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	float navmap_exit6_x;
 	float navmap_exit6_y;
 	unsigned int navmap_cant_generados;
+	int chair_id;
+	int chair_x;
+	int chair_y;
+	int chair_state;
+	int medic_x;
+	int medic_y;
+	int receptionist_x;
+	int receptionist_y;
+    unsigned int receptionist_patientQueue[2000];
+	unsigned int receptionist_front;
+	unsigned int receptionist_rear;
+	unsigned int receptionist_size;
+	unsigned int receptionist_tick;
+	int receptionist_current_patient;
+	int receptionist_attend_patient;
+	int receptionist_estado;
+	int agent_generator_chairs_generated;
+	int agent_generator_triage_generated;
+	unsigned int chair_admin_id;
+    unsigned int chair_admin_chairArray[35];
+	unsigned int box_id;
+	unsigned int box_occupied;
+	unsigned int triage_id;
+    unsigned int triage_boxArray[3];
+    unsigned int triage_patientQueue[100];
+	unsigned int triage_front;
+	unsigned int triage_rear;
+	unsigned int triage_size;
+	unsigned int triage_tick;
 
     /* Variables for environment variables */
     float env_EMMISION_RATE_EXIT1;
@@ -966,25 +1077,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_go_to_x = 0;
 	in_agent_go_to_y = 0;
 	in_agent_chair_no = 0;
-	in_chair_id = 0;
-	in_chair_x = 0;
-	in_chair_y = 0;
-	in_chair_state = 0;
-	in_medic_x = 0;
-	in_medic_y = 0;
-	in_receptionist_x = 0;
-	in_receptionist_y = 0;
-	in_receptionist_colaPacientes = 0;
-	in_receptionist_front = 0;
-	in_receptionist_rear = 0;
-	in_receptionist_size = 0;
-	in_receptionist_tick = 0;
-	in_receptionist_current_patient = 0;
-	in_receptionist_attend_patient = 0;
-	in_receptionist_estado = 0;
-	in_agent_generator_chairs_generated = 0;
-	in_chair_admin_id = 0;
-	in_chair_admin_chairArray = 0;
+	in_agent_box_no = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -1006,6 +1099,35 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_navmap_exit6_x = 0;
 	in_navmap_exit6_y = 0;
 	in_navmap_cant_generados = 0;
+	in_chair_id = 0;
+	in_chair_x = 0;
+	in_chair_y = 0;
+	in_chair_state = 0;
+	in_medic_x = 0;
+	in_medic_y = 0;
+	in_receptionist_x = 0;
+	in_receptionist_y = 0;
+	in_receptionist_patientQueue = 0;
+	in_receptionist_front = 0;
+	in_receptionist_rear = 0;
+	in_receptionist_size = 0;
+	in_receptionist_tick = 0;
+	in_receptionist_current_patient = 0;
+	in_receptionist_attend_patient = 0;
+	in_receptionist_estado = 0;
+	in_agent_generator_chairs_generated = 0;
+	in_agent_generator_triage_generated = 0;
+	in_chair_admin_id = 0;
+	in_chair_admin_chairArray = 0;
+	in_box_id = 0;
+	in_box_occupied = 0;
+	in_triage_id = 0;
+	in_triage_boxArray = 0;
+	in_triage_patientQueue = 0;
+	in_triage_front = 0;
+	in_triage_rear = 0;
+	in_triage_size = 0;
+	in_triage_tick = 0;
     in_env_EMMISION_RATE_EXIT1 = 0;
     in_env_EMMISION_RATE_EXIT2 = 0;
     in_env_EMMISION_RATE_EXIT3 = 0;
@@ -1062,59 +1184,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->go_to_x[k] = 0;
 		h_agents->go_to_y[k] = 0;
 		h_agents->chair_no[k] = 0;
-	}
-	
-	//set all chair values to 0
-	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
-	for (int k=0; k<xmachine_memory_chair_MAX; k++)
-	{	
-		h_chairs->id[k] = 0;
-		h_chairs->x[k] = 0;
-		h_chairs->y[k] = 0;
-		h_chairs->state[k] = 0;
-	}
-	
-	//set all medic values to 0
-	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
-	for (int k=0; k<xmachine_memory_medic_MAX; k++)
-	{	
-		h_medics->x[k] = 0;
-		h_medics->y[k] = 0;
-	}
-	
-	//set all receptionist values to 0
-	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
-	for (int k=0; k<xmachine_memory_receptionist_MAX; k++)
-	{	
-		h_receptionists->x[k] = 0.093750;
-		h_receptionists->y[k] = -0.375000;
-        for (i=0;i<2000;i++){
-            h_receptionists->colaPacientes[(i*xmachine_memory_receptionist_MAX)+k] = 0;
-        }
-		h_receptionists->front[k] = 0;
-		h_receptionists->rear[k] = 0;
-		h_receptionists->size[k] = 0;
-		h_receptionists->tick[k] = 0;
-		h_receptionists->current_patient[k] = -1;
-		h_receptionists->attend_patient[k] = 0;
-		h_receptionists->estado[k] = 0;
-	}
-	
-	//set all agent_generator values to 0
-	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
-	for (int k=0; k<xmachine_memory_agent_generator_MAX; k++)
-	{	
-		h_agent_generators->chairs_generated[k] = 0;
-	}
-	
-	//set all chair_admin values to 0
-	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
-	for (int k=0; k<xmachine_memory_chair_admin_MAX; k++)
-	{	
-		h_chair_admins->id[k] = 0;
-        for (i=0;i<35;i++){
-            h_chair_admins->chairArray[(i*xmachine_memory_chair_admin_MAX)+k] = 0;
-        }
+		h_agents->box_no[k] = 0;
 	}
 	
 	//set all navmap values to 0
@@ -1144,6 +1214,85 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_navmaps->cant_generados[k] = 0;
 	}
 	
+	//set all chair values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_chair_MAX; k++)
+	{	
+		h_chairs->id[k] = 0;
+		h_chairs->x[k] = 0;
+		h_chairs->y[k] = 0;
+		h_chairs->state[k] = 0;
+	}
+	
+	//set all medic values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_medic_MAX; k++)
+	{	
+		h_medics->x[k] = 0;
+		h_medics->y[k] = 0;
+	}
+	
+	//set all receptionist values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_receptionist_MAX; k++)
+	{	
+		h_receptionists->x[k] = 0.093750;
+		h_receptionists->y[k] = -0.375000;
+        for (i=0;i<2000;i++){
+            h_receptionists->patientQueue[(i*xmachine_memory_receptionist_MAX)+k] = 0;
+        }
+		h_receptionists->front[k] = 0;
+		h_receptionists->rear[k] = 0;
+		h_receptionists->size[k] = 0;
+		h_receptionists->tick[k] = 0;
+		h_receptionists->current_patient[k] = -1;
+		h_receptionists->attend_patient[k] = 0;
+		h_receptionists->estado[k] = 0;
+	}
+	
+	//set all agent_generator values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_agent_generator_MAX; k++)
+	{	
+		h_agent_generators->chairs_generated[k] = 0;
+		h_agent_generators->triage_generated[k] = 0;
+	}
+	
+	//set all chair_admin values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_chair_admin_MAX; k++)
+	{	
+		h_chair_admins->id[k] = 0;
+        for (i=0;i<35;i++){
+            h_chair_admins->chairArray[(i*xmachine_memory_chair_admin_MAX)+k] = 0;
+        }
+	}
+	
+	//set all box values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_box_MAX; k++)
+	{	
+		h_boxs->id[k] = 0;
+		h_boxs->occupied[k] = 0;
+	}
+	
+	//set all triage values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_triage_MAX; k++)
+	{	
+		h_triages->id[k] = 0;
+        for (i=0;i<3;i++){
+            h_triages->boxArray[(i*xmachine_memory_triage_MAX)+k] = 0;
+        }
+        for (i=0;i<100;i++){
+            h_triages->patientQueue[(i*xmachine_memory_triage_MAX)+k] = 0;
+        }
+		h_triages->front[k] = 0;
+		h_triages->rear[k] = 0;
+		h_triages->size[k] = 0;
+		h_triages->tick[k] = 0;
+	}
+	
 
 	/* Default variables for memory */
     agent_id = 0;
@@ -1165,29 +1314,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_go_to_x = 0;
     agent_go_to_y = 0;
     agent_chair_no = 0;
-    chair_id = 0;
-    chair_x = 0;
-    chair_y = 0;
-    chair_state = 0;
-    medic_x = 0;
-    medic_y = 0;
-    receptionist_x = 0.093750;
-    receptionist_y = -0.375000;
-    for (i=0;i<2000;i++){
-        receptionist_colaPacientes[i] = 0;
-    }
-    receptionist_front = 0;
-    receptionist_rear = 0;
-    receptionist_size = 0;
-    receptionist_tick = 0;
-    receptionist_current_patient = -1;
-    receptionist_attend_patient = 0;
-    receptionist_estado = 0;
-    agent_generator_chairs_generated = 0;
-    chair_admin_id = 0;
-    for (i=0;i<35;i++){
-        chair_admin_chairArray[i] = 0;
-    }
+    agent_box_no = 0;
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -1209,6 +1336,43 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     navmap_exit6_x = 0;
     navmap_exit6_y = 0;
     navmap_cant_generados = 0;
+    chair_id = 0;
+    chair_x = 0;
+    chair_y = 0;
+    chair_state = 0;
+    medic_x = 0;
+    medic_y = 0;
+    receptionist_x = 0.093750;
+    receptionist_y = -0.375000;
+    for (i=0;i<2000;i++){
+        receptionist_patientQueue[i] = 0;
+    }
+    receptionist_front = 0;
+    receptionist_rear = 0;
+    receptionist_size = 0;
+    receptionist_tick = 0;
+    receptionist_current_patient = -1;
+    receptionist_attend_patient = 0;
+    receptionist_estado = 0;
+    agent_generator_chairs_generated = 0;
+    agent_generator_triage_generated = 0;
+    chair_admin_id = 0;
+    for (i=0;i<35;i++){
+        chair_admin_chairArray[i] = 0;
+    }
+    box_id = 0;
+    box_occupied = 0;
+    triage_id = 0;
+    for (i=0;i<3;i++){
+        triage_boxArray[i] = 0;
+    }
+    for (i=0;i<100;i++){
+        triage_patientQueue[i] = 0;
+    }
+    triage_front = 0;
+    triage_rear = 0;
+    triage_size = 0;
+    triage_tick = 0;
 
     /* Default variables for environment variables */
     env_EMMISION_RATE_EXIT1 = 0;
@@ -1373,7 +1537,52 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->go_to_x[*h_xmachine_memory_agent_count] = agent_go_to_x;
 					h_agents->go_to_y[*h_xmachine_memory_agent_count] = agent_go_to_y;
 					h_agents->chair_no[*h_xmachine_memory_agent_count] = agent_chair_no;
+					h_agents->box_no[*h_xmachine_memory_agent_count] = agent_box_no;
 					(*h_xmachine_memory_agent_count) ++;	
+				}
+				else if(strcmp(agentname, "navmap") == 0)
+				{
+					if (*h_xmachine_memory_navmap_count > xmachine_memory_navmap_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent navmap exceeded whilst reading data\n", xmachine_memory_navmap_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_navmaps->x[*h_xmachine_memory_navmap_count] = navmap_x;//Check maximum x value
+                    if(agent_maximum.x < navmap_x)
+                        agent_maximum.x = (float)navmap_x;
+                    //Check minimum x value
+                    if(agent_minimum.x > navmap_x)
+                        agent_minimum.x = (float)navmap_x;
+                    
+					h_navmaps->y[*h_xmachine_memory_navmap_count] = navmap_y;//Check maximum y value
+                    if(agent_maximum.y < navmap_y)
+                        agent_maximum.y = (float)navmap_y;
+                    //Check minimum y value
+                    if(agent_minimum.y > navmap_y)
+                        agent_minimum.y = (float)navmap_y;
+                    
+					h_navmaps->exit_no[*h_xmachine_memory_navmap_count] = navmap_exit_no;
+					h_navmaps->height[*h_xmachine_memory_navmap_count] = navmap_height;
+					h_navmaps->collision_x[*h_xmachine_memory_navmap_count] = navmap_collision_x;
+					h_navmaps->collision_y[*h_xmachine_memory_navmap_count] = navmap_collision_y;
+					h_navmaps->exit0_x[*h_xmachine_memory_navmap_count] = navmap_exit0_x;
+					h_navmaps->exit0_y[*h_xmachine_memory_navmap_count] = navmap_exit0_y;
+					h_navmaps->exit1_x[*h_xmachine_memory_navmap_count] = navmap_exit1_x;
+					h_navmaps->exit1_y[*h_xmachine_memory_navmap_count] = navmap_exit1_y;
+					h_navmaps->exit2_x[*h_xmachine_memory_navmap_count] = navmap_exit2_x;
+					h_navmaps->exit2_y[*h_xmachine_memory_navmap_count] = navmap_exit2_y;
+					h_navmaps->exit3_x[*h_xmachine_memory_navmap_count] = navmap_exit3_x;
+					h_navmaps->exit3_y[*h_xmachine_memory_navmap_count] = navmap_exit3_y;
+					h_navmaps->exit4_x[*h_xmachine_memory_navmap_count] = navmap_exit4_x;
+					h_navmaps->exit4_y[*h_xmachine_memory_navmap_count] = navmap_exit4_y;
+					h_navmaps->exit5_x[*h_xmachine_memory_navmap_count] = navmap_exit5_x;
+					h_navmaps->exit5_y[*h_xmachine_memory_navmap_count] = navmap_exit5_y;
+					h_navmaps->exit6_x[*h_xmachine_memory_navmap_count] = navmap_exit6_x;
+					h_navmaps->exit6_y[*h_xmachine_memory_navmap_count] = navmap_exit6_y;
+					h_navmaps->cant_generados[*h_xmachine_memory_navmap_count] = navmap_cant_generados;
+					(*h_xmachine_memory_navmap_count) ++;	
 				}
 				else if(strcmp(agentname, "chair") == 0)
 				{
@@ -1451,7 +1660,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                         agent_minimum.y = (float)receptionist_y;
                     
                     for (int k=0;k<2000;k++){
-                        h_receptionists->colaPacientes[(k*xmachine_memory_receptionist_MAX)+(*h_xmachine_memory_receptionist_count)] = receptionist_colaPacientes[k];
+                        h_receptionists->patientQueue[(k*xmachine_memory_receptionist_MAX)+(*h_xmachine_memory_receptionist_count)] = receptionist_patientQueue[k];
                     }
 					h_receptionists->front[*h_xmachine_memory_receptionist_count] = receptionist_front;
 					h_receptionists->rear[*h_xmachine_memory_receptionist_count] = receptionist_rear;
@@ -1472,6 +1681,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					}
                     
 					h_agent_generators->chairs_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_chairs_generated;
+					h_agent_generators->triage_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_triage_generated;
 					(*h_xmachine_memory_agent_generator_count) ++;	
 				}
 				else if(strcmp(agentname, "chair_admin") == 0)
@@ -1489,49 +1699,40 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     }
 					(*h_xmachine_memory_chair_admin_count) ++;	
 				}
-				else if(strcmp(agentname, "navmap") == 0)
+				else if(strcmp(agentname, "box") == 0)
 				{
-					if (*h_xmachine_memory_navmap_count > xmachine_memory_navmap_MAX){
-						printf("ERROR: MAX Buffer size (%i) for agent navmap exceeded whilst reading data\n", xmachine_memory_navmap_MAX);
+					if (*h_xmachine_memory_box_count > xmachine_memory_box_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent box exceeded whilst reading data\n", xmachine_memory_box_MAX);
 						// Close the file and stop reading
 						fclose(file);
 						exit(EXIT_FAILURE);
 					}
                     
-					h_navmaps->x[*h_xmachine_memory_navmap_count] = navmap_x;//Check maximum x value
-                    if(agent_maximum.x < navmap_x)
-                        agent_maximum.x = (float)navmap_x;
-                    //Check minimum x value
-                    if(agent_minimum.x > navmap_x)
-                        agent_minimum.x = (float)navmap_x;
+					h_boxs->id[*h_xmachine_memory_box_count] = box_id;
+					h_boxs->occupied[*h_xmachine_memory_box_count] = box_occupied;
+					(*h_xmachine_memory_box_count) ++;	
+				}
+				else if(strcmp(agentname, "triage") == 0)
+				{
+					if (*h_xmachine_memory_triage_count > xmachine_memory_triage_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent triage exceeded whilst reading data\n", xmachine_memory_triage_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
                     
-					h_navmaps->y[*h_xmachine_memory_navmap_count] = navmap_y;//Check maximum y value
-                    if(agent_maximum.y < navmap_y)
-                        agent_maximum.y = (float)navmap_y;
-                    //Check minimum y value
-                    if(agent_minimum.y > navmap_y)
-                        agent_minimum.y = (float)navmap_y;
-                    
-					h_navmaps->exit_no[*h_xmachine_memory_navmap_count] = navmap_exit_no;
-					h_navmaps->height[*h_xmachine_memory_navmap_count] = navmap_height;
-					h_navmaps->collision_x[*h_xmachine_memory_navmap_count] = navmap_collision_x;
-					h_navmaps->collision_y[*h_xmachine_memory_navmap_count] = navmap_collision_y;
-					h_navmaps->exit0_x[*h_xmachine_memory_navmap_count] = navmap_exit0_x;
-					h_navmaps->exit0_y[*h_xmachine_memory_navmap_count] = navmap_exit0_y;
-					h_navmaps->exit1_x[*h_xmachine_memory_navmap_count] = navmap_exit1_x;
-					h_navmaps->exit1_y[*h_xmachine_memory_navmap_count] = navmap_exit1_y;
-					h_navmaps->exit2_x[*h_xmachine_memory_navmap_count] = navmap_exit2_x;
-					h_navmaps->exit2_y[*h_xmachine_memory_navmap_count] = navmap_exit2_y;
-					h_navmaps->exit3_x[*h_xmachine_memory_navmap_count] = navmap_exit3_x;
-					h_navmaps->exit3_y[*h_xmachine_memory_navmap_count] = navmap_exit3_y;
-					h_navmaps->exit4_x[*h_xmachine_memory_navmap_count] = navmap_exit4_x;
-					h_navmaps->exit4_y[*h_xmachine_memory_navmap_count] = navmap_exit4_y;
-					h_navmaps->exit5_x[*h_xmachine_memory_navmap_count] = navmap_exit5_x;
-					h_navmaps->exit5_y[*h_xmachine_memory_navmap_count] = navmap_exit5_y;
-					h_navmaps->exit6_x[*h_xmachine_memory_navmap_count] = navmap_exit6_x;
-					h_navmaps->exit6_y[*h_xmachine_memory_navmap_count] = navmap_exit6_y;
-					h_navmaps->cant_generados[*h_xmachine_memory_navmap_count] = navmap_cant_generados;
-					(*h_xmachine_memory_navmap_count) ++;	
+					h_triages->id[*h_xmachine_memory_triage_count] = triage_id;
+                    for (int k=0;k<3;k++){
+                        h_triages->boxArray[(k*xmachine_memory_triage_MAX)+(*h_xmachine_memory_triage_count)] = triage_boxArray[k];
+                    }
+                    for (int k=0;k<100;k++){
+                        h_triages->patientQueue[(k*xmachine_memory_triage_MAX)+(*h_xmachine_memory_triage_count)] = triage_patientQueue[k];
+                    }
+					h_triages->front[*h_xmachine_memory_triage_count] = triage_front;
+					h_triages->rear[*h_xmachine_memory_triage_count] = triage_rear;
+					h_triages->size[*h_xmachine_memory_triage_count] = triage_size;
+					h_triages->tick[*h_xmachine_memory_triage_count] = triage_tick;
+					(*h_xmachine_memory_triage_count) ++;	
 				}
 				else
 				{
@@ -1560,29 +1761,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_go_to_x = 0;
                 agent_go_to_y = 0;
                 agent_chair_no = 0;
-                chair_id = 0;
-                chair_x = 0;
-                chair_y = 0;
-                chair_state = 0;
-                medic_x = 0;
-                medic_y = 0;
-                receptionist_x = 0.093750;
-                receptionist_y = -0.375000;
-                for (i=0;i<2000;i++){
-                    receptionist_colaPacientes[i] = 0;
-                }
-                receptionist_front = 0;
-                receptionist_rear = 0;
-                receptionist_size = 0;
-                receptionist_tick = 0;
-                receptionist_current_patient = -1;
-                receptionist_attend_patient = 0;
-                receptionist_estado = 0;
-                agent_generator_chairs_generated = 0;
-                chair_admin_id = 0;
-                for (i=0;i<35;i++){
-                    chair_admin_chairArray[i] = 0;
-                }
+                agent_box_no = 0;
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -1604,6 +1783,43 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 navmap_exit6_x = 0;
                 navmap_exit6_y = 0;
                 navmap_cant_generados = 0;
+                chair_id = 0;
+                chair_x = 0;
+                chair_y = 0;
+                chair_state = 0;
+                medic_x = 0;
+                medic_y = 0;
+                receptionist_x = 0.093750;
+                receptionist_y = -0.375000;
+                for (i=0;i<2000;i++){
+                    receptionist_patientQueue[i] = 0;
+                }
+                receptionist_front = 0;
+                receptionist_rear = 0;
+                receptionist_size = 0;
+                receptionist_tick = 0;
+                receptionist_current_patient = -1;
+                receptionist_attend_patient = 0;
+                receptionist_estado = 0;
+                agent_generator_chairs_generated = 0;
+                agent_generator_triage_generated = 0;
+                chair_admin_id = 0;
+                for (i=0;i<35;i++){
+                    chair_admin_chairArray[i] = 0;
+                }
+                box_id = 0;
+                box_occupied = 0;
+                triage_id = 0;
+                for (i=0;i<3;i++){
+                    triage_boxArray[i] = 0;
+                }
+                for (i=0;i<100;i++){
+                    triage_patientQueue[i] = 0;
+                }
+                triage_front = 0;
+                triage_rear = 0;
+                triage_size = 0;
+                triage_tick = 0;
                 
                 in_xagent = 0;
 			}
@@ -1645,44 +1861,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/go_to_y") == 0) in_agent_go_to_y = 0;
 			if(strcmp(buffer, "chair_no") == 0) in_agent_chair_no = 1;
 			if(strcmp(buffer, "/chair_no") == 0) in_agent_chair_no = 0;
-			if(strcmp(buffer, "id") == 0) in_chair_id = 1;
-			if(strcmp(buffer, "/id") == 0) in_chair_id = 0;
-			if(strcmp(buffer, "x") == 0) in_chair_x = 1;
-			if(strcmp(buffer, "/x") == 0) in_chair_x = 0;
-			if(strcmp(buffer, "y") == 0) in_chair_y = 1;
-			if(strcmp(buffer, "/y") == 0) in_chair_y = 0;
-			if(strcmp(buffer, "state") == 0) in_chair_state = 1;
-			if(strcmp(buffer, "/state") == 0) in_chair_state = 0;
-			if(strcmp(buffer, "x") == 0) in_medic_x = 1;
-			if(strcmp(buffer, "/x") == 0) in_medic_x = 0;
-			if(strcmp(buffer, "y") == 0) in_medic_y = 1;
-			if(strcmp(buffer, "/y") == 0) in_medic_y = 0;
-			if(strcmp(buffer, "x") == 0) in_receptionist_x = 1;
-			if(strcmp(buffer, "/x") == 0) in_receptionist_x = 0;
-			if(strcmp(buffer, "y") == 0) in_receptionist_y = 1;
-			if(strcmp(buffer, "/y") == 0) in_receptionist_y = 0;
-			if(strcmp(buffer, "colaPacientes") == 0) in_receptionist_colaPacientes = 1;
-			if(strcmp(buffer, "/colaPacientes") == 0) in_receptionist_colaPacientes = 0;
-			if(strcmp(buffer, "front") == 0) in_receptionist_front = 1;
-			if(strcmp(buffer, "/front") == 0) in_receptionist_front = 0;
-			if(strcmp(buffer, "rear") == 0) in_receptionist_rear = 1;
-			if(strcmp(buffer, "/rear") == 0) in_receptionist_rear = 0;
-			if(strcmp(buffer, "size") == 0) in_receptionist_size = 1;
-			if(strcmp(buffer, "/size") == 0) in_receptionist_size = 0;
-			if(strcmp(buffer, "tick") == 0) in_receptionist_tick = 1;
-			if(strcmp(buffer, "/tick") == 0) in_receptionist_tick = 0;
-			if(strcmp(buffer, "current_patient") == 0) in_receptionist_current_patient = 1;
-			if(strcmp(buffer, "/current_patient") == 0) in_receptionist_current_patient = 0;
-			if(strcmp(buffer, "attend_patient") == 0) in_receptionist_attend_patient = 1;
-			if(strcmp(buffer, "/attend_patient") == 0) in_receptionist_attend_patient = 0;
-			if(strcmp(buffer, "estado") == 0) in_receptionist_estado = 1;
-			if(strcmp(buffer, "/estado") == 0) in_receptionist_estado = 0;
-			if(strcmp(buffer, "chairs_generated") == 0) in_agent_generator_chairs_generated = 1;
-			if(strcmp(buffer, "/chairs_generated") == 0) in_agent_generator_chairs_generated = 0;
-			if(strcmp(buffer, "id") == 0) in_chair_admin_id = 1;
-			if(strcmp(buffer, "/id") == 0) in_chair_admin_id = 0;
-			if(strcmp(buffer, "chairArray") == 0) in_chair_admin_chairArray = 1;
-			if(strcmp(buffer, "/chairArray") == 0) in_chair_admin_chairArray = 0;
+			if(strcmp(buffer, "box_no") == 0) in_agent_box_no = 1;
+			if(strcmp(buffer, "/box_no") == 0) in_agent_box_no = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -1725,6 +1905,64 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/exit6_y") == 0) in_navmap_exit6_y = 0;
 			if(strcmp(buffer, "cant_generados") == 0) in_navmap_cant_generados = 1;
 			if(strcmp(buffer, "/cant_generados") == 0) in_navmap_cant_generados = 0;
+			if(strcmp(buffer, "id") == 0) in_chair_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_chair_id = 0;
+			if(strcmp(buffer, "x") == 0) in_chair_x = 1;
+			if(strcmp(buffer, "/x") == 0) in_chair_x = 0;
+			if(strcmp(buffer, "y") == 0) in_chair_y = 1;
+			if(strcmp(buffer, "/y") == 0) in_chair_y = 0;
+			if(strcmp(buffer, "state") == 0) in_chair_state = 1;
+			if(strcmp(buffer, "/state") == 0) in_chair_state = 0;
+			if(strcmp(buffer, "x") == 0) in_medic_x = 1;
+			if(strcmp(buffer, "/x") == 0) in_medic_x = 0;
+			if(strcmp(buffer, "y") == 0) in_medic_y = 1;
+			if(strcmp(buffer, "/y") == 0) in_medic_y = 0;
+			if(strcmp(buffer, "x") == 0) in_receptionist_x = 1;
+			if(strcmp(buffer, "/x") == 0) in_receptionist_x = 0;
+			if(strcmp(buffer, "y") == 0) in_receptionist_y = 1;
+			if(strcmp(buffer, "/y") == 0) in_receptionist_y = 0;
+			if(strcmp(buffer, "patientQueue") == 0) in_receptionist_patientQueue = 1;
+			if(strcmp(buffer, "/patientQueue") == 0) in_receptionist_patientQueue = 0;
+			if(strcmp(buffer, "front") == 0) in_receptionist_front = 1;
+			if(strcmp(buffer, "/front") == 0) in_receptionist_front = 0;
+			if(strcmp(buffer, "rear") == 0) in_receptionist_rear = 1;
+			if(strcmp(buffer, "/rear") == 0) in_receptionist_rear = 0;
+			if(strcmp(buffer, "size") == 0) in_receptionist_size = 1;
+			if(strcmp(buffer, "/size") == 0) in_receptionist_size = 0;
+			if(strcmp(buffer, "tick") == 0) in_receptionist_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_receptionist_tick = 0;
+			if(strcmp(buffer, "current_patient") == 0) in_receptionist_current_patient = 1;
+			if(strcmp(buffer, "/current_patient") == 0) in_receptionist_current_patient = 0;
+			if(strcmp(buffer, "attend_patient") == 0) in_receptionist_attend_patient = 1;
+			if(strcmp(buffer, "/attend_patient") == 0) in_receptionist_attend_patient = 0;
+			if(strcmp(buffer, "estado") == 0) in_receptionist_estado = 1;
+			if(strcmp(buffer, "/estado") == 0) in_receptionist_estado = 0;
+			if(strcmp(buffer, "chairs_generated") == 0) in_agent_generator_chairs_generated = 1;
+			if(strcmp(buffer, "/chairs_generated") == 0) in_agent_generator_chairs_generated = 0;
+			if(strcmp(buffer, "triage_generated") == 0) in_agent_generator_triage_generated = 1;
+			if(strcmp(buffer, "/triage_generated") == 0) in_agent_generator_triage_generated = 0;
+			if(strcmp(buffer, "id") == 0) in_chair_admin_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_chair_admin_id = 0;
+			if(strcmp(buffer, "chairArray") == 0) in_chair_admin_chairArray = 1;
+			if(strcmp(buffer, "/chairArray") == 0) in_chair_admin_chairArray = 0;
+			if(strcmp(buffer, "id") == 0) in_box_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_box_id = 0;
+			if(strcmp(buffer, "occupied") == 0) in_box_occupied = 1;
+			if(strcmp(buffer, "/occupied") == 0) in_box_occupied = 0;
+			if(strcmp(buffer, "id") == 0) in_triage_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_triage_id = 0;
+			if(strcmp(buffer, "boxArray") == 0) in_triage_boxArray = 1;
+			if(strcmp(buffer, "/boxArray") == 0) in_triage_boxArray = 0;
+			if(strcmp(buffer, "patientQueue") == 0) in_triage_patientQueue = 1;
+			if(strcmp(buffer, "/patientQueue") == 0) in_triage_patientQueue = 0;
+			if(strcmp(buffer, "front") == 0) in_triage_front = 1;
+			if(strcmp(buffer, "/front") == 0) in_triage_front = 0;
+			if(strcmp(buffer, "rear") == 0) in_triage_rear = 1;
+			if(strcmp(buffer, "/rear") == 0) in_triage_rear = 0;
+			if(strcmp(buffer, "size") == 0) in_triage_size = 1;
+			if(strcmp(buffer, "/size") == 0) in_triage_size = 0;
+			if(strcmp(buffer, "tick") == 0) in_triage_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_triage_tick = 0;
 			
             /* environment variables */
             if(strcmp(buffer, "EMMISION_RATE_EXIT1") == 0) in_env_EMMISION_RATE_EXIT1 = 1;
@@ -1868,62 +2106,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_agent_chair_no){
                     agent_chair_no = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_chair_id){
-                    chair_id = (int) fpgu_strtol(buffer); 
-                }
-				if(in_chair_x){
-                    chair_x = (int) fpgu_strtol(buffer); 
-                }
-				if(in_chair_y){
-                    chair_y = (int) fpgu_strtol(buffer); 
-                }
-				if(in_chair_state){
-                    chair_state = (int) fpgu_strtol(buffer); 
-                }
-				if(in_medic_x){
-                    medic_x = (int) fpgu_strtol(buffer); 
-                }
-				if(in_medic_y){
-                    medic_y = (int) fpgu_strtol(buffer); 
-                }
-				if(in_receptionist_x){
-                    receptionist_x = (int) fpgu_strtol(buffer); 
-                }
-				if(in_receptionist_y){
-                    receptionist_y = (int) fpgu_strtol(buffer); 
-                }
-				if(in_receptionist_colaPacientes){
-                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, receptionist_colaPacientes, 2000);    
-                }
-				if(in_receptionist_front){
-                    receptionist_front = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_receptionist_rear){
-                    receptionist_rear = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_receptionist_size){
-                    receptionist_size = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_receptionist_tick){
-                    receptionist_tick = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_receptionist_current_patient){
-                    receptionist_current_patient = (int) fpgu_strtol(buffer); 
-                }
-				if(in_receptionist_attend_patient){
-                    receptionist_attend_patient = (int) fpgu_strtol(buffer); 
-                }
-				if(in_receptionist_estado){
-                    receptionist_estado = (int) fpgu_strtol(buffer); 
-                }
-				if(in_agent_generator_chairs_generated){
-                    agent_generator_chairs_generated = (int) fpgu_strtol(buffer); 
-                }
-				if(in_chair_admin_id){
-                    chair_admin_id = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_chair_admin_chairArray){
-                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, chair_admin_chairArray, 35);    
+				if(in_agent_box_no){
+                    agent_box_no = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 
@@ -1987,6 +2171,93 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_navmap_cant_generados){
                     navmap_cant_generados = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_chair_id){
+                    chair_id = (int) fpgu_strtol(buffer); 
+                }
+				if(in_chair_x){
+                    chair_x = (int) fpgu_strtol(buffer); 
+                }
+				if(in_chair_y){
+                    chair_y = (int) fpgu_strtol(buffer); 
+                }
+				if(in_chair_state){
+                    chair_state = (int) fpgu_strtol(buffer); 
+                }
+				if(in_medic_x){
+                    medic_x = (int) fpgu_strtol(buffer); 
+                }
+				if(in_medic_y){
+                    medic_y = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_x){
+                    receptionist_x = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_y){
+                    receptionist_y = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_patientQueue){
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, receptionist_patientQueue, 2000);    
+                }
+				if(in_receptionist_front){
+                    receptionist_front = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_rear){
+                    receptionist_rear = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_size){
+                    receptionist_size = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_tick){
+                    receptionist_tick = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_receptionist_current_patient){
+                    receptionist_current_patient = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_attend_patient){
+                    receptionist_attend_patient = (int) fpgu_strtol(buffer); 
+                }
+				if(in_receptionist_estado){
+                    receptionist_estado = (int) fpgu_strtol(buffer); 
+                }
+				if(in_agent_generator_chairs_generated){
+                    agent_generator_chairs_generated = (int) fpgu_strtol(buffer); 
+                }
+				if(in_agent_generator_triage_generated){
+                    agent_generator_triage_generated = (int) fpgu_strtol(buffer); 
+                }
+				if(in_chair_admin_id){
+                    chair_admin_id = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_chair_admin_chairArray){
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, chair_admin_chairArray, 35);    
+                }
+				if(in_box_id){
+                    box_id = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_box_occupied){
+                    box_occupied = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_triage_id){
+                    triage_id = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_triage_boxArray){
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, triage_boxArray, 3);    
+                }
+				if(in_triage_patientQueue){
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, triage_patientQueue, 100);    
+                }
+				if(in_triage_front){
+                    triage_front = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_triage_rear){
+                    triage_rear = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_triage_size){
+                    triage_size = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_triage_tick){
+                    triage_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				
             }

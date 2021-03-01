@@ -1,7 +1,5 @@
 //Archivo con las funciones del recepcionista	
 
-#include "parameters.h"
-
 /*---------------------------------IMPLEMENTACIÓN DE LA COLA---------------------------------*/
 
 // Inicializa todas las variables necesarias para el manejo de la cola
@@ -26,7 +24,7 @@ __FLAME_GPU_FUNC__ int isEmpty(xmachine_memory_receptionist* agent){
 __FLAME_GPU_FUNC__ int enqueue(xmachine_memory_receptionist* agent, unsigned int value){ 
     if (isFull(agent)) 
         return 1; 
-    agent->colaPacientes[agent->rear] = value;
+    agent->patientQueue[agent->rear] = value;
     agent->rear = (agent->rear + 1) % capacity;
     agent->size = agent->size + 1; 
     
@@ -38,7 +36,7 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
 { 
     if (isEmpty(agent)) 
         return 0; 
-    int item = agent->colaPacientes[agent->front];
+    int item = agent->patientQueue[agent->front];
     agent->front = (agent->front + 1) % capacity; 
     agent->size = agent->size - 1;
     return item;
@@ -106,7 +104,7 @@ __FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, 
 						agent->estado = 1;
 						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
-						printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
+						//printf("Me contagie y el que me contagió está en la posición %d, %d", prueba1, prueba2);
 					}
 				}	
 			}			
@@ -116,41 +114,3 @@ __FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, 
 
 	return 0;
 }
-
-/* 
-// Función que devuelve el principio de la cola 
-int front(xmachine_memory_receptionist* agent) 
-{ 
-    if (isEmpty(queue)) 
-        return INT_MIN; 
-    return queue->array[queue->front]; 
-} 
-  
-// Function to get rear of queue 
-int rear(struct Queue* queue) 
-{ 
-    if (isEmpty(queue)) 
-        return INT_MIN; 
-    return queue->array[queue->rear]; 
-} */
-
-/*  
-// Driver program to test above functions./ 
-int main() 
-{ 
-    struct Queue* queue = createQueue(1000); 
-  
-    enqueue(queue, 10); 
-    enqueue(queue, 20); 
-    enqueue(queue, 30); 
-    enqueue(queue, 40); 
-  
-    printf("%d dequeued from queue\n\n", 
-           dequeue(queue)); 
-  
-    printf("Front item is %d\n", front(queue)); 
-    printf("Rear item is %d\n", rear(queue)); 
-  
-    return 0; 
-}
-*/

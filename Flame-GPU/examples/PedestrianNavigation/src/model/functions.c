@@ -25,6 +25,8 @@
 #include "medic.c"
 #include "chair.c"
 #include "agent_generator.c"
+#include "triage.c"
+#include "box.c"
 
 //This function creates all the agents requiered to run the hospital
 __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
@@ -104,6 +106,14 @@ __FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmach
 __FLAME_GPU_FUNC__ int output_chair_contact(xmachine_memory_agent* agent, xmachine_message_chair_contact_list* chairContactMessages){
 	
 	add_chair_contact_message(chairContactMessages, agent->id, agent->chair_no, agent->estado);
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmachine_message_triage_petition_list* triagePetitionMessages){
+	
+	add_triage_petition_message(triagePetitionMessages, agent->id);
+	agent->estado_movimiento++;
 
 	return 0;
 }
@@ -335,6 +345,17 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				agent->estado_movimiento++;
 			}
 			break;
+		case 17:
+			if(mover_a_destino(agent,88,96) == 0){
+				agent->estado_movimiento++;
+			}
+			break;
+		case 18:
+			if(mover_a_destino(agent,106,96) == 0){
+				printf("Bueno llegue");
+				agent->estado_movimiento++;
+			}
+			break;
 	}
 	 
 	return 0; 
@@ -377,7 +398,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0);
+				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0);
 				
 				/*if(agent->cant_generados==0){
 					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 0, 0, 0, 0, 0);
@@ -392,7 +413,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				agent->cant_generados++;
 				
 				if(agent->cant_generados==cant_personas){
-					printf("Termine de generar personas");
+					//printf("Termine de generar personas");
 				}
 			}
 		}
@@ -401,7 +422,6 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 
     return 0;
 }
-
 
 /*-------------------------------------------------------------Recepción de mensajes-------------------------------------------------------------*/
 
@@ -445,11 +465,26 @@ __FLAME_GPU_FUNC__ int receive_chair_state(xmachine_memory_agent* agent, xmachin
 	xmachine_message_chair_state* current_message = get_first_chair_state_message(chairStateMessages);
 	while(current_message){
 		if(current_message->id == agent->id){
-			if(current_message->state == 1){
-                printf("Hola, funciona el contagio de la silla\n");
+			if(current_message->state == 1 && agent->estado == 0){
+               agent->estado = 1;
             }
 		}
 		current_message = get_next_chair_state_message(current_message, chairStateMessages);
+	}
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xmachine_message_triage_response_list* triageResponseMessages){
+	
+	xmachine_message_triage_response* current_message = get_first_triage_response_message(triageResponseMessages);
+	while(current_message){
+		if(agent->id == current_message->id){
+			agent->estado_movimiento++;
+			agent->box_no = current_message->box_no;
+			printf("Tengo que ir al box %d, soy %d\n",current_message->box_no,agent->id);
+		}
+		current_message = get_next_triage_response_message(current_message, triageResponseMessages);
 	}
 
 	return 0;

@@ -96,6 +96,20 @@ xmachine_memory_agent_list* h_agents_default;      /**< Pointer to agent list (p
 xmachine_memory_agent_list* d_agents_default;      /**< Pointer to agent list (population) on the device*/
 int h_xmachine_memory_agent_default_count;   /**< Agent population size counter */ 
 
+/* navmap Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
+xmachine_memory_navmap_list* d_navmaps;      /**< Pointer to agent list (population) on the device*/
+xmachine_memory_navmap_list* d_navmaps_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
+xmachine_memory_navmap_list* d_navmaps_new;  /**< Pointer to new agent list on the device (used to hold new agents before they are appended to the population)*/
+int h_xmachine_memory_navmap_count;   /**< Agent population size counter */ 
+int h_xmachine_memory_navmap_pop_width;   /**< Agent population width */
+uint * d_xmachine_memory_navmap_keys;	  /**< Agent sort identifiers keys*/
+uint * d_xmachine_memory_navmap_values;  /**< Agent sort identifiers value */
+
+/* navmap state variables */
+xmachine_memory_navmap_list* h_navmaps_static;      /**< Pointer to agent list (population) on host*/
+xmachine_memory_navmap_list* d_navmaps_static;      /**< Pointer to agent list (population) on the device*/
+int h_xmachine_memory_navmap_static_count;   /**< Agent population size counter */ 
+
 /* chair Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
 xmachine_memory_chair_list* d_chairs;      /**< Pointer to agent list (population) on the device*/
 xmachine_memory_chair_list* d_chairs_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
@@ -161,19 +175,31 @@ xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin;      /**< Pointer
 xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin;      /**< Pointer to agent list (population) on the device*/
 int h_xmachine_memory_chair_admin_defaultAdmin_count;   /**< Agent population size counter */ 
 
-/* navmap Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
-xmachine_memory_navmap_list* d_navmaps;      /**< Pointer to agent list (population) on the device*/
-xmachine_memory_navmap_list* d_navmaps_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
-xmachine_memory_navmap_list* d_navmaps_new;  /**< Pointer to new agent list on the device (used to hold new agents before they are appended to the population)*/
-int h_xmachine_memory_navmap_count;   /**< Agent population size counter */ 
-int h_xmachine_memory_navmap_pop_width;   /**< Agent population width */
-uint * d_xmachine_memory_navmap_keys;	  /**< Agent sort identifiers keys*/
-uint * d_xmachine_memory_navmap_values;  /**< Agent sort identifiers value */
+/* box Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
+xmachine_memory_box_list* d_boxs;      /**< Pointer to agent list (population) on the device*/
+xmachine_memory_box_list* d_boxs_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
+xmachine_memory_box_list* d_boxs_new;  /**< Pointer to new agent list on the device (used to hold new agents before they are appended to the population)*/
+int h_xmachine_memory_box_count;   /**< Agent population size counter */ 
+uint * d_xmachine_memory_box_keys;	  /**< Agent sort identifiers keys*/
+uint * d_xmachine_memory_box_values;  /**< Agent sort identifiers value */
 
-/* navmap state variables */
-xmachine_memory_navmap_list* h_navmaps_static;      /**< Pointer to agent list (population) on host*/
-xmachine_memory_navmap_list* d_navmaps_static;      /**< Pointer to agent list (population) on the device*/
-int h_xmachine_memory_navmap_static_count;   /**< Agent population size counter */ 
+/* box state variables */
+xmachine_memory_box_list* h_boxs_defaultBox;      /**< Pointer to agent list (population) on host*/
+xmachine_memory_box_list* d_boxs_defaultBox;      /**< Pointer to agent list (population) on the device*/
+int h_xmachine_memory_box_defaultBox_count;   /**< Agent population size counter */ 
+
+/* triage Agent variables these lists are used in the agent function where as the other lists are used only outside the agent functions*/
+xmachine_memory_triage_list* d_triages;      /**< Pointer to agent list (population) on the device*/
+xmachine_memory_triage_list* d_triages_swap; /**< Pointer to agent list swap on the device (used when killing agents)*/
+xmachine_memory_triage_list* d_triages_new;  /**< Pointer to new agent list on the device (used to hold new agents before they are appended to the population)*/
+int h_xmachine_memory_triage_count;   /**< Agent population size counter */ 
+uint * d_xmachine_memory_triage_keys;	  /**< Agent sort identifiers keys*/
+uint * d_xmachine_memory_triage_values;  /**< Agent sort identifiers value */
+
+/* triage state variables */
+xmachine_memory_triage_list* h_triages_defaultTriage;      /**< Pointer to agent list (population) on host*/
+xmachine_memory_triage_list* d_triages_defaultTriage;      /**< Pointer to agent list (population) on the device*/
+int h_xmachine_memory_triage_defaultTriage_count;   /**< Agent population size counter */ 
 
 
 /* Variables to track the state of host copies of state lists, for the purposes of host agent data access.
@@ -198,25 +224,7 @@ unsigned int h_agents_default_variable_estado_movimiento_data_iteration;
 unsigned int h_agents_default_variable_go_to_x_data_iteration;
 unsigned int h_agents_default_variable_go_to_y_data_iteration;
 unsigned int h_agents_default_variable_chair_no_data_iteration;
-unsigned int h_chairs_defaultChair_variable_id_data_iteration;
-unsigned int h_chairs_defaultChair_variable_x_data_iteration;
-unsigned int h_chairs_defaultChair_variable_y_data_iteration;
-unsigned int h_chairs_defaultChair_variable_state_data_iteration;
-unsigned int h_medics_default2_variable_x_data_iteration;
-unsigned int h_medics_default2_variable_y_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_x_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_y_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_front_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_rear_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_size_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_tick_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_current_patient_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration;
-unsigned int h_receptionists_defaultReceptionist_variable_estado_data_iteration;
-unsigned int h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration;
-unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
-unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
+unsigned int h_agents_default_variable_box_no_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -238,6 +246,35 @@ unsigned int h_navmaps_static_variable_exit5_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit6_x_data_iteration;
 unsigned int h_navmaps_static_variable_exit6_y_data_iteration;
 unsigned int h_navmaps_static_variable_cant_generados_data_iteration;
+unsigned int h_chairs_defaultChair_variable_id_data_iteration;
+unsigned int h_chairs_defaultChair_variable_x_data_iteration;
+unsigned int h_chairs_defaultChair_variable_y_data_iteration;
+unsigned int h_chairs_defaultChair_variable_state_data_iteration;
+unsigned int h_medics_default2_variable_x_data_iteration;
+unsigned int h_medics_default2_variable_y_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_x_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_y_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_front_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_rear_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_size_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_tick_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_current_patient_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration;
+unsigned int h_receptionists_defaultReceptionist_variable_estado_data_iteration;
+unsigned int h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration;
+unsigned int h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration;
+unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
+unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
+unsigned int h_boxs_defaultBox_variable_id_data_iteration;
+unsigned int h_boxs_defaultBox_variable_occupied_data_iteration;
+unsigned int h_triages_defaultTriage_variable_id_data_iteration;
+unsigned int h_triages_defaultTriage_variable_boxArray_data_iteration;
+unsigned int h_triages_defaultTriage_variable_patientQueue_data_iteration;
+unsigned int h_triages_defaultTriage_variable_front_data_iteration;
+unsigned int h_triages_defaultTriage_variable_rear_data_iteration;
+unsigned int h_triages_defaultTriage_variable_size_data_iteration;
+unsigned int h_triages_defaultTriage_variable_tick_data_iteration;
 
 
 /* Message Memory */
@@ -366,6 +403,38 @@ xmachine_message_chair_contact_list* d_chair_contacts_swap;    /**< Pointer to m
 int h_message_chair_contact_count;         /**< message list counter*/
 int h_message_chair_contact_output_type;   /**< message output type (single or optional)*/
 
+/* box_petition Message variables */
+xmachine_message_box_petition_list* h_box_petitions;         /**< Pointer to message list on host*/
+xmachine_message_box_petition_list* d_box_petitions;         /**< Pointer to message list on device*/
+xmachine_message_box_petition_list* d_box_petitions_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_box_petition_count;         /**< message list counter*/
+int h_message_box_petition_output_type;   /**< message output type (single or optional)*/
+
+/* box_response Message variables */
+xmachine_message_box_response_list* h_box_responses;         /**< Pointer to message list on host*/
+xmachine_message_box_response_list* d_box_responses;         /**< Pointer to message list on device*/
+xmachine_message_box_response_list* d_box_responses_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_box_response_count;         /**< message list counter*/
+int h_message_box_response_output_type;   /**< message output type (single or optional)*/
+
+/* triage_petition Message variables */
+xmachine_message_triage_petition_list* h_triage_petitions;         /**< Pointer to message list on host*/
+xmachine_message_triage_petition_list* d_triage_petitions;         /**< Pointer to message list on device*/
+xmachine_message_triage_petition_list* d_triage_petitions_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_triage_petition_count;         /**< message list counter*/
+int h_message_triage_petition_output_type;   /**< message output type (single or optional)*/
+
+/* triage_response Message variables */
+xmachine_message_triage_response_list* h_triage_responses;         /**< Pointer to message list on host*/
+xmachine_message_triage_response_list* d_triage_responses;         /**< Pointer to message list on device*/
+xmachine_message_triage_response_list* d_triage_responses_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_triage_response_count;         /**< message list counter*/
+int h_message_triage_response_output_type;   /**< message output type (single or optional)*/
+
   
 /* CUDA Streams for function layers */
 cudaStream_t stream1;
@@ -373,11 +442,15 @@ cudaStream_t stream2;
 cudaStream_t stream3;
 cudaStream_t stream4;
 cudaStream_t stream5;
+cudaStream_t stream6;
 
 /* Device memory and sizes for CUB values */
 
 void * d_temp_scan_storage_agent;
 size_t temp_scan_storage_bytes_agent;
+
+void * d_temp_scan_storage_navmap;
+size_t temp_scan_storage_bytes_navmap;
 
 void * d_temp_scan_storage_chair;
 size_t temp_scan_storage_bytes_chair;
@@ -394,8 +467,11 @@ size_t temp_scan_storage_bytes_agent_generator;
 void * d_temp_scan_storage_chair_admin;
 size_t temp_scan_storage_bytes_chair_admin;
 
-void * d_temp_scan_storage_navmap;
-size_t temp_scan_storage_bytes_navmap;
+void * d_temp_scan_storage_box;
+size_t temp_scan_storage_bytes_box;
+
+void * d_temp_scan_storage_triage;
+size_t temp_scan_storage_bytes_triage;
 
 
 /*Global condition counts*/
@@ -470,6 +546,31 @@ void agent_receive_chair_response(cudaStream_t &stream);
  */
 void agent_receive_check_in_done(cudaStream_t &stream);
 
+/** agent_output_triage_petition
+ * Agent function prototype for output_triage_petition function of agent agent
+ */
+void agent_output_triage_petition(cudaStream_t &stream);
+
+/** agent_receive_triage_response
+ * Agent function prototype for receive_triage_response function of agent agent
+ */
+void agent_receive_triage_response(cudaStream_t &stream);
+
+/** navmap_output_navmap_cells
+ * Agent function prototype for output_navmap_cells function of navmap agent
+ */
+void navmap_output_navmap_cells(cudaStream_t &stream);
+
+/** navmap_generate_pedestrians
+ * Agent function prototype for generate_pedestrians function of navmap agent
+ */
+void navmap_generate_pedestrians(cudaStream_t &stream);
+
+/** navmap_generate_medics
+ * Agent function prototype for generate_medics function of navmap agent
+ */
+void navmap_generate_medics(cudaStream_t &stream);
+
 /** chair_output_chair_state
  * Agent function prototype for output_chair_state function of chair agent
  */
@@ -495,25 +596,25 @@ void receptionist_infect_receptionist(cudaStream_t &stream);
  */
 void agent_generator_generate_chairs(cudaStream_t &stream);
 
+/** agent_generator_generate_triage
+ * Agent function prototype for generate_triage function of agent_generator agent
+ */
+void agent_generator_generate_triage(cudaStream_t &stream);
+
 /** chair_admin_attend_chair_petitions
  * Agent function prototype for attend_chair_petitions function of chair_admin agent
  */
 void chair_admin_attend_chair_petitions(cudaStream_t &stream);
 
-/** navmap_output_navmap_cells
- * Agent function prototype for output_navmap_cells function of navmap agent
+/** box_box_server
+ * Agent function prototype for box_server function of box agent
  */
-void navmap_output_navmap_cells(cudaStream_t &stream);
+void box_box_server(cudaStream_t &stream);
 
-/** navmap_generate_pedestrians
- * Agent function prototype for generate_pedestrians function of navmap agent
+/** triage_receive_triage_petitions
+ * Agent function prototype for receive_triage_petitions function of triage agent
  */
-void navmap_generate_pedestrians(cudaStream_t &stream);
-
-/** navmap_generate_medics
- * Agent function prototype for generate_medics function of navmap agent
- */
-void navmap_generate_medics(cudaStream_t &stream);
+void triage_receive_triage_petitions(cudaStream_t &stream);
 
   
 void setPaddingAndOffset()
@@ -626,25 +727,7 @@ void initialise(char * inputfile){
     h_agents_default_variable_go_to_x_data_iteration = 0;
     h_agents_default_variable_go_to_y_data_iteration = 0;
     h_agents_default_variable_chair_no_data_iteration = 0;
-    h_chairs_defaultChair_variable_id_data_iteration = 0;
-    h_chairs_defaultChair_variable_x_data_iteration = 0;
-    h_chairs_defaultChair_variable_y_data_iteration = 0;
-    h_chairs_defaultChair_variable_state_data_iteration = 0;
-    h_medics_default2_variable_x_data_iteration = 0;
-    h_medics_default2_variable_y_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
-    h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
-    h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
-    h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
+    h_agents_default_variable_box_no_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -666,6 +749,35 @@ void initialise(char * inputfile){
     h_navmaps_static_variable_exit6_x_data_iteration = 0;
     h_navmaps_static_variable_exit6_y_data_iteration = 0;
     h_navmaps_static_variable_cant_generados_data_iteration = 0;
+    h_chairs_defaultChair_variable_id_data_iteration = 0;
+    h_chairs_defaultChair_variable_x_data_iteration = 0;
+    h_chairs_defaultChair_variable_y_data_iteration = 0;
+    h_chairs_defaultChair_variable_state_data_iteration = 0;
+    h_medics_default2_variable_x_data_iteration = 0;
+    h_medics_default2_variable_y_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_tick_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = 0;
+    h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
+    h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
+    h_boxs_defaultBox_variable_id_data_iteration = 0;
+    h_boxs_defaultBox_variable_occupied_data_iteration = 0;
+    h_triages_defaultTriage_variable_id_data_iteration = 0;
+    h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
+    h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
+    h_triages_defaultTriage_variable_front_data_iteration = 0;
+    h_triages_defaultTriage_variable_rear_data_iteration = 0;
+    h_triages_defaultTriage_variable_size_data_iteration = 0;
+    h_triages_defaultTriage_variable_tick_data_iteration = 0;
     
 
 
@@ -675,6 +787,8 @@ void initialise(char * inputfile){
 	/* Agent memory allocation (CPU) */
 	int xmachine_agent_SoA_size = sizeof(xmachine_memory_agent_list);
 	h_agents_default = (xmachine_memory_agent_list*)malloc(xmachine_agent_SoA_size);
+	int xmachine_navmap_SoA_size = sizeof(xmachine_memory_navmap_list);
+	h_navmaps_static = (xmachine_memory_navmap_list*)malloc(xmachine_navmap_SoA_size);
 	int xmachine_chair_SoA_size = sizeof(xmachine_memory_chair_list);
 	h_chairs_defaultChair = (xmachine_memory_chair_list*)malloc(xmachine_chair_SoA_size);
 	int xmachine_medic_SoA_size = sizeof(xmachine_memory_medic_list);
@@ -685,8 +799,10 @@ void initialise(char * inputfile){
 	h_agent_generators_defaultGenerator = (xmachine_memory_agent_generator_list*)malloc(xmachine_agent_generator_SoA_size);
 	int xmachine_chair_admin_SoA_size = sizeof(xmachine_memory_chair_admin_list);
 	h_chair_admins_defaultAdmin = (xmachine_memory_chair_admin_list*)malloc(xmachine_chair_admin_SoA_size);
-	int xmachine_navmap_SoA_size = sizeof(xmachine_memory_navmap_list);
-	h_navmaps_static = (xmachine_memory_navmap_list*)malloc(xmachine_navmap_SoA_size);
+	int xmachine_box_SoA_size = sizeof(xmachine_memory_box_list);
+	h_boxs_defaultBox = (xmachine_memory_box_list*)malloc(xmachine_box_SoA_size);
+	int xmachine_triage_SoA_size = sizeof(xmachine_memory_triage_list);
+	h_triages_defaultTriage = (xmachine_memory_triage_list*)malloc(xmachine_triage_SoA_size);
 
 	/* Message memory allocation (CPU) */
 	int message_pedestrian_location_SoA_size = sizeof(xmachine_message_pedestrian_location_list);
@@ -707,6 +823,14 @@ void initialise(char * inputfile){
 	h_chair_states = (xmachine_message_chair_state_list*)malloc(message_chair_state_SoA_size);
 	int message_chair_contact_SoA_size = sizeof(xmachine_message_chair_contact_list);
 	h_chair_contacts = (xmachine_message_chair_contact_list*)malloc(message_chair_contact_SoA_size);
+	int message_box_petition_SoA_size = sizeof(xmachine_message_box_petition_list);
+	h_box_petitions = (xmachine_message_box_petition_list*)malloc(message_box_petition_SoA_size);
+	int message_box_response_SoA_size = sizeof(xmachine_message_box_response_list);
+	h_box_responses = (xmachine_message_box_response_list*)malloc(message_box_response_SoA_size);
+	int message_triage_petition_SoA_size = sizeof(xmachine_message_triage_petition_list);
+	h_triage_petitions = (xmachine_message_triage_petition_list*)malloc(message_triage_petition_SoA_size);
+	int message_triage_response_SoA_size = sizeof(xmachine_message_triage_response_list);
+	h_triage_responses = (xmachine_message_triage_response_list*)malloc(message_triage_response_SoA_size);
 
 	//Exit if agent or message buffer sizes are to small for function outputs
 
@@ -762,7 +886,7 @@ void initialise(char * inputfile){
 	
 
 	//read initial states
-	readInitialStates(inputfile, h_agents_default, &h_xmachine_memory_agent_default_count, h_chairs_defaultChair, &h_xmachine_memory_chair_defaultChair_count, h_medics_default2, &h_xmachine_memory_medic_default2_count, h_receptionists_defaultReceptionist, &h_xmachine_memory_receptionist_defaultReceptionist_count, h_agent_generators_defaultGenerator, &h_xmachine_memory_agent_generator_defaultGenerator_count, h_chair_admins_defaultAdmin, &h_xmachine_memory_chair_admin_defaultAdmin_count, h_navmaps_static, &h_xmachine_memory_navmap_static_count);
+	readInitialStates(inputfile, h_agents_default, &h_xmachine_memory_agent_default_count, h_navmaps_static, &h_xmachine_memory_navmap_static_count, h_chairs_defaultChair, &h_xmachine_memory_chair_defaultChair_count, h_medics_default2, &h_xmachine_memory_medic_default2_count, h_receptionists_defaultReceptionist, &h_xmachine_memory_receptionist_defaultReceptionist_count, h_agent_generators_defaultGenerator, &h_xmachine_memory_agent_generator_defaultGenerator_count, h_chair_admins_defaultAdmin, &h_xmachine_memory_chair_admin_defaultAdmin_count, h_boxs_defaultBox, &h_xmachine_memory_box_defaultBox_count, h_triages_defaultTriage, &h_xmachine_memory_triage_defaultTriage_count);
 
   // Read graphs from disk
   
@@ -779,6 +903,15 @@ void initialise(char * inputfile){
 	/* default memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_agents_default, xmachine_agent_SoA_size));
 	gpuErrchk( cudaMemcpy( d_agents_default, h_agents_default, xmachine_agent_SoA_size, cudaMemcpyHostToDevice));
+    
+	/* navmap Agent memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_navmaps, xmachine_navmap_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_navmaps_swap, xmachine_navmap_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_navmaps_new, xmachine_navmap_SoA_size));
+    
+	/* static memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_navmaps_static, xmachine_navmap_SoA_size));
+	gpuErrchk( cudaMemcpy( d_navmaps_static, h_navmaps_static, xmachine_navmap_SoA_size, cudaMemcpyHostToDevice));
     
 	/* chair Agent memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_chairs, xmachine_chair_SoA_size));
@@ -835,14 +968,27 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_chair_admins_defaultAdmin, xmachine_chair_admin_SoA_size));
 	gpuErrchk( cudaMemcpy( d_chair_admins_defaultAdmin, h_chair_admins_defaultAdmin, xmachine_chair_admin_SoA_size, cudaMemcpyHostToDevice));
     
-	/* navmap Agent memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_navmaps, xmachine_navmap_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_navmaps_swap, xmachine_navmap_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_navmaps_new, xmachine_navmap_SoA_size));
+	/* box Agent memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_boxs, xmachine_box_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_boxs_swap, xmachine_box_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_boxs_new, xmachine_box_SoA_size));
+    //continuous agent sort identifiers
+  gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_box_keys, xmachine_memory_box_MAX* sizeof(uint)));
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_box_values, xmachine_memory_box_MAX* sizeof(uint)));
+	/* defaultBox memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_boxs_defaultBox, xmachine_box_SoA_size));
+	gpuErrchk( cudaMemcpy( d_boxs_defaultBox, h_boxs_defaultBox, xmachine_box_SoA_size, cudaMemcpyHostToDevice));
     
-	/* static memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_navmaps_static, xmachine_navmap_SoA_size));
-	gpuErrchk( cudaMemcpy( d_navmaps_static, h_navmaps_static, xmachine_navmap_SoA_size, cudaMemcpyHostToDevice));
+	/* triage Agent memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_triages, xmachine_triage_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_triages_swap, xmachine_triage_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_triages_new, xmachine_triage_SoA_size));
+    //continuous agent sort identifiers
+  gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_triage_keys, xmachine_memory_triage_MAX* sizeof(uint)));
+	gpuErrchk( cudaMalloc( (void**) &d_xmachine_memory_triage_values, xmachine_memory_triage_MAX* sizeof(uint)));
+	/* defaultTriage memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_triages_defaultTriage, xmachine_triage_SoA_size));
+	gpuErrchk( cudaMemcpy( d_triages_defaultTriage, h_triages_defaultTriage, xmachine_triage_SoA_size, cudaMemcpyHostToDevice));
     
 	/* pedestrian_location Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_pedestrian_locations, message_pedestrian_location_SoA_size));
@@ -926,6 +1072,26 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_chair_contacts, message_chair_contact_SoA_size));
 	gpuErrchk( cudaMalloc( (void**) &d_chair_contacts_swap, message_chair_contact_SoA_size));
 	gpuErrchk( cudaMemcpy( d_chair_contacts, h_chair_contacts, message_chair_contact_SoA_size, cudaMemcpyHostToDevice));
+	
+	/* box_petition Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_box_petitions, message_box_petition_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_box_petitions_swap, message_box_petition_SoA_size));
+	gpuErrchk( cudaMemcpy( d_box_petitions, h_box_petitions, message_box_petition_SoA_size, cudaMemcpyHostToDevice));
+	
+	/* box_response Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_box_responses, message_box_response_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_box_responses_swap, message_box_response_SoA_size));
+	gpuErrchk( cudaMemcpy( d_box_responses, h_box_responses, message_box_response_SoA_size, cudaMemcpyHostToDevice));
+	
+	/* triage_petition Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_triage_petitions, message_triage_petition_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_triage_petitions_swap, message_triage_petition_SoA_size));
+	gpuErrchk( cudaMemcpy( d_triage_petitions, h_triage_petitions, message_triage_petition_SoA_size, cudaMemcpyHostToDevice));
+	
+	/* triage_response Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_triage_responses, message_triage_response_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_triage_responses_swap, message_triage_response_SoA_size));
+	gpuErrchk( cudaMemcpy( d_triage_responses, h_triage_responses, message_triage_response_SoA_size, cudaMemcpyHostToDevice));
 		
 
 
@@ -946,6 +1112,17 @@ void initialise(char * inputfile){
         xmachine_memory_agent_MAX
     );
     gpuErrchk(cudaMalloc(&d_temp_scan_storage_agent, temp_scan_storage_bytes_agent));
+    
+    d_temp_scan_storage_navmap = nullptr;
+    temp_scan_storage_bytes_navmap = 0;
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_navmap, 
+        temp_scan_storage_bytes_navmap, 
+        (int*) nullptr, 
+        (int*) nullptr, 
+        xmachine_memory_navmap_MAX
+    );
+    gpuErrchk(cudaMalloc(&d_temp_scan_storage_navmap, temp_scan_storage_bytes_navmap));
     
     d_temp_scan_storage_chair = nullptr;
     temp_scan_storage_bytes_chair = 0;
@@ -1002,16 +1179,27 @@ void initialise(char * inputfile){
     );
     gpuErrchk(cudaMalloc(&d_temp_scan_storage_chair_admin, temp_scan_storage_bytes_chair_admin));
     
-    d_temp_scan_storage_navmap = nullptr;
-    temp_scan_storage_bytes_navmap = 0;
+    d_temp_scan_storage_box = nullptr;
+    temp_scan_storage_bytes_box = 0;
     cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_navmap, 
-        temp_scan_storage_bytes_navmap, 
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
         (int*) nullptr, 
         (int*) nullptr, 
-        xmachine_memory_navmap_MAX
+        xmachine_memory_box_MAX
     );
-    gpuErrchk(cudaMalloc(&d_temp_scan_storage_navmap, temp_scan_storage_bytes_navmap));
+    gpuErrchk(cudaMalloc(&d_temp_scan_storage_box, temp_scan_storage_bytes_box));
+    
+    d_temp_scan_storage_triage = nullptr;
+    temp_scan_storage_bytes_triage = 0;
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_triage, 
+        temp_scan_storage_bytes_triage, 
+        (int*) nullptr, 
+        (int*) nullptr, 
+        xmachine_memory_triage_MAX
+    );
+    gpuErrchk(cudaMalloc(&d_temp_scan_storage_triage, temp_scan_storage_bytes_triage));
     
 
 	/*Set global condition counts*/
@@ -1080,11 +1268,14 @@ void initialise(char * inputfile){
   gpuErrchk(cudaStreamCreate(&stream3));
   gpuErrchk(cudaStreamCreate(&stream4));
   gpuErrchk(cudaStreamCreate(&stream5));
+  gpuErrchk(cudaStreamCreate(&stream6));
 
 #if defined(OUTPUT_POPULATION_PER_ITERATION) && OUTPUT_POPULATION_PER_ITERATION
 	// Print the agent population size of all agents in all states
 	
 		printf("Init agent_agent_default_count: %u\n",get_agent_agent_default_count());
+	
+		printf("Init agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
 	
 		printf("Init agent_chair_defaultChair_count: %u\n",get_agent_chair_defaultChair_count());
 	
@@ -1096,7 +1287,9 @@ void initialise(char * inputfile){
 	
 		printf("Init agent_chair_admin_defaultAdmin_count: %u\n",get_agent_chair_admin_defaultAdmin_count());
 	
-		printf("Init agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
+		printf("Init agent_box_defaultBox_count: %u\n",get_agent_box_defaultBox_count());
+	
+		printf("Init agent_triage_defaultTriage_count: %u\n",get_agent_triage_defaultTriage_count());
 	
 #endif
 } 
@@ -1270,6 +1463,62 @@ void sort_chair_admins_defaultAdmin(void (*generate_key_value_pairs)(unsigned in
 	d_chair_admins_swap = d_chair_admins_temp;	
 }
 
+void sort_boxs_defaultBox(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_box_list* agents))
+{
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+
+	//generate sort keys
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_key_value_pairs, no_sm, h_xmachine_memory_box_defaultBox_count); 
+	gridSize = (h_xmachine_memory_box_defaultBox_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	generate_key_value_pairs<<<gridSize, blockSize>>>(d_xmachine_memory_box_keys, d_xmachine_memory_box_values, d_boxs_defaultBox);
+	gpuErrchkLaunch();
+
+	//updated Thrust sort
+	thrust::sort_by_key( thrust::device_pointer_cast(d_xmachine_memory_box_keys),  thrust::device_pointer_cast(d_xmachine_memory_box_keys) + h_xmachine_memory_box_defaultBox_count,  thrust::device_pointer_cast(d_xmachine_memory_box_values));
+	gpuErrchkLaunch();
+
+	//reorder agents
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_box_agents, no_sm, h_xmachine_memory_box_defaultBox_count); 
+	gridSize = (h_xmachine_memory_box_defaultBox_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	reorder_box_agents<<<gridSize, blockSize>>>(d_xmachine_memory_box_values, d_boxs_defaultBox, d_boxs_swap);
+	gpuErrchkLaunch();
+
+	//swap
+	xmachine_memory_box_list* d_boxs_temp = d_boxs_defaultBox;
+	d_boxs_defaultBox = d_boxs_swap;
+	d_boxs_swap = d_boxs_temp;	
+}
+
+void sort_triages_defaultTriage(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_triage_list* agents))
+{
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+
+	//generate sort keys
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_key_value_pairs, no_sm, h_xmachine_memory_triage_defaultTriage_count); 
+	gridSize = (h_xmachine_memory_triage_defaultTriage_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	generate_key_value_pairs<<<gridSize, blockSize>>>(d_xmachine_memory_triage_keys, d_xmachine_memory_triage_values, d_triages_defaultTriage);
+	gpuErrchkLaunch();
+
+	//updated Thrust sort
+	thrust::sort_by_key( thrust::device_pointer_cast(d_xmachine_memory_triage_keys),  thrust::device_pointer_cast(d_xmachine_memory_triage_keys) + h_xmachine_memory_triage_defaultTriage_count,  thrust::device_pointer_cast(d_xmachine_memory_triage_values));
+	gpuErrchkLaunch();
+
+	//reorder agents
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reorder_triage_agents, no_sm, h_xmachine_memory_triage_defaultTriage_count); 
+	gridSize = (h_xmachine_memory_triage_defaultTriage_count + blockSize - 1) / blockSize;    // Round up according to array size 
+	reorder_triage_agents<<<gridSize, blockSize>>>(d_xmachine_memory_triage_values, d_triages_defaultTriage, d_triages_swap);
+	gpuErrchkLaunch();
+
+	//swap
+	xmachine_memory_triage_list* d_triages_temp = d_triages_defaultTriage;
+	d_triages_defaultTriage = d_triages_swap;
+	d_triages_swap = d_triages_temp;	
+}
+
 
 void cleanup(){
     PROFILE_SCOPED_RANGE("cleanup");
@@ -1286,6 +1535,14 @@ void cleanup(){
 	
 	free( h_agents_default);
 	gpuErrchk(cudaFree(d_agents_default));
+	
+	/* navmap Agent variables */
+	gpuErrchk(cudaFree(d_navmaps));
+	gpuErrchk(cudaFree(d_navmaps_swap));
+	gpuErrchk(cudaFree(d_navmaps_new));
+	
+	free( h_navmaps_static);
+	gpuErrchk(cudaFree(d_navmaps_static));
 	
 	/* chair Agent variables */
 	gpuErrchk(cudaFree(d_chairs));
@@ -1327,13 +1584,21 @@ void cleanup(){
 	free( h_chair_admins_defaultAdmin);
 	gpuErrchk(cudaFree(d_chair_admins_defaultAdmin));
 	
-	/* navmap Agent variables */
-	gpuErrchk(cudaFree(d_navmaps));
-	gpuErrchk(cudaFree(d_navmaps_swap));
-	gpuErrchk(cudaFree(d_navmaps_new));
+	/* box Agent variables */
+	gpuErrchk(cudaFree(d_boxs));
+	gpuErrchk(cudaFree(d_boxs_swap));
+	gpuErrchk(cudaFree(d_boxs_new));
 	
-	free( h_navmaps_static);
-	gpuErrchk(cudaFree(d_navmaps_static));
+	free( h_boxs_defaultBox);
+	gpuErrchk(cudaFree(d_boxs_defaultBox));
+	
+	/* triage Agent variables */
+	gpuErrchk(cudaFree(d_triages));
+	gpuErrchk(cudaFree(d_triages_swap));
+	gpuErrchk(cudaFree(d_triages_new));
+	
+	free( h_triages_defaultTriage);
+	gpuErrchk(cudaFree(d_triages_defaultTriage));
 	
 
 	/* Message data free */
@@ -1405,6 +1670,26 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_chair_contacts));
 	gpuErrchk(cudaFree(d_chair_contacts_swap));
 	
+	/* box_petition Message variables */
+	free( h_box_petitions);
+	gpuErrchk(cudaFree(d_box_petitions));
+	gpuErrchk(cudaFree(d_box_petitions_swap));
+	
+	/* box_response Message variables */
+	free( h_box_responses);
+	gpuErrchk(cudaFree(d_box_responses));
+	gpuErrchk(cudaFree(d_box_responses_swap));
+	
+	/* triage_petition Message variables */
+	free( h_triage_petitions);
+	gpuErrchk(cudaFree(d_triage_petitions));
+	gpuErrchk(cudaFree(d_triage_petitions_swap));
+	
+	/* triage_response Message variables */
+	free( h_triage_responses);
+	gpuErrchk(cudaFree(d_triage_responses));
+	gpuErrchk(cudaFree(d_triage_responses_swap));
+	
 
     /* Free temporary CUB memory if required. */
     
@@ -1412,6 +1697,12 @@ void cleanup(){
       gpuErrchk(cudaFree(d_temp_scan_storage_agent));
       d_temp_scan_storage_agent = nullptr;
       temp_scan_storage_bytes_agent = 0;
+    }
+    
+    if(d_temp_scan_storage_navmap != nullptr){
+      gpuErrchk(cudaFree(d_temp_scan_storage_navmap));
+      d_temp_scan_storage_navmap = nullptr;
+      temp_scan_storage_bytes_navmap = 0;
     }
     
     if(d_temp_scan_storage_chair != nullptr){
@@ -1444,10 +1735,16 @@ void cleanup(){
       temp_scan_storage_bytes_chair_admin = 0;
     }
     
-    if(d_temp_scan_storage_navmap != nullptr){
-      gpuErrchk(cudaFree(d_temp_scan_storage_navmap));
-      d_temp_scan_storage_navmap = nullptr;
-      temp_scan_storage_bytes_navmap = 0;
+    if(d_temp_scan_storage_box != nullptr){
+      gpuErrchk(cudaFree(d_temp_scan_storage_box));
+      d_temp_scan_storage_box = nullptr;
+      temp_scan_storage_bytes_box = 0;
+    }
+    
+    if(d_temp_scan_storage_triage != nullptr){
+      gpuErrchk(cudaFree(d_temp_scan_storage_triage));
+      d_temp_scan_storage_triage = nullptr;
+      temp_scan_storage_bytes_triage = 0;
     }
     
 
@@ -1461,6 +1758,7 @@ void cleanup(){
   gpuErrchk(cudaStreamDestroy(stream3));
   gpuErrchk(cudaStreamDestroy(stream4));
   gpuErrchk(cudaStreamDestroy(stream5));
+  gpuErrchk(cudaStreamDestroy(stream6));
 
   /* CUDA Event Timers for Instrumentation */
 #if defined(INSTRUMENT_ITERATIONS) && INSTRUMENT_ITERATIONS
@@ -1516,6 +1814,22 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_chair_contact_count, &h_message_chair_contact_count, sizeof(int)));
 	
+	h_message_box_petition_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_box_petition_count, &h_message_box_petition_count, sizeof(int)));
+	
+	h_message_box_response_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_box_response_count, &h_message_box_response_count, sizeof(int)));
+	
+	h_message_triage_petition_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_triage_petition_count, &h_message_triage_petition_count, sizeof(int)));
+	
+	h_message_triage_response_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_triage_response_count, &h_message_triage_response_count, sizeof(int)));
+	
 
 	/* Call agent functions in order iterating through the layer functions */
 	
@@ -1561,6 +1875,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_generator_generate_chairs = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_generator_generate_triage");
+	agent_generator_generate_triage(stream4);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_generator_generate_triage = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -1634,6 +1962,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_output_chair_petition = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_output_triage_petition");
+	agent_output_triage_petition(stream6);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_output_triage_petition = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -1762,6 +2104,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: chair_admin_attend_chair_petitions = %f (ms)\n", instrument_milliseconds);
 #endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("triage_receive_triage_petitions");
+	triage_receive_triage_petitions(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: triage_receive_triage_petitions = %f (ms)\n", instrument_milliseconds);
+#endif
 	cudaDeviceSynchronize();
   
 	/* Layer 8*/
@@ -1793,6 +2149,34 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_receive_chair_response = %f (ms)\n", instrument_milliseconds);
 #endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_receive_chair_response");
+	agent_receive_chair_response(stream3);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_receive_chair_response = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_receive_triage_response");
+	agent_receive_triage_response(stream4);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_receive_triage_response = %f (ms)\n", instrument_milliseconds);
+#endif
 	cudaDeviceSynchronize();
   
     
@@ -1804,6 +2188,8 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	
 		printf("agent_agent_default_count: %u\n",get_agent_agent_default_count());
 	
+		printf("agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
+	
 		printf("agent_chair_defaultChair_count: %u\n",get_agent_chair_defaultChair_count());
 	
 		printf("agent_medic_default2_count: %u\n",get_agent_medic_default2_count());
@@ -1814,7 +2200,9 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	
 		printf("agent_chair_admin_defaultAdmin_count: %u\n",get_agent_chair_admin_defaultAdmin_count());
 	
-		printf("agent_navmap_static_count: %u\n",get_agent_navmap_static_count());
+		printf("agent_box_defaultBox_count: %u\n",get_agent_box_defaultBox_count());
+	
+		printf("agent_triage_defaultTriage_count: %u\n",get_agent_triage_defaultTriage_count());
 	
 #endif
 
@@ -2317,6 +2705,29 @@ xmachine_memory_agent_list* get_host_agent_default_agents(){
 }
 
     
+int get_agent_navmap_MAX_count(){
+    return xmachine_memory_navmap_MAX;
+}
+
+
+int get_agent_navmap_static_count(){
+	//discrete agent 
+	return xmachine_memory_navmap_MAX;
+}
+
+xmachine_memory_navmap_list* get_device_navmap_static_agents(){
+	return d_navmaps_static;
+}
+
+xmachine_memory_navmap_list* get_host_navmap_static_agents(){
+	return h_navmaps_static;
+}
+
+int get_navmap_population_width(){
+  return h_xmachine_memory_navmap_pop_width;
+}
+
+    
 int get_agent_chair_MAX_count(){
     return xmachine_memory_chair_MAX;
 }
@@ -2417,26 +2828,43 @@ xmachine_memory_chair_admin_list* get_host_chair_admin_defaultAdmin_agents(){
 }
 
     
-int get_agent_navmap_MAX_count(){
-    return xmachine_memory_navmap_MAX;
+int get_agent_box_MAX_count(){
+    return xmachine_memory_box_MAX;
 }
 
 
-int get_agent_navmap_static_count(){
-	//discrete agent 
-	return xmachine_memory_navmap_MAX;
+int get_agent_box_defaultBox_count(){
+	//continuous agent
+	return h_xmachine_memory_box_defaultBox_count;
+	
 }
 
-xmachine_memory_navmap_list* get_device_navmap_static_agents(){
-	return d_navmaps_static;
+xmachine_memory_box_list* get_device_box_defaultBox_agents(){
+	return d_boxs_defaultBox;
 }
 
-xmachine_memory_navmap_list* get_host_navmap_static_agents(){
-	return h_navmaps_static;
+xmachine_memory_box_list* get_host_box_defaultBox_agents(){
+	return h_boxs_defaultBox;
 }
 
-int get_navmap_population_width(){
-  return h_xmachine_memory_navmap_pop_width;
+    
+int get_agent_triage_MAX_count(){
+    return xmachine_memory_triage_MAX;
+}
+
+
+int get_agent_triage_defaultTriage_count(){
+	//continuous agent
+	return h_xmachine_memory_triage_defaultTriage_count;
+	
+}
+
+xmachine_memory_triage_list* get_device_triage_defaultTriage_agents(){
+	return d_triages_defaultTriage;
+}
+
+xmachine_memory_triage_list* get_host_triage_defaultTriage_agents(){
+	return h_triages_defaultTriage;
 }
 
 
@@ -3165,732 +3593,38 @@ __host__ unsigned int get_agent_default_variable_chair_no(unsigned int index){
     }
 }
 
-/** int get_chair_defaultChair_variable_id(unsigned int index)
- * Gets the value of the id variable of an chair agent in the defaultChair state on the host. 
+/** unsigned int get_agent_default_variable_box_no(unsigned int index)
+ * Gets the value of the box_no variable of an agent agent in the default state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable id
+ * @return value of agent variable box_no
  */
-__host__ int get_chair_defaultChair_variable_id(unsigned int index){
-    unsigned int count = get_agent_chair_defaultChair_count();
+__host__ unsigned int get_agent_default_variable_box_no(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_chairs_defaultChair_variable_id_data_iteration != currentIteration){
+        if(h_agents_default_variable_box_no_data_iteration != currentIteration){
             gpuErrchk(
                 cudaMemcpy(
-                    h_chairs_defaultChair->id,
-                    d_chairs_defaultChair->id,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_chairs_defaultChair_variable_id_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_chairs_defaultChair->id[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access id for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_chair_defaultChair_variable_x(unsigned int index)
- * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_chair_defaultChair_variable_x(unsigned int index){
-    unsigned int count = get_agent_chair_defaultChair_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_chairs_defaultChair_variable_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_chairs_defaultChair->x,
-                    d_chairs_defaultChair->x,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_chairs_defaultChair_variable_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_chairs_defaultChair->x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access x for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_chair_defaultChair_variable_y(unsigned int index)
- * Gets the value of the y variable of an chair agent in the defaultChair state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_chair_defaultChair_variable_y(unsigned int index){
-    unsigned int count = get_agent_chair_defaultChair_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_chairs_defaultChair_variable_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_chairs_defaultChair->y,
-                    d_chairs_defaultChair->y,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_chairs_defaultChair_variable_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_chairs_defaultChair->y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access y for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_chair_defaultChair_variable_state(unsigned int index)
- * Gets the value of the state variable of an chair agent in the defaultChair state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable state
- */
-__host__ int get_chair_defaultChair_variable_state(unsigned int index){
-    unsigned int count = get_agent_chair_defaultChair_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_chairs_defaultChair_variable_state_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_chairs_defaultChair->state,
-                    d_chairs_defaultChair->state,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_chairs_defaultChair_variable_state_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_chairs_defaultChair->state[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access state for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_medic_default2_variable_x(unsigned int index)
- * Gets the value of the x variable of an medic agent in the default2 state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_medic_default2_variable_x(unsigned int index){
-    unsigned int count = get_agent_medic_default2_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_medics_default2_variable_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_medics_default2->x,
-                    d_medics_default2->x,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_medics_default2_variable_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_medics_default2->x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access x for the %u th member of medic_default2. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_medic_default2_variable_y(unsigned int index)
- * Gets the value of the y variable of an medic agent in the default2 state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_medic_default2_variable_y(unsigned int index){
-    unsigned int count = get_agent_medic_default2_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_medics_default2_variable_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_medics_default2->y,
-                    d_medics_default2->y,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_medics_default2_variable_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_medics_default2->y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access y for the %u th member of medic_default2. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
- * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_receptionist_defaultReceptionist_variable_x(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_x_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->x,
-                    d_receptionists_defaultReceptionist->x,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_x_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->x[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access x for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
- * Gets the value of the y variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_y_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->y,
-                    d_receptionists_defaultReceptionist->y,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_y_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->y[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access y for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element)
- * Gets the element-th value of the colaPacientes variable array of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable colaPacientes
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_colaPacientes(unsigned int index, unsigned int element){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int numElements = 2000;
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count && element < numElements ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration != currentIteration){
-            
-            for(unsigned int e = 0; e < numElements; e++){
-                gpuErrchk(
-                    cudaMemcpy(
-                        h_receptionists_defaultReceptionist->colaPacientes + (e * xmachine_memory_receptionist_MAX),
-                        d_receptionists_defaultReceptionist->colaPacientes + (e * xmachine_memory_receptionist_MAX), 
-                        count * sizeof(unsigned int), 
-                        cudaMemcpyDeviceToHost
-                    )
-                );
-                // Update some global value indicating what data is currently present in that host array.
-                h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = currentIteration;
-            }
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->colaPacientes[index + (element * xmachine_memory_receptionist_MAX)];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access the %u-th element of colaPacientes for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", element, index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index)
- * Gets the value of the front variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable front
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_front_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->front,
-                    d_receptionists_defaultReceptionist->front,
+                    h_agents_default->box_no,
+                    d_agents_default->box_no,
                     count * sizeof(unsigned int),
                     cudaMemcpyDeviceToHost
                 )
             );
             // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_front_data_iteration = currentIteration;
+            h_agents_default_variable_box_no_data_iteration = currentIteration;
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->front[index];
+        return h_agents_default->box_no[index];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access front for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index)
- * Gets the value of the rear variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable rear
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_rear_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->rear,
-                    d_receptionists_defaultReceptionist->rear,
-                    count * sizeof(unsigned int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_rear_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->rear[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access rear for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index)
- * Gets the value of the size variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable size
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_size_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->size,
-                    d_receptionists_defaultReceptionist->size,
-                    count * sizeof(unsigned int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_size_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->size[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access size for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index)
- * Gets the value of the tick variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable tick
- */
-__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_tick_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->tick,
-                    d_receptionists_defaultReceptionist->tick,
-                    count * sizeof(unsigned int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_tick_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->tick[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index)
- * Gets the value of the current_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable current_patient
- */
-__host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_current_patient_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->current_patient,
-                    d_receptionists_defaultReceptionist->current_patient,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->current_patient[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access current_patient for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index)
- * Gets the value of the attend_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable attend_patient
- */
-__host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->attend_patient,
-                    d_receptionists_defaultReceptionist->attend_patient,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->attend_patient[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access attend_patient for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_receptionist_defaultReceptionist_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index){
-    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_receptionists_defaultReceptionist_variable_estado_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_receptionists_defaultReceptionist->estado,
-                    d_receptionists_defaultReceptionist->estado,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_receptionists_defaultReceptionist_variable_estado_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_receptionists_defaultReceptionist->estado[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access estado for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index)
- * Gets the value of the chairs_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable chairs_generated
- */
-__host__ int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index){
-    unsigned int count = get_agent_agent_generator_defaultGenerator_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_agent_generators_defaultGenerator->chairs_generated,
-                    d_agent_generators_defaultGenerator->chairs_generated,
-                    count * sizeof(int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_agent_generators_defaultGenerator->chairs_generated[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access chairs_generated for the %u th member of agent_generator_defaultGenerator. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
- * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable id
- */
-__host__ unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index){
-    unsigned int count = get_agent_chair_admin_defaultAdmin_count();
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_chair_admins_defaultAdmin_variable_id_data_iteration != currentIteration){
-            gpuErrchk(
-                cudaMemcpy(
-                    h_chair_admins_defaultAdmin->id,
-                    d_chair_admins_defaultAdmin->id,
-                    count * sizeof(unsigned int),
-                    cudaMemcpyDeviceToHost
-                )
-            );
-            // Update some global value indicating what data is currently present in that host array.
-            h_chair_admins_defaultAdmin_variable_id_data_iteration = currentIteration;
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_chair_admins_defaultAdmin->id[index];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access id for the %u th member of chair_admin_defaultAdmin. count is %u at iteration %u\n", index, count, currentIteration);
-        // Otherwise we return a default value
-        return 0;
-
-    }
-}
-
-/** unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element)
- * Gets the element-th value of the chairArray variable array of an chair_admin agent in the defaultAdmin state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable chairArray
- */
-__host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element){
-    unsigned int count = get_agent_chair_admin_defaultAdmin_count();
-    unsigned int numElements = 35;
-    unsigned int currentIteration = getIterationNumber();
-    
-    // If the index is within bounds - no need to check >= 0 due to unsigned.
-    if(count > 0 && index < count && element < numElements ){
-        // If necessary, copy agent data from the device to the host in the default stream
-        if(h_chair_admins_defaultAdmin_variable_chairArray_data_iteration != currentIteration){
-            
-            for(unsigned int e = 0; e < numElements; e++){
-                gpuErrchk(
-                    cudaMemcpy(
-                        h_chair_admins_defaultAdmin->chairArray + (e * xmachine_memory_chair_admin_MAX),
-                        d_chair_admins_defaultAdmin->chairArray + (e * xmachine_memory_chair_admin_MAX), 
-                        count * sizeof(unsigned int), 
-                        cudaMemcpyDeviceToHost
-                    )
-                );
-                // Update some global value indicating what data is currently present in that host array.
-                h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = currentIteration;
-            }
-        }
-
-        // Return the value of the index-th element of the relevant host array.
-        return h_chair_admins_defaultAdmin->chairArray[index + (element * xmachine_memory_chair_admin_MAX)];
-
-    } else {
-        fprintf(stderr, "Warning: Attempting to access the %u-th element of chairArray for the %u th member of chair_admin_defaultAdmin. count is %u at iteration %u\n", element, index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access box_no for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -4695,6 +4429,1128 @@ __host__ unsigned int get_navmap_static_variable_cant_generados(unsigned int ind
     }
 }
 
+/** int get_chair_defaultChair_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ int get_chair_defaultChair_variable_id(unsigned int index){
+    unsigned int count = get_agent_chair_defaultChair_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chairs_defaultChair_variable_id_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chairs_defaultChair->id,
+                    d_chairs_defaultChair->id,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chairs_defaultChair_variable_id_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chairs_defaultChair->id[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access id for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_chair_defaultChair_variable_x(unsigned int index)
+ * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_chair_defaultChair_variable_x(unsigned int index){
+    unsigned int count = get_agent_chair_defaultChair_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chairs_defaultChair_variable_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chairs_defaultChair->x,
+                    d_chairs_defaultChair->x,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chairs_defaultChair_variable_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chairs_defaultChair->x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access x for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_chair_defaultChair_variable_y(unsigned int index)
+ * Gets the value of the y variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_chair_defaultChair_variable_y(unsigned int index){
+    unsigned int count = get_agent_chair_defaultChair_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chairs_defaultChair_variable_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chairs_defaultChair->y,
+                    d_chairs_defaultChair->y,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chairs_defaultChair_variable_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chairs_defaultChair->y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access y for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_chair_defaultChair_variable_state(unsigned int index)
+ * Gets the value of the state variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable state
+ */
+__host__ int get_chair_defaultChair_variable_state(unsigned int index){
+    unsigned int count = get_agent_chair_defaultChair_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chairs_defaultChair_variable_state_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chairs_defaultChair->state,
+                    d_chairs_defaultChair->state,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chairs_defaultChair_variable_state_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chairs_defaultChair->state[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access state for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_medic_default2_variable_x(unsigned int index)
+ * Gets the value of the x variable of an medic agent in the default2 state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_medic_default2_variable_x(unsigned int index){
+    unsigned int count = get_agent_medic_default2_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_medics_default2_variable_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_medics_default2->x,
+                    d_medics_default2->x,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_medics_default2_variable_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_medics_default2->x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access x for the %u th member of medic_default2. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_medic_default2_variable_y(unsigned int index)
+ * Gets the value of the y variable of an medic agent in the default2 state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_medic_default2_variable_y(unsigned int index){
+    unsigned int count = get_agent_medic_default2_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_medics_default2_variable_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_medics_default2->y,
+                    d_medics_default2->y,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_medics_default2_variable_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_medics_default2->y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access y for the %u th member of medic_default2. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
+ * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable x
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_x(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_x_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->x,
+                    d_receptionists_defaultReceptionist->x,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_x_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->x[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access x for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
+ * Gets the value of the y variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable y
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_y_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->y,
+                    d_receptionists_defaultReceptionist->y,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_y_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->y[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access y for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_patientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the patientQueue variable array of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable patientQueue
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_patientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int numElements = 2000;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_receptionists_defaultReceptionist->patientQueue + (e * xmachine_memory_receptionist_MAX),
+                        d_receptionists_defaultReceptionist->patientQueue + (e * xmachine_memory_receptionist_MAX), 
+                        count * sizeof(unsigned int), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->patientQueue[index + (element * xmachine_memory_receptionist_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of patientQueue for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index)
+ * Gets the value of the front variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable front
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_front(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_front_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->front,
+                    d_receptionists_defaultReceptionist->front,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_front_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->front[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access front for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_rear(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_rear_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->rear,
+                    d_receptionists_defaultReceptionist->rear,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_rear_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->rear[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access rear for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index)
+ * Gets the value of the size variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_size(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_size_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->size,
+                    d_receptionists_defaultReceptionist->size,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_size_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->size[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access size for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_receptionist_defaultReceptionist_variable_tick(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_tick_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->tick,
+                    d_receptionists_defaultReceptionist->tick,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_tick_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->tick[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index)
+ * Gets the value of the current_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable current_patient
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_current_patient_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->current_patient,
+                    d_receptionists_defaultReceptionist->current_patient,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_current_patient_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->current_patient[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access current_patient for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index)
+ * Gets the value of the attend_patient variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable attend_patient
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->attend_patient,
+                    d_receptionists_defaultReceptionist->attend_patient,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->attend_patient[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access attend_patient for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_receptionist_defaultReceptionist_variable_estado(unsigned int index)
+ * Gets the value of the estado variable of an receptionist agent in the defaultReceptionist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable estado
+ */
+__host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index){
+    unsigned int count = get_agent_receptionist_defaultReceptionist_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_receptionists_defaultReceptionist_variable_estado_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_receptionists_defaultReceptionist->estado,
+                    d_receptionists_defaultReceptionist->estado,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_receptionists_defaultReceptionist_variable_estado_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_receptionists_defaultReceptionist->estado[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access estado for the %u th member of receptionist_defaultReceptionist. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index)
+ * Gets the value of the chairs_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable chairs_generated
+ */
+__host__ int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index){
+    unsigned int count = get_agent_agent_generator_defaultGenerator_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agent_generators_defaultGenerator->chairs_generated,
+                    d_agent_generators_defaultGenerator->chairs_generated,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agent_generators_defaultGenerator->chairs_generated[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access chairs_generated for the %u th member of agent_generator_defaultGenerator. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** int get_agent_generator_defaultGenerator_variable_triage_generated(unsigned int index)
+ * Gets the value of the triage_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable triage_generated
+ */
+__host__ int get_agent_generator_defaultGenerator_variable_triage_generated(unsigned int index){
+    unsigned int count = get_agent_agent_generator_defaultGenerator_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agent_generators_defaultGenerator->triage_generated,
+                    d_agent_generators_defaultGenerator->triage_generated,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agent_generators_defaultGenerator->triage_generated[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access triage_generated for the %u th member of agent_generator_defaultGenerator. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
+ * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index){
+    unsigned int count = get_agent_chair_admin_defaultAdmin_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chair_admins_defaultAdmin_variable_id_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chair_admins_defaultAdmin->id,
+                    d_chair_admins_defaultAdmin->id,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chair_admins_defaultAdmin_variable_id_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chair_admins_defaultAdmin->id[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access id for the %u th member of chair_admin_defaultAdmin. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element)
+ * Gets the element-th value of the chairArray variable array of an chair_admin agent in the defaultAdmin state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable chairArray
+ */
+__host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_chair_admin_defaultAdmin_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chair_admins_defaultAdmin_variable_chairArray_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_chair_admins_defaultAdmin->chairArray + (e * xmachine_memory_chair_admin_MAX),
+                        d_chair_admins_defaultAdmin->chairArray + (e * xmachine_memory_chair_admin_MAX), 
+                        count * sizeof(unsigned int), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chair_admins_defaultAdmin->chairArray[index + (element * xmachine_memory_chair_admin_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of chairArray for the %u th member of chair_admin_defaultAdmin. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_box_defaultBox_variable_id(unsigned int index)
+ * Gets the value of the id variable of an box agent in the defaultBox state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_box_defaultBox_variable_id(unsigned int index){
+    unsigned int count = get_agent_box_defaultBox_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_boxs_defaultBox_variable_id_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_boxs_defaultBox->id,
+                    d_boxs_defaultBox->id,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_boxs_defaultBox_variable_id_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_boxs_defaultBox->id[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access id for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_box_defaultBox_variable_occupied(unsigned int index)
+ * Gets the value of the occupied variable of an box agent in the defaultBox state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable occupied
+ */
+__host__ unsigned int get_box_defaultBox_variable_occupied(unsigned int index){
+    unsigned int count = get_agent_box_defaultBox_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_boxs_defaultBox_variable_occupied_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_boxs_defaultBox->occupied,
+                    d_boxs_defaultBox->occupied,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_boxs_defaultBox_variable_occupied_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_boxs_defaultBox->occupied[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access occupied for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_id(unsigned int index)
+ * Gets the value of the id variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_id(unsigned int index){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_id_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_triages_defaultTriage->id,
+                    d_triages_defaultTriage->id,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_triages_defaultTriage_variable_id_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->id[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access id for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element)
+ * Gets the element-th value of the boxArray variable array of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable boxArray
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int numElements = 3;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_boxArray_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_triages_defaultTriage->boxArray + (e * xmachine_memory_triage_MAX),
+                        d_triages_defaultTriage->boxArray + (e * xmachine_memory_triage_MAX), 
+                        count * sizeof(unsigned int), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_triages_defaultTriage_variable_boxArray_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->boxArray[index + (element * xmachine_memory_triage_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of boxArray for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_patientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the patientQueue variable array of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable patientQueue
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_patientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int numElements = 100;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_patientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_triages_defaultTriage->patientQueue + (e * xmachine_memory_triage_MAX),
+                        d_triages_defaultTriage->patientQueue + (e * xmachine_memory_triage_MAX), 
+                        count * sizeof(unsigned int), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_triages_defaultTriage_variable_patientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->patientQueue[index + (element * xmachine_memory_triage_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of patientQueue for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_front(unsigned int index)
+ * Gets the value of the front variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable front
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_front(unsigned int index){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_front_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_triages_defaultTriage->front,
+                    d_triages_defaultTriage->front,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_triages_defaultTriage_variable_front_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->front[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access front for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_rear(unsigned int index){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_rear_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_triages_defaultTriage->rear,
+                    d_triages_defaultTriage->rear,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_triages_defaultTriage_variable_rear_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->rear[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access rear for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_size(unsigned int index)
+ * Gets the value of the size variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_size(unsigned int index){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_size_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_triages_defaultTriage->size,
+                    d_triages_defaultTriage->size,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_triages_defaultTriage_variable_size_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->size[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access size for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_triage_defaultTriage_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an triage agent in the defaultTriage state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_triage_defaultTriage_variable_tick(unsigned int index){
+    unsigned int count = get_agent_triage_defaultTriage_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_triages_defaultTriage_variable_tick_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_triages_defaultTriage->tick,
+                    d_triages_defaultTriage->tick,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_triages_defaultTriage_variable_tick_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_triages_defaultTriage->tick[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 
 
 /* Host based agent creation functions */
@@ -4746,6 +5602,8 @@ void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list *
 		gpuErrchk(cudaMemcpy(d_dst->go_to_y, &h_agent->go_to_y, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->chair_no, &h_agent->chair_no, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->box_no, &h_agent->box_no, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -4799,6 +5657,8 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
 		gpuErrchk(cudaMemcpy(d_dst->go_to_y, h_src->go_to_y, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->chair_no, h_src->chair_no, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->box_no, h_src->box_no, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -4892,7 +5752,7 @@ void copy_single_xmachine_memory_receptionist_hostToDevice(xmachine_memory_recep
 		gpuErrchk(cudaMemcpy(d_dst->y, &h_agent->y, sizeof(int), cudaMemcpyHostToDevice));
  
 	for(unsigned int i = 0; i < 2000; i++){
-		gpuErrchk(cudaMemcpy(d_dst->colaPacientes + (i * xmachine_memory_receptionist_MAX), h_agent->colaPacientes + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->patientQueue + (i * xmachine_memory_receptionist_MAX), h_agent->patientQueue + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
     }
  
 		gpuErrchk(cudaMemcpy(d_dst->front, &h_agent->front, sizeof(unsigned int), cudaMemcpyHostToDevice));
@@ -4929,7 +5789,7 @@ void copy_partial_xmachine_memory_receptionist_hostToDevice(xmachine_memory_rece
 		gpuErrchk(cudaMemcpy(d_dst->y, h_src->y, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		for(unsigned int i = 0; i < 2000; i++){
-			gpuErrchk(cudaMemcpy(d_dst->colaPacientes + (i * xmachine_memory_receptionist_MAX), h_src->colaPacientes + (i * xmachine_memory_receptionist_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+			gpuErrchk(cudaMemcpy(d_dst->patientQueue + (i * xmachine_memory_receptionist_MAX), h_src->patientQueue + (i * xmachine_memory_receptionist_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
         }
 
  
@@ -4959,6 +5819,8 @@ void copy_partial_xmachine_memory_receptionist_hostToDevice(xmachine_memory_rece
 void copy_single_xmachine_memory_agent_generator_hostToDevice(xmachine_memory_agent_generator_list * d_dst, xmachine_memory_agent_generator * h_agent){
  
 		gpuErrchk(cudaMemcpy(d_dst->chairs_generated, &h_agent->chairs_generated, sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->triage_generated, &h_agent->triage_generated, sizeof(int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -4976,6 +5838,8 @@ void copy_partial_xmachine_memory_agent_generator_hostToDevice(xmachine_memory_a
     if (count > 0){
 	 
 		gpuErrchk(cudaMemcpy(d_dst->chairs_generated, h_src->chairs_generated, count * sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->triage_generated, h_src->triage_generated, count * sizeof(int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -5015,6 +5879,104 @@ void copy_partial_xmachine_memory_chair_admin_hostToDevice(xmachine_memory_chair
 			gpuErrchk(cudaMemcpy(d_dst->chairArray + (i * xmachine_memory_chair_admin_MAX), h_src->chairArray + (i * xmachine_memory_chair_admin_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
         }
 
+
+    }
+}
+
+
+/* copy_single_xmachine_memory_box_hostToDevice
+ * Private function to copy a host agent struct into a device SoA agent list.
+ * @param d_dst destination agent state list
+ * @param h_agent agent struct
+ */
+void copy_single_xmachine_memory_box_hostToDevice(xmachine_memory_box_list * d_dst, xmachine_memory_box * h_agent){
+ 
+		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->occupied, &h_agent->occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+
+}
+/*
+ * Private function to copy some elements from a host based struct of arrays to a device based struct of arrays for a single agent state.
+ * Individual copies of `count` elements are performed for each agent variable or each component of agent array variables, to avoid wasted data transfer.
+ * There will be a point at which a single cudaMemcpy will outperform many smaller memcpys, however host based agent creation should typically only populate a fraction of the maximum buffer size, so this should be more efficient.
+ * @optimisation - experimentally find the proportion at which transferring the whole SoA would be better and incorporate this. The same will apply to agent variable arrays.
+ * 
+ * @param d_dst device destination SoA
+ * @oaram h_src host source SoA
+ * @param count the number of agents to transfer data for
+ */
+void copy_partial_xmachine_memory_box_hostToDevice(xmachine_memory_box_list * d_dst, xmachine_memory_box_list * h_src, unsigned int count){
+    // Only copy elements if there is data to move.
+    if (count > 0){
+	 
+		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->occupied, h_src->occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+
+    }
+}
+
+
+/* copy_single_xmachine_memory_triage_hostToDevice
+ * Private function to copy a host agent struct into a device SoA agent list.
+ * @param d_dst destination agent state list
+ * @param h_agent agent struct
+ */
+void copy_single_xmachine_memory_triage_hostToDevice(xmachine_memory_triage_list * d_dst, xmachine_memory_triage * h_agent){
+ 
+		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+	for(unsigned int i = 0; i < 3; i++){
+		gpuErrchk(cudaMemcpy(d_dst->boxArray + (i * xmachine_memory_triage_MAX), h_agent->boxArray + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+    }
+ 
+	for(unsigned int i = 0; i < 100; i++){
+		gpuErrchk(cudaMemcpy(d_dst->patientQueue + (i * xmachine_memory_triage_MAX), h_agent->patientQueue + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+    }
+ 
+		gpuErrchk(cudaMemcpy(d_dst->front, &h_agent->front, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->rear, &h_agent->rear, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->size, &h_agent->size, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(unsigned int), cudaMemcpyHostToDevice));
+
+}
+/*
+ * Private function to copy some elements from a host based struct of arrays to a device based struct of arrays for a single agent state.
+ * Individual copies of `count` elements are performed for each agent variable or each component of agent array variables, to avoid wasted data transfer.
+ * There will be a point at which a single cudaMemcpy will outperform many smaller memcpys, however host based agent creation should typically only populate a fraction of the maximum buffer size, so this should be more efficient.
+ * @optimisation - experimentally find the proportion at which transferring the whole SoA would be better and incorporate this. The same will apply to agent variable arrays.
+ * 
+ * @param d_dst device destination SoA
+ * @oaram h_src host source SoA
+ * @param count the number of agents to transfer data for
+ */
+void copy_partial_xmachine_memory_triage_hostToDevice(xmachine_memory_triage_list * d_dst, xmachine_memory_triage_list * h_src, unsigned int count){
+    // Only copy elements if there is data to move.
+    if (count > 0){
+	 
+		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		for(unsigned int i = 0; i < 3; i++){
+			gpuErrchk(cudaMemcpy(d_dst->boxArray + (i * xmachine_memory_triage_MAX), h_src->boxArray + (i * xmachine_memory_triage_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+        }
+
+ 
+		for(unsigned int i = 0; i < 100; i++){
+			gpuErrchk(cudaMemcpy(d_dst->patientQueue + (i * xmachine_memory_triage_MAX), h_src->patientQueue + (i * xmachine_memory_triage_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+        }
+
+ 
+		gpuErrchk(cudaMemcpy(d_dst->front, h_src->front, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->rear, h_src->rear, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->size, h_src->size, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -5089,6 +6051,8 @@ void h_unpack_agents_agent_AoS_to_SoA(xmachine_memory_agent_list * dst, xmachine
 			dst->go_to_y[i] = src[i]->go_to_y;
 			 
 			dst->chair_no[i] = src[i]->chair_no;
+			 
+			dst->box_no[i] = src[i]->box_no;
 			
 		}
 	}
@@ -5139,6 +6103,7 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent){
     h_agents_default_variable_go_to_x_data_iteration = 0;
     h_agents_default_variable_go_to_y_data_iteration = 0;
     h_agents_default_variable_chair_no_data_iteration = 0;
+    h_agents_default_variable_box_no_data_iteration = 0;
     
 
 }
@@ -5189,6 +6154,7 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
         h_agents_default_variable_go_to_x_data_iteration = 0;
         h_agents_default_variable_go_to_y_data_iteration = 0;
         h_agents_default_variable_chair_no_data_iteration = 0;
+        h_agents_default_variable_box_no_data_iteration = 0;
         
 
 	}
@@ -5423,10 +6389,10 @@ xmachine_memory_receptionist* h_allocate_agent_receptionist(){
 
     agent->y = -0.375000;
 	// Agent variable arrays must be allocated
-    agent->colaPacientes = (unsigned int*)malloc(2000 * sizeof(unsigned int));
+    agent->patientQueue = (unsigned int*)malloc(2000 * sizeof(unsigned int));
 	
     // If there is no default value, memset to 0.
-    memset(agent->colaPacientes, 0, sizeof(unsigned int)*2000);
+    memset(agent->patientQueue, 0, sizeof(unsigned int)*2000);
     agent->tick = 0;
 
     agent->current_patient = -1;
@@ -5439,7 +6405,7 @@ xmachine_memory_receptionist* h_allocate_agent_receptionist(){
 }
 void h_free_agent_receptionist(xmachine_memory_receptionist** agent){
 
-    free((*agent)->colaPacientes);
+    free((*agent)->patientQueue);
  
 	free((*agent));
 	(*agent) = NULL;
@@ -5468,7 +6434,7 @@ void h_unpack_agents_receptionist_AoS_to_SoA(xmachine_memory_receptionist_list *
 			dst->y[i] = src[i]->y;
 			 
 			for(unsigned int j = 0; j < 2000; j++){
-				dst->colaPacientes[(j * xmachine_memory_receptionist_MAX) + i] = src[i]->colaPacientes[j];
+				dst->patientQueue[(j * xmachine_memory_receptionist_MAX) + i] = src[i]->patientQueue[j];
 			}
 			 
 			dst->front[i] = src[i]->front;
@@ -5517,7 +6483,7 @@ void h_add_agent_receptionist_defaultReceptionist(xmachine_memory_receptionist* 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
     h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
-    h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = 0;
+    h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
@@ -5558,7 +6524,7 @@ void h_add_agents_receptionist_defaultReceptionist(xmachine_memory_receptionist*
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
-        h_receptionists_defaultReceptionist_variable_colaPacientes_data_iteration = 0;
+        h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_front_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_rear_data_iteration = 0;
         h_receptionists_defaultReceptionist_variable_size_data_iteration = 0;
@@ -5577,6 +6543,8 @@ xmachine_memory_agent_generator* h_allocate_agent_agent_generator(){
     memset(agent, 0, sizeof(xmachine_memory_agent_generator));
 
     agent->chairs_generated = 0;
+
+    agent->triage_generated = 0;
 
 	return agent;
 }
@@ -5605,6 +6573,8 @@ void h_unpack_agents_agent_generator_AoS_to_SoA(xmachine_memory_agent_generator_
 		for(unsigned int i = 0; i < count; i++){
 			 
 			dst->chairs_generated[i] = src[i]->chairs_generated;
+			 
+			dst->triage_generated[i] = src[i]->triage_generated;
 			
 		}
 	}
@@ -5637,6 +6607,7 @@ void h_add_agent_agent_generator_defaultGenerator(xmachine_memory_agent_generato
 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
     h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = 0;
     
 
 }
@@ -5669,6 +6640,7 @@ void h_add_agents_agent_generator_defaultGenerator(xmachine_memory_agent_generat
 
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
+        h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = 0;
         
 
 	}
@@ -5785,6 +6757,257 @@ void h_add_agents_chair_admin_defaultAdmin(xmachine_memory_chair_admin** agents,
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
         h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
+        
+
+	}
+}
+
+xmachine_memory_box* h_allocate_agent_box(){
+	xmachine_memory_box* agent = (xmachine_memory_box*)malloc(sizeof(xmachine_memory_box));
+	// Memset the whole agent strcuture
+    memset(agent, 0, sizeof(xmachine_memory_box));
+
+	return agent;
+}
+void h_free_agent_box(xmachine_memory_box** agent){
+ 
+	free((*agent));
+	(*agent) = NULL;
+}
+xmachine_memory_box** h_allocate_agent_box_array(unsigned int count){
+	xmachine_memory_box ** agents = (xmachine_memory_box**)malloc(count * sizeof(xmachine_memory_box*));
+	for (unsigned int i = 0; i < count; i++) {
+		agents[i] = h_allocate_agent_box();
+	}
+	return agents;
+}
+void h_free_agent_box_array(xmachine_memory_box*** agents, unsigned int count){
+	for (unsigned int i = 0; i < count; i++) {
+		h_free_agent_box(&((*agents)[i]));
+	}
+	free((*agents));
+	(*agents) = NULL;
+}
+
+void h_unpack_agents_box_AoS_to_SoA(xmachine_memory_box_list * dst, xmachine_memory_box** src, unsigned int count){
+	if(count > 0){
+		for(unsigned int i = 0; i < count; i++){
+			 
+			dst->id[i] = src[i]->id;
+			 
+			dst->occupied[i] = src[i]->occupied;
+			
+		}
+	}
+}
+
+
+void h_add_agent_box_defaultBox(xmachine_memory_box* agent){
+	if (h_xmachine_memory_box_count + 1 > xmachine_memory_box_MAX){
+		printf("Error: Buffer size of box agents in state defaultBox will be exceeded by h_add_agent_box_defaultBox\n");
+		exit(EXIT_FAILURE);
+	}	
+
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+	unsigned int count = 1;
+	
+	// Copy data from host struct to device SoA for target state
+	copy_single_xmachine_memory_box_hostToDevice(d_boxs_new, agent);
+
+	// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_box_Agents, no_sm, count);
+	gridSize = (count + blockSize - 1) / blockSize;
+	append_box_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_boxs_defaultBox, d_boxs_new, h_xmachine_memory_box_defaultBox_count, count);
+	gpuErrchkLaunch();
+	// Update the number of agents in this state.
+	h_xmachine_memory_box_defaultBox_count += count;
+	gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));
+	cudaDeviceSynchronize();
+
+    // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+    h_boxs_defaultBox_variable_id_data_iteration = 0;
+    h_boxs_defaultBox_variable_occupied_data_iteration = 0;
+    
+
+}
+void h_add_agents_box_defaultBox(xmachine_memory_box** agents, unsigned int count){
+	if(count > 0){
+		int blockSize;
+		int minGridSize;
+		int gridSize;
+
+		if (h_xmachine_memory_box_count + count > xmachine_memory_box_MAX){
+			printf("Error: Buffer size of box agents in state defaultBox will be exceeded by h_add_agents_box_defaultBox\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// Unpack data from AoS into the pre-existing SoA
+		h_unpack_agents_box_AoS_to_SoA(h_boxs_defaultBox, agents, count);
+
+		// Copy data from the host SoA to the device SoA for the target state
+		copy_partial_xmachine_memory_box_hostToDevice(d_boxs_new, h_boxs_defaultBox, count);
+
+		// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+		cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_box_Agents, no_sm, count);
+		gridSize = (count + blockSize - 1) / blockSize;
+		append_box_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_boxs_defaultBox, d_boxs_new, h_xmachine_memory_box_defaultBox_count, count);
+		gpuErrchkLaunch();
+		// Update the number of agents in this state.
+		h_xmachine_memory_box_defaultBox_count += count;
+		gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));
+		cudaDeviceSynchronize();
+
+        // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+        h_boxs_defaultBox_variable_id_data_iteration = 0;
+        h_boxs_defaultBox_variable_occupied_data_iteration = 0;
+        
+
+	}
+}
+
+xmachine_memory_triage* h_allocate_agent_triage(){
+	xmachine_memory_triage* agent = (xmachine_memory_triage*)malloc(sizeof(xmachine_memory_triage));
+	// Memset the whole agent strcuture
+    memset(agent, 0, sizeof(xmachine_memory_triage));
+
+    agent->id = 0;
+	// Agent variable arrays must be allocated
+    agent->boxArray = (unsigned int*)malloc(3 * sizeof(unsigned int));
+	// If we have a default value, set each element correctly.
+	for(unsigned int index = 0; index < 3; index++){
+		agent->boxArray[index] = 0;
+	}	// Agent variable arrays must be allocated
+    agent->patientQueue = (unsigned int*)malloc(100 * sizeof(unsigned int));
+	
+    // If there is no default value, memset to 0.
+    memset(agent->patientQueue, 0, sizeof(unsigned int)*100);
+    agent->tick = 0;
+
+	return agent;
+}
+void h_free_agent_triage(xmachine_memory_triage** agent){
+
+    free((*agent)->boxArray);
+
+    free((*agent)->patientQueue);
+ 
+	free((*agent));
+	(*agent) = NULL;
+}
+xmachine_memory_triage** h_allocate_agent_triage_array(unsigned int count){
+	xmachine_memory_triage ** agents = (xmachine_memory_triage**)malloc(count * sizeof(xmachine_memory_triage*));
+	for (unsigned int i = 0; i < count; i++) {
+		agents[i] = h_allocate_agent_triage();
+	}
+	return agents;
+}
+void h_free_agent_triage_array(xmachine_memory_triage*** agents, unsigned int count){
+	for (unsigned int i = 0; i < count; i++) {
+		h_free_agent_triage(&((*agents)[i]));
+	}
+	free((*agents));
+	(*agents) = NULL;
+}
+
+void h_unpack_agents_triage_AoS_to_SoA(xmachine_memory_triage_list * dst, xmachine_memory_triage** src, unsigned int count){
+	if(count > 0){
+		for(unsigned int i = 0; i < count; i++){
+			 
+			dst->id[i] = src[i]->id;
+			 
+			for(unsigned int j = 0; j < 3; j++){
+				dst->boxArray[(j * xmachine_memory_triage_MAX) + i] = src[i]->boxArray[j];
+			}
+			 
+			for(unsigned int j = 0; j < 100; j++){
+				dst->patientQueue[(j * xmachine_memory_triage_MAX) + i] = src[i]->patientQueue[j];
+			}
+			 
+			dst->front[i] = src[i]->front;
+			 
+			dst->rear[i] = src[i]->rear;
+			 
+			dst->size[i] = src[i]->size;
+			 
+			dst->tick[i] = src[i]->tick;
+			
+		}
+	}
+}
+
+
+void h_add_agent_triage_defaultTriage(xmachine_memory_triage* agent){
+	if (h_xmachine_memory_triage_count + 1 > xmachine_memory_triage_MAX){
+		printf("Error: Buffer size of triage agents in state defaultTriage will be exceeded by h_add_agent_triage_defaultTriage\n");
+		exit(EXIT_FAILURE);
+	}	
+
+	int blockSize;
+	int minGridSize;
+	int gridSize;
+	unsigned int count = 1;
+	
+	// Copy data from host struct to device SoA for target state
+	copy_single_xmachine_memory_triage_hostToDevice(d_triages_new, agent);
+
+	// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_triage_Agents, no_sm, count);
+	gridSize = (count + blockSize - 1) / blockSize;
+	append_triage_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_triages_defaultTriage, d_triages_new, h_xmachine_memory_triage_defaultTriage_count, count);
+	gpuErrchkLaunch();
+	// Update the number of agents in this state.
+	h_xmachine_memory_triage_defaultTriage_count += count;
+	gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_triage_defaultTriage_count, &h_xmachine_memory_triage_defaultTriage_count, sizeof(int)));
+	cudaDeviceSynchronize();
+
+    // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+    h_triages_defaultTriage_variable_id_data_iteration = 0;
+    h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
+    h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
+    h_triages_defaultTriage_variable_front_data_iteration = 0;
+    h_triages_defaultTriage_variable_rear_data_iteration = 0;
+    h_triages_defaultTriage_variable_size_data_iteration = 0;
+    h_triages_defaultTriage_variable_tick_data_iteration = 0;
+    
+
+}
+void h_add_agents_triage_defaultTriage(xmachine_memory_triage** agents, unsigned int count){
+	if(count > 0){
+		int blockSize;
+		int minGridSize;
+		int gridSize;
+
+		if (h_xmachine_memory_triage_count + count > xmachine_memory_triage_MAX){
+			printf("Error: Buffer size of triage agents in state defaultTriage will be exceeded by h_add_agents_triage_defaultTriage\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// Unpack data from AoS into the pre-existing SoA
+		h_unpack_agents_triage_AoS_to_SoA(h_triages_defaultTriage, agents, count);
+
+		// Copy data from the host SoA to the device SoA for the target state
+		copy_partial_xmachine_memory_triage_hostToDevice(d_triages_new, h_triages_defaultTriage, count);
+
+		// Use append kernel (@optimisation - This can be replaced with a pointer swap if the target state list is empty)
+		cudaOccupancyMaxPotentialBlockSizeVariableSMem(&minGridSize, &blockSize, append_triage_Agents, no_sm, count);
+		gridSize = (count + blockSize - 1) / blockSize;
+		append_triage_Agents <<<gridSize, blockSize, 0, stream1 >>>(d_triages_defaultTriage, d_triages_new, h_xmachine_memory_triage_defaultTriage_count, count);
+		gpuErrchkLaunch();
+		// Update the number of agents in this state.
+		h_xmachine_memory_triage_defaultTriage_count += count;
+		gpuErrchk(cudaMemcpyToSymbol(d_xmachine_memory_triage_defaultTriage_count, &h_xmachine_memory_triage_defaultTriage_count, sizeof(int)));
+		cudaDeviceSynchronize();
+
+        // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
+        h_triages_defaultTriage_variable_id_data_iteration = 0;
+        h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
+        h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
+        h_triages_defaultTriage_variable_front_data_iteration = 0;
+        h_triages_defaultTriage_variable_rear_data_iteration = 0;
+        h_triages_defaultTriage_variable_size_data_iteration = 0;
+        h_triages_defaultTriage_variable_tick_data_iteration = 0;
         
 
 	}
@@ -6156,361 +7379,25 @@ unsigned int max_agent_default_chair_no_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-int reduce_chair_defaultChair_id_variable(){
+unsigned int reduce_agent_default_box_no_variable(){
     //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->id),  thrust::device_pointer_cast(d_chairs_defaultChair->id) + h_xmachine_memory_chair_defaultChair_count);
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->box_no),  thrust::device_pointer_cast(d_agents_default->box_no) + h_xmachine_memory_agent_default_count);
 }
 
-int count_chair_defaultChair_id_variable(int count_value){
+unsigned int count_agent_default_box_no_variable(unsigned int count_value){
     //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->id),  thrust::device_pointer_cast(d_chairs_defaultChair->id) + h_xmachine_memory_chair_defaultChair_count, count_value);
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->box_no),  thrust::device_pointer_cast(d_agents_default->box_no) + h_xmachine_memory_agent_default_count, count_value);
 }
-int min_chair_defaultChair_id_variable(){
+unsigned int min_agent_default_box_no_variable(){
     //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->id);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->box_no);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-int max_chair_defaultChair_id_variable(){
+unsigned int max_agent_default_box_no_variable(){
     //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->id);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_chair_defaultChair_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->x),  thrust::device_pointer_cast(d_chairs_defaultChair->x) + h_xmachine_memory_chair_defaultChair_count);
-}
-
-int count_chair_defaultChair_x_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->x),  thrust::device_pointer_cast(d_chairs_defaultChair->x) + h_xmachine_memory_chair_defaultChair_count, count_value);
-}
-int min_chair_defaultChair_x_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_chair_defaultChair_x_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_chair_defaultChair_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->y),  thrust::device_pointer_cast(d_chairs_defaultChair->y) + h_xmachine_memory_chair_defaultChair_count);
-}
-
-int count_chair_defaultChair_y_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->y),  thrust::device_pointer_cast(d_chairs_defaultChair->y) + h_xmachine_memory_chair_defaultChair_count, count_value);
-}
-int min_chair_defaultChair_y_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_chair_defaultChair_y_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_chair_defaultChair_state_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->state),  thrust::device_pointer_cast(d_chairs_defaultChair->state) + h_xmachine_memory_chair_defaultChair_count);
-}
-
-int count_chair_defaultChair_state_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->state),  thrust::device_pointer_cast(d_chairs_defaultChair->state) + h_xmachine_memory_chair_defaultChair_count, count_value);
-}
-int min_chair_defaultChair_state_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->state);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_chair_defaultChair_state_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->state);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_medic_default2_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count);
-}
-
-int count_medic_default2_x_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count, count_value);
-}
-int min_medic_default2_x_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_medic_default2_x_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_medic_default2_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_medics_default2->y),  thrust::device_pointer_cast(d_medics_default2->y) + h_xmachine_memory_medic_default2_count);
-}
-
-int count_medic_default2_y_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_medics_default2->y),  thrust::device_pointer_cast(d_medics_default2->y) + h_xmachine_memory_medic_default2_count, count_value);
-}
-int min_medic_default2_y_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_medic_default2_y_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_receptionist_defaultReceptionist_x_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-int count_receptionist_defaultReceptionist_x_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-int min_receptionist_defaultReceptionist_x_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_receptionist_defaultReceptionist_x_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_receptionist_defaultReceptionist_y_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-int count_receptionist_defaultReceptionist_y_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-int min_receptionist_defaultReceptionist_y_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_receptionist_defaultReceptionist_y_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int reduce_receptionist_defaultReceptionist_front_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value){
-    //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-unsigned int min_receptionist_defaultReceptionist_front_variable(){
-    //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int max_receptionist_defaultReceptionist_front_variable(){
-    //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int reduce_receptionist_defaultReceptionist_rear_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value){
-    //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-unsigned int min_receptionist_defaultReceptionist_rear_variable(){
-    //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int max_receptionist_defaultReceptionist_rear_variable(){
-    //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int reduce_receptionist_defaultReceptionist_size_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value){
-    //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-unsigned int min_receptionist_defaultReceptionist_size_variable(){
-    //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int max_receptionist_defaultReceptionist_size_variable(){
-    //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int reduce_receptionist_defaultReceptionist_tick_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value){
-    //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-unsigned int min_receptionist_defaultReceptionist_tick_variable(){
-    //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int max_receptionist_defaultReceptionist_tick_variable(){
-    //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_receptionist_defaultReceptionist_current_patient_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-int count_receptionist_defaultReceptionist_current_patient_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-int min_receptionist_defaultReceptionist_current_patient_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_receptionist_defaultReceptionist_current_patient_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_receptionist_defaultReceptionist_attend_patient_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-int min_receptionist_defaultReceptionist_attend_patient_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_receptionist_defaultReceptionist_attend_patient_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_receptionist_defaultReceptionist_estado_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado) + h_xmachine_memory_receptionist_defaultReceptionist_count);
-}
-
-int count_receptionist_defaultReceptionist_estado_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
-}
-int min_receptionist_defaultReceptionist_estado_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_receptionist_defaultReceptionist_estado_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int reduce_agent_generator_defaultGenerator_chairs_generated_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count);
-}
-
-int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value){
-    //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count, count_value);
-}
-int min_agent_generator_defaultGenerator_chairs_generated_variable(){
-    //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-int max_agent_generator_defaultGenerator_chairs_generated_variable(){
-    //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int reduce_chair_admin_defaultAdmin_id_variable(){
-    //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id),  thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id) + h_xmachine_memory_chair_admin_defaultAdmin_count);
-}
-
-unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value){
-    //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id),  thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id) + h_xmachine_memory_chair_admin_defaultAdmin_count, count_value);
-}
-unsigned int min_chair_admin_defaultAdmin_id_variable(){
-    //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id);
-    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_admin_defaultAdmin_count) - thrust_ptr;
-    return *(thrust_ptr + result_offset);
-}
-unsigned int max_chair_admin_defaultAdmin_id_variable(){
-    //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id);
-    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_admin_defaultAdmin_count) - thrust_ptr;
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->box_no);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
 int reduce_navmap_static_x_variable(){
@@ -6884,6 +7771,531 @@ unsigned int max_navmap_static_cant_generados_variable(){
     //max in default stream
     thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_navmaps_static->cant_generados);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_navmap_static_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_chair_defaultChair_id_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->id),  thrust::device_pointer_cast(d_chairs_defaultChair->id) + h_xmachine_memory_chair_defaultChair_count);
+}
+
+int count_chair_defaultChair_id_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->id),  thrust::device_pointer_cast(d_chairs_defaultChair->id) + h_xmachine_memory_chair_defaultChair_count, count_value);
+}
+int min_chair_defaultChair_id_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->id);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_chair_defaultChair_id_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_chair_defaultChair_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->x),  thrust::device_pointer_cast(d_chairs_defaultChair->x) + h_xmachine_memory_chair_defaultChair_count);
+}
+
+int count_chair_defaultChair_x_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->x),  thrust::device_pointer_cast(d_chairs_defaultChair->x) + h_xmachine_memory_chair_defaultChair_count, count_value);
+}
+int min_chair_defaultChair_x_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_chair_defaultChair_x_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_chair_defaultChair_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->y),  thrust::device_pointer_cast(d_chairs_defaultChair->y) + h_xmachine_memory_chair_defaultChair_count);
+}
+
+int count_chair_defaultChair_y_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->y),  thrust::device_pointer_cast(d_chairs_defaultChair->y) + h_xmachine_memory_chair_defaultChair_count, count_value);
+}
+int min_chair_defaultChair_y_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_chair_defaultChair_y_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_chair_defaultChair_state_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->state),  thrust::device_pointer_cast(d_chairs_defaultChair->state) + h_xmachine_memory_chair_defaultChair_count);
+}
+
+int count_chair_defaultChair_state_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->state),  thrust::device_pointer_cast(d_chairs_defaultChair->state) + h_xmachine_memory_chair_defaultChair_count, count_value);
+}
+int min_chair_defaultChair_state_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->state);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_chair_defaultChair_state_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->state);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_medic_default2_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count);
+}
+
+int count_medic_default2_x_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_medics_default2->x),  thrust::device_pointer_cast(d_medics_default2->x) + h_xmachine_memory_medic_default2_count, count_value);
+}
+int min_medic_default2_x_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_medic_default2_x_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_medic_default2_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_medics_default2->y),  thrust::device_pointer_cast(d_medics_default2->y) + h_xmachine_memory_medic_default2_count);
+}
+
+int count_medic_default2_y_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_medics_default2->y),  thrust::device_pointer_cast(d_medics_default2->y) + h_xmachine_memory_medic_default2_count, count_value);
+}
+int min_medic_default2_y_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_medic_default2_y_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_medics_default2->y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_medic_default2_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_receptionist_defaultReceptionist_x_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+int count_receptionist_defaultReceptionist_x_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+int min_receptionist_defaultReceptionist_x_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_receptionist_defaultReceptionist_x_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->x);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_receptionist_defaultReceptionist_y_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+int count_receptionist_defaultReceptionist_y_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+int min_receptionist_defaultReceptionist_y_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_receptionist_defaultReceptionist_y_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->y);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_front_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_front_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_front_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_front_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->front);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_rear_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_rear_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_rear_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_rear_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->rear);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_size_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_size_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_size_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_size_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->size);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_receptionist_defaultReceptionist_tick_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+unsigned int count_receptionist_defaultReceptionist_tick_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+unsigned int min_receptionist_defaultReceptionist_tick_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_receptionist_defaultReceptionist_tick_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->tick);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_receptionist_defaultReceptionist_current_patient_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+int count_receptionist_defaultReceptionist_current_patient_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+int min_receptionist_defaultReceptionist_current_patient_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_receptionist_defaultReceptionist_current_patient_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->current_patient);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_receptionist_defaultReceptionist_attend_patient_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+int count_receptionist_defaultReceptionist_attend_patient_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+int min_receptionist_defaultReceptionist_attend_patient_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_receptionist_defaultReceptionist_attend_patient_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->attend_patient);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_receptionist_defaultReceptionist_estado_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado) + h_xmachine_memory_receptionist_defaultReceptionist_count);
+}
+
+int count_receptionist_defaultReceptionist_estado_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado),  thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado) + h_xmachine_memory_receptionist_defaultReceptionist_count, count_value);
+}
+int min_receptionist_defaultReceptionist_estado_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_receptionist_defaultReceptionist_estado_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_receptionists_defaultReceptionist->estado);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_receptionist_defaultReceptionist_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_agent_generator_defaultGenerator_chairs_generated_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count);
+}
+
+int count_agent_generator_defaultGenerator_chairs_generated_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count, count_value);
+}
+int min_agent_generator_defaultGenerator_chairs_generated_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_agent_generator_defaultGenerator_chairs_generated_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->chairs_generated);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_agent_generator_defaultGenerator_triage_generated_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count);
+}
+
+int count_agent_generator_defaultGenerator_triage_generated_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count, count_value);
+}
+int min_agent_generator_defaultGenerator_triage_generated_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_agent_generator_defaultGenerator_triage_generated_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_chair_admin_defaultAdmin_id_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id),  thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id) + h_xmachine_memory_chair_admin_defaultAdmin_count);
+}
+
+unsigned int count_chair_admin_defaultAdmin_id_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id),  thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id) + h_xmachine_memory_chair_admin_defaultAdmin_count, count_value);
+}
+unsigned int min_chair_admin_defaultAdmin_id_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_admin_defaultAdmin_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_chair_admin_defaultAdmin_id_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_chair_admins_defaultAdmin->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_admin_defaultAdmin_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_box_defaultBox_id_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->id),  thrust::device_pointer_cast(d_boxs_defaultBox->id) + h_xmachine_memory_box_defaultBox_count);
+}
+
+unsigned int count_box_defaultBox_id_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->id),  thrust::device_pointer_cast(d_boxs_defaultBox->id) + h_xmachine_memory_box_defaultBox_count, count_value);
+}
+unsigned int min_box_defaultBox_id_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->id);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_box_defaultBox_id_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_box_defaultBox_occupied_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->occupied),  thrust::device_pointer_cast(d_boxs_defaultBox->occupied) + h_xmachine_memory_box_defaultBox_count);
+}
+
+unsigned int count_box_defaultBox_occupied_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->occupied),  thrust::device_pointer_cast(d_boxs_defaultBox->occupied) + h_xmachine_memory_box_defaultBox_count, count_value);
+}
+unsigned int min_box_defaultBox_occupied_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->occupied);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_box_defaultBox_occupied_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->occupied);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_triage_defaultTriage_id_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_triages_defaultTriage->id),  thrust::device_pointer_cast(d_triages_defaultTriage->id) + h_xmachine_memory_triage_defaultTriage_count);
+}
+
+unsigned int count_triage_defaultTriage_id_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_triages_defaultTriage->id),  thrust::device_pointer_cast(d_triages_defaultTriage->id) + h_xmachine_memory_triage_defaultTriage_count, count_value);
+}
+unsigned int min_triage_defaultTriage_id_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->id);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_triage_defaultTriage_id_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_triage_defaultTriage_front_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_triages_defaultTriage->front),  thrust::device_pointer_cast(d_triages_defaultTriage->front) + h_xmachine_memory_triage_defaultTriage_count);
+}
+
+unsigned int count_triage_defaultTriage_front_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_triages_defaultTriage->front),  thrust::device_pointer_cast(d_triages_defaultTriage->front) + h_xmachine_memory_triage_defaultTriage_count, count_value);
+}
+unsigned int min_triage_defaultTriage_front_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->front);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_triage_defaultTriage_front_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->front);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_triage_defaultTriage_rear_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_triages_defaultTriage->rear),  thrust::device_pointer_cast(d_triages_defaultTriage->rear) + h_xmachine_memory_triage_defaultTriage_count);
+}
+
+unsigned int count_triage_defaultTriage_rear_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_triages_defaultTriage->rear),  thrust::device_pointer_cast(d_triages_defaultTriage->rear) + h_xmachine_memory_triage_defaultTriage_count, count_value);
+}
+unsigned int min_triage_defaultTriage_rear_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->rear);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_triage_defaultTriage_rear_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->rear);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_triage_defaultTriage_size_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_triages_defaultTriage->size),  thrust::device_pointer_cast(d_triages_defaultTriage->size) + h_xmachine_memory_triage_defaultTriage_count);
+}
+
+unsigned int count_triage_defaultTriage_size_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_triages_defaultTriage->size),  thrust::device_pointer_cast(d_triages_defaultTriage->size) + h_xmachine_memory_triage_defaultTriage_count, count_value);
+}
+unsigned int min_triage_defaultTriage_size_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->size);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_triage_defaultTriage_size_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->size);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_triage_defaultTriage_tick_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_triages_defaultTriage->tick),  thrust::device_pointer_cast(d_triages_defaultTriage->tick) + h_xmachine_memory_triage_defaultTriage_count);
+}
+
+unsigned int count_triage_defaultTriage_tick_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_triages_defaultTriage->tick),  thrust::device_pointer_cast(d_triages_defaultTriage->tick) + h_xmachine_memory_triage_defaultTriage_count, count_value);
+}
+unsigned int min_triage_defaultTriage_tick_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->tick);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_triage_defaultTriage_tick_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_triages_defaultTriage->tick);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_triage_defaultTriage_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
 
@@ -8637,6 +10049,793 @@ void agent_receive_check_in_done(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
+int agent_output_triage_petition_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** agent_output_triage_petition
+ * Agent function prototype for output_triage_petition function of agent agent
+ */
+void agent_output_triage_petition(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, output_triage_petition_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	output_triage_petition_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_triage_petition_count + h_xmachine_memory_agent_count > xmachine_message_triage_petition_MAX){
+		printf("Error: Buffer size of triage_petition message will be exceeded in function output_triage_petition\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_output_triage_petition, agent_output_triage_petition_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_output_triage_petition_sm_size(blockSize);
+	
+	
+	
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_triage_petition_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_triage_petition_output_type, &h_message_triage_petition_output_type, sizeof(int)));
+	//message is optional so reset the swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_triage_petition_swaps, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_triage_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_triage_petitions); 
+	gpuErrchkLaunch();
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (output_triage_petition)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : triage_petition
+	//Agent Output : 
+	GPUFLAME_output_triage_petition<<<g, b, sm_size, stream>>>(d_agents, d_triage_petitions);
+	gpuErrchkLaunch();
+	
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	//triage_petition Message Type Prefix Sum
+	
+	//swap output
+	xmachine_message_triage_petition_list* d_triage_petitions_scanswap_temp = d_triage_petitions;
+	d_triage_petitions = d_triage_petitions_swap;
+	d_triage_petitions_swap = d_triage_petitions_scanswap_temp;
+	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_triage_petitions_swap->_scan_input,
+        d_triage_petitions_swap->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//Scatter
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_triage_petition_messages, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_optional_triage_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_triage_petitions, d_triage_petitions_swap);
+	gpuErrchkLaunch();
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_triage_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_triage_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//If last item in prefix sum was 1 then increase its index to get the count
+	if (scan_last_included == 1){
+		h_message_triage_petition_count += scan_last_sum+1;
+	}else{
+		h_message_triage_petition_count += scan_last_sum;
+	}
+    //Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_triage_petition_count, &h_message_triage_petition_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of output_triage_petition agents in state default will be exceeded moving working agents to next state in function output_triage_petition\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_receive_triage_response_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input has no partitioning
+	sm_size += (blockSize * sizeof(xmachine_message_triage_response));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** agent_receive_triage_response
+ * Agent function prototype for receive_triage_response function of agent agent
+ */
+void agent_receive_triage_response(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, receive_triage_response_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	receive_triage_response_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receive_triage_response, agent_receive_triage_response_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_receive_triage_response_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (receive_triage_response)
+	//Reallocate   : false
+	//Input        : triage_response
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_receive_triage_response<<<g, b, sm_size, stream>>>(d_agents, d_triage_responses);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of receive_triage_response agents in state default will be exceeded moving working agents to next state in function receive_triage_response\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int navmap_output_navmap_cells_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** navmap_output_navmap_cells
+ * Agent function prototype for output_navmap_cells function of navmap agent
+ */
+void navmap_output_navmap_cells(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_navmap_static_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_navmap_static_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
+	d_navmaps = d_navmaps_static;
+	d_navmaps_static = navmaps_static_temp;
+	//set working count to current state count
+	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_navmap_static_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_output_navmap_cells, navmap_output_navmap_cells_sm_size, state_list_size);
+	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = (int)sqrt(blockSize);
+	b.y = b.x;
+	g.x = (int)sqrt(gridSize);
+	g.y = g.x;
+	sm_size = navmap_output_navmap_cells_sm_size(blockSize);
+	
+	
+	
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (output_navmap_cells)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : navmap_cell
+	//Agent Output : 
+	GPUFLAME_output_navmap_cells<<<g, b, sm_size, stream>>>(d_navmaps, d_navmap_cells);
+	gpuErrchkLaunch();
+	
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+    //currentState maps to working list
+	navmaps_static_temp = d_navmaps_static;
+	d_navmaps_static = d_navmaps;
+	d_navmaps = navmaps_static_temp;
+    //set current state count
+	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int navmap_generate_pedestrians_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** navmap_generate_pedestrians
+ * Agent function prototype for generate_pedestrians function of navmap agent
+ */
+void navmap_generate_pedestrians(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_navmap_static_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_navmap_static_count;
+
+	
+	//FOR agent AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_new);
+	gpuErrchkLaunch();
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
+	d_navmaps = d_navmaps_static;
+	d_navmaps_static = navmaps_static_temp;
+	//set working count to current state count
+	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_navmap_static_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_pedestrians, navmap_generate_pedestrians_sm_size, state_list_size);
+	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = (int)sqrt(blockSize);
+	b.y = b.x;
+	g.x = (int)sqrt(gridSize);
+	g.y = g.x;
+	sm_size = navmap_generate_pedestrians_sm_size(blockSize);
+	
+	
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (generate_pedestrians)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : 
+	//Agent Output : agent
+	GPUFLAME_generate_pedestrians<<<g, b, sm_size, stream>>>(d_navmaps, d_agents_new, d_rand48);
+	gpuErrchkLaunch();
+	
+	
+    //COPY ANY AGENT COUNT BEFORE navmap AGENTS ARE KILLED (needed for scatter)
+	int navmaps_pre_death_count = h_xmachine_memory_navmap_count;
+	
+	//FOR agent AGENT OUTPUT SCATTER AGENTS 
+
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_new->_scan_input, 
+        d_agents_new->_position, 
+        navmaps_pre_death_count,
+        stream
+    );
+
+	//reset agent count
+	int agent_after_birth_count;
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_new->_position[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_new->_scan_input[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		agent_after_birth_count = h_xmachine_memory_agent_default_count + scan_last_sum+1;
+	else
+		agent_after_birth_count = h_xmachine_memory_agent_default_count + scan_last_sum;
+	//check buffer is not exceeded
+	if (agent_after_birth_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of agent agents in state default will be exceeded writing new agents in function generate_pedestrians\n");
+		exit(EXIT_FAILURE);
+	}
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents_new, h_xmachine_memory_agent_default_count, navmaps_pre_death_count);
+	gpuErrchkLaunch();
+	//Copy count to device
+	h_xmachine_memory_agent_default_count = agent_after_birth_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+    //currentState maps to working list
+	navmaps_static_temp = d_navmaps_static;
+	d_navmaps_static = d_navmaps;
+	d_navmaps = navmaps_static_temp;
+    //set current state count
+	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int navmap_generate_medics_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** navmap_generate_medics
+ * Agent function prototype for generate_medics function of navmap agent
+ */
+void navmap_generate_medics(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_navmap_static_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_navmap_static_count;
+
+	
+	//FOR medic AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_medic_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_medic_scan_input<<<gridSize, blockSize, 0, stream>>>(d_medics_new);
+	gpuErrchkLaunch();
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
+	d_navmaps = d_navmaps_static;
+	d_navmaps_static = navmaps_static_temp;
+	//set working count to current state count
+	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_navmap_static_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_medics, navmap_generate_medics_sm_size, state_list_size);
+	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = (int)sqrt(blockSize);
+	b.y = b.x;
+	g.x = (int)sqrt(gridSize);
+	g.y = g.x;
+	sm_size = navmap_generate_medics_sm_size(blockSize);
+	
+	
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (generate_medics)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : 
+	//Agent Output : medic
+	GPUFLAME_generate_medics<<<g, b, sm_size, stream>>>(d_navmaps, d_medics_new, d_rand48);
+	gpuErrchkLaunch();
+	
+	
+    //COPY ANY AGENT COUNT BEFORE navmap AGENTS ARE KILLED (needed for scatter)
+	int navmaps_pre_death_count = h_xmachine_memory_navmap_count;
+	
+	//FOR medic AGENT OUTPUT SCATTER AGENTS 
+
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_medic, 
+        temp_scan_storage_bytes_medic, 
+        d_medics_new->_scan_input, 
+        d_medics_new->_position, 
+        navmaps_pre_death_count,
+        stream
+    );
+
+	//reset agent count
+	int medic_after_birth_count;
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_medics_new->_position[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_medics_new->_scan_input[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		medic_after_birth_count = h_xmachine_memory_medic_default2_count + scan_last_sum+1;
+	else
+		medic_after_birth_count = h_xmachine_memory_medic_default2_count + scan_last_sum;
+	//check buffer is not exceeded
+	if (medic_after_birth_count > xmachine_memory_medic_MAX){
+		printf("Error: Buffer size of medic agents in state default2 will be exceeded writing new agents in function generate_medics\n");
+		exit(EXIT_FAILURE);
+	}
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_medic_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_medic_Agents<<<gridSize, blockSize, 0, stream>>>(d_medics_default2, d_medics_new, h_xmachine_memory_medic_default2_count, navmaps_pre_death_count);
+	gpuErrchkLaunch();
+	//Copy count to device
+	h_xmachine_memory_medic_default2_count = medic_after_birth_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+    //currentState maps to working list
+	navmaps_static_temp = d_navmaps_static;
+	d_navmaps_static = d_navmaps;
+	d_navmaps = navmaps_static_temp;
+    //set current state count
+	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
 int chair_output_chair_state_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
@@ -9417,6 +11616,226 @@ void agent_generator_generate_chairs(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
+int agent_generator_generate_triage_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** agent_generator_generate_triage
+ * Agent function prototype for generate_triage function of agent_generator agent
+ */
+void agent_generator_generate_triage(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_generator_defaultGenerator_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_generator_defaultGenerator_count;
+
+	
+	//FOR triage AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_triage_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_triage_scan_input<<<gridSize, blockSize, 0, stream>>>(d_triages_new);
+	gpuErrchkLaunch();
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_generator_count = h_xmachine_memory_agent_generator_defaultGenerator_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_count, &h_xmachine_memory_agent_generator_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_generator_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_generator_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_generator_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agent_generators);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_triage_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	generate_triage_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator, d_agent_generators);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_generator_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent_generator, 
+        temp_scan_storage_bytes_agent_generator, 
+        d_agent_generators_defaultGenerator->_scan_input,
+        d_agent_generators_defaultGenerator->_position,
+        h_xmachine_memory_agent_generator_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agent_generators_defaultGenerator->_position[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agent_generators_defaultGenerator->_scan_input[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_generator_defaultGenerator_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_generator_defaultGenerator_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_generator_Agents<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_swap, d_agent_generators_defaultGenerator, 0, h_xmachine_memory_agent_generator_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_generator_list* agent_generators_defaultGenerator_temp = d_agent_generators_defaultGenerator;
+	d_agent_generators_defaultGenerator = d_agent_generators_swap;
+	d_agent_generators_swap = agent_generators_defaultGenerator_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_defaultGenerator_count, &h_xmachine_memory_agent_generator_defaultGenerator_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent_generator, 
+        temp_scan_storage_bytes_agent_generator, 
+        d_agent_generators->_scan_input,
+        d_agent_generators->_position,
+        h_xmachine_memory_agent_generator_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agent_generators->_position[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agent_generators->_scan_input[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_generator_Agents<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_swap, d_agent_generators, 0, h_xmachine_memory_agent_generator_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_generator_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_generator_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_generator_list* agent_generators_temp = d_agent_generators;
+	d_agent_generators = d_agent_generators_swap;
+	d_agent_generators_swap = agent_generators_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_count, &h_xmachine_memory_agent_generator_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_generator_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_generator_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_triage, agent_generator_generate_triage_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_generator_generate_triage_sm_size(blockSize);
+	
+	
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (generate_triage)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : 
+	//Agent Output : triage
+	GPUFLAME_generate_triage<<<g, b, sm_size, stream>>>(d_agent_generators, d_triages_new);
+	gpuErrchkLaunch();
+	
+	
+    //COPY ANY AGENT COUNT BEFORE agent_generator AGENTS ARE KILLED (needed for scatter)
+	int agent_generators_pre_death_count = h_xmachine_memory_agent_generator_count;
+	
+	//FOR triage AGENT OUTPUT SCATTER AGENTS 
+
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_triage, 
+        temp_scan_storage_bytes_triage, 
+        d_triages_new->_scan_input, 
+        d_triages_new->_position, 
+        agent_generators_pre_death_count,
+        stream
+    );
+
+	//reset agent count
+	int triage_after_birth_count;
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_triages_new->_position[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_triages_new->_scan_input[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		triage_after_birth_count = h_xmachine_memory_triage_defaultTriage_count + scan_last_sum+1;
+	else
+		triage_after_birth_count = h_xmachine_memory_triage_defaultTriage_count + scan_last_sum;
+	//check buffer is not exceeded
+	if (triage_after_birth_count > xmachine_memory_triage_MAX){
+		printf("Error: Buffer size of triage agents in state defaultTriage will be exceeded writing new agents in function generate_triage\n");
+		exit(EXIT_FAILURE);
+	}
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_triage_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_triage_Agents<<<gridSize, blockSize, 0, stream>>>(d_triages_defaultTriage, d_triages_new, h_xmachine_memory_triage_defaultTriage_count, agent_generators_pre_death_count);
+	gpuErrchkLaunch();
+	//Copy count to device
+	h_xmachine_memory_triage_defaultTriage_count = triage_after_birth_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_triage_defaultTriage_count, &h_xmachine_memory_triage_defaultTriage_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_generator_defaultGenerator_count+h_xmachine_memory_agent_generator_count > xmachine_memory_agent_generator_MAX){
+		printf("Error: Buffer size of generate_triage agents in state defaultGenerator will be exceeded moving working agents to next state in function generate_triage\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_generator_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_generator_Agents<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator, d_agent_generators, h_xmachine_memory_agent_generator_defaultGenerator_count, h_xmachine_memory_agent_generator_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_generator_defaultGenerator_count += h_xmachine_memory_agent_generator_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_defaultGenerator_count, &h_xmachine_memory_agent_generator_defaultGenerator_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
 int chair_admin_attend_chair_petitions_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
@@ -9576,17 +11995,22 @@ void chair_admin_attend_chair_petitions(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int navmap_output_navmap_cells_sm_size(int blockSize){
+int box_box_server_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
-  
+  //Continuous agent and message input has no partitioning
+	sm_size += (blockSize * sizeof(xmachine_message_box_petition));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
 	return sm_size;
 }
 
-/** navmap_output_navmap_cells
- * Agent function prototype for output_navmap_cells function of navmap agent
+/** box_box_server
+ * Agent function prototype for box_server function of box agent
  */
-void navmap_output_navmap_cells(cudaStream_t &stream){
+void box_box_server(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -9599,7 +12023,7 @@ void navmap_output_navmap_cells(cudaStream_t &stream){
 	
 	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
 	
-	if (h_xmachine_memory_navmap_static_count == 0)
+	if (h_xmachine_memory_box_defaultBox_count == 0)
 	{
 		return;
 	}
@@ -9607,66 +12031,121 @@ void navmap_output_navmap_cells(cudaStream_t &stream){
 	
 	//SET SM size to 0 and save state list size for occupancy calculations
 	sm_size = SM_START;
-	state_list_size = h_xmachine_memory_navmap_static_count;
+	state_list_size = h_xmachine_memory_box_defaultBox_count;
 
 	
 
 	//******************************** AGENT FUNCTION CONDITION *********************
 	//THERE IS NOT A FUNCTION CONDITION
 	//currentState maps to working list
-	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
-	d_navmaps = d_navmaps_static;
-	d_navmaps_static = navmaps_static_temp;
+	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs;
+	d_boxs = d_boxs_defaultBox;
+	d_boxs_defaultBox = boxs_defaultBox_temp;
 	//set working count to current state count
-	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
+	h_xmachine_memory_box_count = h_xmachine_memory_box_defaultBox_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
 	//set current state count to 0
-	h_xmachine_memory_navmap_static_count = 0;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	h_xmachine_memory_box_defaultBox_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
 	
  
 
 	//******************************** AGENT FUNCTION *******************************
 
 	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_box_response_count + h_xmachine_memory_box_count > xmachine_message_box_response_MAX){
+		printf("Error: Buffer size of box_response message will be exceeded in function box_server\n");
+		exit(EXIT_FAILURE);
+	}
+	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_output_navmap_cells, navmap_output_navmap_cells_sm_size, state_list_size);
-	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_box_server, box_box_server_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	b.x = (int)sqrt(blockSize);
-	b.y = b.x;
-	g.x = (int)sqrt(gridSize);
-	g.y = g.x;
-	sm_size = navmap_output_navmap_cells_sm_size(blockSize);
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = box_box_server_sm_size(blockSize);
 	
 	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
-	
-	
-	//MAIN XMACHINE FUNCTION CALL (output_navmap_cells)
-	//Reallocate   : false
-	//Input        : 
-	//Output       : navmap_cell
-	//Agent Output : 
-	GPUFLAME_output_navmap_cells<<<g, b, sm_size, stream>>>(d_navmaps, d_navmap_cells);
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_box_response_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_box_response_output_type, &h_message_box_response_output_type, sizeof(int)));
+	//message is optional so reset the swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_response_swaps, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_box_response_swaps<<<gridSize, blockSize, 0, stream>>>(d_box_responses); 
 	gpuErrchkLaunch();
 	
+	
+	//MAIN XMACHINE FUNCTION CALL (box_server)
+	//Reallocate   : false
+	//Input        : box_petition
+	//Output       : box_response
+	//Agent Output : 
+	GPUFLAME_box_server<<<g, b, sm_size, stream>>>(d_boxs, d_box_petitions, d_box_responses);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	//box_response Message Type Prefix Sum
+	
+	//swap output
+	xmachine_message_box_response_list* d_box_responses_scanswap_temp = d_box_responses;
+	d_box_responses = d_box_responses_swap;
+	d_box_responses_swap = d_box_responses_scanswap_temp;
+	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
+        d_box_responses_swap->_scan_input,
+        d_box_responses_swap->_position,
+        h_xmachine_memory_box_count, 
+        stream
+    );
+
+	//Scatter
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_box_response_messages, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_optional_box_response_messages<<<gridSize, blockSize, 0, stream>>>(d_box_responses, d_box_responses_swap);
+	gpuErrchkLaunch();
 	
 	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_box_responses_swap->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_box_responses_swap->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//If last item in prefix sum was 1 then increase its index to get the count
+	if (scan_last_included == 1){
+		h_message_box_response_count += scan_last_sum+1;
+	}else{
+		h_message_box_response_count += scan_last_sum;
+	}
+    //Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_box_response_count, &h_message_box_response_count, sizeof(int)));	
+	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
     
-    //currentState maps to working list
-	navmaps_static_temp = d_navmaps_static;
-	d_navmaps_static = d_navmaps;
-	d_navmaps = navmaps_static_temp;
-    //set current state count
-	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_box_defaultBox_count+h_xmachine_memory_box_count > xmachine_memory_box_MAX){
+		printf("Error: Buffer size of box_server agents in state defaultBox will be exceeded moving working agents to next state in function box_server\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  boxs_defaultBox_temp = d_boxs;
+  d_boxs = d_boxs_defaultBox;
+  d_boxs_defaultBox = boxs_defaultBox_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_box_defaultBox_count += h_xmachine_memory_box_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
 	
 	
 }
@@ -9675,17 +12154,22 @@ void navmap_output_navmap_cells(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int navmap_generate_pedestrians_sm_size(int blockSize){
+int triage_receive_triage_petitions_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
-  
+  //Continuous agent and message input has no partitioning
+	sm_size += (blockSize * sizeof(xmachine_message_triage_petition));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
 	return sm_size;
 }
 
-/** navmap_generate_pedestrians
- * Agent function prototype for generate_pedestrians function of navmap agent
+/** triage_receive_triage_petitions
+ * Agent function prototype for receive_triage_petitions function of triage agent
  */
-void navmap_generate_pedestrians(cudaStream_t &stream){
+void triage_receive_triage_petitions(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -9698,7 +12182,7 @@ void navmap_generate_pedestrians(cudaStream_t &stream){
 	
 	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
 	
-	if (h_xmachine_memory_navmap_static_count == 0)
+	if (h_xmachine_memory_triage_defaultTriage_count == 0)
 	{
 		return;
 	}
@@ -9706,239 +12190,121 @@ void navmap_generate_pedestrians(cudaStream_t &stream){
 	
 	//SET SM size to 0 and save state list size for occupancy calculations
 	sm_size = SM_START;
-	state_list_size = h_xmachine_memory_navmap_static_count;
+	state_list_size = h_xmachine_memory_triage_defaultTriage_count;
 
-	
-	//FOR agent AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_new);
-	gpuErrchkLaunch();
 	
 
 	//******************************** AGENT FUNCTION CONDITION *********************
 	//THERE IS NOT A FUNCTION CONDITION
 	//currentState maps to working list
-	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
-	d_navmaps = d_navmaps_static;
-	d_navmaps_static = navmaps_static_temp;
+	xmachine_memory_triage_list* triages_defaultTriage_temp = d_triages;
+	d_triages = d_triages_defaultTriage;
+	d_triages_defaultTriage = triages_defaultTriage_temp;
 	//set working count to current state count
-	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
+	h_xmachine_memory_triage_count = h_xmachine_memory_triage_defaultTriage_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_triage_count, &h_xmachine_memory_triage_count, sizeof(int)));	
 	//set current state count to 0
-	h_xmachine_memory_navmap_static_count = 0;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	h_xmachine_memory_triage_defaultTriage_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_triage_defaultTriage_count, &h_xmachine_memory_triage_defaultTriage_count, sizeof(int)));	
 	
  
 
 	//******************************** AGENT FUNCTION *******************************
 
 	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_triage_response_count + h_xmachine_memory_triage_count > xmachine_message_triage_response_MAX){
+		printf("Error: Buffer size of triage_response message will be exceeded in function receive_triage_petitions\n");
+		exit(EXIT_FAILURE);
+	}
+	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_pedestrians, navmap_generate_pedestrians_sm_size, state_list_size);
-	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receive_triage_petitions, triage_receive_triage_petitions_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	b.x = (int)sqrt(blockSize);
-	b.y = b.x;
-	g.x = (int)sqrt(gridSize);
-	g.y = g.x;
-	sm_size = navmap_generate_pedestrians_sm_size(blockSize);
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = triage_receive_triage_petitions_sm_size(blockSize);
 	
 	
 	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
-	//MAIN XMACHINE FUNCTION CALL (generate_pedestrians)
-	//Reallocate   : false
-	//Input        : 
-	//Output       : 
-	//Agent Output : agent
-	GPUFLAME_generate_pedestrians<<<g, b, sm_size, stream>>>(d_navmaps, d_agents_new, d_rand48);
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_triage_response_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_triage_response_output_type, &h_message_triage_response_output_type, sizeof(int)));
+	//message is optional so reset the swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_triage_response_swaps, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_triage_response_swaps<<<gridSize, blockSize, 0, stream>>>(d_triage_responses); 
 	gpuErrchkLaunch();
 	
 	
-    //COPY ANY AGENT COUNT BEFORE navmap AGENTS ARE KILLED (needed for scatter)
-	int navmaps_pre_death_count = h_xmachine_memory_navmap_count;
+	//MAIN XMACHINE FUNCTION CALL (receive_triage_petitions)
+	//Reallocate   : false
+	//Input        : triage_petition
+	//Output       : triage_response
+	//Agent Output : 
+	GPUFLAME_receive_triage_petitions<<<g, b, sm_size, stream>>>(d_triages, d_triage_petitions, d_triage_responses, d_rand48);
+	gpuErrchkLaunch();
 	
-	//FOR agent AGENT OUTPUT SCATTER AGENTS 
-
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	//triage_response Message Type Prefix Sum
+	
+	//swap output
+	xmachine_message_triage_response_list* d_triage_responses_scanswap_temp = d_triage_responses;
+	d_triage_responses = d_triage_responses_swap;
+	d_triage_responses_swap = d_triage_responses_scanswap_temp;
+	
     cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_agent, 
-        temp_scan_storage_bytes_agent, 
-        d_agents_new->_scan_input, 
-        d_agents_new->_position, 
-        navmaps_pre_death_count,
+        d_temp_scan_storage_triage, 
+        temp_scan_storage_bytes_triage, 
+        d_triage_responses_swap->_scan_input,
+        d_triage_responses_swap->_position,
+        h_xmachine_memory_triage_count, 
         stream
     );
 
-	//reset agent count
-	int agent_after_birth_count;
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_new->_position[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_new->_scan_input[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	if (scan_last_included == 1)
-		agent_after_birth_count = h_xmachine_memory_agent_default_count + scan_last_sum+1;
-	else
-		agent_after_birth_count = h_xmachine_memory_agent_default_count + scan_last_sum;
-	//check buffer is not exceeded
-	if (agent_after_birth_count > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of agent agents in state default will be exceeded writing new agents in function generate_pedestrians\n");
-		exit(EXIT_FAILURE);
-	}
-	//Scatter into swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	//Scatter
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_triage_response_messages, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents_new, h_xmachine_memory_agent_default_count, navmaps_pre_death_count);
+	scatter_optional_triage_response_messages<<<gridSize, blockSize, 0, stream>>>(d_triage_responses, d_triage_responses_swap);
 	gpuErrchkLaunch();
-	//Copy count to device
-	h_xmachine_memory_agent_default_count = agent_after_birth_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_triage_responses_swap->_position[h_xmachine_memory_triage_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_triage_responses_swap->_scan_input[h_xmachine_memory_triage_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//If last item in prefix sum was 1 then increase its index to get the count
+	if (scan_last_included == 1){
+		h_message_triage_response_count += scan_last_sum+1;
+	}else{
+		h_message_triage_response_count += scan_last_sum;
+	}
+    //Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_triage_response_count, &h_message_triage_response_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
     
-    //currentState maps to working list
-	navmaps_static_temp = d_navmaps_static;
-	d_navmaps_static = d_navmaps;
-	d_navmaps = navmaps_static_temp;
-    //set current state count
-	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
-	
-	
-}
-
-
-
-	
-/* Shared memory size calculator for agent function */
-int navmap_generate_medics_sm_size(int blockSize){
-	int sm_size;
-	sm_size = SM_START;
-  
-	return sm_size;
-}
-
-/** navmap_generate_medics
- * Agent function prototype for generate_medics function of navmap agent
- */
-void navmap_generate_medics(cudaStream_t &stream){
-
-    int sm_size;
-    int blockSize;
-    int minGridSize;
-    int gridSize;
-    int state_list_size;
-	dim3 g; //grid for agent func
-	dim3 b; //block for agent func
-
-	
-	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
-	
-	if (h_xmachine_memory_navmap_static_count == 0)
-	{
-		return;
-	}
-	
-	
-	//SET SM size to 0 and save state list size for occupancy calculations
-	sm_size = SM_START;
-	state_list_size = h_xmachine_memory_navmap_static_count;
-
-	
-	//FOR medic AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_medic_scan_input, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_medic_scan_input<<<gridSize, blockSize, 0, stream>>>(d_medics_new);
-	gpuErrchkLaunch();
-	
-
-	//******************************** AGENT FUNCTION CONDITION *********************
-	//THERE IS NOT A FUNCTION CONDITION
-	//currentState maps to working list
-	xmachine_memory_navmap_list* navmaps_static_temp = d_navmaps;
-	d_navmaps = d_navmaps_static;
-	d_navmaps_static = navmaps_static_temp;
-	//set working count to current state count
-	h_xmachine_memory_navmap_count = h_xmachine_memory_navmap_static_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_count, &h_xmachine_memory_navmap_count, sizeof(int)));	
-	//set current state count to 0
-	h_xmachine_memory_navmap_static_count = 0;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
-	
- 
-
-	//******************************** AGENT FUNCTION *******************************
-
-	
-	
-	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_medics, navmap_generate_medics_sm_size, state_list_size);
-	blockSize = lowest_sqr_pow2(blockSize); //For discrete agents the block size must be a square power of 2
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	b.x = (int)sqrt(blockSize);
-	b.y = b.x;
-	g.x = (int)sqrt(gridSize);
-	g.y = g.x;
-	sm_size = navmap_generate_medics_sm_size(blockSize);
-	
-	
-	
-	
-	//MAIN XMACHINE FUNCTION CALL (generate_medics)
-	//Reallocate   : false
-	//Input        : 
-	//Output       : 
-	//Agent Output : medic
-	GPUFLAME_generate_medics<<<g, b, sm_size, stream>>>(d_navmaps, d_medics_new, d_rand48);
-	gpuErrchkLaunch();
-	
-	
-    //COPY ANY AGENT COUNT BEFORE navmap AGENTS ARE KILLED (needed for scatter)
-	int navmaps_pre_death_count = h_xmachine_memory_navmap_count;
-	
-	//FOR medic AGENT OUTPUT SCATTER AGENTS 
-
-    cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_medic, 
-        temp_scan_storage_bytes_medic, 
-        d_medics_new->_scan_input, 
-        d_medics_new->_position, 
-        navmaps_pre_death_count,
-        stream
-    );
-
-	//reset agent count
-	int medic_after_birth_count;
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_medics_new->_position[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_medics_new->_scan_input[navmaps_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	if (scan_last_included == 1)
-		medic_after_birth_count = h_xmachine_memory_medic_default2_count + scan_last_sum+1;
-	else
-		medic_after_birth_count = h_xmachine_memory_medic_default2_count + scan_last_sum;
-	//check buffer is not exceeded
-	if (medic_after_birth_count > xmachine_memory_medic_MAX){
-		printf("Error: Buffer size of medic agents in state default2 will be exceeded writing new agents in function generate_medics\n");
-		exit(EXIT_FAILURE);
-	}
-	//Scatter into swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_medic_Agents, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_medic_Agents<<<gridSize, blockSize, 0, stream>>>(d_medics_default2, d_medics_new, h_xmachine_memory_medic_default2_count, navmaps_pre_death_count);
-	gpuErrchkLaunch();
-	//Copy count to device
-	h_xmachine_memory_medic_default2_count = medic_after_birth_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_medic_default2_count, &h_xmachine_memory_medic_default2_count, sizeof(int)));	
-	
-	
-	//************************ MOVE AGENTS TO NEXT STATE ****************************
-    
-    //currentState maps to working list
-	navmaps_static_temp = d_navmaps_static;
-	d_navmaps_static = d_navmaps;
-	d_navmaps = navmaps_static_temp;
-    //set current state count
-	h_xmachine_memory_navmap_static_count = h_xmachine_memory_navmap_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_navmap_static_count, &h_xmachine_memory_navmap_static_count, sizeof(int)));	
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_triage_defaultTriage_count+h_xmachine_memory_triage_count > xmachine_memory_triage_MAX){
+		printf("Error: Buffer size of receive_triage_petitions agents in state defaultTriage will be exceeded moving working agents to next state in function receive_triage_petitions\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  triages_defaultTriage_temp = d_triages;
+  d_triages = d_triages_defaultTriage;
+  d_triages_defaultTriage = triages_defaultTriage_temp;
+        
+	//update new state agent size
+	h_xmachine_memory_triage_defaultTriage_count += h_xmachine_memory_triage_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_triage_defaultTriage_count, &h_xmachine_memory_triage_defaultTriage_count, sizeof(int)));	
 	
 	
 }
@@ -9948,6 +12314,11 @@ void navmap_generate_medics(cudaStream_t &stream){
 extern void reset_agent_default_count()
 {
     h_xmachine_memory_agent_default_count = 0;
+}
+ 
+extern void reset_navmap_static_count()
+{
+    h_xmachine_memory_navmap_static_count = 0;
 }
  
 extern void reset_chair_defaultChair_count()
@@ -9975,7 +12346,12 @@ extern void reset_chair_admin_defaultAdmin_count()
     h_xmachine_memory_chair_admin_defaultAdmin_count = 0;
 }
  
-extern void reset_navmap_static_count()
+extern void reset_box_defaultBox_count()
 {
-    h_xmachine_memory_navmap_static_count = 0;
+    h_xmachine_memory_box_defaultBox_count = 0;
+}
+ 
+extern void reset_triage_defaultTriage_count()
+{
+    h_xmachine_memory_triage_defaultTriage_count = 0;
 }

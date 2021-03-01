@@ -17,7 +17,7 @@
 #define ticks_portador 10000
 #define ticks_enfermo 10000
 //Cantidad de personas a generar
-#define cant_personas 2
+#define cant_personas 6
  
 //Manejo de las sillas
 #ifndef firstChair_x

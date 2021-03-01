@@ -1,6 +1,4 @@
-
 //Manejo de las sillas
-#include "parameters.h"
 
 __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, xmachine_memory_chair_list* chair_agents){
     
@@ -12,5 +10,15 @@ __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, x
     add_chair_agent(chair_agents, agent->chairs_generated, x, y, 0);
 
     agent->chairs_generated++;
+    return 0;
+}
+
+__FLAME_GPU_FUNC__ int generate_triage(xmachine_memory_agent_generator* agent, xmachine_memory_triage_list* triage_agents){
+    
+    printf("Triage generado\n"); 
+    
+    add_triage_agent(triage_agents, 0,0,0,0,0);
+
+    agent->triage_generated++;
     return 0;
 }
