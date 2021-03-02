@@ -56,6 +56,14 @@ __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
 	// Freeing the previously allocated memory
 	h_free_agent_agent_generator(&h_agent_generator);
 
+	//Agregado del triage
+	// Allocating memory in CPU to save the agent
+	xmachine_memory_triage * h_triage = h_allocate_agent_triage();
+	// Copying the agent from the CPU to GPU
+	h_add_agent_triage_defaultTriage(h_triage);
+	// Freeing the previously allocated memory
+	h_free_agent_triage(&h_triage);
+
 }
 
 /**
@@ -113,6 +121,15 @@ __FLAME_GPU_FUNC__ int output_chair_contact(xmachine_memory_agent* agent, xmachi
 __FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmachine_message_triage_petition_list* triagePetitionMessages){
 	
 	add_triage_petition_message(triagePetitionMessages, agent->id);
+	agent->estado_movimiento++;
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int output_box_petition(xmachine_memory_agent* agent, xmachine_message_box_petition_list* boxPetitionMessages){
+	
+	add_box_petition_message(boxPetitionMessages, agent->id, agent->box_no);
+	printf("Soy %d y mande el mensaje %d\n",agent->id, agent->box_no);
 	agent->estado_movimiento++;
 
 	return 0;
@@ -352,7 +369,21 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			break;
 		case 18:
 			if(mover_a_destino(agent,106,96) == 0){
-				printf("Bueno llegue");
+				agent->estado_movimiento++;
+			}
+			break;
+		case 19:
+			if(mover_a_destino(agent,106,78) == 0){
+				agent->estado_movimiento++;
+			}
+			break;
+		case 23:
+			if(mover_a_destino(agent,106,96) == 0){
+				agent->estado_movimiento++;
+			}
+			break;
+		case 24:
+			if(mover_a_destino(agent,88,96) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
@@ -425,15 +456,15 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 
 /*-------------------------------------------------------------Recepción de mensajes-------------------------------------------------------------*/
 
-__FLAME_GPU_FUNC__ int receive_check_in_done(xmachine_memory_agent* agent, xmachine_message_check_in_done_list* avisarPacienteMessages){
+__FLAME_GPU_FUNC__ int receive_check_in_response(xmachine_memory_agent* agent, xmachine_message_check_in_response_list* avisarPacienteMessages){
 
-	xmachine_message_check_in_done* current_message = get_first_check_in_done_message(avisarPacienteMessages);
+	xmachine_message_check_in_response* current_message = get_first_check_in_response_message(avisarPacienteMessages);
 	while(current_message){
 		if(current_message->id == agent->id){
 			//printf("Soy %d y recibi este mensaje %d\n",agent->id,current_message->id);
 			agent->estado_movimiento++;
 		}
-		current_message = get_next_check_in_done_message(current_message, avisarPacienteMessages);
+		current_message = get_next_check_in_response_message(current_message, avisarPacienteMessages);
 	}
 
 	return 0;
@@ -485,6 +516,20 @@ __FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xma
 			printf("Tengo que ir al box %d, soy %d\n",current_message->box_no,agent->id);
 		}
 		current_message = get_next_triage_response_message(current_message, triageResponseMessages);
+	}
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachine_message_box_response_list* boxResponseMessages){
+	
+	xmachine_message_box_response* current_message = get_first_box_response_message(boxResponseMessages);
+	while(current_message){
+		if(agent->id == current_message->id){
+			agent->estado_movimiento++;
+			//printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,current_message->room,agent->id);
+		}
+		current_message = get_next_box_response_message(current_message, boxResponseMessages);
 	}
 
 	return 0;

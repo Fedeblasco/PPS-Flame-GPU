@@ -48,9 +48,19 @@ __FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, x
 	
 	//Chequeo todos los mensajes que recibo y encolo los que necesite
     xmachine_message_triage_petition* current_message = get_first_triage_petition_message(triagePetitionMessages);
-	while(current_message){
-        printf("Encolando el mensaje %d\n",current_message->id);
-        triageEnqueue(agent, current_message->id);
+	int enqueue_message = 1;
+    while(current_message){
+        for(int i=0;i<3;i++){
+            if(current_message->id == agent->boxArray[i]){
+                agent->boxArray[i] = 0; 
+                printf("Libero la posicion %d, quedo en el valor %d\n",i,agent->boxArray[i]);
+                enqueue_message = 0;
+            }
+        }
+        if(enqueue_message){
+            //printf("Encolando el mensaje %d\n",current_message->id);
+            triageEnqueue(agent, current_message->id);
+        }
         current_message = get_next_triage_petition_message(current_message, triagePetitionMessages);	
 	}
 

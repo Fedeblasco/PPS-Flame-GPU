@@ -13,12 +13,12 @@ __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, x
     return 0;
 }
 
-__FLAME_GPU_FUNC__ int generate_triage(xmachine_memory_agent_generator* agent, xmachine_memory_triage_list* triage_agents){
+__FLAME_GPU_FUNC__ int generate_boxes(xmachine_memory_agent_generator* agent, xmachine_memory_box_list* box_agents){
     
-    printf("Triage generado\n"); 
+    printf("Box generado\n"); 
     
-    add_triage_agent(triage_agents, 0,0,0,0,0);
+    add_box_agent(box_agents, agent->boxes_generated,0,0);
 
-    agent->triage_generated++;
+    agent->boxes_generated++;
     return 0;
 }

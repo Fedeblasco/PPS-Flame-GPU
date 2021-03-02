@@ -263,11 +263,12 @@ unsigned int h_receptionists_defaultReceptionist_variable_current_patient_data_i
 unsigned int h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_estado_data_iteration;
 unsigned int h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration;
-unsigned int h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration;
+unsigned int h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
 unsigned int h_boxs_defaultBox_variable_id_data_iteration;
-unsigned int h_boxs_defaultBox_variable_occupied_data_iteration;
+unsigned int h_boxs_defaultBox_variable_attending_data_iteration;
+unsigned int h_boxs_defaultBox_variable_tick_data_iteration;
 unsigned int h_triages_defaultTriage_variable_id_data_iteration;
 unsigned int h_triages_defaultTriage_variable_boxArray_data_iteration;
 unsigned int h_triages_defaultTriage_variable_patientQueue_data_iteration;
@@ -363,13 +364,13 @@ xmachine_message_check_in_list* d_check_ins_swap;    /**< Pointer to message swa
 int h_message_check_in_count;         /**< message list counter*/
 int h_message_check_in_output_type;   /**< message output type (single or optional)*/
 
-/* check_in_done Message variables */
-xmachine_message_check_in_done_list* h_check_in_dones;         /**< Pointer to message list on host*/
-xmachine_message_check_in_done_list* d_check_in_dones;         /**< Pointer to message list on device*/
-xmachine_message_check_in_done_list* d_check_in_dones_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* check_in_response Message variables */
+xmachine_message_check_in_response_list* h_check_in_responses;         /**< Pointer to message list on host*/
+xmachine_message_check_in_response_list* d_check_in_responses;         /**< Pointer to message list on device*/
+xmachine_message_check_in_response_list* d_check_in_responses_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
 /* Non partitioned and spatial partitioned message variables  */
-int h_message_check_in_done_count;         /**< message list counter*/
-int h_message_check_in_done_output_type;   /**< message output type (single or optional)*/
+int h_message_check_in_response_count;         /**< message list counter*/
+int h_message_check_in_response_output_type;   /**< message output type (single or optional)*/
 
 /* chair_petition Message variables */
 xmachine_message_chair_petition_list* h_chair_petitions;         /**< Pointer to message list on host*/
@@ -443,6 +444,7 @@ cudaStream_t stream3;
 cudaStream_t stream4;
 cudaStream_t stream5;
 cudaStream_t stream6;
+cudaStream_t stream7;
 
 /* Device memory and sizes for CUB values */
 
@@ -541,10 +543,20 @@ void agent_output_chair_petition(cudaStream_t &stream);
  */
 void agent_receive_chair_response(cudaStream_t &stream);
 
-/** agent_receive_check_in_done
- * Agent function prototype for receive_check_in_done function of agent agent
+/** agent_receive_check_in_response
+ * Agent function prototype for receive_check_in_response function of agent agent
  */
-void agent_receive_check_in_done(cudaStream_t &stream);
+void agent_receive_check_in_response(cudaStream_t &stream);
+
+/** agent_output_box_petition
+ * Agent function prototype for output_box_petition function of agent agent
+ */
+void agent_output_box_petition(cudaStream_t &stream);
+
+/** agent_receive_box_response
+ * Agent function prototype for receive_box_response function of agent agent
+ */
+void agent_receive_box_response(cudaStream_t &stream);
 
 /** agent_output_triage_petition
  * Agent function prototype for output_triage_petition function of agent agent
@@ -596,10 +608,10 @@ void receptionist_infect_receptionist(cudaStream_t &stream);
  */
 void agent_generator_generate_chairs(cudaStream_t &stream);
 
-/** agent_generator_generate_triage
- * Agent function prototype for generate_triage function of agent_generator agent
+/** agent_generator_generate_boxes
+ * Agent function prototype for generate_boxes function of agent_generator agent
  */
-void agent_generator_generate_triage(cudaStream_t &stream);
+void agent_generator_generate_boxes(cudaStream_t &stream);
 
 /** chair_admin_attend_chair_petitions
  * Agent function prototype for attend_chair_petitions function of chair_admin agent
@@ -610,6 +622,11 @@ void chair_admin_attend_chair_petitions(cudaStream_t &stream);
  * Agent function prototype for box_server function of box agent
  */
 void box_box_server(cudaStream_t &stream);
+
+/** box_attend_box_patient
+ * Agent function prototype for attend_box_patient function of box agent
+ */
+void box_attend_box_patient(cudaStream_t &stream);
 
 /** triage_receive_triage_petitions
  * Agent function prototype for receive_triage_petitions function of triage agent
@@ -766,11 +783,12 @@ void initialise(char * inputfile){
     h_receptionists_defaultReceptionist_variable_attend_patient_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_estado_data_iteration = 0;
     h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
-    h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
     h_boxs_defaultBox_variable_id_data_iteration = 0;
-    h_boxs_defaultBox_variable_occupied_data_iteration = 0;
+    h_boxs_defaultBox_variable_attending_data_iteration = 0;
+    h_boxs_defaultBox_variable_tick_data_iteration = 0;
     h_triages_defaultTriage_variable_id_data_iteration = 0;
     h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
     h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
@@ -813,8 +831,8 @@ void initialise(char * inputfile){
 	h_navmap_cells = (xmachine_message_navmap_cell_list*)malloc(message_navmap_cell_SoA_size);
 	int message_check_in_SoA_size = sizeof(xmachine_message_check_in_list);
 	h_check_ins = (xmachine_message_check_in_list*)malloc(message_check_in_SoA_size);
-	int message_check_in_done_SoA_size = sizeof(xmachine_message_check_in_done_list);
-	h_check_in_dones = (xmachine_message_check_in_done_list*)malloc(message_check_in_done_SoA_size);
+	int message_check_in_response_SoA_size = sizeof(xmachine_message_check_in_response_list);
+	h_check_in_responses = (xmachine_message_check_in_response_list*)malloc(message_check_in_response_SoA_size);
 	int message_chair_petition_SoA_size = sizeof(xmachine_message_chair_petition_list);
 	h_chair_petitions = (xmachine_message_chair_petition_list*)malloc(message_chair_petition_SoA_size);
 	int message_chair_response_SoA_size = sizeof(xmachine_message_chair_response_list);
@@ -1048,10 +1066,10 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_check_ins_swap, message_check_in_SoA_size));
 	gpuErrchk( cudaMemcpy( d_check_ins, h_check_ins, message_check_in_SoA_size, cudaMemcpyHostToDevice));
 	
-	/* check_in_done Message memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_check_in_dones, message_check_in_done_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_check_in_dones_swap, message_check_in_done_SoA_size));
-	gpuErrchk( cudaMemcpy( d_check_in_dones, h_check_in_dones, message_check_in_done_SoA_size, cudaMemcpyHostToDevice));
+	/* check_in_response Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_check_in_responses, message_check_in_response_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_check_in_responses_swap, message_check_in_response_SoA_size));
+	gpuErrchk( cudaMemcpy( d_check_in_responses, h_check_in_responses, message_check_in_response_SoA_size, cudaMemcpyHostToDevice));
 	
 	/* chair_petition Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_chair_petitions, message_chair_petition_SoA_size));
@@ -1269,6 +1287,7 @@ void initialise(char * inputfile){
   gpuErrchk(cudaStreamCreate(&stream4));
   gpuErrchk(cudaStreamCreate(&stream5));
   gpuErrchk(cudaStreamCreate(&stream6));
+  gpuErrchk(cudaStreamCreate(&stream7));
 
 #if defined(OUTPUT_POPULATION_PER_ITERATION) && OUTPUT_POPULATION_PER_ITERATION
 	// Print the agent population size of all agents in all states
@@ -1645,10 +1664,10 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_check_ins));
 	gpuErrchk(cudaFree(d_check_ins_swap));
 	
-	/* check_in_done Message variables */
-	free( h_check_in_dones);
-	gpuErrchk(cudaFree(d_check_in_dones));
-	gpuErrchk(cudaFree(d_check_in_dones_swap));
+	/* check_in_response Message variables */
+	free( h_check_in_responses);
+	gpuErrchk(cudaFree(d_check_in_responses));
+	gpuErrchk(cudaFree(d_check_in_responses_swap));
 	
 	/* chair_petition Message variables */
 	free( h_chair_petitions);
@@ -1759,6 +1778,7 @@ void cleanup(){
   gpuErrchk(cudaStreamDestroy(stream4));
   gpuErrchk(cudaStreamDestroy(stream5));
   gpuErrchk(cudaStreamDestroy(stream6));
+  gpuErrchk(cudaStreamDestroy(stream7));
 
   /* CUDA Event Timers for Instrumentation */
 #if defined(INSTRUMENT_ITERATIONS) && INSTRUMENT_ITERATIONS
@@ -1794,9 +1814,9 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_check_in_count, &h_message_check_in_count, sizeof(int)));
 	
-	h_message_check_in_done_count = 0;
+	h_message_check_in_response_count = 0;
 	//upload to device constant
-	gpuErrchk(cudaMemcpyToSymbol( d_message_check_in_done_count, &h_message_check_in_done_count, sizeof(int)));
+	gpuErrchk(cudaMemcpyToSymbol( d_message_check_in_response_count, &h_message_check_in_response_count, sizeof(int)));
 	
 	h_message_chair_petition_count = 0;
 	//upload to device constant
@@ -1881,14 +1901,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_generator_generate_triage");
-	agent_generator_generate_triage(stream4);
+    PROFILE_PUSH_RANGE("agent_generator_generate_boxes");
+	agent_generator_generate_boxes(stream4);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_generator_generate_triage = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: agent_generator_generate_boxes = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -1976,6 +1996,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_output_triage_petition = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_output_box_petition");
+	agent_output_box_petition(stream7);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_output_box_petition = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -2087,6 +2121,34 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: receptionist_receptionServer = %f (ms)\n", instrument_milliseconds);
 #endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("box_box_server");
+	box_box_server(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: box_box_server = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("box_attend_box_patient");
+	box_attend_box_patient(stream3);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: box_attend_box_patient = %f (ms)\n", instrument_milliseconds);
+#endif
 	cudaDeviceSynchronize();
   
 	/* Layer 7*/
@@ -2126,14 +2188,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_receive_check_in_done");
-	agent_receive_check_in_done(stream1);
+    PROFILE_PUSH_RANGE("agent_receive_check_in_response");
+	agent_receive_check_in_response(stream1);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_receive_check_in_done = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: agent_receive_check_in_response = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
@@ -2176,6 +2238,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_receive_triage_response = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_receive_box_response");
+	agent_receive_box_response(stream5);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_receive_box_response = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -5080,38 +5156,38 @@ __host__ int get_agent_generator_defaultGenerator_variable_chairs_generated(unsi
     }
 }
 
-/** int get_agent_generator_defaultGenerator_variable_triage_generated(unsigned int index)
- * Gets the value of the triage_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+/** int get_agent_generator_defaultGenerator_variable_boxes_generated(unsigned int index)
+ * Gets the value of the boxes_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable triage_generated
+ * @return value of agent variable boxes_generated
  */
-__host__ int get_agent_generator_defaultGenerator_variable_triage_generated(unsigned int index){
+__host__ int get_agent_generator_defaultGenerator_variable_boxes_generated(unsigned int index){
     unsigned int count = get_agent_agent_generator_defaultGenerator_count();
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration != currentIteration){
+        if(h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration != currentIteration){
             gpuErrchk(
                 cudaMemcpy(
-                    h_agent_generators_defaultGenerator->triage_generated,
-                    d_agent_generators_defaultGenerator->triage_generated,
+                    h_agent_generators_defaultGenerator->boxes_generated,
+                    d_agent_generators_defaultGenerator->boxes_generated,
                     count * sizeof(int),
                     cudaMemcpyDeviceToHost
                 )
             );
             // Update some global value indicating what data is currently present in that host array.
-            h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = currentIteration;
+            h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = currentIteration;
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_agent_generators_defaultGenerator->triage_generated[index];
+        return h_agent_generators_defaultGenerator->boxes_generated[index];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access triage_generated for the %u th member of agent_generator_defaultGenerator. count is %u at iteration %u\n", index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access boxes_generated for the %u th member of agent_generator_defaultGenerator. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -5237,38 +5313,76 @@ __host__ unsigned int get_box_defaultBox_variable_id(unsigned int index){
     }
 }
 
-/** unsigned int get_box_defaultBox_variable_occupied(unsigned int index)
- * Gets the value of the occupied variable of an box agent in the defaultBox state on the host. 
+/** unsigned int get_box_defaultBox_variable_attending(unsigned int index)
+ * Gets the value of the attending variable of an box agent in the defaultBox state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable occupied
+ * @return value of agent variable attending
  */
-__host__ unsigned int get_box_defaultBox_variable_occupied(unsigned int index){
+__host__ unsigned int get_box_defaultBox_variable_attending(unsigned int index){
     unsigned int count = get_agent_box_defaultBox_count();
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_boxs_defaultBox_variable_occupied_data_iteration != currentIteration){
+        if(h_boxs_defaultBox_variable_attending_data_iteration != currentIteration){
             gpuErrchk(
                 cudaMemcpy(
-                    h_boxs_defaultBox->occupied,
-                    d_boxs_defaultBox->occupied,
+                    h_boxs_defaultBox->attending,
+                    d_boxs_defaultBox->attending,
                     count * sizeof(unsigned int),
                     cudaMemcpyDeviceToHost
                 )
             );
             // Update some global value indicating what data is currently present in that host array.
-            h_boxs_defaultBox_variable_occupied_data_iteration = currentIteration;
+            h_boxs_defaultBox_variable_attending_data_iteration = currentIteration;
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_boxs_defaultBox->occupied[index];
+        return h_boxs_defaultBox->attending[index];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access occupied for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access attending for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_box_defaultBox_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an box agent in the defaultBox state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_box_defaultBox_variable_tick(unsigned int index){
+    unsigned int count = get_agent_box_defaultBox_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_boxs_defaultBox_variable_tick_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_boxs_defaultBox->tick,
+                    d_boxs_defaultBox->tick,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_boxs_defaultBox_variable_tick_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_boxs_defaultBox->tick[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -5820,7 +5934,7 @@ void copy_single_xmachine_memory_agent_generator_hostToDevice(xmachine_memory_ag
  
 		gpuErrchk(cudaMemcpy(d_dst->chairs_generated, &h_agent->chairs_generated, sizeof(int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->triage_generated, &h_agent->triage_generated, sizeof(int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->boxes_generated, &h_agent->boxes_generated, sizeof(int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -5839,7 +5953,7 @@ void copy_partial_xmachine_memory_agent_generator_hostToDevice(xmachine_memory_a
 	 
 		gpuErrchk(cudaMemcpy(d_dst->chairs_generated, h_src->chairs_generated, count * sizeof(int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->triage_generated, h_src->triage_generated, count * sizeof(int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->boxes_generated, h_src->boxes_generated, count * sizeof(int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -5893,7 +6007,9 @@ void copy_single_xmachine_memory_box_hostToDevice(xmachine_memory_box_list * d_d
  
 		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->occupied, &h_agent->occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->attending, &h_agent->attending, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -5912,7 +6028,9 @@ void copy_partial_xmachine_memory_box_hostToDevice(xmachine_memory_box_list * d_
 	 
 		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->occupied, h_src->occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->attending, h_src->attending, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -6544,7 +6662,7 @@ xmachine_memory_agent_generator* h_allocate_agent_agent_generator(){
 
     agent->chairs_generated = 0;
 
-    agent->triage_generated = 0;
+    agent->boxes_generated = 0;
 
 	return agent;
 }
@@ -6574,7 +6692,7 @@ void h_unpack_agents_agent_generator_AoS_to_SoA(xmachine_memory_agent_generator_
 			 
 			dst->chairs_generated[i] = src[i]->chairs_generated;
 			 
-			dst->triage_generated[i] = src[i]->triage_generated;
+			dst->boxes_generated[i] = src[i]->boxes_generated;
 			
 		}
 	}
@@ -6607,7 +6725,7 @@ void h_add_agent_agent_generator_defaultGenerator(xmachine_memory_agent_generato
 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
     h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
-    h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = 0;
     
 
 }
@@ -6640,7 +6758,7 @@ void h_add_agents_agent_generator_defaultGenerator(xmachine_memory_agent_generat
 
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_agent_generators_defaultGenerator_variable_chairs_generated_data_iteration = 0;
-        h_agent_generators_defaultGenerator_variable_triage_generated_data_iteration = 0;
+        h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = 0;
         
 
 	}
@@ -6795,7 +6913,9 @@ void h_unpack_agents_box_AoS_to_SoA(xmachine_memory_box_list * dst, xmachine_mem
 			 
 			dst->id[i] = src[i]->id;
 			 
-			dst->occupied[i] = src[i]->occupied;
+			dst->attending[i] = src[i]->attending;
+			 
+			dst->tick[i] = src[i]->tick;
 			
 		}
 	}
@@ -6828,7 +6948,8 @@ void h_add_agent_box_defaultBox(xmachine_memory_box* agent){
 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
     h_boxs_defaultBox_variable_id_data_iteration = 0;
-    h_boxs_defaultBox_variable_occupied_data_iteration = 0;
+    h_boxs_defaultBox_variable_attending_data_iteration = 0;
+    h_boxs_defaultBox_variable_tick_data_iteration = 0;
     
 
 }
@@ -6861,7 +6982,8 @@ void h_add_agents_box_defaultBox(xmachine_memory_box** agents, unsigned int coun
 
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_boxs_defaultBox_variable_id_data_iteration = 0;
-        h_boxs_defaultBox_variable_occupied_data_iteration = 0;
+        h_boxs_defaultBox_variable_attending_data_iteration = 0;
+        h_boxs_defaultBox_variable_tick_data_iteration = 0;
         
 
 	}
@@ -8109,24 +8231,24 @@ int max_agent_generator_defaultGenerator_chairs_generated_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-int reduce_agent_generator_defaultGenerator_triage_generated_variable(){
+int reduce_agent_generator_defaultGenerator_boxes_generated_variable(){
     //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count);
+    return thrust::reduce(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->boxes_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->boxes_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count);
 }
 
-int count_agent_generator_defaultGenerator_triage_generated_variable(int count_value){
+int count_agent_generator_defaultGenerator_boxes_generated_variable(int count_value){
     //count in default stream
-    return (int)thrust::count(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count, count_value);
+    return (int)thrust::count(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->boxes_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->boxes_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count, count_value);
 }
-int min_agent_generator_defaultGenerator_triage_generated_variable(){
+int min_agent_generator_defaultGenerator_boxes_generated_variable(){
     //min in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated);
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->boxes_generated);
     size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-int max_agent_generator_defaultGenerator_triage_generated_variable(){
+int max_agent_generator_defaultGenerator_boxes_generated_variable(){
     //max in default stream
-    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->triage_generated);
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->boxes_generated);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -8172,24 +8294,45 @@ unsigned int max_box_defaultBox_id_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int reduce_box_defaultBox_occupied_variable(){
+unsigned int reduce_box_defaultBox_attending_variable(){
     //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->occupied),  thrust::device_pointer_cast(d_boxs_defaultBox->occupied) + h_xmachine_memory_box_defaultBox_count);
+    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->attending),  thrust::device_pointer_cast(d_boxs_defaultBox->attending) + h_xmachine_memory_box_defaultBox_count);
 }
 
-unsigned int count_box_defaultBox_occupied_variable(unsigned int count_value){
+unsigned int count_box_defaultBox_attending_variable(unsigned int count_value){
     //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->occupied),  thrust::device_pointer_cast(d_boxs_defaultBox->occupied) + h_xmachine_memory_box_defaultBox_count, count_value);
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->attending),  thrust::device_pointer_cast(d_boxs_defaultBox->attending) + h_xmachine_memory_box_defaultBox_count, count_value);
 }
-unsigned int min_box_defaultBox_occupied_variable(){
+unsigned int min_box_defaultBox_attending_variable(){
     //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->occupied);
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->attending);
     size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int max_box_defaultBox_occupied_variable(){
+unsigned int max_box_defaultBox_attending_variable(){
     //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->occupied);
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->attending);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_box_defaultBox_tick_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->tick),  thrust::device_pointer_cast(d_boxs_defaultBox->tick) + h_xmachine_memory_box_defaultBox_count);
+}
+
+unsigned int count_box_defaultBox_tick_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->tick),  thrust::device_pointer_cast(d_boxs_defaultBox->tick) + h_xmachine_memory_box_defaultBox_count, count_value);
+}
+unsigned int min_box_defaultBox_tick_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->tick);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_box_defaultBox_tick_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->tick);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -9862,11 +10005,11 @@ void agent_receive_chair_response(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int agent_receive_check_in_done_sm_size(int blockSize){
+int agent_receive_check_in_response_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   //Continuous agent and message input has no partitioning
-	sm_size += (blockSize * sizeof(xmachine_message_check_in_done));
+	sm_size += (blockSize * sizeof(xmachine_message_check_in_response));
 	
 	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
 	sm_size += (blockSize * PADDING);
@@ -9874,10 +10017,10 @@ int agent_receive_check_in_done_sm_size(int blockSize){
 	return sm_size;
 }
 
-/** agent_receive_check_in_done
- * Agent function prototype for receive_check_in_done function of agent agent
+/** agent_receive_check_in_response
+ * Agent function prototype for receive_check_in_response function of agent agent
  */
-void agent_receive_check_in_done(cudaStream_t &stream){
+void agent_receive_check_in_response(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -9920,9 +10063,9 @@ void agent_receive_check_in_done(cudaStream_t &stream){
 	gpuErrchkLaunch();
 
 	//APPLY FUNCTION FILTER
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, receive_check_in_done_function_filter, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, receive_check_in_response_function_filter, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	receive_check_in_done_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	receive_check_in_response_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
 	gpuErrchkLaunch();
 
 	//GRID AND BLOCK SIZE FOR COMPACT
@@ -10000,24 +10143,24 @@ void agent_receive_check_in_done(cudaStream_t &stream){
 	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receive_check_in_done, agent_receive_check_in_done_sm_size, state_list_size);
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receive_check_in_response, agent_receive_check_in_response_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
 	b.x = blockSize;
 	g.x = gridSize;
 	
-	sm_size = agent_receive_check_in_done_sm_size(blockSize);
+	sm_size = agent_receive_check_in_response_sm_size(blockSize);
 	
 	
 	
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (receive_check_in_done)
+	//MAIN XMACHINE FUNCTION CALL (receive_check_in_response)
 	//Reallocate   : false
-	//Input        : check_in_done
+	//Input        : check_in_response
 	//Output       : 
 	//Agent Output : 
-	GPUFLAME_receive_check_in_done<<<g, b, sm_size, stream>>>(d_agents, d_check_in_dones);
+	GPUFLAME_receive_check_in_response<<<g, b, sm_size, stream>>>(d_agents, d_check_in_responses);
 	gpuErrchkLaunch();
 	
 	
@@ -10028,7 +10171,7 @@ void agent_receive_check_in_done(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of receive_check_in_done agents in state default will be exceeded moving working agents to next state in function receive_check_in_done\n");
+		printf("Error: Buffer size of receive_check_in_response agents in state default will be exceeded moving working agents to next state in function receive_check_in_response\n");
       exit(EXIT_FAILURE);
       }
       
@@ -10037,6 +10180,343 @@ void agent_receive_check_in_done(cudaStream_t &stream){
   gridSize = (state_list_size + blockSize - 1) / blockSize;
   append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
   gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_output_box_petition_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** agent_output_box_petition
+ * Agent function prototype for output_box_petition function of agent agent
+ */
+void agent_output_box_petition(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, output_box_petition_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	output_box_petition_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_box_petition_count + h_xmachine_memory_agent_count > xmachine_message_box_petition_MAX){
+		printf("Error: Buffer size of box_petition message will be exceeded in function output_box_petition\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_output_box_petition, agent_output_box_petition_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_output_box_petition_sm_size(blockSize);
+	
+	
+	
+	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
+	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
+	h_message_box_petition_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_box_petition_output_type, &h_message_box_petition_output_type, sizeof(int)));
+	//message is optional so reset the swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_petition_swaps, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_box_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_box_petitions); 
+	gpuErrchkLaunch();
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (output_box_petition)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : box_petition
+	//Agent Output : 
+	GPUFLAME_output_box_petition<<<g, b, sm_size, stream>>>(d_agents, d_box_petitions);
+	gpuErrchkLaunch();
+	
+	
+	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
+	//box_petition Message Type Prefix Sum
+	
+	//swap output
+	xmachine_message_box_petition_list* d_box_petitions_scanswap_temp = d_box_petitions;
+	d_box_petitions = d_box_petitions_swap;
+	d_box_petitions_swap = d_box_petitions_scanswap_temp;
+	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_box_petitions_swap->_scan_input,
+        d_box_petitions_swap->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//Scatter
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_box_petition_messages, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_optional_box_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_box_petitions, d_box_petitions_swap);
+	gpuErrchkLaunch();
+	
+	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_box_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_box_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//If last item in prefix sum was 1 then increase its index to get the count
+	if (scan_last_included == 1){
+		h_message_box_petition_count += scan_last_sum+1;
+	}else{
+		h_message_box_petition_count += scan_last_sum;
+	}
+    //Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_message_box_petition_count, &h_message_box_petition_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of output_box_petition agents in state default will be exceeded moving working agents to next state in function output_box_petition\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_receive_box_response_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input has no partitioning
+	sm_size += (blockSize * sizeof(xmachine_message_box_response));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** agent_receive_box_response
+ * Agent function prototype for receive_box_response function of agent agent
+ */
+void agent_receive_box_response(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_agent_list* agents_default_temp = d_agents;
+	d_agents = d_agents_default;
+	d_agents_default = agents_default_temp;
+	//set working count to current state count
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	//set current state count to 0
+	h_xmachine_memory_agent_default_count = 0;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receive_box_response, agent_receive_box_response_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_receive_box_response_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (receive_box_response)
+	//Reallocate   : false
+	//Input        : box_response
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_receive_box_response<<<g, b, sm_size, stream>>>(d_agents, d_box_responses);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of receive_box_response agents in state default will be exceeded moving working agents to next state in function receive_box_response\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //pointer swap the updated data
+  agents_default_temp = d_agents;
+  d_agents = d_agents_default;
+  d_agents_default = agents_default_temp;
         
 	//update new state agent size
 	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
@@ -11153,8 +11633,8 @@ void receptionist_receptionServer(cudaStream_t &stream){
 
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_check_in_done_count + h_xmachine_memory_receptionist_count > xmachine_message_check_in_done_MAX){
-		printf("Error: Buffer size of check_in_done message will be exceeded in function receptionServer\n");
+	if (h_message_check_in_response_count + h_xmachine_memory_receptionist_count > xmachine_message_check_in_response_MAX){
+		printf("Error: Buffer size of check_in_response message will be exceeded in function receptionServer\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -11173,60 +11653,60 @@ void receptionist_receptionServer(cudaStream_t &stream){
 	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
-	h_message_check_in_done_output_type = optional_message;
-	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_done_output_type, &h_message_check_in_done_output_type, sizeof(int)));
+	h_message_check_in_response_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_response_output_type, &h_message_check_in_response_output_type, sizeof(int)));
 	//message is optional so reset the swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_check_in_done_swaps, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_check_in_response_swaps, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_check_in_done_swaps<<<gridSize, blockSize, 0, stream>>>(d_check_in_dones); 
+	reset_check_in_response_swaps<<<gridSize, blockSize, 0, stream>>>(d_check_in_responses); 
 	gpuErrchkLaunch();
 	
 	
 	//MAIN XMACHINE FUNCTION CALL (receptionServer)
 	//Reallocate   : false
 	//Input        : check_in
-	//Output       : check_in_done
+	//Output       : check_in_response
 	//Agent Output : 
-	GPUFLAME_receptionServer<<<g, b, sm_size, stream>>>(d_receptionists, d_check_ins, d_check_in_dones);
+	GPUFLAME_receptionServer<<<g, b, sm_size, stream>>>(d_receptionists, d_check_ins, d_check_in_responses);
 	gpuErrchkLaunch();
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
-	//check_in_done Message Type Prefix Sum
+	//check_in_response Message Type Prefix Sum
 	
 	//swap output
-	xmachine_message_check_in_done_list* d_check_in_dones_scanswap_temp = d_check_in_dones;
-	d_check_in_dones = d_check_in_dones_swap;
-	d_check_in_dones_swap = d_check_in_dones_scanswap_temp;
+	xmachine_message_check_in_response_list* d_check_in_responses_scanswap_temp = d_check_in_responses;
+	d_check_in_responses = d_check_in_responses_swap;
+	d_check_in_responses_swap = d_check_in_responses_scanswap_temp;
 	
     cub::DeviceScan::ExclusiveSum(
         d_temp_scan_storage_receptionist, 
         temp_scan_storage_bytes_receptionist, 
-        d_check_in_dones_swap->_scan_input,
-        d_check_in_dones_swap->_position,
+        d_check_in_responses_swap->_scan_input,
+        d_check_in_responses_swap->_position,
         h_xmachine_memory_receptionist_count, 
         stream
     );
 
 	//Scatter
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_check_in_done_messages, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_check_in_response_messages, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_optional_check_in_done_messages<<<gridSize, blockSize, 0, stream>>>(d_check_in_dones, d_check_in_dones_swap);
+	scatter_optional_check_in_response_messages<<<gridSize, blockSize, 0, stream>>>(d_check_in_responses, d_check_in_responses_swap);
 	gpuErrchkLaunch();
 	
 	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_check_in_dones_swap->_position[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_check_in_dones_swap->_scan_input[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_check_in_responses_swap->_position[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_check_in_responses_swap->_scan_input[h_xmachine_memory_receptionist_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	//If last item in prefix sum was 1 then increase its index to get the count
 	if (scan_last_included == 1){
-		h_message_check_in_done_count += scan_last_sum+1;
+		h_message_check_in_response_count += scan_last_sum+1;
 	}else{
-		h_message_check_in_done_count += scan_last_sum;
+		h_message_check_in_response_count += scan_last_sum;
 	}
     //Copy count to device
-	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_done_count, &h_message_check_in_done_count, sizeof(int)));	
+	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_response_count, &h_message_check_in_response_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
@@ -11616,17 +12096,17 @@ void agent_generator_generate_chairs(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int agent_generator_generate_triage_sm_size(int blockSize){
+int agent_generator_generate_boxes_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   
 	return sm_size;
 }
 
-/** agent_generator_generate_triage
- * Agent function prototype for generate_triage function of agent_generator agent
+/** agent_generator_generate_boxes
+ * Agent function prototype for generate_boxes function of agent_generator agent
  */
-void agent_generator_generate_triage(cudaStream_t &stream){
+void agent_generator_generate_boxes(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -11650,10 +12130,10 @@ void agent_generator_generate_triage(cudaStream_t &stream){
 	state_list_size = h_xmachine_memory_agent_generator_defaultGenerator_count;
 
 	
-	//FOR triage AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_triage_scan_input, no_sm, state_list_size); 
+	//FOR box AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_scan_input, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_triage_scan_input<<<gridSize, blockSize, 0, stream>>>(d_triages_new);
+	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs_new);
 	gpuErrchkLaunch();
 	
 
@@ -11675,9 +12155,9 @@ void agent_generator_generate_triage(cudaStream_t &stream){
 	gpuErrchkLaunch();
 
 	//APPLY FUNCTION FILTER
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_triage_function_filter, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_boxes_function_filter, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	generate_triage_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator, d_agent_generators);
+	generate_boxes_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator, d_agent_generators);
 	gpuErrchkLaunch();
 
 	//GRID AND BLOCK SIZE FOR COMPACT
@@ -11755,67 +12235,67 @@ void agent_generator_generate_triage(cudaStream_t &stream){
 	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_triage, agent_generator_generate_triage_sm_size, state_list_size);
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_boxes, agent_generator_generate_boxes_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
 	b.x = blockSize;
 	g.x = gridSize;
 	
-	sm_size = agent_generator_generate_triage_sm_size(blockSize);
+	sm_size = agent_generator_generate_boxes_sm_size(blockSize);
 	
 	
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (generate_triage)
+	//MAIN XMACHINE FUNCTION CALL (generate_boxes)
 	//Reallocate   : false
 	//Input        : 
 	//Output       : 
-	//Agent Output : triage
-	GPUFLAME_generate_triage<<<g, b, sm_size, stream>>>(d_agent_generators, d_triages_new);
+	//Agent Output : box
+	GPUFLAME_generate_boxes<<<g, b, sm_size, stream>>>(d_agent_generators, d_boxs_new);
 	gpuErrchkLaunch();
 	
 	
     //COPY ANY AGENT COUNT BEFORE agent_generator AGENTS ARE KILLED (needed for scatter)
 	int agent_generators_pre_death_count = h_xmachine_memory_agent_generator_count;
 	
-	//FOR triage AGENT OUTPUT SCATTER AGENTS 
+	//FOR box AGENT OUTPUT SCATTER AGENTS 
 
     cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_triage, 
-        temp_scan_storage_bytes_triage, 
-        d_triages_new->_scan_input, 
-        d_triages_new->_position, 
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
+        d_boxs_new->_scan_input, 
+        d_boxs_new->_position, 
         agent_generators_pre_death_count,
         stream
     );
 
 	//reset agent count
-	int triage_after_birth_count;
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_triages_new->_position[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_triages_new->_scan_input[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	int box_after_birth_count;
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs_new->_position[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs_new->_scan_input[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	if (scan_last_included == 1)
-		triage_after_birth_count = h_xmachine_memory_triage_defaultTriage_count + scan_last_sum+1;
+		box_after_birth_count = h_xmachine_memory_box_defaultBox_count + scan_last_sum+1;
 	else
-		triage_after_birth_count = h_xmachine_memory_triage_defaultTriage_count + scan_last_sum;
+		box_after_birth_count = h_xmachine_memory_box_defaultBox_count + scan_last_sum;
 	//check buffer is not exceeded
-	if (triage_after_birth_count > xmachine_memory_triage_MAX){
-		printf("Error: Buffer size of triage agents in state defaultTriage will be exceeded writing new agents in function generate_triage\n");
+	if (box_after_birth_count > xmachine_memory_box_MAX){
+		printf("Error: Buffer size of box agents in state defaultBox will be exceeded writing new agents in function generate_boxes\n");
 		exit(EXIT_FAILURE);
 	}
 	//Scatter into swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_triage_Agents, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_box_Agents, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_triage_Agents<<<gridSize, blockSize, 0, stream>>>(d_triages_defaultTriage, d_triages_new, h_xmachine_memory_triage_defaultTriage_count, agent_generators_pre_death_count);
+	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs_new, h_xmachine_memory_box_defaultBox_count, agent_generators_pre_death_count);
 	gpuErrchkLaunch();
 	//Copy count to device
-	h_xmachine_memory_triage_defaultTriage_count = triage_after_birth_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_triage_defaultTriage_count, &h_xmachine_memory_triage_defaultTriage_count, sizeof(int)));	
+	h_xmachine_memory_box_defaultBox_count = box_after_birth_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_generator_defaultGenerator_count+h_xmachine_memory_agent_generator_count > xmachine_memory_agent_generator_MAX){
-		printf("Error: Buffer size of generate_triage agents in state defaultGenerator will be exceeded moving working agents to next state in function generate_triage\n");
+		printf("Error: Buffer size of generate_boxes agents in state defaultGenerator will be exceeded moving working agents to next state in function generate_boxes\n");
       exit(EXIT_FAILURE);
       }
       
@@ -12036,28 +12516,100 @@ void box_box_server(cudaStream_t &stream){
 	
 
 	//******************************** AGENT FUNCTION CONDITION *********************
-	//THERE IS NOT A FUNCTION CONDITION
-	//currentState maps to working list
-	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs;
-	d_boxs = d_boxs_defaultBox;
-	d_boxs_defaultBox = boxs_defaultBox_temp;
-	//set working count to current state count
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
 	h_xmachine_memory_box_count = h_xmachine_memory_box_defaultBox_count;
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
-	//set current state count to 0
-	h_xmachine_memory_box_defaultBox_count = 0;
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, box_server_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	box_server_function_filter<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_box_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
+        d_boxs_defaultBox->_scan_input,
+        d_boxs_defaultBox->_position,
+        h_xmachine_memory_box_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs_defaultBox->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs_defaultBox->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_box_defaultBox_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_box_defaultBox_count = scan_last_sum;
+	//Scatter into swap
+	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs_defaultBox, 0, h_xmachine_memory_box_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs_defaultBox;
+	d_boxs_defaultBox = d_boxs_swap;
+	d_boxs_swap = boxs_defaultBox_temp;
+	//update the device count
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
+        d_boxs->_scan_input,
+        d_boxs->_position,
+        h_xmachine_memory_box_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs, 0, h_xmachine_memory_box_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_box_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_box_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_box_list* boxs_temp = d_boxs;
+	d_boxs = d_boxs_swap;
+	d_boxs_swap = boxs_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_box_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_box_count;
 	
  
 
 	//******************************** AGENT FUNCTION *******************************
 
-	
-	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_box_response_count + h_xmachine_memory_box_count > xmachine_message_box_response_MAX){
-		printf("Error: Buffer size of box_response message will be exceeded in function box_server\n");
-		exit(EXIT_FAILURE);
-	}
 	
 	
 	//calculate the grid block size for main agent function
@@ -12072,6 +12624,192 @@ void box_box_server(cudaStream_t &stream){
 	
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
+	
+	//MAIN XMACHINE FUNCTION CALL (box_server)
+	//Reallocate   : false
+	//Input        : box_petition
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_box_server<<<g, b, sm_size, stream>>>(d_boxs, d_box_petitions);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_box_defaultBox_count+h_xmachine_memory_box_count > xmachine_memory_box_MAX){
+		printf("Error: Buffer size of box_server agents in state defaultBox will be exceeded moving working agents to next state in function box_server\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_box_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs, h_xmachine_memory_box_defaultBox_count, h_xmachine_memory_box_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_box_defaultBox_count += h_xmachine_memory_box_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int box_attend_box_patient_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** box_attend_box_patient
+ * Agent function prototype for attend_box_patient function of box agent
+ */
+void box_attend_box_patient(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_box_defaultBox_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_box_defaultBox_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_box_count = h_xmachine_memory_box_defaultBox_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, attend_box_patient_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	attend_box_patient_function_filter<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_box_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
+        d_boxs_defaultBox->_scan_input,
+        d_boxs_defaultBox->_position,
+        h_xmachine_memory_box_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs_defaultBox->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs_defaultBox->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_box_defaultBox_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_box_defaultBox_count = scan_last_sum;
+	//Scatter into swap
+	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs_defaultBox, 0, h_xmachine_memory_box_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs_defaultBox;
+	d_boxs_defaultBox = d_boxs_swap;
+	d_boxs_swap = boxs_defaultBox_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_box, 
+        temp_scan_storage_bytes_box, 
+        d_boxs->_scan_input,
+        d_boxs->_position,
+        h_xmachine_memory_box_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs, 0, h_xmachine_memory_box_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_box_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_box_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_box_list* boxs_temp = d_boxs;
+	d_boxs = d_boxs_swap;
+	d_boxs_swap = boxs_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_box_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_box_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_box_response_count + h_xmachine_memory_box_count > xmachine_message_box_response_MAX){
+		printf("Error: Buffer size of box_response message will be exceeded in function attend_box_patient\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_attend_box_patient, box_attend_box_patient_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = box_attend_box_patient_sm_size(blockSize);
+	
+	
+	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
 	h_message_box_response_output_type = optional_message;
@@ -12083,16 +12821,14 @@ void box_box_server(cudaStream_t &stream){
 	gpuErrchkLaunch();
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (box_server)
+	//MAIN XMACHINE FUNCTION CALL (attend_box_patient)
 	//Reallocate   : false
-	//Input        : box_petition
+	//Input        : 
 	//Output       : box_response
 	//Agent Output : 
-	GPUFLAME_box_server<<<g, b, sm_size, stream>>>(d_boxs, d_box_petitions, d_box_responses);
+	GPUFLAME_attend_box_patient<<<g, b, sm_size, stream>>>(d_boxs, d_box_responses, d_rand48);
 	gpuErrchkLaunch();
 	
-	
-	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
 	//box_response Message Type Prefix Sum
@@ -12134,14 +12870,15 @@ void box_box_server(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_box_defaultBox_count+h_xmachine_memory_box_count > xmachine_memory_box_MAX){
-		printf("Error: Buffer size of box_server agents in state defaultBox will be exceeded moving working agents to next state in function box_server\n");
+		printf("Error: Buffer size of attend_box_patient agents in state defaultBox will be exceeded moving working agents to next state in function attend_box_patient\n");
       exit(EXIT_FAILURE);
       }
       
-  //pointer swap the updated data
-  boxs_defaultBox_temp = d_boxs;
-  d_boxs = d_boxs_defaultBox;
-  d_boxs_defaultBox = boxs_defaultBox_temp;
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_box_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs, h_xmachine_memory_box_defaultBox_count, h_xmachine_memory_box_count);
+  gpuErrchkLaunch();
         
 	//update new state agent size
 	h_xmachine_memory_box_defaultBox_count += h_xmachine_memory_box_count;

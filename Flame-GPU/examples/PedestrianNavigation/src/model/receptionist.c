@@ -45,7 +45,7 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent)
 /*---------------------------------Atención de pacientes---------------------------------*/
 
 //Función que chequea los pacientes que llegan y los atiende
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_check_in_done_list* patientMessages){
+__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_check_in_response_list* patientMessages){
 	
 	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
 	while(current_message){
@@ -61,18 +61,18 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
     //Si tengo algun paciente esperando y no estoy procesando a nadie
     if((!isEmpty(agent)) && (agent->current_patient == -1)){
         unsigned int patient = dequeue(agent);
-        add_check_in_done_message(patientMessages, patient);
+        add_check_in_response_message(patientMessages, patient);
         agent->current_patient = patient;
         /*agent->tick++;
         if(agent->tick >= espera){
             unsigned int prueba = dequeue(agent);
-            add_check_in_done_message(patientMessages, prueba);
+            add_check_in_response_message(patientMessages, prueba);
             agent->tick = 0;
         }*/
     }else if(agent->attend_patient == 1){
         agent->tick++;
         if(agent->tick >= espera){
-            add_check_in_done_message(patientMessages, agent->current_patient);
+            add_check_in_response_message(patientMessages, agent->current_patient);
             agent->tick = 0;
             agent->current_patient = -1;
             agent->attend_patient = 0;

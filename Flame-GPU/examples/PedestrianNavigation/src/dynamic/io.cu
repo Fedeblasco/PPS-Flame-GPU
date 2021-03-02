@@ -663,10 +663,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</chairs_generated>\n", file);
         
-		fputs("<triage_generated>", file);
-        sprintf(data, "%d", h_agent_generators_defaultGenerator->triage_generated[i]);
+		fputs("<boxes_generated>", file);
+        sprintf(data, "%d", h_agent_generators_defaultGenerator->boxes_generated[i]);
 		fputs(data, file);
-		fputs("</triage_generated>\n", file);
+		fputs("</boxes_generated>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -700,10 +700,15 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</id>\n", file);
         
-		fputs("<occupied>", file);
-        sprintf(data, "%u", h_boxs_defaultBox->occupied[i]);
+		fputs("<attending>", file);
+        sprintf(data, "%u", h_boxs_defaultBox->attending[i]);
 		fputs(data, file);
-		fputs("</occupied>\n", file);
+		fputs("</attending>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_boxs_defaultBox->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -843,11 +848,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_attend_patient;
     int in_receptionist_estado;
     int in_agent_generator_chairs_generated;
-    int in_agent_generator_triage_generated;
+    int in_agent_generator_boxes_generated;
     int in_chair_admin_id;
     int in_chair_admin_chairArray;
     int in_box_id;
-    int in_box_occupied;
+    int in_box_attending;
+    int in_box_tick;
     int in_triage_id;
     int in_triage_boxArray;
     int in_triage_patientQueue;
@@ -994,11 +1000,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int receptionist_attend_patient;
 	int receptionist_estado;
 	int agent_generator_chairs_generated;
-	int agent_generator_triage_generated;
+	int agent_generator_boxes_generated;
 	unsigned int chair_admin_id;
     unsigned int chair_admin_chairArray[35];
 	unsigned int box_id;
-	unsigned int box_occupied;
+	unsigned int box_attending;
+	unsigned int box_tick;
 	unsigned int triage_id;
     unsigned int triage_boxArray[3];
     unsigned int triage_patientQueue[100];
@@ -1116,11 +1123,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_attend_patient = 0;
 	in_receptionist_estado = 0;
 	in_agent_generator_chairs_generated = 0;
-	in_agent_generator_triage_generated = 0;
+	in_agent_generator_boxes_generated = 0;
 	in_chair_admin_id = 0;
 	in_chair_admin_chairArray = 0;
 	in_box_id = 0;
-	in_box_occupied = 0;
+	in_box_attending = 0;
+	in_box_tick = 0;
 	in_triage_id = 0;
 	in_triage_boxArray = 0;
 	in_triage_patientQueue = 0;
@@ -1255,7 +1263,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	for (int k=0; k<xmachine_memory_agent_generator_MAX; k++)
 	{	
 		h_agent_generators->chairs_generated[k] = 0;
-		h_agent_generators->triage_generated[k] = 0;
+		h_agent_generators->boxes_generated[k] = 0;
 	}
 	
 	//set all chair_admin values to 0
@@ -1273,7 +1281,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	for (int k=0; k<xmachine_memory_box_MAX; k++)
 	{	
 		h_boxs->id[k] = 0;
-		h_boxs->occupied[k] = 0;
+		h_boxs->attending[k] = 0;
+		h_boxs->tick[k] = 0;
 	}
 	
 	//set all triage values to 0
@@ -1355,13 +1364,14 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_attend_patient = 0;
     receptionist_estado = 0;
     agent_generator_chairs_generated = 0;
-    agent_generator_triage_generated = 0;
+    agent_generator_boxes_generated = 0;
     chair_admin_id = 0;
     for (i=0;i<35;i++){
         chair_admin_chairArray[i] = 0;
     }
     box_id = 0;
-    box_occupied = 0;
+    box_attending = 0;
+    box_tick = 0;
     triage_id = 0;
     for (i=0;i<3;i++){
         triage_boxArray[i] = 0;
@@ -1681,7 +1691,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					}
                     
 					h_agent_generators->chairs_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_chairs_generated;
-					h_agent_generators->triage_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_triage_generated;
+					h_agent_generators->boxes_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_boxes_generated;
 					(*h_xmachine_memory_agent_generator_count) ++;	
 				}
 				else if(strcmp(agentname, "chair_admin") == 0)
@@ -1709,7 +1719,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					}
                     
 					h_boxs->id[*h_xmachine_memory_box_count] = box_id;
-					h_boxs->occupied[*h_xmachine_memory_box_count] = box_occupied;
+					h_boxs->attending[*h_xmachine_memory_box_count] = box_attending;
+					h_boxs->tick[*h_xmachine_memory_box_count] = box_tick;
 					(*h_xmachine_memory_box_count) ++;	
 				}
 				else if(strcmp(agentname, "triage") == 0)
@@ -1802,13 +1813,14 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_attend_patient = 0;
                 receptionist_estado = 0;
                 agent_generator_chairs_generated = 0;
-                agent_generator_triage_generated = 0;
+                agent_generator_boxes_generated = 0;
                 chair_admin_id = 0;
                 for (i=0;i<35;i++){
                     chair_admin_chairArray[i] = 0;
                 }
                 box_id = 0;
-                box_occupied = 0;
+                box_attending = 0;
+                box_tick = 0;
                 triage_id = 0;
                 for (i=0;i<3;i++){
                     triage_boxArray[i] = 0;
@@ -1939,16 +1951,18 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/estado") == 0) in_receptionist_estado = 0;
 			if(strcmp(buffer, "chairs_generated") == 0) in_agent_generator_chairs_generated = 1;
 			if(strcmp(buffer, "/chairs_generated") == 0) in_agent_generator_chairs_generated = 0;
-			if(strcmp(buffer, "triage_generated") == 0) in_agent_generator_triage_generated = 1;
-			if(strcmp(buffer, "/triage_generated") == 0) in_agent_generator_triage_generated = 0;
+			if(strcmp(buffer, "boxes_generated") == 0) in_agent_generator_boxes_generated = 1;
+			if(strcmp(buffer, "/boxes_generated") == 0) in_agent_generator_boxes_generated = 0;
 			if(strcmp(buffer, "id") == 0) in_chair_admin_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_chair_admin_id = 0;
 			if(strcmp(buffer, "chairArray") == 0) in_chair_admin_chairArray = 1;
 			if(strcmp(buffer, "/chairArray") == 0) in_chair_admin_chairArray = 0;
 			if(strcmp(buffer, "id") == 0) in_box_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_box_id = 0;
-			if(strcmp(buffer, "occupied") == 0) in_box_occupied = 1;
-			if(strcmp(buffer, "/occupied") == 0) in_box_occupied = 0;
+			if(strcmp(buffer, "attending") == 0) in_box_attending = 1;
+			if(strcmp(buffer, "/attending") == 0) in_box_attending = 0;
+			if(strcmp(buffer, "tick") == 0) in_box_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_box_tick = 0;
 			if(strcmp(buffer, "id") == 0) in_triage_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_triage_id = 0;
 			if(strcmp(buffer, "boxArray") == 0) in_triage_boxArray = 1;
@@ -2223,8 +2237,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_agent_generator_chairs_generated){
                     agent_generator_chairs_generated = (int) fpgu_strtol(buffer); 
                 }
-				if(in_agent_generator_triage_generated){
-                    agent_generator_triage_generated = (int) fpgu_strtol(buffer); 
+				if(in_agent_generator_boxes_generated){
+                    agent_generator_boxes_generated = (int) fpgu_strtol(buffer); 
                 }
 				if(in_chair_admin_id){
                     chair_admin_id = (unsigned int) fpgu_strtoul(buffer); 
@@ -2235,8 +2249,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_box_id){
                     box_id = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_box_occupied){
-                    box_occupied = (unsigned int) fpgu_strtoul(buffer); 
+				if(in_box_attending){
+                    box_attending = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_box_tick){
+                    box_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_triage_id){
                     triage_id = (unsigned int) fpgu_strtoul(buffer); 

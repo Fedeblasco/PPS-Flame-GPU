@@ -439,12 +439,12 @@
         
   <!-- Funciones del recepcionista -->
         <gpu:function>
-          <name>receive_check_in_done</name>
+          <name>receive_check_in_response</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <inputs>
             <gpu:input>
-              <messageName>check_in_done</messageName>
+              <messageName>check_in_response</messageName>
             </gpu:input>
           </inputs>
           <condition>
@@ -475,6 +475,42 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+  <!-- Funciones del box -->
+        <gpu:function>
+          <name>output_box_petition</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>box_petition</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>20</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+        
+        <gpu:function>
+          <name>receive_box_response</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>box_response</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
   <!-- Funciones del triage -->
         <gpu:function>
           <name>output_triage_petition</name>
@@ -488,11 +524,27 @@
           </outputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>15</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>||</operator>
             <rhs>
-                <value>15</value>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>22</value>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -822,7 +874,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>check_in_done</messageName>
+              <messageName>check_in_response</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -865,7 +917,7 @@
         </gpu:variable>
         <gpu:variable>
           <type>int</type>
-          <name>triage_generated</name>
+          <name>boxes_generated</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
       </memory>
@@ -894,22 +946,22 @@
         </gpu:function>
         
         <gpu:function>
-          <name>generate_triage</name>
+          <name>generate_boxes</name>
           <currentState>defaultGenerator</currentState>
           <nextState>defaultGenerator</nextState>
           <xagentOutputs>
             <gpu:xagentOutput>
-              <xagentName>triage</xagentName>
-              <state>defaultTriage</state>
+              <xagentName>box</xagentName>
+              <state>defaultBox</state>
             </gpu:xagentOutput>
           </xagentOutputs>
           <condition>
             <lhs>
-              <agentVariable>triage_generated</agentVariable>
+              <agentVariable>boxes_generated</agentVariable>
             </lhs>
             <operator>&lt;</operator>
             <rhs>
-                <value>1</value>
+                <value>3</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -982,7 +1034,11 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>occupied</name>
+          <name>attending</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>tick</name>
         </gpu:variable>
       </memory>
       <functions>
@@ -995,14 +1051,40 @@
               <messageName>box_petition</messageName>
             </gpu:input>
           </inputs>
+          <condition>
+            <lhs>
+              <agentVariable>attending</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>0</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>attend_box_patient</name>
+          <currentState>defaultBox</currentState>
+          <nextState>defaultBox</nextState>
           <outputs>
             <gpu:output>
               <messageName>box_response</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
+          <condition>
+            <lhs>
+              <agentVariable>attending</agentVariable>
+            </lhs>
+            <operator>></operator>
+            <rhs>
+                <value>0</value>
+            </rhs>
+          </condition>
           <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
+          <gpu:RNG>true</gpu:RNG>
         </gpu:function>
       </functions>
       <states>
@@ -1199,7 +1281,7 @@
     </gpu:message>
 
     <gpu:message> 
-      <name>check_in_done</name>
+      <name>check_in_response</name>
       <variables>
         <gpu:variable>
           <type>unsigned int</type>
@@ -1284,6 +1366,10 @@
           <type>unsigned int</type>
           <name>id</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>box_no</name>
+        </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
@@ -1295,6 +1381,10 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>room</name>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
@@ -1346,7 +1436,7 @@
         <name>generate_chairs</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>generate_triage</name>
+        <name>generate_boxes</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1367,6 +1457,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>output_triage_petition</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>output_box_petition</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1397,6 +1490,12 @@
       <gpu:layerFunction>
         <name>receptionServer</name>
       </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>box_server</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>attend_box_patient</name>
+      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
@@ -1408,7 +1507,7 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>receive_check_in_done</name>
+        <name>receive_check_in_response</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_chair_response</name>
@@ -1418,6 +1517,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_triage_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_box_response</name>
       </gpu:layerFunction>
     </layer>
   </layers>
