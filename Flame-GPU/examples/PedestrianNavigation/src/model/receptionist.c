@@ -63,6 +63,7 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
         unsigned int patient = dequeue(agent);
         add_check_in_response_message(patientMessages, patient);
         agent->current_patient = patient;
+        //printf("Enviando mensaje 1 a %d\n",agent->current_patient);
         /*agent->tick++;
         if(agent->tick >= espera){
             unsigned int prueba = dequeue(agent);
@@ -72,6 +73,7 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
     }else if(agent->attend_patient == 1){
         agent->tick++;
         if(agent->tick >= espera){
+            //printf("Enviando mensaje 2 a %d\n",agent->current_patient);
             add_check_in_response_message(patientMessages, agent->current_patient);
             agent->tick = 0;
             agent->current_patient = -1;

@@ -229,7 +229,7 @@
           <name>go_to_y</name>
         </gpu:variable>
         <gpu:variable>
-          <type>unsigned int</type>
+          <type>int</type>
           <name>chair_no</name>
         </gpu:variable>
         <gpu:variable>
@@ -306,7 +306,7 @@
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
         
-  <!-- Funciones de manejo de sillas-->
+  <!-- Funciones de las sillas-->
 
         <gpu:function>
           <name>receive_chair_state</name>
@@ -376,7 +376,7 @@
                     </lhs>
                     <operator>==</operator>
                     <rhs>
-                        <value>5</value>
+                        <value>11</value>
                     </rhs>
                   </condition>
                 </rhs>
@@ -390,7 +390,7 @@
                 </lhs>
                 <operator>==</operator>
                 <rhs>
-                    <value>12</value>
+                    <value>24</value>
                 </rhs>
               </condition>
             </rhs>
@@ -412,11 +412,27 @@
             <lhs>
               <condition>
                 <lhs>
-                  <agentVariable>estado_movimiento</agentVariable>
+                  <condition>
+                    <lhs>
+                      <agentVariable>estado_movimiento</agentVariable>
+                    </lhs>
+                    <operator>==</operator>
+                    <rhs>
+                        <value>2</value>
+                    </rhs>
+                  </condition>
                 </lhs>
-                <operator>==</operator>
+                <operator>||</operator>
                 <rhs>
-                    <value>2</value>
+                  <condition>
+                    <lhs>
+                      <agentVariable>estado_movimiento</agentVariable>
+                    </lhs>
+                    <operator>==</operator>
+                    <rhs>
+                        <value>12</value>
+                    </rhs>
+                  </condition>
                 </rhs>
               </condition>
             </lhs>
@@ -428,7 +444,7 @@
                 </lhs>
                 <operator>==</operator>
                 <rhs>
-                    <value>13</value>
+                    <value>25</value>
                 </rhs>
               </condition>
             </rhs>
@@ -447,6 +463,12 @@
               <messageName>check_in_response</messageName>
             </gpu:input>
           </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_petition</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
           <condition>
             <lhs>
               <condition>
@@ -467,7 +489,7 @@
                 </lhs>
                 <operator>==</operator>
                 <rhs>
-                    <value>9</value>
+                    <value>8</value>
                 </rhs>
               </condition>
             </rhs>
@@ -492,7 +514,7 @@
             </lhs>
             <operator>==</operator>
             <rhs>
-                <value>20</value>
+                <value>19</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -530,7 +552,7 @@
                 </lhs>
                 <operator>==</operator>
                 <rhs>
-                    <value>15</value>
+                    <value>14</value>
                 </rhs>
               </condition>
             </lhs>
@@ -542,7 +564,7 @@
                 </lhs>
                 <operator>==</operator>
                 <rhs>
-                    <value>22</value>
+                    <value>21</value>
                 </rhs>
               </condition>
             </rhs>
@@ -560,13 +582,19 @@
               <messageName>triage_response</messageName>
             </gpu:input>
           </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>chair_petition</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
           <condition>
             <lhs>
               <agentVariable>estado_movimiento</agentVariable>
             </lhs>
             <operator>==</operator>
             <rhs>
-                <value>16</value>
+                <value>15</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -701,21 +729,6 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
-      
-        <gpu:function>
-          <name>generate_medics</name>
-          <currentState>static</currentState>
-          <nextState>static</nextState>
-          <xagentOutputs>
-            <gpu:xagentOutput>
-              <xagentName>medic</xagentName>
-              <state>default2</state>
-            </gpu:xagentOutput>
-          </xagentOutputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>true</gpu:RNG>
-        </gpu:function>
-      
       </functions>
       <states>
         <gpu:state>
@@ -778,33 +791,60 @@
       <gpu:type>continuous</gpu:type>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:xagent>
-<!-- Agente medic -->   
+<!-- Agente doctor_manager -->   
     <gpu:xagent>
-      <name>medic</name>
+      <name>doctor_manager</name>
       <memory>
         <gpu:variable>
-          <type>int</type>
-          <name>x</name>
+          <type>unsigned int</type>
+          <name>front</name>
         </gpu:variable>
         <gpu:variable>
-          <type>int</type>
-          <name>y</name>
+          <type>unsigned int</type>
+          <name>rear</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>size</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>doctorArray</name>
+          <description>Arreglo que maneja si cada doctor está disponible o no</description>
+          <arrayLength>4</arrayLength>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>patientQueue</name>
+          <arrayLength>100</arrayLength>
         </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
-          <name>prueba</name>
-          <currentState>default2</currentState>
-          <nextState>default2</nextState>
+          <name>receive_doctor_petitions</name>
+          <currentState>defaultDoctorManager</currentState>
+          <nextState>defaultDoctorManager</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>doctor_petition</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>doctor_response</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
       </functions>
       <states>
         <gpu:state>
-          <name>default2</name>
+          <name>defaultDoctorManager</name>
         </gpu:state>
-        <initialState>default2</initialState>
+        <initialState>defaultDoctorManager</initialState>
       </states>
       <gpu:type>continuous</gpu:type>
       <gpu:bufferSize>65536</gpu:bufferSize>
@@ -1102,23 +1142,6 @@
       <memory>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>id</name><!-- Agregada porque sino falla la compilación -->
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>boxArray</name>
-          <description>Arreglo que maneja si cada box está disponible o no</description>
-          <arrayLength>3</arrayLength>
-          <defaultValue>0</defaultValue>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>patientQueue</name>
-          <arrayLength>100</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
           <name>front</name>
         </gpu:variable>
         <gpu:variable>
@@ -1133,6 +1156,18 @@
           <type>unsigned int</type>
           <name>tick</name>
           <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>boxArray</name>
+          <description>Arreglo que maneja si cada box está disponible o no</description>
+          <arrayLength>3</arrayLength>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>patientQueue</name>
+          <arrayLength>100</arrayLength>
         </gpu:variable>
       </memory>
       <functions>
@@ -1152,7 +1187,7 @@
             </gpu:output>
           </outputs>
           <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>true</gpu:RNG>
+          <gpu:RNG>false</gpu:RNG>
         </gpu:function>
       </functions>
       <states>
@@ -1394,6 +1429,34 @@
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
+  <!-- Mensajes del doctor_manager -->
+    <gpu:message> 
+      <name>doctor_petition</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>doctor_response</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>doctor_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
   <!-- Mensajes del triage -->
     <gpu:message> 
         <name>triage_petition</name>
@@ -1428,9 +1491,6 @@
     <layer>
       <gpu:layerFunction>
         <name>generate_pedestrians</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>generate_medics</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>generate_chairs</name>
@@ -1469,6 +1529,9 @@
       <gpu:layerFunction>
         <name>output_chair_state</name>
       </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_triage_petitions</name>
+      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
@@ -1479,6 +1542,9 @@
       </gpu:layerFunction>
        <gpu:layerFunction>
         <name>receive_chair_state</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_triage_response</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1496,27 +1562,21 @@
       <gpu:layerFunction>
         <name>attend_box_patient</name>
       </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_check_in_response</name>
+      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
         <name>attend_chair_petitions</name>
       </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>receive_triage_petitions</name>
-      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>receive_check_in_response</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
         <name>receive_chair_response</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_chair_response</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>receive_triage_response</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_box_response</name>

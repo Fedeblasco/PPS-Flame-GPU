@@ -44,7 +44,7 @@ __FLAME_GPU_FUNC__ unsigned int triageDequeue(xmachine_memory_triage* agent)
 
 /*--------------------------------- Atención de pacientes ---------------------------------*/
 
-__FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, xmachine_message_triage_petition_list* triagePetitionMessages, xmachine_message_triage_response_list* triageResponseMessages, RNG_rand48* rand48){
+__FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, xmachine_message_triage_petition_list* triagePetitionMessages, xmachine_message_triage_response_list* triageResponseMessages){
 	
 	//Chequeo todos los mensajes que recibo y encolo los que necesite
     xmachine_message_triage_petition* current_message = get_first_triage_petition_message(triagePetitionMessages);
@@ -53,7 +53,7 @@ __FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, x
         for(int i=0;i<3;i++){
             if(current_message->id == agent->boxArray[i]){
                 agent->boxArray[i] = 0; 
-                printf("Libero la posicion %d, quedo en el valor %d\n",i,agent->boxArray[i]);
+                //printf("Libero la posicion %d, quedo en el valor %d\n",i,agent->boxArray[i]);
                 enqueue_message = 0;
             }
         }

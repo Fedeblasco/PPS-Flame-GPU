@@ -6,6 +6,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 	int send_message = 1;
 	while(current_message){
 		
+		//printf("Hola, me llego el mensaje %d",current_message->id);
 		int index = -1;  //Variable utilizada para el cálculo de índice random
 		int index2 = -1; //Variable utilizada para el cálculo de índice lineal
 
@@ -23,6 +24,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 			}
 			if(agent->chairArray[i] == current_message->id){//Si recibo un mensaje de la persona que esta sentada, libero el asiento
 				agent->chairArray[i] = 0;
+				//printf("Liberando silla %d",i);
 				send_message = 0;
 			}
 		}
@@ -30,10 +32,11 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 			if(index != -1){
 				agent->chairArray[index] = current_message->id;//Marco que esta ocupada
 				add_chair_response_message(chairResponseMessages, current_message->id, index);//Envío la silla, si mando -1 es que no tiene sillas disponibles
+				//printf("Sentate en la posición random %d\n",index);
 			}else{
 				if(index2 != -1){
 					agent->chairArray[index2] = current_message->id;//Marco que esta ocupada
-					printf("Sentate en la posición lineal %d\n",index2);
+					//printf("Sentate en la posición lineal %d\n",index2);
 				}
 				add_chair_response_message(chairResponseMessages, current_message->id, index2);//Envío la silla, si mando -1 es que no tiene sillas disponibles
 			}
