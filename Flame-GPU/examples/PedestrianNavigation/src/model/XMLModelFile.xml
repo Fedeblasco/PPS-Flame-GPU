@@ -236,6 +236,14 @@
           <type>unsigned int</type>
           <name>box_no</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>doctor_no</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>priority</name>
+        </gpu:variable>
       </memory>
   <!-- Funciones -->
       <functions>
@@ -545,12 +553,28 @@
             </gpu:output>
           </outputs>
           <condition>
-            <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+            <lhs> 
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>27</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>and</operator>
             <rhs>
-                <value>27</value>
+              <condition>
+                <lhs>
+                  <agentVariable>doctor_no</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>1</value>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -859,7 +883,7 @@
           <name>size</name>
         </gpu:variable>
         <gpu:variable>
-          <type>unsigned int</type>
+          <type>int</type>
           <name>doctorArray</name>
           <description>Arreglo que maneja si cada doctor está disponible o no</description>
           <arrayLength>4</arrayLength>
@@ -867,8 +891,53 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>patientQueue</name>
-          <arrayLength>100</arrayLength>
+          <name>surgeon_occupied</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>pediatrician_occupied</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>gynecologist_occupied</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>geriatrics_occupied</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>psychiatrist_occupied</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>doctorPatientQueue</name>
+          <arrayLength>35</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>surgeonPatientQueue</name>
+          <arrayLength>35</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>pediatricianPatientQueue</name>
+          <arrayLength>35</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>gynecologistPatientQueue</name>
+          <arrayLength>35</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>geriatricsPatientQueue</name>
+          <arrayLength>35</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>psychiatristPatientQueue</name>
+          <arrayLength>35</arrayLength>
         </gpu:variable>
       </memory>
       <functions>
@@ -1470,7 +1539,7 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>room</name>
+          <name>doctor_no</name>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
@@ -1487,6 +1556,14 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>doctor_no</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>priority</name>
         </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
@@ -1570,6 +1647,9 @@
         <name>output_triage_petition</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
+        <name>output_doctor_petition</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
         <name>output_box_petition</name>
       </gpu:layerFunction>
     </layer>
@@ -1596,6 +1676,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_triage_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_doctor_petitions</name>
       </gpu:layerFunction>
     </layer>
     <layer>

@@ -17,6 +17,7 @@
 6. No hay persistencia de datos al cambiar de estado en los agentes (o por lo menos no hay persistencia en los arreglos)
 7. Al final se optó por ponerles condiciones a cada una de las funciones y que se ejecuten si cumplen estas condiciones
 8. Se hace un doble chequeo del radio del mensaje enviado, para no tener problemas al generarlo y poder variar el radio más facil
+9. A los ivec2 se accede con .x o .y , por ej ivec2.x ivec2.y
 
 # Cosas de Flame-GPU
 

@@ -327,6 +327,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -375,6 +377,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -423,6 +427,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -471,6 +477,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -519,6 +527,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -545,7 +555,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if (currentState->estado_movimiento[index]==27)
+		if ((currentState->estado_movimiento[index]==27)and(currentState->doctor_no[index]==1))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -567,6 +577,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -615,6 +627,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -663,6 +677,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -711,6 +727,8 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->go_to_y[index] = currentState->go_to_y[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -901,7 +919,9 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 		agents_dst->go_to_x[output_index] = agents_src->go_to_x[index];        
 		agents_dst->go_to_y[output_index] = agents_src->go_to_y[index];        
 		agents_dst->chair_no[output_index] = agents_src->chair_no[index];        
-		agents_dst->box_no[output_index] = agents_src->box_no[index];
+		agents_dst->box_no[output_index] = agents_src->box_no[index];        
+		agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];        
+		agents_dst->priority[output_index] = agents_src->priority[index];
 	}
 }
 
@@ -941,6 +961,8 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 	    agents_dst->go_to_y[output_index] = agents_src->go_to_y[index];
 	    agents_dst->chair_no[output_index] = agents_src->chair_no[index];
 	    agents_dst->box_no[output_index] = agents_src->box_no[index];
+	    agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];
+	    agents_dst->priority[output_index] = agents_src->priority[index];
     }
 }
 
@@ -967,9 +989,11 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param go_to_y agent variable of type unsigned int
  * @param chair_no agent variable of type int
  * @param box_no agent variable of type unsigned int
+ * @param doctor_no agent variable of type unsigned int
+ * @param priority agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
 	
 	int index;
     
@@ -1008,12 +1032,14 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int
 	agents->go_to_y[index] = go_to_y;
 	agents->chair_no[index] = chair_no;
 	agents->box_no[index] = box_no;
+	agents->doctor_no[index] = doctor_no;
+	agents->priority[index] = priority;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no){
-    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, chair_no, box_no);
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, chair_no, box_no, doctor_no, priority);
 }
 
 /** reorder_agent_agents
@@ -1049,6 +1075,8 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 	ordered_agents->go_to_y[index] = unordered_agents->go_to_y[old_pos];
 	ordered_agents->chair_no[index] = unordered_agents->chair_no[old_pos];
 	ordered_agents->box_no[index] = unordered_agents->box_no[old_pos];
+	ordered_agents->doctor_no[index] = unordered_agents->doctor_no[old_pos];
+	ordered_agents->priority[index] = unordered_agents->priority[old_pos];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1236,9 +1264,29 @@ __global__ void scatter_doctor_manager_Agents(xmachine_memory_doctor_manager_lis
 		agents_dst->size[output_index] = agents_src->size[index];
 	    for (int i=0; i<4; i++){
 	      agents_dst->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }        
+		agents_dst->surgeon_occupied[output_index] = agents_src->surgeon_occupied[index];        
+		agents_dst->pediatrician_occupied[output_index] = agents_src->pediatrician_occupied[index];        
+		agents_dst->gynecologist_occupied[output_index] = agents_src->gynecologist_occupied[index];        
+		agents_dst->geriatrics_occupied[output_index] = agents_src->geriatrics_occupied[index];        
+		agents_dst->psychiatrist_occupied[output_index] = agents_src->psychiatrist_occupied[index];
+	    for (int i=0; i<35; i++){
+	      agents_dst->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
-	    for (int i=0; i<100; i++){
-	      agents_dst->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    for (int i=0; i<35; i++){
+	      agents_dst->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
 	}
 }
@@ -1265,8 +1313,28 @@ __global__ void append_doctor_manager_Agents(xmachine_memory_doctor_manager_list
 	    for (int i=0; i<4; i++){
 	      agents_dst->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
-	    for (int i=0; i<100; i++){
-	      agents_dst->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    agents_dst->surgeon_occupied[output_index] = agents_src->surgeon_occupied[index];
+	    agents_dst->pediatrician_occupied[output_index] = agents_src->pediatrician_occupied[index];
+	    agents_dst->gynecologist_occupied[output_index] = agents_src->gynecologist_occupied[index];
+	    agents_dst->geriatrics_occupied[output_index] = agents_src->geriatrics_occupied[index];
+	    agents_dst->psychiatrist_occupied[output_index] = agents_src->psychiatrist_occupied[index];
+	    for (int i=0; i<35; i++){
+	      agents_dst->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
     }
 }
@@ -1277,11 +1345,21 @@ __global__ void append_doctor_manager_Agents(xmachine_memory_doctor_manager_list
  * @param front agent variable of type unsigned int
  * @param rear agent variable of type unsigned int
  * @param size agent variable of type unsigned int
- * @param doctorArray agent variable of type unsigned int
- * @param patientQueue agent variable of type unsigned int
+ * @param doctorArray agent variable of type int
+ * @param surgeon_occupied agent variable of type unsigned int
+ * @param pediatrician_occupied agent variable of type unsigned int
+ * @param gynecologist_occupied agent variable of type unsigned int
+ * @param geriatrics_occupied agent variable of type unsigned int
+ * @param psychiatrist_occupied agent variable of type unsigned int
+ * @param doctorPatientQueue agent variable of type ivec2
+ * @param surgeonPatientQueue agent variable of type ivec2
+ * @param pediatricianPatientQueue agent variable of type ivec2
+ * @param gynecologistPatientQueue agent variable of type ivec2
+ * @param geriatricsPatientQueue agent variable of type ivec2
+ * @param psychiatristPatientQueue agent variable of type ivec2
  */
 template <int AGENT_TYPE>
-__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size){
+__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int surgeon_occupied, unsigned int pediatrician_occupied, unsigned int gynecologist_occupied, unsigned int geriatrics_occupied, unsigned int psychiatrist_occupied){
 	
 	int index;
     
@@ -1303,12 +1381,17 @@ __device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* ag
 	agents->front[index] = front;
 	agents->rear[index] = rear;
 	agents->size[index] = size;
+	agents->surgeon_occupied[index] = surgeon_occupied;
+	agents->pediatrician_occupied[index] = pediatrician_occupied;
+	agents->gynecologist_occupied[index] = gynecologist_occupied;
+	agents->geriatrics_occupied[index] = geriatrics_occupied;
+	agents->psychiatrist_occupied[index] = psychiatrist_occupied;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size){
-    add_doctor_manager_agent<DISCRETE_2D>(agents, front, rear, size);
+__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int surgeon_occupied, unsigned int pediatrician_occupied, unsigned int gynecologist_occupied, unsigned int geriatrics_occupied, unsigned int psychiatrist_occupied){
+    add_doctor_manager_agent<DISCRETE_2D>(agents, front, rear, size, surgeon_occupied, pediatrician_occupied, gynecologist_occupied, geriatrics_occupied, psychiatrist_occupied);
 }
 
 /** reorder_doctor_manager_agents
@@ -1330,8 +1413,28 @@ __global__ void reorder_doctor_manager_agents(unsigned int* values, xmachine_mem
 	for (int i=0; i<4; i++){
 	  ordered_agents->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
 	}
-	for (int i=0; i<100; i++){
-	  ordered_agents->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	ordered_agents->surgeon_occupied[index] = unordered_agents->surgeon_occupied[old_pos];
+	ordered_agents->pediatrician_occupied[index] = unordered_agents->pediatrician_occupied[old_pos];
+	ordered_agents->gynecologist_occupied[index] = unordered_agents->gynecologist_occupied[old_pos];
+	ordered_agents->geriatrics_occupied[index] = unordered_agents->geriatrics_occupied[old_pos];
+	ordered_agents->psychiatrist_occupied[index] = unordered_agents->psychiatrist_occupied[old_pos];
+	for (int i=0; i<35; i++){
+	  ordered_agents->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
 	}
 }
 
@@ -4285,10 +4388,10 @@ __device__ xmachine_message_box_petition* get_next_box_petition_message(xmachine
  * Add non partitioned or spatially partitioned box_response message
  * @param messages xmachine_message_box_response_list message list to add too
  * @param id agent variable of type unsigned int
- * @param room agent variable of type unsigned int
+ * @param doctor_no agent variable of type unsigned int
  * @param priority agent variable of type unsigned int
  */
-__device__ void add_box_response_message(xmachine_message_box_response_list* messages, unsigned int id, unsigned int room, unsigned int priority){
+__device__ void add_box_response_message(xmachine_message_box_response_list* messages, unsigned int id, unsigned int doctor_no, unsigned int priority){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_box_response_count;
@@ -4309,7 +4412,7 @@ __device__ void add_box_response_message(xmachine_message_box_response_list* mes
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
-	messages->room[index] = room;
+	messages->doctor_no[index] = doctor_no;
 	messages->priority[index] = priority;
 
 }
@@ -4332,7 +4435,7 @@ __global__ void scatter_optional_box_response_messages(xmachine_message_box_resp
 		//AoS - xmachine_message_box_response Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
 		messages->id[output_index] = messages_swap->id[index];
-		messages->room[output_index] = messages_swap->room[index];
+		messages->doctor_no[output_index] = messages_swap->doctor_no[index];
 		messages->priority[output_index] = messages_swap->priority[index];				
 	}
 }
@@ -4374,7 +4477,7 @@ __device__ xmachine_message_box_response* get_first_box_response_message(xmachin
 	xmachine_message_box_response temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
-	temp_message.room = messages->room[index];
+	temp_message.doctor_no = messages->doctor_no[index];
 	temp_message.priority = messages->priority[index];
 
 	//AoS to shared memory
@@ -4418,7 +4521,7 @@ __device__ xmachine_message_box_response* get_next_box_response_message(xmachine
 		xmachine_message_box_response temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
-		temp_message.room = messages->room[index];
+		temp_message.doctor_no = messages->doctor_no[index];
 		temp_message.priority = messages->priority[index];
 
 		//AoS to shared memory
@@ -4441,8 +4544,10 @@ __device__ xmachine_message_box_response* get_next_box_response_message(xmachine
  * Add non partitioned or spatially partitioned doctor_petition message
  * @param messages xmachine_message_doctor_petition_list message list to add too
  * @param id agent variable of type unsigned int
+ * @param doctor_no agent variable of type unsigned int
+ * @param priority agent variable of type unsigned int
  */
-__device__ void add_doctor_petition_message(xmachine_message_doctor_petition_list* messages, unsigned int id){
+__device__ void add_doctor_petition_message(xmachine_message_doctor_petition_list* messages, unsigned int id, unsigned int doctor_no, unsigned int priority){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_doctor_petition_count;
@@ -4463,6 +4568,8 @@ __device__ void add_doctor_petition_message(xmachine_message_doctor_petition_lis
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
+	messages->doctor_no[index] = doctor_no;
+	messages->priority[index] = priority;
 
 }
 
@@ -4483,7 +4590,9 @@ __global__ void scatter_optional_doctor_petition_messages(xmachine_message_docto
 
 		//AoS - xmachine_message_doctor_petition Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
-		messages->id[output_index] = messages_swap->id[index];				
+		messages->id[output_index] = messages_swap->id[index];
+		messages->doctor_no[output_index] = messages_swap->doctor_no[index];
+		messages->priority[output_index] = messages_swap->priority[index];				
 	}
 }
 
@@ -4524,6 +4633,8 @@ __device__ xmachine_message_doctor_petition* get_first_doctor_petition_message(x
 	xmachine_message_doctor_petition temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
+	temp_message.doctor_no = messages->doctor_no[index];
+	temp_message.priority = messages->priority[index];
 
 	//AoS to shared memory
 	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_doctor_petition));
@@ -4566,6 +4677,8 @@ __device__ xmachine_message_doctor_petition* get_next_doctor_petition_message(xm
 		xmachine_message_doctor_petition temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
+		temp_message.doctor_no = messages->doctor_no[index];
+		temp_message.priority = messages->priority[index];
 
 		//AoS to shared memory
 		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_doctor_petition));
@@ -5071,6 +5184,8 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_pedestrian_location(&agent, pedestrian_location_messages	);
@@ -5100,6 +5215,8 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5140,6 +5257,8 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !avoid_pedestrians(&agent, pedestrian_location_messages, partition_matrix, rand48);
@@ -5169,6 +5288,8 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5209,6 +5330,8 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_pedestrian_state(&agent, pedestrian_state_messages	);
@@ -5238,6 +5361,8 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5278,6 +5403,8 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !infect_pedestrians(&agent, pedestrian_state_messages, partition_matrix, rand48);
@@ -5307,6 +5434,8 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5347,6 +5476,8 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !move(&agent, check_in_messages	);
@@ -5376,6 +5507,8 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5415,6 +5548,8 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 	} else {
 	
 	agent.id = 0;
@@ -5437,6 +5572,8 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.go_to_y = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.priority = 0;
 	}
 
 	//FLAME function call
@@ -5470,6 +5607,8 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 	}
 }
 
@@ -5511,6 +5650,8 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_chair_contact(&agent, chair_contact_messages	);
@@ -5540,6 +5681,8 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5580,6 +5723,8 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_chair_petition(&agent, chair_petition_messages	);
@@ -5609,6 +5754,8 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5648,6 +5795,8 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 	} else {
 	
 	agent.id = 0;
@@ -5670,6 +5819,8 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.go_to_y = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.priority = 0;
 	}
 
 	//FLAME function call
@@ -5703,6 +5854,8 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 	}
 }
 
@@ -5743,6 +5896,8 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 	} else {
 	
 	agent.id = 0;
@@ -5765,6 +5920,8 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.go_to_y = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.priority = 0;
 	}
 
 	//FLAME function call
@@ -5798,6 +5955,8 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 	}
 }
 
@@ -5839,6 +5998,8 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_box_petition(&agent, box_petition_messages	);
@@ -5868,6 +6029,8 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -5907,6 +6070,8 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 	} else {
 	
 	agent.id = 0;
@@ -5929,6 +6094,8 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.go_to_y = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.priority = 0;
 	}
 
 	//FLAME function call
@@ -5962,6 +6129,8 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 	}
 }
 
@@ -6003,6 +6172,8 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_doctor_petition(&agent, doctor_petition_messages	);
@@ -6032,12 +6203,14 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
  *
  */
-__global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_chair_petition_list* chair_petition_messages){
+__global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_doctor_petition_list* doctor_petition_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -6071,6 +6244,8 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 	} else {
 	
 	agent.id = 0;
@@ -6093,10 +6268,12 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.go_to_y = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.priority = 0;
 	}
 
 	//FLAME function call
-	int dead = !receive_doctor_response(&agent, doctor_response_messages, chair_petition_messages	);
+	int dead = !receive_doctor_response(&agent, doctor_response_messages, doctor_petition_messages	);
 	
 
 	
@@ -6126,6 +6303,8 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 	}
 }
 
@@ -6167,6 +6346,8 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 
 	//FLAME function call
 	int dead = !output_triage_petition(&agent, triage_petition_messages	);
@@ -6196,6 +6377,8 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 }
 
 /**
@@ -6235,6 +6418,8 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.go_to_y = agents->go_to_y[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.priority = agents->priority[index];
 	} else {
 	
 	agent.id = 0;
@@ -6257,6 +6442,8 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.go_to_y = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.priority = 0;
 	}
 
 	//FLAME function call
@@ -6290,6 +6477,8 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agents->go_to_y[index] = agent.go_to_y;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->priority[index] = agent.priority;
 	}
 }
 
@@ -6503,14 +6692,34 @@ __global__ void GPUFLAME_receive_doctor_petitions(xmachine_memory_doctor_manager
 	agent.rear = agents->rear[index];
 	agent.size = agents->size[index];
     agent.doctorArray = &(agents->doctorArray[index]);
-    agent.patientQueue = &(agents->patientQueue[index]);
+	agent.surgeon_occupied = agents->surgeon_occupied[index];
+	agent.pediatrician_occupied = agents->pediatrician_occupied[index];
+	agent.gynecologist_occupied = agents->gynecologist_occupied[index];
+	agent.geriatrics_occupied = agents->geriatrics_occupied[index];
+	agent.psychiatrist_occupied = agents->psychiatrist_occupied[index];
+    agent.doctorPatientQueue = &(agents->doctorPatientQueue[index]);
+    agent.surgeonPatientQueue = &(agents->surgeonPatientQueue[index]);
+    agent.pediatricianPatientQueue = &(agents->pediatricianPatientQueue[index]);
+    agent.gynecologistPatientQueue = &(agents->gynecologistPatientQueue[index]);
+    agent.geriatricsPatientQueue = &(agents->geriatricsPatientQueue[index]);
+    agent.psychiatristPatientQueue = &(agents->psychiatristPatientQueue[index]);
 	} else {
 	
 	agent.front = 0;
 	agent.rear = 0;
 	agent.size = 0;
     agent.doctorArray = nullptr;
-    agent.patientQueue = nullptr;
+	agent.surgeon_occupied = 0;
+	agent.pediatrician_occupied = 0;
+	agent.gynecologist_occupied = 0;
+	agent.geriatrics_occupied = 0;
+	agent.psychiatrist_occupied = 0;
+    agent.doctorPatientQueue = nullptr;
+    agent.surgeonPatientQueue = nullptr;
+    agent.pediatricianPatientQueue = nullptr;
+    agent.gynecologistPatientQueue = nullptr;
+    agent.geriatricsPatientQueue = nullptr;
+    agent.psychiatristPatientQueue = nullptr;
 	}
 
 	//FLAME function call
@@ -6527,6 +6736,11 @@ __global__ void GPUFLAME_receive_doctor_petitions(xmachine_memory_doctor_manager
 	agents->front[index] = agent.front;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;
+	agents->surgeon_occupied[index] = agent.surgeon_occupied;
+	agents->pediatrician_occupied[index] = agent.pediatrician_occupied;
+	agents->gynecologist_occupied[index] = agent.gynecologist_occupied;
+	agents->geriatrics_occupied[index] = agent.geriatrics_occupied;
+	agents->psychiatrist_occupied[index] = agent.psychiatrist_occupied;
 	}
 }
 

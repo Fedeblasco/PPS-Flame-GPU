@@ -20,6 +20,7 @@
 #include "header.h"
 #include "parameters.h"
 #include "queue.c"
+#include "priority_queue.c"
 #include "CustomVisualisation.h"
 #include "receptionist.c"
 #include "chair_admin.c"
@@ -64,6 +65,14 @@ __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
 	h_add_agent_triage_defaultTriage(h_triage);
 	// Freeing the previously allocated memory
 	h_free_agent_triage(&h_triage);
+
+	//Agregado del manejador de doctores
+	// Allocating memory in CPU to save the agent
+	xmachine_memory_doctor_manager * h_doctor_manager = h_allocate_agent_doctor_manager();
+	// Copying the agent from the CPU to GPU
+	h_add_agent_doctor_manager_defaultDoctorManager(h_doctor_manager);
+	// Freeing the previously allocated memory
+	h_free_agent_doctor_manager(&h_doctor_manager);
 
 }
 
@@ -129,7 +138,7 @@ __FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmac
 
 __FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmachine_message_doctor_petition_list* doctorPetitionMessages){
 	
-	add_doctor_petition_message(doctorPetitionMessages, agent->id);
+	add_doctor_petition_message(doctorPetitionMessages, agent->id, agent->doctor_no, agent->priority);
 	agent->estado_movimiento++;
 
 	return 0;
@@ -443,7 +452,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0);
+				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0);
 				
 				/*if(agent->cant_generados==0){
 					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 0, 0, 0, 0, 0);
@@ -552,7 +561,9 @@ __FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachi
 	while(current_message){
 		if(agent->id == current_message->id){
 			agent->estado_movimiento++;
-			printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,current_message->room,agent->id);
+			agent->priority = current_message->priority;
+			agent->doctor_no = current_message->doctor_no;
+			//printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,current_message->doctor_no,agent->id);
 		}
 		current_message = get_next_box_response_message(current_message, boxResponseMessages);
 	}

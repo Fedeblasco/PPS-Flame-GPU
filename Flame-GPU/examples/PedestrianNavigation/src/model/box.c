@@ -4,10 +4,10 @@ __FLAME_GPU_FUNC__ int determine_priority(RNG_rand48* rand48){
 	float prob_level[] = {prob_level_1,prob_level_2,prob_level_3,prob_level_4,prob_level_5};
 	int level_time[] = {0,15,60,120,240};
 	for(int i = 0; i<5; i++){
-		acc+=prob_level[i];
-		if(prob_level[i]<random<=acc){
+		if(acc < random <= (acc+prob_level[i])){
 			return level_time[i];
 		}
+		acc+=prob_level[i];
 	}
 	
 	return 0;
@@ -16,12 +16,12 @@ __FLAME_GPU_FUNC__ int determine_priority(RNG_rand48* rand48){
 __FLAME_GPU_FUNC__ int determine_room(RNG_rand48* rand48){
 	float random = rnd<DISCRETE_2D>(rand48);
 	float acc = 0;
-	float prob_esp[] = {prob_esp_quirurgicas,prob_esp_medicas,prob_pediatria,prob_cuid_intensivos,prob_ginecologia,prob_geriatria,prob_psiquiatria};
+	float prob_esp[] = {prob_esp_medicas,prob_esp_quirurgicas,prob_pediatria,prob_cuid_intensivos,prob_ginecologia,prob_geriatria,prob_psiquiatria};
 	for(int i = 0; i<7; i++){
-		acc+=prob_esp[i];
-		if(prob_esp[i]<random<=acc){
+		if(acc < random <= (acc+prob_esp[i])){
 			return i;
 		}
+		acc+=prob_esp[i];
 	}
 	
 	return 0;

@@ -225,6 +225,8 @@ unsigned int h_agents_default_variable_go_to_x_data_iteration;
 unsigned int h_agents_default_variable_go_to_y_data_iteration;
 unsigned int h_agents_default_variable_chair_no_data_iteration;
 unsigned int h_agents_default_variable_box_no_data_iteration;
+unsigned int h_agents_default_variable_doctor_no_data_iteration;
+unsigned int h_agents_default_variable_priority_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -254,7 +256,17 @@ unsigned int h_doctor_managers_defaultDoctorManager_variable_front_data_iteratio
 unsigned int h_doctor_managers_defaultDoctorManager_variable_rear_data_iteration;
 unsigned int h_doctor_managers_defaultDoctorManager_variable_size_data_iteration;
 unsigned int h_doctor_managers_defaultDoctorManager_variable_doctorArray_data_iteration;
-unsigned int h_doctor_managers_defaultDoctorManager_variable_patientQueue_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_surgeon_occupied_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_pediatrician_occupied_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_gynecologist_occupied_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_geriatrics_occupied_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_psychiatrist_occupied_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_doctorPatientQueue_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_surgeonPatientQueue_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_pediatricianPatientQueue_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_gynecologistPatientQueue_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_geriatricsPatientQueue_data_iteration;
+unsigned int h_doctor_managers_defaultDoctorManager_variable_psychiatristPatientQueue_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_x_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_y_data_iteration;
 unsigned int h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration;
@@ -463,6 +475,7 @@ cudaStream_t stream4;
 cudaStream_t stream5;
 cudaStream_t stream6;
 cudaStream_t stream7;
+cudaStream_t stream8;
 
 /* Device memory and sizes for CUB values */
 
@@ -768,6 +781,8 @@ void initialise(char * inputfile){
     h_agents_default_variable_go_to_y_data_iteration = 0;
     h_agents_default_variable_chair_no_data_iteration = 0;
     h_agents_default_variable_box_no_data_iteration = 0;
+    h_agents_default_variable_doctor_no_data_iteration = 0;
+    h_agents_default_variable_priority_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -797,7 +812,17 @@ void initialise(char * inputfile){
     h_doctor_managers_defaultDoctorManager_variable_rear_data_iteration = 0;
     h_doctor_managers_defaultDoctorManager_variable_size_data_iteration = 0;
     h_doctor_managers_defaultDoctorManager_variable_doctorArray_data_iteration = 0;
-    h_doctor_managers_defaultDoctorManager_variable_patientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_surgeon_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_pediatrician_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_gynecologist_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_geriatrics_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_psychiatrist_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_doctorPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_surgeonPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_pediatricianPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_gynecologistPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_geriatricsPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_psychiatristPatientQueue_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_x_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_y_data_iteration = 0;
     h_receptionists_defaultReceptionist_variable_patientQueue_data_iteration = 0;
@@ -1327,6 +1352,7 @@ void initialise(char * inputfile){
   gpuErrchk(cudaStreamCreate(&stream5));
   gpuErrchk(cudaStreamCreate(&stream6));
   gpuErrchk(cudaStreamCreate(&stream7));
+  gpuErrchk(cudaStreamCreate(&stream8));
 
 #if defined(OUTPUT_POPULATION_PER_ITERATION) && OUTPUT_POPULATION_PER_ITERATION
 	// Print the agent population size of all agents in all states
@@ -1828,6 +1854,7 @@ void cleanup(){
   gpuErrchk(cudaStreamDestroy(stream5));
   gpuErrchk(cudaStreamDestroy(stream6));
   gpuErrchk(cudaStreamDestroy(stream7));
+  gpuErrchk(cudaStreamDestroy(stream8));
 
   /* CUDA Event Timers for Instrumentation */
 #if defined(INSTRUMENT_ITERATIONS) && INSTRUMENT_ITERATIONS
@@ -2045,8 +2072,22 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
+    PROFILE_PUSH_RANGE("agent_output_doctor_petition");
+	agent_output_doctor_petition(stream7);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_output_doctor_petition = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
     PROFILE_PUSH_RANGE("agent_output_box_petition");
-	agent_output_box_petition(stream7);
+	agent_output_box_petition(stream8);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -2157,6 +2198,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_receive_triage_response = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("doctor_manager_receive_doctor_petitions");
+	doctor_manager_receive_doctor_petitions(stream5);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: doctor_manager_receive_doctor_petitions = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -3750,6 +3805,82 @@ __host__ unsigned int get_agent_default_variable_box_no(unsigned int index){
     }
 }
 
+/** unsigned int get_agent_default_variable_doctor_no(unsigned int index)
+ * Gets the value of the doctor_no variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable doctor_no
+ */
+__host__ unsigned int get_agent_default_variable_doctor_no(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_doctor_no_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->doctor_no,
+                    d_agents_default->doctor_no,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_doctor_no_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->doctor_no[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access doctor_no for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_agent_default_variable_priority(unsigned int index)
+ * Gets the value of the priority variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable priority
+ */
+__host__ unsigned int get_agent_default_variable_priority(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_priority_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->priority,
+                    d_agents_default->priority,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_priority_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->priority[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access priority for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -4814,7 +4945,7 @@ __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_size(unsi
     }
 }
 
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_doctorArray(unsigned int index, unsigned int element)
+/** int get_doctor_manager_defaultDoctorManager_variable_doctorArray(unsigned int index, unsigned int element)
  * Gets the element-th value of the doctorArray variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
@@ -4822,7 +4953,7 @@ __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_size(unsi
  * @param element the element index within the variable array
  * @return element-th value of agent variable doctorArray
  */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_doctorArray(unsigned int index, unsigned int element){
+__host__ int get_doctor_manager_defaultDoctorManager_variable_doctorArray(unsigned int index, unsigned int element){
     unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
     unsigned int numElements = 4;
     unsigned int currentIteration = getIterationNumber();
@@ -4837,7 +4968,7 @@ __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_doctorArr
                     cudaMemcpy(
                         h_doctor_managers_defaultDoctorManager->doctorArray + (e * xmachine_memory_doctor_manager_MAX),
                         d_doctor_managers_defaultDoctorManager->doctorArray + (e * xmachine_memory_doctor_manager_MAX), 
-                        count * sizeof(unsigned int), 
+                        count * sizeof(int), 
                         cudaMemcpyDeviceToHost
                     )
                 );
@@ -4857,45 +4988,450 @@ __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_doctorArr
     }
 }
 
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_patientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the patientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_surgeon_occupied(unsigned int index)
+ * Gets the value of the surgeon_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable surgeon_occupied
+ */
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_surgeon_occupied(unsigned int index){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_surgeon_occupied_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_doctor_managers_defaultDoctorManager->surgeon_occupied,
+                    d_doctor_managers_defaultDoctorManager->surgeon_occupied,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_doctor_managers_defaultDoctorManager_variable_surgeon_occupied_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->surgeon_occupied[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access surgeon_occupied for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_pediatrician_occupied(unsigned int index)
+ * Gets the value of the pediatrician_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable pediatrician_occupied
+ */
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_pediatrician_occupied(unsigned int index){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_pediatrician_occupied_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_doctor_managers_defaultDoctorManager->pediatrician_occupied,
+                    d_doctor_managers_defaultDoctorManager->pediatrician_occupied,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_doctor_managers_defaultDoctorManager_variable_pediatrician_occupied_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->pediatrician_occupied[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access pediatrician_occupied for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_gynecologist_occupied(unsigned int index)
+ * Gets the value of the gynecologist_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable gynecologist_occupied
+ */
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_gynecologist_occupied(unsigned int index){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_gynecologist_occupied_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_doctor_managers_defaultDoctorManager->gynecologist_occupied,
+                    d_doctor_managers_defaultDoctorManager->gynecologist_occupied,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_doctor_managers_defaultDoctorManager_variable_gynecologist_occupied_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->gynecologist_occupied[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access gynecologist_occupied for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_geriatrics_occupied(unsigned int index)
+ * Gets the value of the geriatrics_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable geriatrics_occupied
+ */
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_geriatrics_occupied(unsigned int index){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_geriatrics_occupied_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_doctor_managers_defaultDoctorManager->geriatrics_occupied,
+                    d_doctor_managers_defaultDoctorManager->geriatrics_occupied,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_doctor_managers_defaultDoctorManager_variable_geriatrics_occupied_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->geriatrics_occupied[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access geriatrics_occupied for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_psychiatrist_occupied(unsigned int index)
+ * Gets the value of the psychiatrist_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable psychiatrist_occupied
+ */
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_psychiatrist_occupied(unsigned int index){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_psychiatrist_occupied_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_doctor_managers_defaultDoctorManager->psychiatrist_occupied,
+                    d_doctor_managers_defaultDoctorManager->psychiatrist_occupied,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_doctor_managers_defaultDoctorManager_variable_psychiatrist_occupied_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->psychiatrist_occupied[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access psychiatrist_occupied for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_doctorPatientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the doctorPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @param element the element index within the variable array
- * @return element-th value of agent variable patientQueue
+ * @return element-th value of agent variable doctorPatientQueue
  */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_patientQueue(unsigned int index, unsigned int element){
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_doctorPatientQueue(unsigned int index, unsigned int element){
     unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
-    unsigned int numElements = 100;
+    unsigned int numElements = 35;
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count && element < numElements ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_doctor_managers_defaultDoctorManager_variable_patientQueue_data_iteration != currentIteration){
+        if(h_doctor_managers_defaultDoctorManager_variable_doctorPatientQueue_data_iteration != currentIteration){
             
             for(unsigned int e = 0; e < numElements; e++){
                 gpuErrchk(
                     cudaMemcpy(
-                        h_doctor_managers_defaultDoctorManager->patientQueue + (e * xmachine_memory_doctor_manager_MAX),
-                        d_doctor_managers_defaultDoctorManager->patientQueue + (e * xmachine_memory_doctor_manager_MAX), 
-                        count * sizeof(unsigned int), 
+                        h_doctor_managers_defaultDoctorManager->doctorPatientQueue + (e * xmachine_memory_doctor_manager_MAX),
+                        d_doctor_managers_defaultDoctorManager->doctorPatientQueue + (e * xmachine_memory_doctor_manager_MAX), 
+                        count * sizeof(ivec2), 
                         cudaMemcpyDeviceToHost
                     )
                 );
                 // Update some global value indicating what data is currently present in that host array.
-                h_doctor_managers_defaultDoctorManager_variable_patientQueue_data_iteration = currentIteration;
+                h_doctor_managers_defaultDoctorManager_variable_doctorPatientQueue_data_iteration = currentIteration;
             }
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_doctor_managers_defaultDoctorManager->patientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
+        return h_doctor_managers_defaultDoctorManager->doctorPatientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access the %u-th element of patientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of doctorPatientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
         // Otherwise we return a default value
-        return 0;
+        return {0,0};
+
+    }
+}
+
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_surgeonPatientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the surgeonPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable surgeonPatientQueue
+ */
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_surgeonPatientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_surgeonPatientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_doctor_managers_defaultDoctorManager->surgeonPatientQueue + (e * xmachine_memory_doctor_manager_MAX),
+                        d_doctor_managers_defaultDoctorManager->surgeonPatientQueue + (e * xmachine_memory_doctor_manager_MAX), 
+                        count * sizeof(ivec2), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_doctor_managers_defaultDoctorManager_variable_surgeonPatientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->surgeonPatientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of surgeonPatientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return {0,0};
+
+    }
+}
+
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_pediatricianPatientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the pediatricianPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable pediatricianPatientQueue
+ */
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_pediatricianPatientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_pediatricianPatientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_doctor_managers_defaultDoctorManager->pediatricianPatientQueue + (e * xmachine_memory_doctor_manager_MAX),
+                        d_doctor_managers_defaultDoctorManager->pediatricianPatientQueue + (e * xmachine_memory_doctor_manager_MAX), 
+                        count * sizeof(ivec2), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_doctor_managers_defaultDoctorManager_variable_pediatricianPatientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->pediatricianPatientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of pediatricianPatientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return {0,0};
+
+    }
+}
+
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_gynecologistPatientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the gynecologistPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable gynecologistPatientQueue
+ */
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_gynecologistPatientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_gynecologistPatientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_doctor_managers_defaultDoctorManager->gynecologistPatientQueue + (e * xmachine_memory_doctor_manager_MAX),
+                        d_doctor_managers_defaultDoctorManager->gynecologistPatientQueue + (e * xmachine_memory_doctor_manager_MAX), 
+                        count * sizeof(ivec2), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_doctor_managers_defaultDoctorManager_variable_gynecologistPatientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->gynecologistPatientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of gynecologistPatientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return {0,0};
+
+    }
+}
+
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_geriatricsPatientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the geriatricsPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable geriatricsPatientQueue
+ */
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_geriatricsPatientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_geriatricsPatientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_doctor_managers_defaultDoctorManager->geriatricsPatientQueue + (e * xmachine_memory_doctor_manager_MAX),
+                        d_doctor_managers_defaultDoctorManager->geriatricsPatientQueue + (e * xmachine_memory_doctor_manager_MAX), 
+                        count * sizeof(ivec2), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_doctor_managers_defaultDoctorManager_variable_geriatricsPatientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->geriatricsPatientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of geriatricsPatientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return {0,0};
+
+    }
+}
+
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_psychiatristPatientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the psychiatristPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable psychiatristPatientQueue
+ */
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_psychiatristPatientQueue(unsigned int index, unsigned int element){
+    unsigned int count = get_agent_doctor_manager_defaultDoctorManager_count();
+    unsigned int numElements = 35;
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count && element < numElements ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_doctor_managers_defaultDoctorManager_variable_psychiatristPatientQueue_data_iteration != currentIteration){
+            
+            for(unsigned int e = 0; e < numElements; e++){
+                gpuErrchk(
+                    cudaMemcpy(
+                        h_doctor_managers_defaultDoctorManager->psychiatristPatientQueue + (e * xmachine_memory_doctor_manager_MAX),
+                        d_doctor_managers_defaultDoctorManager->psychiatristPatientQueue + (e * xmachine_memory_doctor_manager_MAX), 
+                        count * sizeof(ivec2), 
+                        cudaMemcpyDeviceToHost
+                    )
+                );
+                // Update some global value indicating what data is currently present in that host array.
+                h_doctor_managers_defaultDoctorManager_variable_psychiatristPatientQueue_data_iteration = currentIteration;
+            }
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_doctor_managers_defaultDoctorManager->psychiatristPatientQueue[index + (element * xmachine_memory_doctor_manager_MAX)];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of psychiatristPatientQueue for the %u th member of doctor_manager_defaultDoctorManager. count is %u at iteration %u\n", element, index, count, currentIteration);
+        // Otherwise we return a default value
+        return {0,0};
 
     }
 }
@@ -5847,6 +6383,10 @@ void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list *
 		gpuErrchk(cudaMemcpy(d_dst->chair_no, &h_agent->chair_no, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->box_no, &h_agent->box_no, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->doctor_no, &h_agent->doctor_no, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->priority, &h_agent->priority, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -5902,6 +6442,10 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
 		gpuErrchk(cudaMemcpy(d_dst->chair_no, h_src->chair_no, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->box_no, h_src->box_no, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->doctor_no, h_src->doctor_no, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->priority, h_src->priority, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -5963,11 +6507,41 @@ void copy_single_xmachine_memory_doctor_manager_hostToDevice(xmachine_memory_doc
 		gpuErrchk(cudaMemcpy(d_dst->size, &h_agent->size, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 	for(unsigned int i = 0; i < 4; i++){
-		gpuErrchk(cudaMemcpy(d_dst->doctorArray + (i * xmachine_memory_doctor_manager_MAX), h_agent->doctorArray + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->doctorArray + (i * xmachine_memory_doctor_manager_MAX), h_agent->doctorArray + i, sizeof(int), cudaMemcpyHostToDevice));
     }
  
-	for(unsigned int i = 0; i < 100; i++){
-		gpuErrchk(cudaMemcpy(d_dst->patientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->patientQueue + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->surgeon_occupied, &h_agent->surgeon_occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->pediatrician_occupied, &h_agent->pediatrician_occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->gynecologist_occupied, &h_agent->gynecologist_occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->geriatrics_occupied, &h_agent->geriatrics_occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->psychiatrist_occupied, &h_agent->psychiatrist_occupied, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->doctorPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->doctorPatientQueue + i, sizeof(ivec2), cudaMemcpyHostToDevice));
+    }
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->surgeonPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->surgeonPatientQueue + i, sizeof(ivec2), cudaMemcpyHostToDevice));
+    }
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->pediatricianPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->pediatricianPatientQueue + i, sizeof(ivec2), cudaMemcpyHostToDevice));
+    }
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->gynecologistPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->gynecologistPatientQueue + i, sizeof(ivec2), cudaMemcpyHostToDevice));
+    }
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->geriatricsPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->geriatricsPatientQueue + i, sizeof(ivec2), cudaMemcpyHostToDevice));
+    }
+ 
+	for(unsigned int i = 0; i < 35; i++){
+		gpuErrchk(cudaMemcpy(d_dst->psychiatristPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_agent->psychiatristPatientQueue + i, sizeof(ivec2), cudaMemcpyHostToDevice));
     }
 
 }
@@ -5992,12 +6566,47 @@ void copy_partial_xmachine_memory_doctor_manager_hostToDevice(xmachine_memory_do
 		gpuErrchk(cudaMemcpy(d_dst->size, h_src->size, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		for(unsigned int i = 0; i < 4; i++){
-			gpuErrchk(cudaMemcpy(d_dst->doctorArray + (i * xmachine_memory_doctor_manager_MAX), h_src->doctorArray + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+			gpuErrchk(cudaMemcpy(d_dst->doctorArray + (i * xmachine_memory_doctor_manager_MAX), h_src->doctorArray + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(int), cudaMemcpyHostToDevice));
         }
 
  
-		for(unsigned int i = 0; i < 100; i++){
-			gpuErrchk(cudaMemcpy(d_dst->patientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->patientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->surgeon_occupied, h_src->surgeon_occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->pediatrician_occupied, h_src->pediatrician_occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->gynecologist_occupied, h_src->gynecologist_occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->geriatrics_occupied, h_src->geriatrics_occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->psychiatrist_occupied, h_src->psychiatrist_occupied, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->doctorPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->doctorPatientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(ivec2), cudaMemcpyHostToDevice));
+        }
+
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->surgeonPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->surgeonPatientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(ivec2), cudaMemcpyHostToDevice));
+        }
+
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->pediatricianPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->pediatricianPatientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(ivec2), cudaMemcpyHostToDevice));
+        }
+
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->gynecologistPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->gynecologistPatientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(ivec2), cudaMemcpyHostToDevice));
+        }
+
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->geriatricsPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->geriatricsPatientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(ivec2), cudaMemcpyHostToDevice));
+        }
+
+ 
+		for(unsigned int i = 0; i < 35; i++){
+			gpuErrchk(cudaMemcpy(d_dst->psychiatristPatientQueue + (i * xmachine_memory_doctor_manager_MAX), h_src->psychiatristPatientQueue + (i * xmachine_memory_doctor_manager_MAX), count * sizeof(ivec2), cudaMemcpyHostToDevice));
         }
 
 
@@ -6318,6 +6927,10 @@ void h_unpack_agents_agent_AoS_to_SoA(xmachine_memory_agent_list * dst, xmachine
 			dst->chair_no[i] = src[i]->chair_no;
 			 
 			dst->box_no[i] = src[i]->box_no;
+			 
+			dst->doctor_no[i] = src[i]->doctor_no;
+			 
+			dst->priority[i] = src[i]->priority;
 			
 		}
 	}
@@ -6369,6 +6982,8 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent){
     h_agents_default_variable_go_to_y_data_iteration = 0;
     h_agents_default_variable_chair_no_data_iteration = 0;
     h_agents_default_variable_box_no_data_iteration = 0;
+    h_agents_default_variable_doctor_no_data_iteration = 0;
+    h_agents_default_variable_priority_data_iteration = 0;
     
 
 }
@@ -6420,6 +7035,8 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
         h_agents_default_variable_go_to_y_data_iteration = 0;
         h_agents_default_variable_chair_no_data_iteration = 0;
         h_agents_default_variable_box_no_data_iteration = 0;
+        h_agents_default_variable_doctor_no_data_iteration = 0;
+        h_agents_default_variable_priority_data_iteration = 0;
         
 
 	}
@@ -6545,22 +7162,52 @@ xmachine_memory_doctor_manager* h_allocate_agent_doctor_manager(){
 	// Memset the whole agent strcuture
     memset(agent, 0, sizeof(xmachine_memory_doctor_manager));
 	// Agent variable arrays must be allocated
-    agent->doctorArray = (unsigned int*)malloc(4 * sizeof(unsigned int));
+    agent->doctorArray = (int*)malloc(4 * sizeof(int));
 	// If we have a default value, set each element correctly.
 	for(unsigned int index = 0; index < 4; index++){
 		agent->doctorArray[index] = 0;
 	}	// Agent variable arrays must be allocated
-    agent->patientQueue = (unsigned int*)malloc(100 * sizeof(unsigned int));
+    agent->doctorPatientQueue = (ivec2*)malloc(35 * sizeof(ivec2));
 	
     // If there is no default value, memset to 0.
-    memset(agent->patientQueue, 0, sizeof(unsigned int)*100);
+    memset(agent->doctorPatientQueue, 0, sizeof(ivec2)*35);	// Agent variable arrays must be allocated
+    agent->surgeonPatientQueue = (ivec2*)malloc(35 * sizeof(ivec2));
+	
+    // If there is no default value, memset to 0.
+    memset(agent->surgeonPatientQueue, 0, sizeof(ivec2)*35);	// Agent variable arrays must be allocated
+    agent->pediatricianPatientQueue = (ivec2*)malloc(35 * sizeof(ivec2));
+	
+    // If there is no default value, memset to 0.
+    memset(agent->pediatricianPatientQueue, 0, sizeof(ivec2)*35);	// Agent variable arrays must be allocated
+    agent->gynecologistPatientQueue = (ivec2*)malloc(35 * sizeof(ivec2));
+	
+    // If there is no default value, memset to 0.
+    memset(agent->gynecologistPatientQueue, 0, sizeof(ivec2)*35);	// Agent variable arrays must be allocated
+    agent->geriatricsPatientQueue = (ivec2*)malloc(35 * sizeof(ivec2));
+	
+    // If there is no default value, memset to 0.
+    memset(agent->geriatricsPatientQueue, 0, sizeof(ivec2)*35);	// Agent variable arrays must be allocated
+    agent->psychiatristPatientQueue = (ivec2*)malloc(35 * sizeof(ivec2));
+	
+    // If there is no default value, memset to 0.
+    memset(agent->psychiatristPatientQueue, 0, sizeof(ivec2)*35);
 	return agent;
 }
 void h_free_agent_doctor_manager(xmachine_memory_doctor_manager** agent){
 
     free((*agent)->doctorArray);
 
-    free((*agent)->patientQueue);
+    free((*agent)->doctorPatientQueue);
+
+    free((*agent)->surgeonPatientQueue);
+
+    free((*agent)->pediatricianPatientQueue);
+
+    free((*agent)->gynecologistPatientQueue);
+
+    free((*agent)->geriatricsPatientQueue);
+
+    free((*agent)->psychiatristPatientQueue);
  
 	free((*agent));
 	(*agent) = NULL;
@@ -6594,8 +7241,38 @@ void h_unpack_agents_doctor_manager_AoS_to_SoA(xmachine_memory_doctor_manager_li
 				dst->doctorArray[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->doctorArray[j];
 			}
 			 
-			for(unsigned int j = 0; j < 100; j++){
-				dst->patientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->patientQueue[j];
+			dst->surgeon_occupied[i] = src[i]->surgeon_occupied;
+			 
+			dst->pediatrician_occupied[i] = src[i]->pediatrician_occupied;
+			 
+			dst->gynecologist_occupied[i] = src[i]->gynecologist_occupied;
+			 
+			dst->geriatrics_occupied[i] = src[i]->geriatrics_occupied;
+			 
+			dst->psychiatrist_occupied[i] = src[i]->psychiatrist_occupied;
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->doctorPatientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->doctorPatientQueue[j];
+			}
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->surgeonPatientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->surgeonPatientQueue[j];
+			}
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->pediatricianPatientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->pediatricianPatientQueue[j];
+			}
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->gynecologistPatientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->gynecologistPatientQueue[j];
+			}
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->geriatricsPatientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->geriatricsPatientQueue[j];
+			}
+			 
+			for(unsigned int j = 0; j < 35; j++){
+				dst->psychiatristPatientQueue[(j * xmachine_memory_doctor_manager_MAX) + i] = src[i]->psychiatristPatientQueue[j];
 			}
 			
 		}
@@ -6632,7 +7309,17 @@ void h_add_agent_doctor_manager_defaultDoctorManager(xmachine_memory_doctor_mana
     h_doctor_managers_defaultDoctorManager_variable_rear_data_iteration = 0;
     h_doctor_managers_defaultDoctorManager_variable_size_data_iteration = 0;
     h_doctor_managers_defaultDoctorManager_variable_doctorArray_data_iteration = 0;
-    h_doctor_managers_defaultDoctorManager_variable_patientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_surgeon_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_pediatrician_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_gynecologist_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_geriatrics_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_psychiatrist_occupied_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_doctorPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_surgeonPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_pediatricianPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_gynecologistPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_geriatricsPatientQueue_data_iteration = 0;
+    h_doctor_managers_defaultDoctorManager_variable_psychiatristPatientQueue_data_iteration = 0;
     
 
 }
@@ -6668,7 +7355,17 @@ void h_add_agents_doctor_manager_defaultDoctorManager(xmachine_memory_doctor_man
         h_doctor_managers_defaultDoctorManager_variable_rear_data_iteration = 0;
         h_doctor_managers_defaultDoctorManager_variable_size_data_iteration = 0;
         h_doctor_managers_defaultDoctorManager_variable_doctorArray_data_iteration = 0;
-        h_doctor_managers_defaultDoctorManager_variable_patientQueue_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_surgeon_occupied_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_pediatrician_occupied_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_gynecologist_occupied_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_geriatrics_occupied_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_psychiatrist_occupied_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_doctorPatientQueue_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_surgeonPatientQueue_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_pediatricianPatientQueue_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_gynecologistPatientQueue_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_geriatricsPatientQueue_data_iteration = 0;
+        h_doctor_managers_defaultDoctorManager_variable_psychiatristPatientQueue_data_iteration = 0;
         
 
 	}
@@ -7692,6 +8389,48 @@ unsigned int max_agent_default_box_no_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
+unsigned int reduce_agent_default_doctor_no_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->doctor_no),  thrust::device_pointer_cast(d_agents_default->doctor_no) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_doctor_no_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->doctor_no),  thrust::device_pointer_cast(d_agents_default->doctor_no) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_doctor_no_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->doctor_no);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_doctor_no_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->doctor_no);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_agent_default_priority_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->priority),  thrust::device_pointer_cast(d_agents_default->priority) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_priority_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->priority),  thrust::device_pointer_cast(d_agents_default->priority) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_priority_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->priority);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_priority_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->priority);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
 int reduce_navmap_static_x_variable(){
     //reduce in default stream
     return thrust::reduce(thrust::device_pointer_cast(d_navmaps_static->x),  thrust::device_pointer_cast(d_navmaps_static->x) + h_xmachine_memory_navmap_static_count);
@@ -8209,6 +8948,111 @@ unsigned int min_doctor_manager_defaultDoctorManager_size_variable(){
 unsigned int max_doctor_manager_defaultDoctorManager_size_variable(){
     //max in default stream
     thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->size);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_doctor_manager_defaultDoctorManager_surgeon_occupied_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->surgeon_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->surgeon_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count);
+}
+
+unsigned int count_doctor_manager_defaultDoctorManager_surgeon_occupied_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->surgeon_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->surgeon_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count, count_value);
+}
+unsigned int min_doctor_manager_defaultDoctorManager_surgeon_occupied_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->surgeon_occupied);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_doctor_manager_defaultDoctorManager_surgeon_occupied_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->surgeon_occupied);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->pediatrician_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->pediatrician_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count);
+}
+
+unsigned int count_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->pediatrician_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->pediatrician_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count, count_value);
+}
+unsigned int min_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->pediatrician_occupied);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->pediatrician_occupied);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->gynecologist_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->gynecologist_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count);
+}
+
+unsigned int count_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->gynecologist_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->gynecologist_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count, count_value);
+}
+unsigned int min_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->gynecologist_occupied);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->gynecologist_occupied);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->geriatrics_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->geriatrics_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count);
+}
+
+unsigned int count_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->geriatrics_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->geriatrics_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count, count_value);
+}
+unsigned int min_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->geriatrics_occupied);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->geriatrics_occupied);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->psychiatrist_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->psychiatrist_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count);
+}
+
+unsigned int count_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->psychiatrist_occupied),  thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->psychiatrist_occupied) + h_xmachine_memory_doctor_manager_defaultDoctorManager_count, count_value);
+}
+unsigned int min_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->psychiatrist_occupied);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_doctor_managers_defaultDoctorManager->psychiatrist_occupied);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_doctor_manager_defaultDoctorManager_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -11116,8 +11960,8 @@ void agent_receive_doctor_response(cudaStream_t &stream){
 
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_chair_petition_count + h_xmachine_memory_agent_count > xmachine_message_chair_petition_MAX){
-		printf("Error: Buffer size of chair_petition message will be exceeded in function receive_doctor_response\n");
+	if (h_message_doctor_petition_count + h_xmachine_memory_agent_count > xmachine_message_doctor_petition_MAX){
+		printf("Error: Buffer size of doctor_petition message will be exceeded in function receive_doctor_response\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -11136,60 +11980,60 @@ void agent_receive_doctor_response(cudaStream_t &stream){
 	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
-	h_message_chair_petition_output_type = optional_message;
-	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_output_type, &h_message_chair_petition_output_type, sizeof(int)));
+	h_message_doctor_petition_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_doctor_petition_output_type, &h_message_doctor_petition_output_type, sizeof(int)));
 	//message is optional so reset the swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_chair_petition_swaps, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_doctor_petition_swaps, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_chair_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions); 
+	reset_doctor_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_doctor_petitions); 
 	gpuErrchkLaunch();
 	
 	
 	//MAIN XMACHINE FUNCTION CALL (receive_doctor_response)
 	//Reallocate   : false
 	//Input        : doctor_response
-	//Output       : chair_petition
+	//Output       : doctor_petition
 	//Agent Output : 
-	GPUFLAME_receive_doctor_response<<<g, b, sm_size, stream>>>(d_agents, d_doctor_responses, d_chair_petitions);
+	GPUFLAME_receive_doctor_response<<<g, b, sm_size, stream>>>(d_agents, d_doctor_responses, d_doctor_petitions);
 	gpuErrchkLaunch();
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
-	//chair_petition Message Type Prefix Sum
+	//doctor_petition Message Type Prefix Sum
 	
 	//swap output
-	xmachine_message_chair_petition_list* d_chair_petitions_scanswap_temp = d_chair_petitions;
-	d_chair_petitions = d_chair_petitions_swap;
-	d_chair_petitions_swap = d_chair_petitions_scanswap_temp;
+	xmachine_message_doctor_petition_list* d_doctor_petitions_scanswap_temp = d_doctor_petitions;
+	d_doctor_petitions = d_doctor_petitions_swap;
+	d_doctor_petitions_swap = d_doctor_petitions_scanswap_temp;
 	
     cub::DeviceScan::ExclusiveSum(
         d_temp_scan_storage_agent, 
         temp_scan_storage_bytes_agent, 
-        d_chair_petitions_swap->_scan_input,
-        d_chair_petitions_swap->_position,
+        d_doctor_petitions_swap->_scan_input,
+        d_doctor_petitions_swap->_position,
         h_xmachine_memory_agent_count, 
         stream
     );
 
 	//Scatter
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_chair_petition_messages, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_doctor_petition_messages, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_optional_chair_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions, d_chair_petitions_swap);
+	scatter_optional_doctor_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_doctor_petitions, d_doctor_petitions_swap);
 	gpuErrchkLaunch();
 	
 	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_chair_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_chair_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_doctor_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_doctor_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	//If last item in prefix sum was 1 then increase its index to get the count
 	if (scan_last_included == 1){
-		h_message_chair_petition_count += scan_last_sum+1;
+		h_message_doctor_petition_count += scan_last_sum+1;
 	}else{
-		h_message_chair_petition_count += scan_last_sum;
+		h_message_doctor_petition_count += scan_last_sum;
 	}
     //Copy count to device
-	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_count, &h_message_chair_petition_count, sizeof(int)));	
+	gpuErrchk( cudaMemcpyToSymbol( d_message_doctor_petition_count, &h_message_doctor_petition_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
