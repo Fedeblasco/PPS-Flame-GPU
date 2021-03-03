@@ -2,7 +2,7 @@
 
 /*---------------------------------IMPLEMENTACIÓN DE LA COLA---------------------------------*/
 
-// Inicializa todas las variables necesarias para el manejo de la cola
+/*// Inicializa todas las variables necesarias para el manejo de la cola
 __FLAME_GPU_FUNC__ int createTriageQueue(xmachine_memory_triage* agent){ 
     agent->front = 0;
     agent->size = 0;
@@ -40,7 +40,7 @@ __FLAME_GPU_FUNC__ unsigned int triageDequeue(xmachine_memory_triage* agent)
     agent->front = (agent->front + 1) % capacity; 
     agent->size = agent->size - 1;
     return item;
-} 
+} */
 
 /*--------------------------------- Atención de pacientes ---------------------------------*/
 
@@ -59,15 +59,15 @@ __FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, x
         }
         if(enqueue_message){
             //printf("Encolando el mensaje %d\n",current_message->id);
-            triageEnqueue(agent, current_message->id);
+            enqueue(agent->patientQueue, current_message->id,&agent->size, &agent->rear);
         }
         current_message = get_next_triage_petition_message(current_message, triagePetitionMessages);	
 	}
 
-    if(!isTriageEmpty(agent)){
+    if(!isEmpty(&agent->size)){
         for (int i = 0; i<3; i++){
             if(agent->boxArray[i] == 0){
-                agent->boxArray[i] = triageDequeue(agent);
+                agent->boxArray[i] = dequeue(agent->patientQueue, &agent->size, &agent->front);
                 add_triage_response_message(triageResponseMessages,agent->boxArray[i],i);
                 break;
             }

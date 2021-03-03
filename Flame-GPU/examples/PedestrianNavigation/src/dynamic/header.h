@@ -101,7 +101,7 @@ typedef glm::dvec4 dvec4;
 //Agent variable array length for xmachine_memory_doctor_manager->patientQueue
 #define xmachine_memory_doctor_manager_patientQueue_LENGTH 100 
 //Agent variable array length for xmachine_memory_receptionist->patientQueue
-#define xmachine_memory_receptionist_patientQueue_LENGTH 2000 
+#define xmachine_memory_receptionist_patientQueue_LENGTH 100 
 //Agent variable array length for xmachine_memory_chair_admin->chairArray
 #define xmachine_memory_chair_admin_chairArray_LENGTH 35 
 //Agent variable array length for xmachine_memory_triage->boxArray
@@ -689,7 +689,7 @@ struct xmachine_memory_receptionist_list
     
     int x [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list x of type int.*/
     int y [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list y of type int.*/
-    unsigned int patientQueue [xmachine_memory_receptionist_MAX*2000];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
+    unsigned int patientQueue [xmachine_memory_receptionist_MAX*100];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
     unsigned int front [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
     unsigned int rear [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
@@ -1142,6 +1142,20 @@ __FLAME_GPU_FUNC__ int output_box_petition(xmachine_memory_agent* agent, xmachin
  * @param box_response_messages  box_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_box_response_message and get_next_box_response_message functions.
  */
 __FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachine_message_box_response_list* box_response_messages);
+
+/**
+ * output_doctor_petition FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param doctor_petition_messages Pointer to output message list of type xmachine_message_doctor_petition_list. Must be passed as an argument to the add_doctor_petition_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmachine_message_doctor_petition_list* doctor_petition_messages);
+
+/**
+ * receive_doctor_response FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param doctor_response_messages  doctor_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_doctor_response_message and get_next_doctor_response_message functions.* @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
+ */
+__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_chair_petition_list* chair_petition_messages);
 
 /**
  * output_triage_petition FLAMEGPU Agent Function

@@ -75,7 +75,7 @@
 #define prob_psiquiatria 0.045610876
 #endif
 
-#define capacity 2000
+#define capacity 100
 #define espera 60
 #define probabilidad_contagio_personal 1.0
 

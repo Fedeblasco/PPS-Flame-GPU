@@ -1,49 +1,5 @@
 //Archivo con las funciones del recepcionista	
 
-/*---------------------------------IMPLEMENTACIÓN DE LA COLA---------------------------------*/
-
-// Inicializa todas las variables necesarias para el manejo de la cola
-__FLAME_GPU_FUNC__ int createQueue(xmachine_memory_receptionist* agent){ 
-    agent->front = 0;
-    agent->size = 0;
-    agent->rear = capacity - 1; 
-    return 0; 
-} 
-  
-// Devuelve !=0 si la cola esta llena
-__FLAME_GPU_FUNC__ int isFull(xmachine_memory_receptionist* agent){ 
-    return (agent->size == capacity); 
-}
-  
-// Devuelve !=0 si la cola está vacía
-__FLAME_GPU_FUNC__ int isEmpty(xmachine_memory_receptionist* agent){ 
-    return (agent->size == 0); 
-} 
-  
-// Función para encolar un valor
-__FLAME_GPU_FUNC__ int enqueue(xmachine_memory_receptionist* agent, unsigned int value){ 
-    if (isFull(agent)) 
-        return 1; 
-    agent->patientQueue[agent->rear] = value;
-    agent->rear = (agent->rear + 1) % capacity;
-    agent->size = agent->size + 1; 
-    
-    return 0;
-} 
-
-// Función para desencolar un valor
-__FLAME_GPU_FUNC__ unsigned int dequeue(xmachine_memory_receptionist* agent) 
-{ 
-    if (isEmpty(agent)) 
-        return 0; 
-    int item = agent->patientQueue[agent->front];
-    agent->front = (agent->front + 1) % capacity; 
-    agent->size = agent->size - 1;
-    return item;
-} 
-
-/*---------------------------------Atención de pacientes---------------------------------*/
-
 //Función que chequea los pacientes que llegan y los atiende
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_check_in_response_list* patientMessages){
 	
@@ -53,14 +9,14 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
         if(current_message->id == agent->current_patient){
             agent->attend_patient = 1;
         }else{
-            enqueue(agent, current_message->id);
+            enqueue(agent->patientQueue, current_message->id,&agent->size, &agent->rear);
         }
         current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}
     
     //Si tengo algun paciente esperando y no estoy procesando a nadie
-    if((!isEmpty(agent)) && (agent->current_patient == -1)){
-        unsigned int patient = dequeue(agent);
+    if((!isEmpty(&agent->size)) && (agent->current_patient == -1)){
+        unsigned int patient = dequeue(agent->patientQueue, &agent->size, &agent->front);
         add_check_in_response_message(patientMessages, patient);
         agent->current_patient = patient;
         //printf("Enviando mensaje 1 a %d\n",agent->current_patient);

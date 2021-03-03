@@ -19,6 +19,7 @@
 
 #include "header.h"
 #include "parameters.h"
+#include "queue.c"
 #include "CustomVisualisation.h"
 #include "receptionist.c"
 #include "chair_admin.c"
@@ -121,6 +122,14 @@ __FLAME_GPU_FUNC__ int output_chair_contact(xmachine_memory_agent* agent, xmachi
 __FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmachine_message_triage_petition_list* triagePetitionMessages){
 	
 	add_triage_petition_message(triagePetitionMessages, agent->id);
+	agent->estado_movimiento++;
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmachine_message_doctor_petition_list* doctorPetitionMessages){
+	
+	add_doctor_petition_message(doctorPetitionMessages, agent->id);
 	agent->estado_movimiento++;
 
 	return 0;
@@ -527,6 +536,12 @@ __FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xma
 		}
 		current_message = get_next_triage_response_message(current_message, triageResponseMessages);
 	}
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctorResponseMessages, xmachine_message_doctor_petition_list* doctorPetitionMessages){
+	
 
 	return 0;
 }

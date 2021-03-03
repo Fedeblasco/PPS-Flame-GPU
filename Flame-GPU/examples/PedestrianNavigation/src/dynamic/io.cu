@@ -630,9 +630,9 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs("</y>\n", file);
         
 		fputs("<patientQueue>", file);
-        for (int j=0;j<2000;j++){
+        for (int j=0;j<100;j++){
             fprintf(file, "%u", h_receptionists_defaultReceptionist->patientQueue[(j*xmachine_memory_receptionist_MAX)+i]);
-            if(j!=(2000-1))
+            if(j!=(100-1))
                 fprintf(file, ",");
         }
 		fputs("</patientQueue>\n", file);
@@ -1012,7 +1012,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     unsigned int doctor_manager_patientQueue[100];
 	int receptionist_x;
 	int receptionist_y;
-    unsigned int receptionist_patientQueue[2000];
+    unsigned int receptionist_patientQueue[100];
 	unsigned int receptionist_front;
 	unsigned int receptionist_rear;
 	unsigned int receptionist_size;
@@ -1275,7 +1275,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	{	
 		h_receptionists->x[k] = 0.093750;
 		h_receptionists->y[k] = -0.375000;
-        for (i=0;i<2000;i++){
+        for (i=0;i<100;i++){
             h_receptionists->patientQueue[(i*xmachine_memory_receptionist_MAX)+k] = 0;
         }
 		h_receptionists->front[k] = 0;
@@ -1388,7 +1388,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     }
     receptionist_x = 0.093750;
     receptionist_y = -0.375000;
-    for (i=0;i<2000;i++){
+    for (i=0;i<100;i++){
         receptionist_patientQueue[i] = 0;
     }
     receptionist_front = 0;
@@ -1698,7 +1698,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     if(agent_minimum.y > receptionist_y)
                         agent_minimum.y = (float)receptionist_y;
                     
-                    for (int k=0;k<2000;k++){
+                    for (int k=0;k<100;k++){
                         h_receptionists->patientQueue[(k*xmachine_memory_receptionist_MAX)+(*h_xmachine_memory_receptionist_count)] = receptionist_patientQueue[k];
                     }
 					h_receptionists->front[*h_xmachine_memory_receptionist_count] = receptionist_front;
@@ -1837,7 +1837,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
                 receptionist_x = 0.093750;
                 receptionist_y = -0.375000;
-                for (i=0;i<2000;i++){
+                for (i=0;i<100;i++){
                     receptionist_patientQueue[i] = 0;
                 }
                 receptionist_front = 0;
@@ -2258,7 +2258,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     receptionist_y = (int) fpgu_strtol(buffer); 
                 }
 				if(in_receptionist_patientQueue){
-                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, receptionist_patientQueue, 2000);    
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, receptionist_patientQueue, 100);    
                 }
 				if(in_receptionist_front){
                     receptionist_front = (unsigned int) fpgu_strtoul(buffer); 
