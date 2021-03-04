@@ -1259,34 +1259,15 @@ __global__ void scatter_doctor_manager_Agents(xmachine_memory_doctor_manager_lis
 
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
-		agents_dst->front[output_index] = agents_src->front[index];        
+		agents_dst->tick[output_index] = agents_src->tick[index];        
 		agents_dst->rear[output_index] = agents_src->rear[index];        
 		agents_dst->size[output_index] = agents_src->size[index];
 	    for (int i=0; i<4; i++){
-	      agents_dst->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+index];
+	      agents_dst->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }        
-		agents_dst->surgeon_occupied[output_index] = agents_src->surgeon_occupied[index];        
-		agents_dst->pediatrician_occupied[output_index] = agents_src->pediatrician_occupied[index];        
-		agents_dst->gynecologist_occupied[output_index] = agents_src->gynecologist_occupied[index];        
-		agents_dst->geriatrics_occupied[output_index] = agents_src->geriatrics_occupied[index];        
-		agents_dst->psychiatrist_occupied[output_index] = agents_src->psychiatrist_occupied[index];
+		agents_dst->free_doctors[output_index] = agents_src->free_doctors[index];
 	    for (int i=0; i<35; i++){
-	      agents_dst->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	      agents_dst->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
 	}
 }
@@ -1307,34 +1288,15 @@ __global__ void append_doctor_manager_Agents(xmachine_memory_doctor_manager_list
 
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
-	    agents_dst->front[output_index] = agents_src->front[index];
+	    agents_dst->tick[output_index] = agents_src->tick[index];
 	    agents_dst->rear[output_index] = agents_src->rear[index];
 	    agents_dst->size[output_index] = agents_src->size[index];
 	    for (int i=0; i<4; i++){
-	      agents_dst->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+index];
+	      agents_dst->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
-	    agents_dst->surgeon_occupied[output_index] = agents_src->surgeon_occupied[index];
-	    agents_dst->pediatrician_occupied[output_index] = agents_src->pediatrician_occupied[index];
-	    agents_dst->gynecologist_occupied[output_index] = agents_src->gynecologist_occupied[index];
-	    agents_dst->geriatrics_occupied[output_index] = agents_src->geriatrics_occupied[index];
-	    agents_dst->psychiatrist_occupied[output_index] = agents_src->psychiatrist_occupied[index];
+	    agents_dst->free_doctors[output_index] = agents_src->free_doctors[index];
 	    for (int i=0; i<35; i++){
-	      agents_dst->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
-	    }
-	    for (int i=0; i<35; i++){
-	      agents_dst->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
+	      agents_dst->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+index];
 	    }
     }
 }
@@ -1342,24 +1304,15 @@ __global__ void append_doctor_manager_Agents(xmachine_memory_doctor_manager_list
 /** add_doctor_manager_agent
  * Continuous doctor_manager agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_doctor_manager_list to add agents to 
- * @param front agent variable of type unsigned int
+ * @param tick agent variable of type unsigned int
  * @param rear agent variable of type unsigned int
  * @param size agent variable of type unsigned int
- * @param doctorArray agent variable of type int
- * @param surgeon_occupied agent variable of type unsigned int
- * @param pediatrician_occupied agent variable of type unsigned int
- * @param gynecologist_occupied agent variable of type unsigned int
- * @param geriatrics_occupied agent variable of type unsigned int
- * @param psychiatrist_occupied agent variable of type unsigned int
- * @param doctorPatientQueue agent variable of type ivec2
- * @param surgeonPatientQueue agent variable of type ivec2
- * @param pediatricianPatientQueue agent variable of type ivec2
- * @param gynecologistPatientQueue agent variable of type ivec2
- * @param geriatricsPatientQueue agent variable of type ivec2
- * @param psychiatristPatientQueue agent variable of type ivec2
+ * @param doctors_occupied agent variable of type int
+ * @param free_doctors agent variable of type unsigned int
+ * @param patientQueue agent variable of type ivec2
  */
 template <int AGENT_TYPE>
-__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int surgeon_occupied, unsigned int pediatrician_occupied, unsigned int gynecologist_occupied, unsigned int geriatrics_occupied, unsigned int psychiatrist_occupied){
+__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int tick, unsigned int rear, unsigned int size, unsigned int free_doctors){
 	
 	int index;
     
@@ -1378,20 +1331,16 @@ __device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* ag
 	agents->_scan_input[index] = 1;
 
 	//write data to new buffer
-	agents->front[index] = front;
+	agents->tick[index] = tick;
 	agents->rear[index] = rear;
 	agents->size[index] = size;
-	agents->surgeon_occupied[index] = surgeon_occupied;
-	agents->pediatrician_occupied[index] = pediatrician_occupied;
-	agents->gynecologist_occupied[index] = gynecologist_occupied;
-	agents->geriatrics_occupied[index] = geriatrics_occupied;
-	agents->psychiatrist_occupied[index] = psychiatrist_occupied;
+	agents->free_doctors[index] = free_doctors;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int surgeon_occupied, unsigned int pediatrician_occupied, unsigned int gynecologist_occupied, unsigned int geriatrics_occupied, unsigned int psychiatrist_occupied){
-    add_doctor_manager_agent<DISCRETE_2D>(agents, front, rear, size, surgeon_occupied, pediatrician_occupied, gynecologist_occupied, geriatrics_occupied, psychiatrist_occupied);
+__device__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int tick, unsigned int rear, unsigned int size, unsigned int free_doctors){
+    add_doctor_manager_agent<DISCRETE_2D>(agents, tick, rear, size, free_doctors);
 }
 
 /** reorder_doctor_manager_agents
@@ -1407,34 +1356,15 @@ __global__ void reorder_doctor_manager_agents(unsigned int* values, xmachine_mem
 	uint old_pos = values[index];
 
 	//reorder agent data
-	ordered_agents->front[index] = unordered_agents->front[old_pos];
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 	ordered_agents->rear[index] = unordered_agents->rear[old_pos];
 	ordered_agents->size[index] = unordered_agents->size[old_pos];
 	for (int i=0; i<4; i++){
-	  ordered_agents->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	  ordered_agents->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
 	}
-	ordered_agents->surgeon_occupied[index] = unordered_agents->surgeon_occupied[old_pos];
-	ordered_agents->pediatrician_occupied[index] = unordered_agents->pediatrician_occupied[old_pos];
-	ordered_agents->gynecologist_occupied[index] = unordered_agents->gynecologist_occupied[old_pos];
-	ordered_agents->geriatrics_occupied[index] = unordered_agents->geriatrics_occupied[old_pos];
-	ordered_agents->psychiatrist_occupied[index] = unordered_agents->psychiatrist_occupied[old_pos];
+	ordered_agents->free_doctors[index] = unordered_agents->free_doctors[old_pos];
 	for (int i=0; i<35; i++){
-	  ordered_agents->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
-	}
-	for (int i=0; i<35; i++){
-	  ordered_agents->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
-	}
-	for (int i=0; i<35; i++){
-	  ordered_agents->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
-	}
-	for (int i=0; i<35; i++){
-	  ordered_agents->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
-	}
-	for (int i=0; i<35; i++){
-	  ordered_agents->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
-	}
-	for (int i=0; i<35; i++){
-	  ordered_agents->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
+	  ordered_agents->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+index] = unordered_agents->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+old_pos];
 	}
 }
 
@@ -6688,38 +6618,20 @@ __global__ void GPUFLAME_receive_doctor_petitions(xmachine_memory_doctor_manager
     //No partitioned input may launch more threads than required - only load agent data within bounds. 
     if (index < d_xmachine_memory_doctor_manager_count){
     
-	agent.front = agents->front[index];
+	agent.tick = agents->tick[index];
 	agent.rear = agents->rear[index];
 	agent.size = agents->size[index];
-    agent.doctorArray = &(agents->doctorArray[index]);
-	agent.surgeon_occupied = agents->surgeon_occupied[index];
-	agent.pediatrician_occupied = agents->pediatrician_occupied[index];
-	agent.gynecologist_occupied = agents->gynecologist_occupied[index];
-	agent.geriatrics_occupied = agents->geriatrics_occupied[index];
-	agent.psychiatrist_occupied = agents->psychiatrist_occupied[index];
-    agent.doctorPatientQueue = &(agents->doctorPatientQueue[index]);
-    agent.surgeonPatientQueue = &(agents->surgeonPatientQueue[index]);
-    agent.pediatricianPatientQueue = &(agents->pediatricianPatientQueue[index]);
-    agent.gynecologistPatientQueue = &(agents->gynecologistPatientQueue[index]);
-    agent.geriatricsPatientQueue = &(agents->geriatricsPatientQueue[index]);
-    agent.psychiatristPatientQueue = &(agents->psychiatristPatientQueue[index]);
+    agent.doctors_occupied = &(agents->doctors_occupied[index]);
+	agent.free_doctors = agents->free_doctors[index];
+    agent.patientQueue = &(agents->patientQueue[index]);
 	} else {
 	
-	agent.front = 0;
+	agent.tick = 0;
 	agent.rear = 0;
 	agent.size = 0;
-    agent.doctorArray = nullptr;
-	agent.surgeon_occupied = 0;
-	agent.pediatrician_occupied = 0;
-	agent.gynecologist_occupied = 0;
-	agent.geriatrics_occupied = 0;
-	agent.psychiatrist_occupied = 0;
-    agent.doctorPatientQueue = nullptr;
-    agent.surgeonPatientQueue = nullptr;
-    agent.pediatricianPatientQueue = nullptr;
-    agent.gynecologistPatientQueue = nullptr;
-    agent.geriatricsPatientQueue = nullptr;
-    agent.psychiatristPatientQueue = nullptr;
+    agent.doctors_occupied = nullptr;
+	agent.free_doctors = 4;
+    agent.patientQueue = nullptr;
 	}
 
 	//FLAME function call
@@ -6733,14 +6645,10 @@ __global__ void GPUFLAME_receive_doctor_petitions(xmachine_memory_doctor_manager
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_receive_doctor_petitions Coalesced memory write (ignore arrays)
-	agents->front[index] = agent.front;
+	agents->tick[index] = agent.tick;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;
-	agents->surgeon_occupied[index] = agent.surgeon_occupied;
-	agents->pediatrician_occupied[index] = agent.pediatrician_occupied;
-	agents->gynecologist_occupied[index] = agent.gynecologist_occupied;
-	agents->geriatrics_occupied[index] = agent.geriatrics_occupied;
-	agents->psychiatrist_occupied[index] = agent.psychiatrist_occupied;
+	agents->free_doctors[index] = agent.free_doctors;
 	}
 }
 

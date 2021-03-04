@@ -12,9 +12,32 @@ __FLAME_GPU_FUNC__ int isPriorityEmpty(unsigned int * size){
   
 // Función para encolar un valor
 __FLAME_GPU_FUNC__ int priorityEnqueue(ivec2 patientQueue[], int patient, int priority, unsigned int * size, unsigned int * rear){ 
-    if (isFull(size)) 
+    if (isPriorityFull(size)) 
         return 1; 
-    //patientQueue[*rear] = value;
+    int index = 0;
+    int index2 = -1;
+    //Me guardo la última posicion vacía, además de la posición donde debería encolarme
+    while(patientQueue[index].x != -1){
+        //La primer posición que sea más grande que yo me la guardo
+        if((patientQueue[index].y > priority) && (index2 == -1)){
+            index2 = index;
+        }
+        index++;
+    }
+    //Si llegue a una posición vacía, me encolo en esa posición
+    if(index2 == -1){
+        patientQueue[index].x = patient;
+        patientQueue[index].y = priority;
+    }else{
+        //Corro todos los valores una posicion para la derecha
+        for(int i=index;i>=index2;i--){
+            patientQueue[i].x = patientQueue[i-1].x;
+            patientQueue[i].y = patientQueue[i-1].y;
+        }
+        //Me encolo donde corresponde
+        patientQueue[index2].x = patient;
+        patientQueue[index2].y = priority;
+    }
     *rear = (*rear + 1) % capacity;
     *size = *size + 1; 
     
@@ -22,15 +45,26 @@ __FLAME_GPU_FUNC__ int priorityEnqueue(ivec2 patientQueue[], int patient, int pr
 } 
 
 // Función para desencolar un valor
-__FLAME_GPU_FUNC__ ivec2 priorityDequeue(ivec2 patientQueue[], unsigned int * size, unsigned int * front) 
+__FLAME_GPU_FUNC__ ivec2 priorityDequeue(ivec2 patientQueue[], unsigned int * size, unsigned int * rear) 
 { 
-    /*if (isEmpty(size)){
-        return 0;
-    }*/
-    /*ivec2 item;
-    item.x = patientQueue[*front].x;
-    item.y = patientQueue[*front].y;
-    *front = (*front + 1) % capacity; 
+    ivec2 item = {0,0};
+    if (isPriorityEmpty(size)){
+        return item;
+    }
+    item.x = patientQueue[0].x;
+    item.y = patientQueue[0].y;
+    for(int i=0;i < *rear; i++){
+        patientQueue[i].x = patientQueue[i+1].x;
+        patientQueue[i].y = patientQueue[i+1].y;
+    }
+    *rear = (*rear - 1) % capacity;
     *size = *size - 1;
-    return item;*/
+    return item;
+}
+
+__FLAME_GPU_FUNC__ int probando(ivec2 patientQueue[]){ 
+    for(int i=0;i<35;i++){
+        printf("Posicion %d, paciente %d, prioridad %d\n",i,patientQueue[i].x,patientQueue[i].y);
+    }
+    return 0;
 }

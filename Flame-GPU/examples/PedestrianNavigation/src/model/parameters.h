@@ -35,6 +35,10 @@
 #define MINUTES_PER_TICK 1
 #endif
 
+#ifndef TICKS_PER_MINUTE
+#define TICKS_PER_MINUTE 10
+#endif
+
 //Probabilidades de prioridad del triage
 #ifndef prob_level_1
 #define prob_level_1 0.0418719
@@ -75,7 +79,7 @@
 #define prob_psiquiatria 0.045610876
 #endif
 
-#define capacity 100
+#define capacity 35
 #define espera 60
 #define probabilidad_contagio_personal 1.0
 

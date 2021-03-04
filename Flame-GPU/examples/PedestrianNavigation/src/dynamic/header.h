@@ -96,20 +96,10 @@ typedef glm::dvec4 dvec4;
 
 //Maximum population size of xmachine_memory_triage
 #define xmachine_memory_triage_MAX 65536 
-//Agent variable array length for xmachine_memory_doctor_manager->doctorArray
-#define xmachine_memory_doctor_manager_doctorArray_LENGTH 4 
-//Agent variable array length for xmachine_memory_doctor_manager->doctorPatientQueue
-#define xmachine_memory_doctor_manager_doctorPatientQueue_LENGTH 35 
-//Agent variable array length for xmachine_memory_doctor_manager->surgeonPatientQueue
-#define xmachine_memory_doctor_manager_surgeonPatientQueue_LENGTH 35 
-//Agent variable array length for xmachine_memory_doctor_manager->pediatricianPatientQueue
-#define xmachine_memory_doctor_manager_pediatricianPatientQueue_LENGTH 35 
-//Agent variable array length for xmachine_memory_doctor_manager->gynecologistPatientQueue
-#define xmachine_memory_doctor_manager_gynecologistPatientQueue_LENGTH 35 
-//Agent variable array length for xmachine_memory_doctor_manager->geriatricsPatientQueue
-#define xmachine_memory_doctor_manager_geriatricsPatientQueue_LENGTH 35 
-//Agent variable array length for xmachine_memory_doctor_manager->psychiatristPatientQueue
-#define xmachine_memory_doctor_manager_psychiatristPatientQueue_LENGTH 35 
+//Agent variable array length for xmachine_memory_doctor_manager->doctors_occupied
+#define xmachine_memory_doctor_manager_doctors_occupied_LENGTH 4 
+//Agent variable array length for xmachine_memory_doctor_manager->patientQueue
+#define xmachine_memory_doctor_manager_patientQueue_LENGTH 35 
 //Agent variable array length for xmachine_memory_receptionist->patientQueue
 #define xmachine_memory_receptionist_patientQueue_LENGTH 100 
 //Agent variable array length for xmachine_memory_chair_admin->chairArray
@@ -306,21 +296,12 @@ struct __align__(16) xmachine_memory_chair
  */
 struct __align__(16) xmachine_memory_doctor_manager
 {
-    unsigned int front;    /**< X-machine memory variable front of type unsigned int.*/
+    unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
     unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
     unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
-    int *doctorArray;    /**< X-machine memory variable doctorArray of type int.*/
-    unsigned int surgeon_occupied;    /**< X-machine memory variable surgeon_occupied of type unsigned int.*/
-    unsigned int pediatrician_occupied;    /**< X-machine memory variable pediatrician_occupied of type unsigned int.*/
-    unsigned int gynecologist_occupied;    /**< X-machine memory variable gynecologist_occupied of type unsigned int.*/
-    unsigned int geriatrics_occupied;    /**< X-machine memory variable geriatrics_occupied of type unsigned int.*/
-    unsigned int psychiatrist_occupied;    /**< X-machine memory variable psychiatrist_occupied of type unsigned int.*/
-    ivec2 *doctorPatientQueue;    /**< X-machine memory variable doctorPatientQueue of type ivec2.*/
-    ivec2 *surgeonPatientQueue;    /**< X-machine memory variable surgeonPatientQueue of type ivec2.*/
-    ivec2 *pediatricianPatientQueue;    /**< X-machine memory variable pediatricianPatientQueue of type ivec2.*/
-    ivec2 *gynecologistPatientQueue;    /**< X-machine memory variable gynecologistPatientQueue of type ivec2.*/
-    ivec2 *geriatricsPatientQueue;    /**< X-machine memory variable geriatricsPatientQueue of type ivec2.*/
-    ivec2 *psychiatristPatientQueue;    /**< X-machine memory variable psychiatristPatientQueue of type ivec2.*/
+    int *doctors_occupied;    /**< X-machine memory variable doctors_occupied of type int.*/
+    unsigned int free_doctors;    /**< X-machine memory variable free_doctors of type unsigned int.*/
+    ivec2 *patientQueue;    /**< X-machine memory variable patientQueue of type ivec2.*/
 };
 
 /** struct xmachine_memory_receptionist
@@ -696,21 +677,12 @@ struct xmachine_memory_doctor_manager_list
     int _position [xmachine_memory_doctor_manager_MAX];    /**< Holds agents position in the 1D agent list */
     int _scan_input [xmachine_memory_doctor_manager_MAX];  /**< Used during parallel prefix sum */
     
-    unsigned int front [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
+    unsigned int tick [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
     unsigned int rear [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
-    int doctorArray [xmachine_memory_doctor_manager_MAX*4];    /**< X-machine memory variable list doctorArray of type int.*/
-    unsigned int surgeon_occupied [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list surgeon_occupied of type unsigned int.*/
-    unsigned int pediatrician_occupied [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list pediatrician_occupied of type unsigned int.*/
-    unsigned int gynecologist_occupied [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list gynecologist_occupied of type unsigned int.*/
-    unsigned int geriatrics_occupied [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list geriatrics_occupied of type unsigned int.*/
-    unsigned int psychiatrist_occupied [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list psychiatrist_occupied of type unsigned int.*/
-    ivec2 doctorPatientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list doctorPatientQueue of type ivec2.*/
-    ivec2 surgeonPatientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list surgeonPatientQueue of type ivec2.*/
-    ivec2 pediatricianPatientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list pediatricianPatientQueue of type ivec2.*/
-    ivec2 gynecologistPatientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list gynecologistPatientQueue of type ivec2.*/
-    ivec2 geriatricsPatientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list geriatricsPatientQueue of type ivec2.*/
-    ivec2 psychiatristPatientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list psychiatristPatientQueue of type ivec2.*/
+    int doctors_occupied [xmachine_memory_doctor_manager_MAX*4];    /**< X-machine memory variable list doctors_occupied of type int.*/
+    unsigned int free_doctors [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list free_doctors of type unsigned int.*/
+    ivec2 patientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list patientQueue of type ivec2.*/
 };
 
 /** struct xmachine_memory_receptionist_list
@@ -1776,16 +1748,12 @@ __FLAME_GPU_FUNC__ void add_chair_agent(xmachine_memory_chair_list* agents, int 
 /** add_doctor_manager_agent
  * Adds a new continuous valued doctor_manager agent to the xmachine_memory_doctor_manager_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_doctor_manager_list agent list
- * @param front	agent agent variable of type unsigned int
+ * @param tick	agent agent variable of type unsigned int
  * @param rear	agent agent variable of type unsigned int
  * @param size	agent agent variable of type unsigned int
- * @param surgeon_occupied	agent agent variable of type unsigned int
- * @param pediatrician_occupied	agent agent variable of type unsigned int
- * @param gynecologist_occupied	agent agent variable of type unsigned int
- * @param geriatrics_occupied	agent agent variable of type unsigned int
- * @param psychiatrist_occupied	agent agent variable of type unsigned int
+ * @param free_doctors	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int surgeon_occupied, unsigned int pediatrician_occupied, unsigned int gynecologist_occupied, unsigned int geriatrics_occupied, unsigned int psychiatrist_occupied);
+__FLAME_GPU_FUNC__ void add_doctor_manager_agent(xmachine_memory_doctor_manager_list* agents, unsigned int tick, unsigned int rear, unsigned int size, unsigned int free_doctors);
 
 /** get_doctor_manager_agent_array_value
  *  Template function for accessing doctor_manager agent array memory variables.
@@ -2794,14 +2762,14 @@ __host__ int get_chair_defaultChair_variable_y(unsigned int index);
  */
 __host__ int get_chair_defaultChair_variable_state(unsigned int index);
 
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_front(unsigned int index)
- * Gets the value of the front variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable front
+ * @return value of agent variable tick
  */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_front(unsigned int index);
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_tick(unsigned int index);
 
 /** unsigned int get_doctor_manager_defaultDoctorManager_variable_rear(unsigned int index)
  * Gets the value of the rear variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
@@ -2821,120 +2789,34 @@ __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_rear(unsi
  */
 __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_size(unsigned int index);
 
-/** int get_doctor_manager_defaultDoctorManager_variable_doctorArray(unsigned int index, unsigned int element)
- * Gets the element-th value of the doctorArray variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+/** int get_doctor_manager_defaultDoctorManager_variable_doctors_occupied(unsigned int index, unsigned int element)
+ * Gets the element-th value of the doctors_occupied variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @param element the element index within the variable array
- * @return element-th value of agent variable doctorArray
+ * @return element-th value of agent variable doctors_occupied
  */
-__host__ int get_doctor_manager_defaultDoctorManager_variable_doctorArray(unsigned int index, unsigned int element);
+__host__ int get_doctor_manager_defaultDoctorManager_variable_doctors_occupied(unsigned int index, unsigned int element);
 
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_surgeon_occupied(unsigned int index)
- * Gets the value of the surgeon_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
+/** unsigned int get_doctor_manager_defaultDoctorManager_variable_free_doctors(unsigned int index)
+ * Gets the value of the free_doctors variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable surgeon_occupied
+ * @return value of agent variable free_doctors
  */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_surgeon_occupied(unsigned int index);
+__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_free_doctors(unsigned int index);
 
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_pediatrician_occupied(unsigned int index)
- * Gets the value of the pediatrician_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable pediatrician_occupied
- */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_pediatrician_occupied(unsigned int index);
-
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_gynecologist_occupied(unsigned int index)
- * Gets the value of the gynecologist_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable gynecologist_occupied
- */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_gynecologist_occupied(unsigned int index);
-
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_geriatrics_occupied(unsigned int index)
- * Gets the value of the geriatrics_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable geriatrics_occupied
- */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_geriatrics_occupied(unsigned int index);
-
-/** unsigned int get_doctor_manager_defaultDoctorManager_variable_psychiatrist_occupied(unsigned int index)
- * Gets the value of the psychiatrist_occupied variable of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable psychiatrist_occupied
- */
-__host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_psychiatrist_occupied(unsigned int index);
-
-/** ivec2 get_doctor_manager_defaultDoctorManager_variable_doctorPatientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the doctorPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
+/** ivec2 get_doctor_manager_defaultDoctorManager_variable_patientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the patientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @param element the element index within the variable array
- * @return element-th value of agent variable doctorPatientQueue
+ * @return element-th value of agent variable patientQueue
  */
-__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_doctorPatientQueue(unsigned int index, unsigned int element);
-
-/** ivec2 get_doctor_manager_defaultDoctorManager_variable_surgeonPatientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the surgeonPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable surgeonPatientQueue
- */
-__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_surgeonPatientQueue(unsigned int index, unsigned int element);
-
-/** ivec2 get_doctor_manager_defaultDoctorManager_variable_pediatricianPatientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the pediatricianPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable pediatricianPatientQueue
- */
-__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_pediatricianPatientQueue(unsigned int index, unsigned int element);
-
-/** ivec2 get_doctor_manager_defaultDoctorManager_variable_gynecologistPatientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the gynecologistPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable gynecologistPatientQueue
- */
-__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_gynecologistPatientQueue(unsigned int index, unsigned int element);
-
-/** ivec2 get_doctor_manager_defaultDoctorManager_variable_geriatricsPatientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the geriatricsPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable geriatricsPatientQueue
- */
-__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_geriatricsPatientQueue(unsigned int index, unsigned int element);
-
-/** ivec2 get_doctor_manager_defaultDoctorManager_variable_psychiatristPatientQueue(unsigned int index, unsigned int element)
- * Gets the element-th value of the psychiatristPatientQueue variable array of an doctor_manager agent in the defaultDoctorManager state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @param element the element index within the variable array
- * @return element-th value of agent variable psychiatristPatientQueue
- */
-__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_psychiatristPatientQueue(unsigned int index, unsigned int element);
+__host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_patientQueue(unsigned int index, unsigned int element);
 
 /** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
  * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
@@ -4571,31 +4453,31 @@ int min_chair_defaultChair_state_variable();
  */
 int max_chair_defaultChair_state_variable();
 
-/** unsigned int reduce_doctor_manager_defaultDoctorManager_front_variable();
+/** unsigned int reduce_doctor_manager_defaultDoctorManager_tick_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
  */
-unsigned int reduce_doctor_manager_defaultDoctorManager_front_variable();
+unsigned int reduce_doctor_manager_defaultDoctorManager_tick_variable();
 
 
 
-/** unsigned int count_doctor_manager_defaultDoctorManager_front_variable(unsigned int count_value){
+/** unsigned int count_doctor_manager_defaultDoctorManager_tick_variable(unsigned int count_value){
  * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
  * @param count_value The unique value which should be counted
  * @return The number of unique values of the count_value found in the agent state variable list
  */
-unsigned int count_doctor_manager_defaultDoctorManager_front_variable(unsigned int count_value);
+unsigned int count_doctor_manager_defaultDoctorManager_tick_variable(unsigned int count_value);
 
-/** unsigned int min_doctor_manager_defaultDoctorManager_front_variable();
+/** unsigned int min_doctor_manager_defaultDoctorManager_tick_variable();
  * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int min_doctor_manager_defaultDoctorManager_front_variable();
-/** unsigned int max_doctor_manager_defaultDoctorManager_front_variable();
+unsigned int min_doctor_manager_defaultDoctorManager_tick_variable();
+/** unsigned int max_doctor_manager_defaultDoctorManager_tick_variable();
  * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int max_doctor_manager_defaultDoctorManager_front_variable();
+unsigned int max_doctor_manager_defaultDoctorManager_tick_variable();
 
 /** unsigned int reduce_doctor_manager_defaultDoctorManager_rear_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
@@ -4649,135 +4531,31 @@ unsigned int min_doctor_manager_defaultDoctorManager_size_variable();
  */
 unsigned int max_doctor_manager_defaultDoctorManager_size_variable();
 
-/** unsigned int reduce_doctor_manager_defaultDoctorManager_surgeon_occupied_variable();
+/** unsigned int reduce_doctor_manager_defaultDoctorManager_free_doctors_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
  */
-unsigned int reduce_doctor_manager_defaultDoctorManager_surgeon_occupied_variable();
+unsigned int reduce_doctor_manager_defaultDoctorManager_free_doctors_variable();
 
 
 
-/** unsigned int count_doctor_manager_defaultDoctorManager_surgeon_occupied_variable(unsigned int count_value){
+/** unsigned int count_doctor_manager_defaultDoctorManager_free_doctors_variable(unsigned int count_value){
  * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
  * @param count_value The unique value which should be counted
  * @return The number of unique values of the count_value found in the agent state variable list
  */
-unsigned int count_doctor_manager_defaultDoctorManager_surgeon_occupied_variable(unsigned int count_value);
+unsigned int count_doctor_manager_defaultDoctorManager_free_doctors_variable(unsigned int count_value);
 
-/** unsigned int min_doctor_manager_defaultDoctorManager_surgeon_occupied_variable();
+/** unsigned int min_doctor_manager_defaultDoctorManager_free_doctors_variable();
  * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int min_doctor_manager_defaultDoctorManager_surgeon_occupied_variable();
-/** unsigned int max_doctor_manager_defaultDoctorManager_surgeon_occupied_variable();
+unsigned int min_doctor_manager_defaultDoctorManager_free_doctors_variable();
+/** unsigned int max_doctor_manager_defaultDoctorManager_free_doctors_variable();
  * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int max_doctor_manager_defaultDoctorManager_surgeon_occupied_variable();
-
-/** unsigned int reduce_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable();
-
-
-
-/** unsigned int count_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable(unsigned int count_value);
-
-/** unsigned int min_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable();
-/** unsigned int max_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_doctor_manager_defaultDoctorManager_pediatrician_occupied_variable();
-
-/** unsigned int reduce_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable();
-
-
-
-/** unsigned int count_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable(unsigned int count_value);
-
-/** unsigned int min_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable();
-/** unsigned int max_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_doctor_manager_defaultDoctorManager_gynecologist_occupied_variable();
-
-/** unsigned int reduce_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable();
-
-
-
-/** unsigned int count_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable(unsigned int count_value);
-
-/** unsigned int min_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable();
-/** unsigned int max_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_doctor_manager_defaultDoctorManager_geriatrics_occupied_variable();
-
-/** unsigned int reduce_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-unsigned int reduce_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable();
-
-
-
-/** unsigned int count_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable(unsigned int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-unsigned int count_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable(unsigned int count_value);
-
-/** unsigned int min_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int min_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable();
-/** unsigned int max_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-unsigned int max_doctor_manager_defaultDoctorManager_psychiatrist_occupied_variable();
+unsigned int max_doctor_manager_defaultDoctorManager_free_doctors_variable();
 
 /** int reduce_receptionist_defaultReceptionist_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

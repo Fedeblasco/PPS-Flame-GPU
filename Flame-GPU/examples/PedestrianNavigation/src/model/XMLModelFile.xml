@@ -872,7 +872,7 @@
       <memory>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>front</name>
+          <name>tick</name>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
@@ -884,60 +884,21 @@
         </gpu:variable>
         <gpu:variable>
           <type>int</type>
-          <name>doctorArray</name>
+          <name>doctors_occupied</name>
           <description>Arreglo que maneja si cada doctor está disponible o no</description>
           <arrayLength>4</arrayLength>
           <defaultValue>0</defaultValue>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>surgeon_occupied</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>pediatrician_occupied</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>gynecologist_occupied</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>geriatrics_occupied</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>psychiatrist_occupied</name>
+          <name>free_doctors</name>
+          <defaultValue>4</defaultValue>
         </gpu:variable>
         <gpu:variable>
           <type>ivec2</type>
-          <name>doctorPatientQueue</name>
+          <name>patientQueue</name>
           <arrayLength>35</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>ivec2</type>
-          <name>surgeonPatientQueue</name>
-          <arrayLength>35</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>ivec2</type>
-          <name>pediatricianPatientQueue</name>
-          <arrayLength>35</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>ivec2</type>
-          <name>gynecologistPatientQueue</name>
-          <arrayLength>35</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>ivec2</type>
-          <name>geriatricsPatientQueue</name>
-          <arrayLength>35</arrayLength>
-        </gpu:variable>
-        <gpu:variable>
-          <type>ivec2</type>
-          <name>psychiatristPatientQueue</name>
-          <arrayLength>35</arrayLength>
+          <defaultValue>-1,-1</defaultValue>
         </gpu:variable>
       </memory>
       <functions>

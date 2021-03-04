@@ -591,10 +591,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs("<xagent>\n" , file);
 		fputs("<name>doctor_manager</name>\n", file);
         
-		fputs("<front>", file);
-        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->front[i]);
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->tick[i]);
 		fputs(data, file);
-		fputs("</front>\n", file);
+		fputs("</tick>\n", file);
         
 		fputs("<rear>", file);
         sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->rear[i]);
@@ -606,86 +606,26 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</size>\n", file);
         
-		fputs("<doctorArray>", file);
+		fputs("<doctors_occupied>", file);
         for (int j=0;j<4;j++){
-            fprintf(file, "%d", h_doctor_managers_defaultDoctorManager->doctorArray[(j*xmachine_memory_doctor_manager_MAX)+i]);
+            fprintf(file, "%d", h_doctor_managers_defaultDoctorManager->doctors_occupied[(j*xmachine_memory_doctor_manager_MAX)+i]);
             if(j!=(4-1))
                 fprintf(file, ",");
         }
-		fputs("</doctorArray>\n", file);
+		fputs("</doctors_occupied>\n", file);
         
-		fputs("<surgeon_occupied>", file);
-        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->surgeon_occupied[i]);
+		fputs("<free_doctors>", file);
+        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->free_doctors[i]);
 		fputs(data, file);
-		fputs("</surgeon_occupied>\n", file);
+		fputs("</free_doctors>\n", file);
         
-		fputs("<pediatrician_occupied>", file);
-        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->pediatrician_occupied[i]);
-		fputs(data, file);
-		fputs("</pediatrician_occupied>\n", file);
-        
-		fputs("<gynecologist_occupied>", file);
-        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->gynecologist_occupied[i]);
-		fputs(data, file);
-		fputs("</gynecologist_occupied>\n", file);
-        
-		fputs("<geriatrics_occupied>", file);
-        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->geriatrics_occupied[i]);
-		fputs(data, file);
-		fputs("</geriatrics_occupied>\n", file);
-        
-		fputs("<psychiatrist_occupied>", file);
-        sprintf(data, "%u", h_doctor_managers_defaultDoctorManager->psychiatrist_occupied[i]);
-		fputs(data, file);
-		fputs("</psychiatrist_occupied>\n", file);
-        
-		fputs("<doctorPatientQueue>", file);
+		fputs("<patientQueue>", file);
         for (int j=0;j<35;j++){
-            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->doctorPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->doctorPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
+            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->patientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->patientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
             if(j!=(35-1))
                 fprintf(file, "|");
         }
-		fputs("</doctorPatientQueue>\n", file);
-        
-		fputs("<surgeonPatientQueue>", file);
-        for (int j=0;j<35;j++){
-            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->surgeonPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->surgeonPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
-            if(j!=(35-1))
-                fprintf(file, "|");
-        }
-		fputs("</surgeonPatientQueue>\n", file);
-        
-		fputs("<pediatricianPatientQueue>", file);
-        for (int j=0;j<35;j++){
-            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->pediatricianPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->pediatricianPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
-            if(j!=(35-1))
-                fprintf(file, "|");
-        }
-		fputs("</pediatricianPatientQueue>\n", file);
-        
-		fputs("<gynecologistPatientQueue>", file);
-        for (int j=0;j<35;j++){
-            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->gynecologistPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->gynecologistPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
-            if(j!=(35-1))
-                fprintf(file, "|");
-        }
-		fputs("</gynecologistPatientQueue>\n", file);
-        
-		fputs("<geriatricsPatientQueue>", file);
-        for (int j=0;j<35;j++){
-            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->geriatricsPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->geriatricsPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
-            if(j!=(35-1))
-                fprintf(file, "|");
-        }
-		fputs("</geriatricsPatientQueue>\n", file);
-        
-		fputs("<psychiatristPatientQueue>", file);
-        for (int j=0;j<35;j++){
-            fprintf(file, "%d, %d", h_doctor_managers_defaultDoctorManager->psychiatristPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].x, h_doctor_managers_defaultDoctorManager->psychiatristPatientQueue[(j*xmachine_memory_doctor_manager_MAX)+i].y);
-            if(j!=(35-1))
-                fprintf(file, "|");
-        }
-		fputs("</psychiatristPatientQueue>\n", file);
+		fputs("</patientQueue>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -928,21 +868,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_chair_x;
     int in_chair_y;
     int in_chair_state;
-    int in_doctor_manager_front;
+    int in_doctor_manager_tick;
     int in_doctor_manager_rear;
     int in_doctor_manager_size;
-    int in_doctor_manager_doctorArray;
-    int in_doctor_manager_surgeon_occupied;
-    int in_doctor_manager_pediatrician_occupied;
-    int in_doctor_manager_gynecologist_occupied;
-    int in_doctor_manager_geriatrics_occupied;
-    int in_doctor_manager_psychiatrist_occupied;
-    int in_doctor_manager_doctorPatientQueue;
-    int in_doctor_manager_surgeonPatientQueue;
-    int in_doctor_manager_pediatricianPatientQueue;
-    int in_doctor_manager_gynecologistPatientQueue;
-    int in_doctor_manager_geriatricsPatientQueue;
-    int in_doctor_manager_psychiatristPatientQueue;
+    int in_doctor_manager_doctors_occupied;
+    int in_doctor_manager_free_doctors;
+    int in_doctor_manager_patientQueue;
     int in_receptionist_x;
     int in_receptionist_y;
     int in_receptionist_patientQueue;
@@ -1094,21 +1025,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int chair_x;
 	int chair_y;
 	int chair_state;
-	unsigned int doctor_manager_front;
+	unsigned int doctor_manager_tick;
 	unsigned int doctor_manager_rear;
 	unsigned int doctor_manager_size;
-    int doctor_manager_doctorArray[4];
-	unsigned int doctor_manager_surgeon_occupied;
-	unsigned int doctor_manager_pediatrician_occupied;
-	unsigned int doctor_manager_gynecologist_occupied;
-	unsigned int doctor_manager_geriatrics_occupied;
-	unsigned int doctor_manager_psychiatrist_occupied;
-    ivec2 doctor_manager_doctorPatientQueue[35];
-    ivec2 doctor_manager_surgeonPatientQueue[35];
-    ivec2 doctor_manager_pediatricianPatientQueue[35];
-    ivec2 doctor_manager_gynecologistPatientQueue[35];
-    ivec2 doctor_manager_geriatricsPatientQueue[35];
-    ivec2 doctor_manager_psychiatristPatientQueue[35];
+    int doctor_manager_doctors_occupied[4];
+	unsigned int doctor_manager_free_doctors;
+    ivec2 doctor_manager_patientQueue[35];
 	int receptionist_x;
 	int receptionist_y;
     unsigned int receptionist_patientQueue[100];
@@ -1231,21 +1153,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_chair_x = 0;
 	in_chair_y = 0;
 	in_chair_state = 0;
-	in_doctor_manager_front = 0;
+	in_doctor_manager_tick = 0;
 	in_doctor_manager_rear = 0;
 	in_doctor_manager_size = 0;
-	in_doctor_manager_doctorArray = 0;
-	in_doctor_manager_surgeon_occupied = 0;
-	in_doctor_manager_pediatrician_occupied = 0;
-	in_doctor_manager_gynecologist_occupied = 0;
-	in_doctor_manager_geriatrics_occupied = 0;
-	in_doctor_manager_psychiatrist_occupied = 0;
-	in_doctor_manager_doctorPatientQueue = 0;
-	in_doctor_manager_surgeonPatientQueue = 0;
-	in_doctor_manager_pediatricianPatientQueue = 0;
-	in_doctor_manager_gynecologistPatientQueue = 0;
-	in_doctor_manager_geriatricsPatientQueue = 0;
-	in_doctor_manager_psychiatristPatientQueue = 0;
+	in_doctor_manager_doctors_occupied = 0;
+	in_doctor_manager_free_doctors = 0;
+	in_doctor_manager_patientQueue = 0;
 	in_receptionist_x = 0;
 	in_receptionist_y = 0;
 	in_receptionist_patientQueue = 0;
@@ -1371,34 +1284,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
 	for (int k=0; k<xmachine_memory_doctor_manager_MAX; k++)
 	{	
-		h_doctor_managers->front[k] = 0;
+		h_doctor_managers->tick[k] = 0;
 		h_doctor_managers->rear[k] = 0;
 		h_doctor_managers->size[k] = 0;
         for (i=0;i<4;i++){
-            h_doctor_managers->doctorArray[(i*xmachine_memory_doctor_manager_MAX)+k] = 0;
+            h_doctor_managers->doctors_occupied[(i*xmachine_memory_doctor_manager_MAX)+k] = 0;
         }
-		h_doctor_managers->surgeon_occupied[k] = 0;
-		h_doctor_managers->pediatrician_occupied[k] = 0;
-		h_doctor_managers->gynecologist_occupied[k] = 0;
-		h_doctor_managers->geriatrics_occupied[k] = 0;
-		h_doctor_managers->psychiatrist_occupied[k] = 0;
+		h_doctor_managers->free_doctors[k] = 4;
         for (i=0;i<35;i++){
-            h_doctor_managers->doctorPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {0,0};
-        }
-        for (i=0;i<35;i++){
-            h_doctor_managers->surgeonPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {0,0};
-        }
-        for (i=0;i<35;i++){
-            h_doctor_managers->pediatricianPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {0,0};
-        }
-        for (i=0;i<35;i++){
-            h_doctor_managers->gynecologistPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {0,0};
-        }
-        for (i=0;i<35;i++){
-            h_doctor_managers->geriatricsPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {0,0};
-        }
-        for (i=0;i<35;i++){
-            h_doctor_managers->psychiatristPatientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {0,0};
+            h_doctor_managers->patientQueue[(i*xmachine_memory_doctor_manager_MAX)+k] = {-1,-1};
         }
 	}
 	
@@ -1512,34 +1406,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     chair_x = 0;
     chair_y = 0;
     chair_state = 0;
-    doctor_manager_front = 0;
+    doctor_manager_tick = 0;
     doctor_manager_rear = 0;
     doctor_manager_size = 0;
     for (i=0;i<4;i++){
-        doctor_manager_doctorArray[i] = 0;
+        doctor_manager_doctors_occupied[i] = 0;
     }
-    doctor_manager_surgeon_occupied = 0;
-    doctor_manager_pediatrician_occupied = 0;
-    doctor_manager_gynecologist_occupied = 0;
-    doctor_manager_geriatrics_occupied = 0;
-    doctor_manager_psychiatrist_occupied = 0;
+    doctor_manager_free_doctors = 4;
     for (i=0;i<35;i++){
-        doctor_manager_doctorPatientQueue[i] = {0,0};
-    }
-    for (i=0;i<35;i++){
-        doctor_manager_surgeonPatientQueue[i] = {0,0};
-    }
-    for (i=0;i<35;i++){
-        doctor_manager_pediatricianPatientQueue[i] = {0,0};
-    }
-    for (i=0;i<35;i++){
-        doctor_manager_gynecologistPatientQueue[i] = {0,0};
-    }
-    for (i=0;i<35;i++){
-        doctor_manager_geriatricsPatientQueue[i] = {0,0};
-    }
-    for (i=0;i<35;i++){
-        doctor_manager_psychiatristPatientQueue[i] = {0,0};
+        doctor_manager_patientQueue[i] = {-1,-1};
     }
     receptionist_x = 0.093750;
     receptionist_y = -0.375000;
@@ -1821,34 +1696,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 						exit(EXIT_FAILURE);
 					}
                     
-					h_doctor_managers->front[*h_xmachine_memory_doctor_manager_count] = doctor_manager_front;
+					h_doctor_managers->tick[*h_xmachine_memory_doctor_manager_count] = doctor_manager_tick;
 					h_doctor_managers->rear[*h_xmachine_memory_doctor_manager_count] = doctor_manager_rear;
 					h_doctor_managers->size[*h_xmachine_memory_doctor_manager_count] = doctor_manager_size;
                     for (int k=0;k<4;k++){
-                        h_doctor_managers->doctorArray[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_doctorArray[k];
+                        h_doctor_managers->doctors_occupied[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_doctors_occupied[k];
                     }
-					h_doctor_managers->surgeon_occupied[*h_xmachine_memory_doctor_manager_count] = doctor_manager_surgeon_occupied;
-					h_doctor_managers->pediatrician_occupied[*h_xmachine_memory_doctor_manager_count] = doctor_manager_pediatrician_occupied;
-					h_doctor_managers->gynecologist_occupied[*h_xmachine_memory_doctor_manager_count] = doctor_manager_gynecologist_occupied;
-					h_doctor_managers->geriatrics_occupied[*h_xmachine_memory_doctor_manager_count] = doctor_manager_geriatrics_occupied;
-					h_doctor_managers->psychiatrist_occupied[*h_xmachine_memory_doctor_manager_count] = doctor_manager_psychiatrist_occupied;
+					h_doctor_managers->free_doctors[*h_xmachine_memory_doctor_manager_count] = doctor_manager_free_doctors;
                     for (int k=0;k<35;k++){
-                        h_doctor_managers->doctorPatientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_doctorPatientQueue[k];
-                    }
-                    for (int k=0;k<35;k++){
-                        h_doctor_managers->surgeonPatientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_surgeonPatientQueue[k];
-                    }
-                    for (int k=0;k<35;k++){
-                        h_doctor_managers->pediatricianPatientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_pediatricianPatientQueue[k];
-                    }
-                    for (int k=0;k<35;k++){
-                        h_doctor_managers->gynecologistPatientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_gynecologistPatientQueue[k];
-                    }
-                    for (int k=0;k<35;k++){
-                        h_doctor_managers->geriatricsPatientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_geriatricsPatientQueue[k];
-                    }
-                    for (int k=0;k<35;k++){
-                        h_doctor_managers->psychiatristPatientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_psychiatristPatientQueue[k];
+                        h_doctor_managers->patientQueue[(k*xmachine_memory_doctor_manager_MAX)+(*h_xmachine_memory_doctor_manager_count)] = doctor_manager_patientQueue[k];
                     }
 					(*h_xmachine_memory_doctor_manager_count) ++;	
 				}
@@ -2005,34 +1861,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 chair_x = 0;
                 chair_y = 0;
                 chair_state = 0;
-                doctor_manager_front = 0;
+                doctor_manager_tick = 0;
                 doctor_manager_rear = 0;
                 doctor_manager_size = 0;
                 for (i=0;i<4;i++){
-                    doctor_manager_doctorArray[i] = 0;
+                    doctor_manager_doctors_occupied[i] = 0;
                 }
-                doctor_manager_surgeon_occupied = 0;
-                doctor_manager_pediatrician_occupied = 0;
-                doctor_manager_gynecologist_occupied = 0;
-                doctor_manager_geriatrics_occupied = 0;
-                doctor_manager_psychiatrist_occupied = 0;
+                doctor_manager_free_doctors = 4;
                 for (i=0;i<35;i++){
-                    doctor_manager_doctorPatientQueue[i] = {0,0};
-                }
-                for (i=0;i<35;i++){
-                    doctor_manager_surgeonPatientQueue[i] = {0,0};
-                }
-                for (i=0;i<35;i++){
-                    doctor_manager_pediatricianPatientQueue[i] = {0,0};
-                }
-                for (i=0;i<35;i++){
-                    doctor_manager_gynecologistPatientQueue[i] = {0,0};
-                }
-                for (i=0;i<35;i++){
-                    doctor_manager_geriatricsPatientQueue[i] = {0,0};
-                }
-                for (i=0;i<35;i++){
-                    doctor_manager_psychiatristPatientQueue[i] = {0,0};
+                    doctor_manager_patientQueue[i] = {-1,-1};
                 }
                 receptionist_x = 0.093750;
                 receptionist_y = -0.375000;
@@ -2162,36 +1999,18 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/y") == 0) in_chair_y = 0;
 			if(strcmp(buffer, "state") == 0) in_chair_state = 1;
 			if(strcmp(buffer, "/state") == 0) in_chair_state = 0;
-			if(strcmp(buffer, "front") == 0) in_doctor_manager_front = 1;
-			if(strcmp(buffer, "/front") == 0) in_doctor_manager_front = 0;
+			if(strcmp(buffer, "tick") == 0) in_doctor_manager_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_doctor_manager_tick = 0;
 			if(strcmp(buffer, "rear") == 0) in_doctor_manager_rear = 1;
 			if(strcmp(buffer, "/rear") == 0) in_doctor_manager_rear = 0;
 			if(strcmp(buffer, "size") == 0) in_doctor_manager_size = 1;
 			if(strcmp(buffer, "/size") == 0) in_doctor_manager_size = 0;
-			if(strcmp(buffer, "doctorArray") == 0) in_doctor_manager_doctorArray = 1;
-			if(strcmp(buffer, "/doctorArray") == 0) in_doctor_manager_doctorArray = 0;
-			if(strcmp(buffer, "surgeon_occupied") == 0) in_doctor_manager_surgeon_occupied = 1;
-			if(strcmp(buffer, "/surgeon_occupied") == 0) in_doctor_manager_surgeon_occupied = 0;
-			if(strcmp(buffer, "pediatrician_occupied") == 0) in_doctor_manager_pediatrician_occupied = 1;
-			if(strcmp(buffer, "/pediatrician_occupied") == 0) in_doctor_manager_pediatrician_occupied = 0;
-			if(strcmp(buffer, "gynecologist_occupied") == 0) in_doctor_manager_gynecologist_occupied = 1;
-			if(strcmp(buffer, "/gynecologist_occupied") == 0) in_doctor_manager_gynecologist_occupied = 0;
-			if(strcmp(buffer, "geriatrics_occupied") == 0) in_doctor_manager_geriatrics_occupied = 1;
-			if(strcmp(buffer, "/geriatrics_occupied") == 0) in_doctor_manager_geriatrics_occupied = 0;
-			if(strcmp(buffer, "psychiatrist_occupied") == 0) in_doctor_manager_psychiatrist_occupied = 1;
-			if(strcmp(buffer, "/psychiatrist_occupied") == 0) in_doctor_manager_psychiatrist_occupied = 0;
-			if(strcmp(buffer, "doctorPatientQueue") == 0) in_doctor_manager_doctorPatientQueue = 1;
-			if(strcmp(buffer, "/doctorPatientQueue") == 0) in_doctor_manager_doctorPatientQueue = 0;
-			if(strcmp(buffer, "surgeonPatientQueue") == 0) in_doctor_manager_surgeonPatientQueue = 1;
-			if(strcmp(buffer, "/surgeonPatientQueue") == 0) in_doctor_manager_surgeonPatientQueue = 0;
-			if(strcmp(buffer, "pediatricianPatientQueue") == 0) in_doctor_manager_pediatricianPatientQueue = 1;
-			if(strcmp(buffer, "/pediatricianPatientQueue") == 0) in_doctor_manager_pediatricianPatientQueue = 0;
-			if(strcmp(buffer, "gynecologistPatientQueue") == 0) in_doctor_manager_gynecologistPatientQueue = 1;
-			if(strcmp(buffer, "/gynecologistPatientQueue") == 0) in_doctor_manager_gynecologistPatientQueue = 0;
-			if(strcmp(buffer, "geriatricsPatientQueue") == 0) in_doctor_manager_geriatricsPatientQueue = 1;
-			if(strcmp(buffer, "/geriatricsPatientQueue") == 0) in_doctor_manager_geriatricsPatientQueue = 0;
-			if(strcmp(buffer, "psychiatristPatientQueue") == 0) in_doctor_manager_psychiatristPatientQueue = 1;
-			if(strcmp(buffer, "/psychiatristPatientQueue") == 0) in_doctor_manager_psychiatristPatientQueue = 0;
+			if(strcmp(buffer, "doctors_occupied") == 0) in_doctor_manager_doctors_occupied = 1;
+			if(strcmp(buffer, "/doctors_occupied") == 0) in_doctor_manager_doctors_occupied = 0;
+			if(strcmp(buffer, "free_doctors") == 0) in_doctor_manager_free_doctors = 1;
+			if(strcmp(buffer, "/free_doctors") == 0) in_doctor_manager_free_doctors = 0;
+			if(strcmp(buffer, "patientQueue") == 0) in_doctor_manager_patientQueue = 1;
+			if(strcmp(buffer, "/patientQueue") == 0) in_doctor_manager_patientQueue = 0;
 			if(strcmp(buffer, "x") == 0) in_receptionist_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_receptionist_x = 0;
 			if(strcmp(buffer, "y") == 0) in_receptionist_y = 1;
@@ -2465,8 +2284,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_chair_state){
                     chair_state = (int) fpgu_strtol(buffer); 
                 }
-				if(in_doctor_manager_front){
-                    doctor_manager_front = (unsigned int) fpgu_strtoul(buffer); 
+				if(in_doctor_manager_tick){
+                    doctor_manager_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_doctor_manager_rear){
                     doctor_manager_rear = (unsigned int) fpgu_strtoul(buffer); 
@@ -2474,41 +2293,14 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_doctor_manager_size){
                     doctor_manager_size = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_doctor_manager_doctorArray){
-                    readArrayInput<int>(&fpgu_strtol, buffer, doctor_manager_doctorArray, 4);    
+				if(in_doctor_manager_doctors_occupied){
+                    readArrayInput<int>(&fpgu_strtol, buffer, doctor_manager_doctors_occupied, 4);    
                 }
-				if(in_doctor_manager_surgeon_occupied){
-                    doctor_manager_surgeon_occupied = (unsigned int) fpgu_strtoul(buffer); 
+				if(in_doctor_manager_free_doctors){
+                    doctor_manager_free_doctors = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_doctor_manager_pediatrician_occupied){
-                    doctor_manager_pediatrician_occupied = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_doctor_manager_gynecologist_occupied){
-                    doctor_manager_gynecologist_occupied = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_doctor_manager_geriatrics_occupied){
-                    doctor_manager_geriatrics_occupied = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_doctor_manager_psychiatrist_occupied){
-                    doctor_manager_psychiatrist_occupied = (unsigned int) fpgu_strtoul(buffer); 
-                }
-				if(in_doctor_manager_doctorPatientQueue){
-                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_doctorPatientQueue, 35);    
-                }
-				if(in_doctor_manager_surgeonPatientQueue){
-                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_surgeonPatientQueue, 35);    
-                }
-				if(in_doctor_manager_pediatricianPatientQueue){
-                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_pediatricianPatientQueue, 35);    
-                }
-				if(in_doctor_manager_gynecologistPatientQueue){
-                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_gynecologistPatientQueue, 35);    
-                }
-				if(in_doctor_manager_geriatricsPatientQueue){
-                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_geriatricsPatientQueue, 35);    
-                }
-				if(in_doctor_manager_psychiatristPatientQueue){
-                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_psychiatristPatientQueue, 35);    
+				if(in_doctor_manager_patientQueue){
+                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_patientQueue, 35);    
                 }
 				if(in_receptionist_x){
                     receptionist_x = (int) fpgu_strtol(buffer); 
