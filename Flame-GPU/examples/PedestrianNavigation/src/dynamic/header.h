@@ -243,6 +243,7 @@ struct __align__(16) xmachine_memory_agent
     unsigned int estado_movimiento;    /**< X-machine memory variable estado_movimiento of type unsigned int.*/
     unsigned int go_to_x;    /**< X-machine memory variable go_to_x of type unsigned int.*/
     unsigned int go_to_y;    /**< X-machine memory variable go_to_y of type unsigned int.*/
+    unsigned int checkpoint;    /**< X-machine memory variable checkpoint of type unsigned int.*/
     int chair_no;    /**< X-machine memory variable chair_no of type int.*/
     unsigned int box_no;    /**< X-machine memory variable box_no of type unsigned int.*/
     unsigned int doctor_no;    /**< X-machine memory variable doctor_no of type unsigned int.*/
@@ -612,6 +613,7 @@ struct xmachine_memory_agent_list
     unsigned int estado_movimiento [xmachine_memory_agent_MAX];    /**< X-machine memory variable list estado_movimiento of type unsigned int.*/
     unsigned int go_to_x [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_x of type unsigned int.*/
     unsigned int go_to_y [xmachine_memory_agent_MAX];    /**< X-machine memory variable list go_to_y of type unsigned int.*/
+    unsigned int checkpoint [xmachine_memory_agent_MAX];    /**< X-machine memory variable list checkpoint of type unsigned int.*/
     int chair_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list chair_no of type int.*/
     unsigned int box_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list box_no of type unsigned int.*/
     unsigned int doctor_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list doctor_no of type unsigned int.*/
@@ -1163,9 +1165,9 @@ __FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmac
 /**
  * receive_doctor_response FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param doctor_response_messages  doctor_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_doctor_response_message and get_next_doctor_response_message functions.* @param doctor_petition_messages Pointer to output message list of type xmachine_message_doctor_petition_list. Must be passed as an argument to the add_doctor_petition_message function ??.
+ * @param doctor_response_messages  doctor_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_doctor_response_message and get_next_doctor_response_message functions.* @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_doctor_petition_list* doctor_petition_messages);
+__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_chair_petition_list* chair_petition_messages);
 
 /**
  * output_triage_petition FLAMEGPU Agent Function
@@ -1728,12 +1730,13 @@ __FLAME_GPU_FUNC__ xmachine_message_triage_response * get_next_triage_response_m
  * @param estado_movimiento	agent agent variable of type unsigned int
  * @param go_to_x	agent agent variable of type unsigned int
  * @param go_to_y	agent agent variable of type unsigned int
+ * @param checkpoint	agent agent variable of type unsigned int
  * @param chair_no	agent agent variable of type int
  * @param box_no	agent agent variable of type unsigned int
  * @param doctor_no	agent agent variable of type unsigned int
  * @param priority	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority);
 
 /** add_chair_agent
  * Adds a new continuous valued chair agent to the xmachine_memory_chair_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -2500,6 +2503,15 @@ __host__ unsigned int get_agent_default_variable_go_to_x(unsigned int index);
  * @return value of agent variable go_to_y
  */
 __host__ unsigned int get_agent_default_variable_go_to_y(unsigned int index);
+
+/** unsigned int get_agent_default_variable_checkpoint(unsigned int index)
+ * Gets the value of the checkpoint variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable checkpoint
+ */
+__host__ unsigned int get_agent_default_variable_checkpoint(unsigned int index);
 
 /** int get_agent_default_variable_chair_no(unsigned int index)
  * Gets the value of the chair_no variable of an agent agent in the default state on the host. 
@@ -3817,6 +3829,32 @@ unsigned int min_agent_default_go_to_y_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 unsigned int max_agent_default_go_to_y_variable();
+
+/** unsigned int reduce_agent_default_checkpoint_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_checkpoint_variable();
+
+
+
+/** unsigned int count_agent_default_checkpoint_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_checkpoint_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_checkpoint_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_checkpoint_variable();
+/** unsigned int max_agent_default_checkpoint_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_checkpoint_variable();
 
 /** int reduce_agent_default_chair_no_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

@@ -229,6 +229,11 @@
           <name>go_to_y</name>
         </gpu:variable>
         <gpu:variable>
+          <type>unsigned int</type>
+          <name>checkpoint</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
           <type>int</type>
           <name>chair_no</name>
         </gpu:variable>
@@ -592,7 +597,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>doctor_petition</messageName>
+              <messageName>chair_petition</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -1632,7 +1637,7 @@
       <gpu:layerFunction>
         <name>infect_receptionist</name>
       </gpu:layerFunction>
-       <gpu:layerFunction>
+      <gpu:layerFunction>
         <name>receive_chair_state</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
@@ -1640,6 +1645,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_doctor_petitions</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_doctor_response</name>
       </gpu:layerFunction>
     </layer>
     <layer>

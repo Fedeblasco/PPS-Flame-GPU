@@ -325,6 +325,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -375,6 +376,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -425,6 +427,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -475,6 +478,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -525,6 +529,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -575,6 +580,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -625,6 +631,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -675,6 +682,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -725,6 +733,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
 			nextState->go_to_x[index] = currentState->go_to_x[index];
 			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
@@ -918,6 +927,7 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 		agents_dst->estado_movimiento[output_index] = agents_src->estado_movimiento[index];        
 		agents_dst->go_to_x[output_index] = agents_src->go_to_x[index];        
 		agents_dst->go_to_y[output_index] = agents_src->go_to_y[index];        
+		agents_dst->checkpoint[output_index] = agents_src->checkpoint[index];        
 		agents_dst->chair_no[output_index] = agents_src->chair_no[index];        
 		agents_dst->box_no[output_index] = agents_src->box_no[index];        
 		agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];        
@@ -959,6 +969,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 	    agents_dst->estado_movimiento[output_index] = agents_src->estado_movimiento[index];
 	    agents_dst->go_to_x[output_index] = agents_src->go_to_x[index];
 	    agents_dst->go_to_y[output_index] = agents_src->go_to_y[index];
+	    agents_dst->checkpoint[output_index] = agents_src->checkpoint[index];
 	    agents_dst->chair_no[output_index] = agents_src->chair_no[index];
 	    agents_dst->box_no[output_index] = agents_src->box_no[index];
 	    agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];
@@ -987,13 +998,14 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param estado_movimiento agent variable of type unsigned int
  * @param go_to_x agent variable of type unsigned int
  * @param go_to_y agent variable of type unsigned int
+ * @param checkpoint agent variable of type unsigned int
  * @param chair_no agent variable of type int
  * @param box_no agent variable of type unsigned int
  * @param doctor_no agent variable of type unsigned int
  * @param priority agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
 	
 	int index;
     
@@ -1030,6 +1042,7 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int
 	agents->estado_movimiento[index] = estado_movimiento;
 	agents->go_to_x[index] = go_to_x;
 	agents->go_to_y[index] = go_to_y;
+	agents->checkpoint[index] = checkpoint;
 	agents->chair_no[index] = chair_no;
 	agents->box_no[index] = box_no;
 	agents->doctor_no[index] = doctor_no;
@@ -1038,8 +1051,8 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
-    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, chair_no, box_no, doctor_no, priority);
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, priority);
 }
 
 /** reorder_agent_agents
@@ -1073,6 +1086,7 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 	ordered_agents->estado_movimiento[index] = unordered_agents->estado_movimiento[old_pos];
 	ordered_agents->go_to_x[index] = unordered_agents->go_to_x[old_pos];
 	ordered_agents->go_to_y[index] = unordered_agents->go_to_y[old_pos];
+	ordered_agents->checkpoint[index] = unordered_agents->checkpoint[old_pos];
 	ordered_agents->chair_no[index] = unordered_agents->chair_no[old_pos];
 	ordered_agents->box_no[index] = unordered_agents->box_no[old_pos];
 	ordered_agents->doctor_no[index] = unordered_agents->doctor_no[old_pos];
@@ -5112,6 +5126,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5143,6 +5158,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5185,6 +5201,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5216,6 +5233,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5258,6 +5276,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5289,6 +5308,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5331,6 +5351,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5362,6 +5383,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5404,6 +5426,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5435,6 +5458,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5476,6 +5500,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5500,6 +5525,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.estado_movimiento = 0;
 	agent.go_to_x = 0;
 	agent.go_to_y = 0;
+	agent.checkpoint = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
@@ -5535,6 +5561,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5578,6 +5605,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5609,6 +5637,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5651,6 +5680,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5682,6 +5712,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5723,6 +5754,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5747,6 +5779,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.estado_movimiento = 0;
 	agent.go_to_x = 0;
 	agent.go_to_y = 0;
+	agent.checkpoint = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
@@ -5782,6 +5815,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5824,6 +5858,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5848,6 +5883,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.estado_movimiento = 0;
 	agent.go_to_x = 0;
 	agent.go_to_y = 0;
+	agent.checkpoint = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
@@ -5883,6 +5919,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5926,6 +5963,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -5957,6 +5995,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -5998,6 +6037,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -6022,6 +6062,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.estado_movimiento = 0;
 	agent.go_to_x = 0;
 	agent.go_to_y = 0;
+	agent.checkpoint = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
@@ -6057,6 +6098,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -6100,6 +6142,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -6131,6 +6174,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -6140,7 +6184,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 /**
  *
  */
-__global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_doctor_petition_list* doctor_petition_messages){
+__global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_chair_petition_list* chair_petition_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -6172,6 +6216,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -6196,6 +6241,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.estado_movimiento = 0;
 	agent.go_to_x = 0;
 	agent.go_to_y = 0;
+	agent.checkpoint = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
@@ -6203,7 +6249,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	}
 
 	//FLAME function call
-	int dead = !receive_doctor_response(&agent, doctor_response_messages, doctor_petition_messages	);
+	int dead = !receive_doctor_response(&agent, doctor_response_messages, chair_petition_messages	);
 	
 
 	
@@ -6231,6 +6277,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -6274,6 +6321,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -6305,6 +6353,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
@@ -6346,6 +6395,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.estado_movimiento = agents->estado_movimiento[index];
 	agent.go_to_x = agents->go_to_x[index];
 	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
@@ -6370,6 +6420,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.estado_movimiento = 0;
 	agent.go_to_x = 0;
 	agent.go_to_y = 0;
+	agent.checkpoint = 0;
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
@@ -6405,6 +6456,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agents->estado_movimiento[index] = agent.estado_movimiento;
 	agents->go_to_x[index] = agent.go_to_x;
 	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;

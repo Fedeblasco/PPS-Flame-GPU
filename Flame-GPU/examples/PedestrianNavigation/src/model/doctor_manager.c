@@ -30,8 +30,8 @@ __FLAME_GPU_FUNC__ int receive_doctor_petitions(xmachine_memory_doctor_manager* 
             for(int i=0;i<agent->rear;i++){
                 agent->patientQueue[i].y--;
                 if(agent->patientQueue[i].y < 0){
-                    priorityDequeue(agent->patientQueue,&agent->size,&agent->rear);
                     add_doctor_response_message(doctorResponseMessages,agent->patientQueue[i].x,-1);
+                    priorityDequeue(agent->patientQueue,&agent->size,&agent->rear);
                 }
             }
             agent->tick=0;

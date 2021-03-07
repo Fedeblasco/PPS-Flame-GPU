@@ -311,6 +311,38 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
 	return 0; 
 }
 
+__FLAME_GPU_FUNC__ int go_to_doctor(xmachine_memory_agent* agent){
+	
+	switch(agent->checkpoint){
+		case 0:
+			//El que va al cuarto doctor se maneja distinto para que esquive la esquina
+			if(agent->go_to_y == 41){
+				if(mover_a_destino(agent,agent->go_to_x+20,59) == 0){
+					agent->checkpoint++;
+				}
+			}else{
+				if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+					agent->checkpoint = 2;
+				}
+			}
+			break;
+		//Utilizado solo por el que va al cuarto doctor
+		case 1:
+			if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+					agent->checkpoint++;
+			}
+			break;
+		case 2:
+			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+				return 1;
+			}
+			break;
+	}
+
+	return 0;
+
+}
+
 /**
  * move FLAMEGPU Agent Function
  * Automatically generated using functions.xslt
@@ -410,6 +442,12 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				agent->estado_movimiento++;
 			}
 			break;
+		case 29:
+			if(go_to_doctor(agent)){
+				printf("Llegue al doctor\n");
+				agent->estado_movimiento++;
+			}
+			break;
 	}
 	 
 	return 0; 
@@ -452,7 +490,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0);
+				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 				
 				/*if(agent->cant_generados==0){
 					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 0, 0, 0, 0, 0);
@@ -549,8 +587,20 @@ __FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xma
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctorResponseMessages, xmachine_message_doctor_petition_list* doctorPetitionMessages){
+__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctorResponseMessages, xmachine_message_chair_petition_list* chairPetitionMessages){
 	
+	xmachine_message_doctor_response* current_message = get_first_doctor_response_message(doctorResponseMessages);
+	while(current_message){
+		if(agent->id == current_message->id){
+			agent->estado_movimiento++;
+			add_chair_petition_message(chairPetitionMessages, agent->id);
+			agent->go_to_x = firstDoctor_x;
+			agent->go_to_y = firstDoctor_y - (space_between_doctors * current_message->doctor_no);;
+			agent->chair_no = -1;
+			printf("Tengo que ir al doctor %d, soy %d\n",current_message->doctor_no,agent->id);
+		}
+		current_message = get_next_doctor_response_message(current_message, doctorResponseMessages);
+	}
 
 	return 0;
 }

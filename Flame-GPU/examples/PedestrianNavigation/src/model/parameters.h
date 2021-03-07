@@ -30,6 +30,17 @@
 #define space_between 3
 #endif
 
+//Manejo de los doctores
+#ifndef firstDoctor_x
+#define firstDoctor_x 15
+#endif
+#ifndef firstDoctor_y
+#define firstDoctor_y 95
+#endif
+#ifndef space_between_doctors
+#define space_between_doctors 18
+#endif
+
 //Constante de tiempo
 #ifndef MINUTES_PER_TICK
 #define MINUTES_PER_TICK 1

@@ -425,6 +425,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</go_to_y>\n", file);
         
+		fputs("<checkpoint>", file);
+        sprintf(data, "%u", h_agents_default->checkpoint[i]);
+		fputs(data, file);
+		fputs("</checkpoint>\n", file);
+        
 		fputs("<chair_no>", file);
         sprintf(data, "%d", h_agents_default->chair_no[i]);
 		fputs(data, file);
@@ -839,6 +844,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_estado_movimiento;
     int in_agent_go_to_x;
     int in_agent_go_to_y;
+    int in_agent_checkpoint;
     int in_agent_chair_no;
     int in_agent_box_no;
     int in_agent_doctor_no;
@@ -996,6 +1002,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int agent_estado_movimiento;
 	unsigned int agent_go_to_x;
 	unsigned int agent_go_to_y;
+	unsigned int agent_checkpoint;
 	int agent_chair_no;
 	unsigned int agent_box_no;
 	unsigned int agent_doctor_no;
@@ -1124,6 +1131,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_estado_movimiento = 0;
 	in_agent_go_to_x = 0;
 	in_agent_go_to_y = 0;
+	in_agent_checkpoint = 0;
 	in_agent_chair_no = 0;
 	in_agent_box_no = 0;
 	in_agent_doctor_no = 0;
@@ -1237,6 +1245,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->estado_movimiento[k] = 0;
 		h_agents->go_to_x[k] = 0;
 		h_agents->go_to_y[k] = 0;
+		h_agents->checkpoint[k] = 0;
 		h_agents->chair_no[k] = 0;
 		h_agents->box_no[k] = 0;
 		h_agents->doctor_no[k] = 0;
@@ -1377,6 +1386,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_estado_movimiento = 0;
     agent_go_to_x = 0;
     agent_go_to_y = 0;
+    agent_checkpoint = 0;
     agent_chair_no = 0;
     agent_box_no = 0;
     agent_doctor_no = 0;
@@ -1610,6 +1620,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->estado_movimiento[*h_xmachine_memory_agent_count] = agent_estado_movimiento;
 					h_agents->go_to_x[*h_xmachine_memory_agent_count] = agent_go_to_x;
 					h_agents->go_to_y[*h_xmachine_memory_agent_count] = agent_go_to_y;
+					h_agents->checkpoint[*h_xmachine_memory_agent_count] = agent_checkpoint;
 					h_agents->chair_no[*h_xmachine_memory_agent_count] = agent_chair_no;
 					h_agents->box_no[*h_xmachine_memory_agent_count] = agent_box_no;
 					h_agents->doctor_no[*h_xmachine_memory_agent_count] = agent_doctor_no;
@@ -1832,6 +1843,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_estado_movimiento = 0;
                 agent_go_to_x = 0;
                 agent_go_to_y = 0;
+                agent_checkpoint = 0;
                 agent_chair_no = 0;
                 agent_box_no = 0;
                 agent_doctor_no = 0;
@@ -1941,6 +1953,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/go_to_x") == 0) in_agent_go_to_x = 0;
 			if(strcmp(buffer, "go_to_y") == 0) in_agent_go_to_y = 1;
 			if(strcmp(buffer, "/go_to_y") == 0) in_agent_go_to_y = 0;
+			if(strcmp(buffer, "checkpoint") == 0) in_agent_checkpoint = 1;
+			if(strcmp(buffer, "/checkpoint") == 0) in_agent_checkpoint = 0;
 			if(strcmp(buffer, "chair_no") == 0) in_agent_chair_no = 1;
 			if(strcmp(buffer, "/chair_no") == 0) in_agent_chair_no = 0;
 			if(strcmp(buffer, "box_no") == 0) in_agent_box_no = 1;
@@ -2196,6 +2210,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_agent_go_to_y){
                     agent_go_to_y = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_agent_checkpoint){
+                    agent_checkpoint = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_agent_chair_no){
                     agent_chair_no = (int) fpgu_strtol(buffer); 
