@@ -639,6 +639,12 @@
               <messageName>attention_terminated</messageName>
             </gpu:input>
           </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>free_doctor</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
           <condition>
             <lhs>
               <agentVariable>estado_movimiento</agentVariable>
@@ -983,6 +989,19 @@
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>receive_free_doctors</name>
+          <currentState>defaultDoctorManager</currentState>
+          <nextState>defaultDoctorManager</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>free_doctor</messageName>
+            </gpu:input>
+          </inputs>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
@@ -1668,6 +1687,18 @@
     </gpu:message>
 
     <gpu:message> 
+      <name>free_doctor</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>doctor_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
       <name>attention_terminated</name>
       <variables>
         <gpu:variable>
@@ -1818,6 +1849,9 @@
       <gpu:layerFunction>
         <name>receive_doctor_petitions</name>
       </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_attention_terminated</name>
+      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
@@ -1827,7 +1861,7 @@
         <name>receive_doctor_response</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>receive_attention_terminated</name>
+        <name>receive_free_doctors</name>
       </gpu:layerFunction>
     </layer>
     <layer>

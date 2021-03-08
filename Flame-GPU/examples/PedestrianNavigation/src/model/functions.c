@@ -461,6 +461,11 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				agent->estado_movimiento++;
 			}
 			break;
+		case 32:
+			/*if(go_to_exit(agent)){
+				printf("Me re muero");
+			}*/
+			break;
 	}
 	 
 	return 0; 
@@ -624,12 +629,13 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent, xmachine_message_attention_terminated_list* attentionTerminatedMessages){
+__FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent, xmachine_message_attention_terminated_list* attentionTerminatedMessages, xmachine_message_free_doctor_list* freeDoctorMessages){
 	
 	xmachine_message_attention_terminated* current_message = get_first_attention_terminated_message(attentionTerminatedMessages);
 	while(current_message){
 		if(agent->id == current_message->id){
-			printf("Terminaron de atenderme, soy %d\n",agent->id);
+			add_free_doctor_message(freeDoctorMessages, agent->doctor_no);
+			agent->estado_movimiento++;
 		}
 		current_message = get_next_attention_terminated_message(current_message, attentionTerminatedMessages);
 	}

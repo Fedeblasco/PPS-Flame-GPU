@@ -152,6 +152,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_doctor_reached
 #define xmachine_message_doctor_reached_MAX 65536
 
+//Maximum population size of xmachine_mmessage_free_doctor
+#define xmachine_message_free_doctor_MAX 65536
+
 //Maximum population size of xmachine_mmessage_attention_terminated
 #define xmachine_message_attention_terminated_MAX 65536
 
@@ -182,6 +185,7 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_box_petition_partitioningNone
 #define xmachine_message_box_response_partitioningNone
 #define xmachine_message_doctor_reached_partitioningNone
+#define xmachine_message_free_doctor_partitioningNone
 #define xmachine_message_attention_terminated_partitioningNone
 #define xmachine_message_doctor_petition_partitioningNone
 #define xmachine_message_doctor_response_partitioningNone
@@ -562,6 +566,18 @@ struct __align__(16) xmachine_message_doctor_reached
     int _position;          /**< 1D position of message in linear message list */   
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int doctor_no;        /**< Message variable doctor_no of type unsigned int.*/
+};
+
+/** struct xmachine_message_free_doctor
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_free_doctor
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
     unsigned int doctor_no;        /**< Message variable doctor_no of type unsigned int.*/
 };
 
@@ -1021,6 +1037,20 @@ struct xmachine_message_doctor_reached_list
     
 };
 
+/** struct xmachine_message_free_doctor_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_free_doctor_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_free_doctor_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_free_doctor_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int doctor_no [xmachine_message_free_doctor_MAX];    /**< Message memory variable list doctor_no of type unsigned int.*/
+    
+};
+
 /** struct xmachine_message_attention_terminated_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -1265,9 +1295,9 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 /**
  * receive_attention_terminated FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param attention_terminated_messages  attention_terminated_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_attention_terminated_message and get_next_attention_terminated_message functions.
+ * @param attention_terminated_messages  attention_terminated_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_attention_terminated_message and get_next_attention_terminated_message functions.* @param free_doctor_messages Pointer to output message list of type xmachine_message_free_doctor_list. Must be passed as an argument to the add_free_doctor_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent, xmachine_message_attention_terminated_list* attention_terminated_messages);
+__FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent, xmachine_message_attention_terminated_list* attention_terminated_messages, xmachine_message_free_doctor_list* free_doctor_messages);
 
 /**
  * output_doctor_reached FLAMEGPU Agent Function
@@ -1317,6 +1347,13 @@ __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine
  * @param doctor_petition_messages  doctor_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_doctor_petition_message and get_next_doctor_petition_message functions.* @param doctor_response_messages Pointer to output message list of type xmachine_message_doctor_response_list. Must be passed as an argument to the add_doctor_response_message function ??.
  */
 __FLAME_GPU_FUNC__ int receive_doctor_petitions(xmachine_memory_doctor_manager* agent, xmachine_message_doctor_petition_list* doctor_petition_messages, xmachine_message_doctor_response_list* doctor_response_messages);
+
+/**
+ * receive_free_doctors FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_doctor_manager. This represents a single agent instance and can be modified directly.
+ * @param free_doctor_messages  free_doctor_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_free_doctor_message and get_next_free_doctor_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_free_doctors(xmachine_memory_doctor_manager* agent, xmachine_message_free_doctor_list* free_doctor_messages);
 
 /**
  * receptionServer FLAMEGPU Agent Function
@@ -1742,6 +1779,33 @@ __FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_first_doctor_reached_me
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_next_doctor_reached_message(xmachine_message_doctor_reached* current, xmachine_message_doctor_reached_list* doctor_reached_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) free_doctor message implemented in FLAMEGPU_Kernels */
+
+/** add_free_doctor_message
+ * Function for all types of message partitioning
+ * Adds a new free_doctor agent to the xmachine_memory_free_doctor_list list using a linear mapping
+ * @param agents	xmachine_memory_free_doctor_list agent list
+ * @param doctor_no	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_free_doctor_message(xmachine_message_free_doctor_list* free_doctor_messages, unsigned int doctor_no);
+ 
+/** get_first_free_doctor_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param free_doctor_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_doctor * get_first_free_doctor_message(xmachine_message_free_doctor_list* free_doctor_messages);
+
+/** get_next_free_doctor_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param free_doctor_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_doctor * get_next_free_doctor_message(xmachine_message_free_doctor* current, xmachine_message_free_doctor_list* free_doctor_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) attention_terminated message implemented in FLAMEGPU_Kernels */

@@ -40,3 +40,14 @@ __FLAME_GPU_FUNC__ int receive_doctor_petitions(xmachine_memory_doctor_manager* 
     }
 	return 0;
 }
+
+__FLAME_GPU_FUNC__ int receive_free_doctors(xmachine_memory_doctor_manager* agent, xmachine_message_free_doctor_list* freeDoctorMessages){
+    xmachine_message_free_doctor* current_message = get_first_free_doctor_message(freeDoctorMessages);
+    while(current_message){
+        printf("Liberando el doctor %d\n",current_message->doctor_no);
+        agent->free_doctors++;
+        agent->doctors_occupied[current_message->doctor_no]=0;
+        current_message = get_next_free_doctor_message(current_message, freeDoctorMessages);	
+	}
+    return 0;
+}
