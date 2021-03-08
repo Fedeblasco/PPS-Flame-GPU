@@ -356,6 +356,32 @@ __FLAME_GPU_FUNC__ int go_to_doctor(xmachine_memory_agent* agent){
 
 }
 
+__FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
+
+	switch(agent->checkpoint){
+		case 0:
+			if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+				//printf("Llegue al primer checkpoint\n");
+				agent->checkpoint++;
+			}
+			break;
+		case 1:
+			if(mover_a_destino(agent,88,96) == 0){
+				//printf("Llegue al segundo checkpoint\n");
+				agent->checkpoint++;
+			}
+			break;
+		case 2:
+			if(mover_a_destino(agent,150,102) == 0){
+				return 1;
+			}
+			break;
+	}
+
+	return 0;
+
+}
+
 /**
  * move FLAMEGPU Agent Function
  * Automatically generated using functions.xslt
@@ -458,13 +484,14 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 		case 30:
 			if(go_to_doctor(agent)){
 				printf("Llegue al doctor\n");
+				agent->checkpoint=0;
 				agent->estado_movimiento++;
 			}
 			break;
-		case 32:
-			/*if(go_to_exit(agent)){
-				printf("Me re muero");
-			}*/
+		case 33:
+			if(go_to_exit(agent)){
+				printf("Me muero");
+			}
 			break;
 	}
 	 
