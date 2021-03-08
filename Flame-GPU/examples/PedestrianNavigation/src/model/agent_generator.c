@@ -22,3 +22,13 @@ __FLAME_GPU_FUNC__ int generate_boxes(xmachine_memory_agent_generator* agent, xm
     agent->boxes_generated++;
     return 0;
 }
+
+__FLAME_GPU_FUNC__ int generate_doctors(xmachine_memory_agent_generator* agent, xmachine_memory_doctor_list* doctor_agents){
+    
+    printf("Doctor generado\n"); 
+    
+    add_doctor_agent(doctor_agents, agent->doctors_generated,0,0);
+
+    agent->doctors_generated++;
+    return 0;
+}

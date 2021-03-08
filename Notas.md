@@ -19,6 +19,9 @@
 8. Se hace un doble chequeo del radio del mensaje enviado, para no tener problemas al generarlo y poder variar el radio más facil
 9. A los ivec2 se accede con .x o .y , por ej ivec2.x ivec2.y
 
+# Problemas que encontre en flame
+1. No hubo manera de hacer que ande la liberación de sillas dentro de la función receive_doctor_response, hubo que hacerlo en la funcion output_chair_petition
+
 # Cosas de Flame-GPU
 
 1. Throughout a simulation, agent data is persistent however message information (and in particular message lists) is persistent only over the lifecycle of a single iteration. (Pag 3)

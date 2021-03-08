@@ -399,11 +399,27 @@
             <rhs>
               <condition>
                 <lhs>
-                  <agentVariable>estado_movimiento</agentVariable>
+                  <condition>
+                    <lhs>
+                      <agentVariable>estado_movimiento</agentVariable>
+                    </lhs>
+                    <operator>==</operator>
+                    <rhs>
+                        <value>24</value>
+                    </rhs>
+                  </condition>
                 </lhs>
-                <operator>==</operator>
+                <operator>||</operator>
                 <rhs>
-                    <value>24</value>
+                  <condition>
+                    <lhs>
+                      <agentVariable>estado_movimiento</agentVariable>
+                    </lhs>
+                    <operator>==</operator>
+                    <rhs>
+                        <value>29</value>
+                    </rhs>
+                  </condition>
                 </rhs>
               </condition>
             </rhs>
@@ -608,6 +624,51 @@
             <operator>==</operator>
             <rhs>
                 <value>28</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>receive_attention_terminated</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>attention_terminated</messageName>
+            </gpu:input>
+          </inputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>32</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>output_doctor_reached</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>doctor_reached</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs>
+              <agentVariable>estado_movimiento</agentVariable>
+            </lhs>
+            <operator>==</operator>
+            <rhs>
+                <value>31</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -1046,6 +1107,11 @@
           <name>boxes_generated</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>doctors_generated</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
@@ -1088,6 +1154,29 @@
             <operator>&lt;</operator>
             <rhs>
                 <value>3</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>generate_doctors</name>
+          <currentState>defaultGenerator</currentState>
+          <nextState>defaultGenerator</nextState>
+          <xagentOutputs>
+            <gpu:xagentOutput>
+              <xagentName>doctor</xagentName>
+              <state>defaultDoctor</state>
+            </gpu:xagentOutput>
+          </xagentOutputs>
+          <condition>
+            <lhs>
+              <agentVariable>doctors_generated</agentVariable>
+            </lhs>
+            <operator>&lt;</operator>
+            <rhs>
+                <value>4</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -1218,6 +1307,52 @@
           <name>defaultBox</name>
         </gpu:state>
         <initialState>defaultBox</initialState>
+      </states>
+      <gpu:type>continuous</gpu:type>
+      <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
+    </gpu:xagent>
+<!-- Agente doctor -->
+    <gpu:xagent>
+      <name>doctor</name>
+      <memory>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>attending</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>tick</name>
+        </gpu:variable>
+      </memory>
+      <functions>
+        <gpu:function>
+          <name>doctor_server</name>
+          <currentState>defaultDoctor</currentState>
+          <nextState>defaultDoctor</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>doctor_reached</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>attention_terminated</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+      </functions>
+      <states>
+        <gpu:state>
+          <name>defaultDoctor</name>
+        </gpu:state>
+        <initialState>defaultDoctor</initialState>
       </states>
       <gpu:type>continuous</gpu:type>
       <gpu:bufferSize>65536</gpu:bufferSize><!-- Se ponen potencias de 2, no hay perdida de performance por poner un numero grande -->
@@ -1515,7 +1650,35 @@
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
-  <!-- Mensajes del doctor_manager -->
+  <!-- Mensajes del doctor -->
+    <gpu:message> 
+      <name>doctor_reached</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>doctor_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>attention_terminated</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+    
     <gpu:message> 
       <name>doctor_petition</name>
       <variables>
@@ -1592,6 +1755,9 @@
       <gpu:layerFunction>
         <name>generate_boxes</name>
       </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>generate_doctors</name>
+      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
@@ -1616,6 +1782,9 @@
         <name>output_doctor_petition</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
+        <name>output_doctor_reached</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
         <name>output_box_petition</name>
       </gpu:layerFunction>
     </layer>
@@ -1628,6 +1797,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_triage_petitions</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>doctor_server</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1646,13 +1818,16 @@
       <gpu:layerFunction>
         <name>receive_doctor_petitions</name>
       </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>receive_doctor_response</name>
-      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
         <name>move</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_doctor_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_attention_terminated</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -1668,16 +1843,11 @@
       <gpu:layerFunction>
         <name>receive_check_in_response</name>
       </gpu:layerFunction>
-    </layer>
-    <layer>
       <gpu:layerFunction>
         <name>attend_chair_petitions</name>
       </gpu:layerFunction>
     </layer>
     <layer>
-      <gpu:layerFunction>
-        <name>receive_chair_response</name>
-      </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_chair_response</name>
       </gpu:layerFunction>

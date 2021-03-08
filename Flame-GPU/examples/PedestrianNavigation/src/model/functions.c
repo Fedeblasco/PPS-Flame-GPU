@@ -22,9 +22,11 @@
 #include "queue.c"
 #include "priority_queue.c"
 #include "CustomVisualisation.h"
+
 #include "receptionist.c"
 #include "chair_admin.c"
 #include "doctor_manager.c"
+#include "doctor.c"
 #include "chair.c"
 #include "agent_generator.c"
 #include "triage.c"
@@ -116,6 +118,9 @@ __FLAME_GPU_FUNC__ int output_navmap_cells(xmachine_memory_navmap* agent, xmachi
 __FLAME_GPU_FUNC__ int output_chair_petition(xmachine_memory_agent* agent, xmachine_message_chair_petition_list* chairPetitionMessages){
 
 	add_chair_petition_message(chairPetitionMessages, agent->id);
+	if(agent->id == 32){
+		printf("Soy 32 y quiero una silla\n");
+	}
 	agent->estado_movimiento++;
 
 	return 0;
@@ -139,6 +144,14 @@ __FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmac
 __FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmachine_message_doctor_petition_list* doctorPetitionMessages){
 	
 	add_doctor_petition_message(doctorPetitionMessages, agent->id, agent->doctor_no, agent->priority);
+	agent->estado_movimiento++;
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int output_doctor_reached(xmachine_memory_agent* agent, xmachine_message_doctor_reached_list* doctorReachedMessages){
+	
+	add_doctor_reached_message(doctorReachedMessages, agent->id, agent->doctor_no);
 	agent->estado_movimiento++;
 
 	return 0;
@@ -442,7 +455,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				agent->estado_movimiento++;
 			}
 			break;
-		case 29:
+		case 30:
 			if(go_to_doctor(agent)){
 				printf("Llegue al doctor\n");
 				agent->estado_movimiento++;
@@ -592,14 +605,33 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 	xmachine_message_doctor_response* current_message = get_first_doctor_response_message(doctorResponseMessages);
 	while(current_message){
 		if(agent->id == current_message->id){
-			agent->estado_movimiento++;
-			add_chair_petition_message(chairPetitionMessages, agent->id);
-			agent->go_to_x = firstDoctor_x;
-			agent->go_to_y = firstDoctor_y - (space_between_doctors * current_message->doctor_no);;
-			agent->chair_no = -1;
-			printf("Tengo que ir al doctor %d, soy %d\n",current_message->doctor_no,agent->id);
+			if(current_message->doctor_no !=-1){
+				agent->go_to_x = firstDoctor_x;
+				agent->go_to_y = firstDoctor_y - (space_between_doctors * current_message->doctor_no);;
+				agent->estado_movimiento++;
+				agent->chair_no = -1;
+				agent->doctor_no = current_message->doctor_no;
+				//printf("Tengo que ir al doctor %d, soy %d\n",current_message->doctor_no,agent->id);
+			}else{
+				//printf("No hay doctores disponibles, soy %d\n",agent->id);
+			}
+			//printf("Enviando un mensaje, soy %d\n",agent->id);
+			//add_chair_petition_message(chairPetitionMessages, agent->id);
 		}
 		current_message = get_next_doctor_response_message(current_message, doctorResponseMessages);
+	}
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent, xmachine_message_attention_terminated_list* attentionTerminatedMessages){
+	
+	xmachine_message_attention_terminated* current_message = get_first_attention_terminated_message(attentionTerminatedMessages);
+	while(current_message){
+		if(agent->id == current_message->id){
+			printf("Terminaron de atenderme, soy %d\n",agent->id);
+		}
+		current_message = get_next_attention_terminated_message(current_message, attentionTerminatedMessages);
 	}
 
 	return 0;

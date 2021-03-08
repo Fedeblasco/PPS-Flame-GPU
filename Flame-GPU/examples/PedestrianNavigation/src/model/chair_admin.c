@@ -4,11 +4,14 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 	
 	xmachine_message_chair_petition* current_message = get_first_chair_petition_message(chairPetitionMessages);
 	int send_message = 1;
-	while(current_message){
+	int corte_de_control = 0;
+	while((current_message)&&(corte_de_control<15)){
 		
 		//printf("Hola, me llego el mensaje %d",current_message->id);
 		int index = -1;  //Variable utilizada para el cálculo de índice random
 		int index2 = -1; //Variable utilizada para el cálculo de índice lineal
+		//printf("Recibi un mensaje de la persona %d\n",current_message->id);
+		corte_de_control++;
 
 		for(int i=0;i<35;i++){
 			
@@ -24,7 +27,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 			}
 			if(agent->chairArray[i] == current_message->id){//Si recibo un mensaje de la persona que esta sentada, libero el asiento
 				agent->chairArray[i] = 0;
-				//printf("Liberando silla %d",i);
+				//printf("Liberando silla %d, de la persona %d\n\n",i,current_message->id);
 				send_message = 0;
 			}
 		}
@@ -43,6 +46,9 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 		}
 
         current_message = get_next_chair_petition_message(current_message, chairPetitionMessages);	
+	}
+	if(corte_de_control == 15){
+		printf("Tuve que cortar porque sino se rompia todo che\n");
 	}
 
 	return 0;
