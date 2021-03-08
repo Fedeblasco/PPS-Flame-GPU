@@ -10303,9 +10303,15 @@ void agent_move(cudaStream_t &stream){
 	reset_check_in_swaps<<<gridSize, blockSize, 0, stream>>>(d_check_ins); 
 	gpuErrchkLaunch();
 	
+	//IF CONTINUOUS AGENT CAN REALLOCATE (process dead agents) THEN RESET AGENT SWAPS	
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+	
 	
 	//MAIN XMACHINE FUNCTION CALL (move)
-	//Reallocate   : false
+	//Reallocate   : true
 	//Input        : 
 	//Output       : check_in
 	//Agent Output : 
@@ -10348,6 +10354,35 @@ void agent_move(cudaStream_t &stream){
     //Copy count to device
 	gpuErrchk( cudaMemcpyToSymbol( d_message_check_in_count, &h_message_check_in_count, sizeof(int)));	
 	
+	//FOR CONTINUOUS AGENTS WITH REALLOCATION REMOVE POSSIBLE DEAD AGENTS	
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer to make swap default
+	xmachine_memory_agent_list* move_agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = move_agents_temp;
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else
+		h_xmachine_memory_agent_count = scan_last_sum;
+	//Copy count to device
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
     
@@ -10357,10 +10392,11 @@ void agent_move(cudaStream_t &stream){
       exit(EXIT_FAILURE);
       }
       
-  //pointer swap the updated data
-  agents_default_temp = d_agents;
-  d_agents = d_agents_default;
-  d_agents_default = agents_default_temp;
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
         
 	//update new state agent size
 	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;

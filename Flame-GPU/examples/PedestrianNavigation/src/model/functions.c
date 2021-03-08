@@ -490,7 +490,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			break;
 		case 33:
 			if(go_to_exit(agent)){
-				printf("Me muero");
+				return 1;
 			}
 			break;
 	}

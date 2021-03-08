@@ -315,7 +315,7 @@
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
-          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:reallocate>true</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
         
