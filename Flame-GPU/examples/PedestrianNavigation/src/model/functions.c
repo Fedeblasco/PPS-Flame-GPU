@@ -160,7 +160,7 @@ __FLAME_GPU_FUNC__ int output_doctor_reached(xmachine_memory_agent* agent, xmach
 
 __FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, xmachine_message_specialist_petition_list* specialistPetitionMessages){
 	
-	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->doctor_no);
+	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->priority,agent->doctor_no);
 	agent->estado_movimiento++;
 
 	return 0;

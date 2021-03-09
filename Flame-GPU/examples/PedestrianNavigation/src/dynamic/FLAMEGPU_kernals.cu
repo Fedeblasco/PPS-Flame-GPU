@@ -174,6 +174,11 @@ __constant__ int d_message_doctor_petition_output_type;   /**< message output ty
 __constant__ int d_message_doctor_response_count;         /**< message list counter*/
 __constant__ int d_message_doctor_response_output_type;   /**< message output type (single or optional)*/
 
+/* specialist_response Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_specialist_response_count;         /**< message list counter*/
+__constant__ int d_message_specialist_response_output_type;   /**< message output type (single or optional)*/
+
 /* triage_petition Message variables */
 /* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
 __constant__ int d_message_triage_petition_count;         /**< message list counter*/
@@ -229,6 +234,7 @@ __constant__ int d_tex_xmachine_message_navmap_cell_exit_no_offset;texture<float
 __constant__ int d_tex_xmachine_message_navmap_cell_height_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_x;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_y;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_y_offset;
+
 
 
 
@@ -5156,9 +5162,10 @@ __device__ xmachine_message_specialist_reached* get_next_specialist_reached_mess
  * Add non partitioned or spatially partitioned specialist_petition message
  * @param messages xmachine_message_specialist_petition_list message list to add too
  * @param id agent variable of type unsigned int
+ * @param priority agent variable of type unsigned int
  * @param specialist_no agent variable of type unsigned int
  */
-__device__ void add_specialist_petition_message(xmachine_message_specialist_petition_list* messages, unsigned int id, unsigned int specialist_no){
+__device__ void add_specialist_petition_message(xmachine_message_specialist_petition_list* messages, unsigned int id, unsigned int priority, unsigned int specialist_no){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_specialist_petition_count;
@@ -5179,6 +5186,7 @@ __device__ void add_specialist_petition_message(xmachine_message_specialist_peti
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
+	messages->priority[index] = priority;
 	messages->specialist_no[index] = specialist_no;
 
 }
@@ -5201,6 +5209,7 @@ __global__ void scatter_optional_specialist_petition_messages(xmachine_message_s
 		//AoS - xmachine_message_specialist_petition Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
 		messages->id[output_index] = messages_swap->id[index];
+		messages->priority[output_index] = messages_swap->priority[index];
 		messages->specialist_no[output_index] = messages_swap->specialist_no[index];				
 	}
 }
@@ -5242,6 +5251,7 @@ __device__ xmachine_message_specialist_petition* get_first_specialist_petition_m
 	xmachine_message_specialist_petition temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
+	temp_message.priority = messages->priority[index];
 	temp_message.specialist_no = messages->specialist_no[index];
 
 	//AoS to shared memory
@@ -5285,6 +5295,7 @@ __device__ xmachine_message_specialist_petition* get_next_specialist_petition_me
 		xmachine_message_specialist_petition temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
+		temp_message.priority = messages->priority[index];
 		temp_message.specialist_no = messages->specialist_no[index];
 
 		//AoS to shared memory
@@ -6047,6 +6058,152 @@ __device__ xmachine_message_doctor_response* get_next_doctor_response_message(xm
 
 	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_doctor_response));
 	return ((xmachine_message_doctor_response*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created specialist_response message functions */
+
+
+/** add_specialist_response_message
+ * Add non partitioned or spatially partitioned specialist_response message
+ * @param messages xmachine_message_specialist_response_list message list to add too
+ * @param id agent variable of type unsigned int
+ */
+__device__ void add_specialist_response_message(xmachine_message_specialist_response_list* messages, unsigned int id){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_specialist_response_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_specialist_response_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_specialist_response_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_specialist_response Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned specialist_response message (for optional messages)
+ * @param messages scatter_optional_specialist_response_messages Sparse xmachine_message_specialist_response_list message list
+ * @param message_swap temp xmachine_message_specialist_response_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_specialist_response_messages(xmachine_message_specialist_response_list* messages, xmachine_message_specialist_response_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_specialist_response_count;
+
+		//AoS - xmachine_message_specialist_response Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];				
+	}
+}
+
+/** reset_specialist_response_swaps
+ * Reset non partitioned or spatially partitioned specialist_response message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_specialist_response_swaps(xmachine_message_specialist_response_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_specialist_response* get_first_specialist_response_message(xmachine_message_specialist_response_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_specialist_response_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_specialist_response Coalesced memory read
+	xmachine_message_specialist_response temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_specialist_response));
+	xmachine_message_specialist_response* sm_message = ((xmachine_message_specialist_response*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_specialist_response*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_specialist_response* get_next_specialist_response_message(xmachine_message_specialist_response* message, xmachine_message_specialist_response_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_specialist_response_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_specialist_response_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_specialist_response Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_specialist_response temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_specialist_response));
+		xmachine_message_specialist_response* sm_message = ((xmachine_message_specialist_response*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_specialist_response));
+	return ((xmachine_message_specialist_response*)&message_share[message_index]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8313,6 +8470,55 @@ __global__ void GPUFLAME_specialist_server(xmachine_memory_specialist_list* agen
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_specialist_server Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->tick[index] = agent.tick;
+	agents->rear[index] = agent.rear;
+	agents->size[index] = agent.size;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_specialist_response_list* specialist_response_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_specialist_petitions Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_specialist agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_specialist_count){
+    
+	agent.id = agents->id[index];
+	agent.tick = agents->tick[index];
+	agent.rear = agents->rear[index];
+	agent.size = agents->size[index];
+    agent.patientQueue = &(agents->patientQueue[index]);
+	} else {
+	
+	agent.id = 0;
+	agent.tick = 0;
+	agent.rear = 0;
+	agent.size = 0;
+    agent.patientQueue = nullptr;
+	}
+
+	//FLAME function call
+	int dead = !receive_specialist_petitions(&agent, specialist_petition_messages, specialist_response_messages	);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_specialist_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_specialist_petitions Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
 	agents->tick[index] = agent.tick;
 	agents->rear[index] = agent.rear;

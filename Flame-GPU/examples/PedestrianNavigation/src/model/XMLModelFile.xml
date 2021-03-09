@@ -1121,6 +1121,25 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+
+        <gpu:function>
+          <name>receive_specialist_petitions</name>
+          <currentState>defaultSpecialist</currentState>
+          <nextState>defaultSpecialist</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>specialist_petition</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>specialist_response</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
       </functions>
       <states>
         <gpu:state>
@@ -1811,6 +1830,10 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
+          <name>priority</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
           <name>specialist_no</name>
         </gpu:variable>
       </variables>
@@ -1888,6 +1911,18 @@
         <gpu:variable>
           <type>int</type>
           <name>doctor_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>specialist_response</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
         </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
@@ -2002,6 +2037,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_doctor_petitions</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_specialist_petitions</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_attention_terminated</name>
