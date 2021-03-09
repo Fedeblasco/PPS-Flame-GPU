@@ -23,6 +23,7 @@
 #include "priority_queue.c"
 #include "CustomVisualisation.h"
 
+#include "specialist.c"
 #include "receptionist.c"
 #include "chair_admin.c"
 #include "doctor_manager.c"
@@ -678,7 +679,7 @@ __FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachi
 			agent->estado_movimiento++;
 			agent->priority = current_message->priority;
 			agent->doctor_no = current_message->doctor_no;
-			//printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,current_message->doctor_no,agent->id);
+			printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,current_message->doctor_no,agent->id);
 		}
 		current_message = get_next_box_response_message(current_message, boxResponseMessages);
 	}

@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_doctor_manager_list* h_doctor_managers_defaultDoctorManager, xmachine_memory_doctor_manager_list* d_doctor_managers_defaultDoctorManager, int h_xmachine_memory_doctor_manager_defaultDoctorManager_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_doctor_list* h_doctors_defaultDoctor, xmachine_memory_doctor_list* d_doctors_defaultDoctor, int h_xmachine_memory_doctor_defaultDoctor_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_doctor_manager_list* h_doctor_managers_defaultDoctorManager, xmachine_memory_doctor_manager_list* d_doctor_managers_defaultDoctorManager, int h_xmachine_memory_doctor_manager_defaultDoctorManager_count,xmachine_memory_specialist_list* h_specialists_defaultSpecialist, xmachine_memory_specialist_list* d_specialists_defaultSpecialist, int h_xmachine_memory_specialist_defaultSpecialist_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_doctor_list* h_doctors_defaultDoctor, xmachine_memory_doctor_list* d_doctors_defaultDoctor, int h_xmachine_memory_doctor_defaultDoctor_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -146,6 +146,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying doctor_manager Agent defaultDoctorManager State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_specialists_defaultSpecialist, d_specialists_defaultSpecialist, sizeof(xmachine_memory_specialist_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying specialist Agent defaultSpecialist State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_receptionists_defaultReceptionist, d_receptionists_defaultReceptionist, sizeof(xmachine_memory_receptionist_list), cudaMemcpyDeviceToHost);
@@ -640,6 +646,41 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         
 		fputs("</xagent>\n", file);
 	}
+	//Write each specialist agent to xml
+	for (int i=0; i<h_xmachine_memory_specialist_defaultSpecialist_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>specialist</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%u", h_specialists_defaultSpecialist->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_specialists_defaultSpecialist->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
+		fputs("<rear>", file);
+        sprintf(data, "%u", h_specialists_defaultSpecialist->rear[i]);
+		fputs(data, file);
+		fputs("</rear>\n", file);
+        
+		fputs("<size>", file);
+        sprintf(data, "%u", h_specialists_defaultSpecialist->size[i]);
+		fputs(data, file);
+		fputs("</size>\n", file);
+        
+		fputs("<patientQueue>", file);
+        for (int j=0;j<35;j++){
+            fprintf(file, "%d, %d", h_specialists_defaultSpecialist->patientQueue[(j*xmachine_memory_specialist_MAX)+i].x, h_specialists_defaultSpecialist->patientQueue[(j*xmachine_memory_specialist_MAX)+i].y);
+            if(j!=(35-1))
+                fprintf(file, "|");
+        }
+		fputs("</patientQueue>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
 	//Write each receptionist agent to xml
 	for (int i=0; i<h_xmachine_memory_receptionist_defaultReceptionist_count; i++){
 		fputs("<xagent>\n" , file);
@@ -839,7 +880,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 
 }
 
-void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_doctor_manager_list* h_doctor_managers, int* h_xmachine_memory_doctor_manager_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_doctor_list* h_doctors, int* h_xmachine_memory_doctor_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count)
+void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_doctor_manager_list* h_doctor_managers, int* h_xmachine_memory_doctor_manager_count,xmachine_memory_specialist_list* h_specialists, int* h_xmachine_memory_specialist_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_doctor_list* h_doctors, int* h_xmachine_memory_doctor_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count)
 {
     PROFILE_SCOPED_RANGE("readInitialStates");
 
@@ -913,6 +954,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_doctor_manager_doctors_occupied;
     int in_doctor_manager_free_doctors;
     int in_doctor_manager_patientQueue;
+    int in_specialist_id;
+    int in_specialist_tick;
+    int in_specialist_rear;
+    int in_specialist_size;
+    int in_specialist_patientQueue;
     int in_receptionist_x;
     int in_receptionist_y;
     int in_receptionist_patientQueue;
@@ -1014,6 +1060,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	*h_xmachine_memory_navmap_count = 0;
 	*h_xmachine_memory_chair_count = 0;
 	*h_xmachine_memory_doctor_manager_count = 0;
+	*h_xmachine_memory_specialist_count = 0;
 	*h_xmachine_memory_receptionist_count = 0;
 	*h_xmachine_memory_agent_generator_count = 0;
 	*h_xmachine_memory_chair_admin_count = 0;
@@ -1076,6 +1123,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int doctor_manager_doctors_occupied[4];
 	unsigned int doctor_manager_free_doctors;
     ivec2 doctor_manager_patientQueue[35];
+	unsigned int specialist_id;
+	unsigned int specialist_tick;
+	unsigned int specialist_rear;
+	unsigned int specialist_size;
+    ivec2 specialist_patientQueue[35];
 	int receptionist_x;
 	int receptionist_y;
     unsigned int receptionist_patientQueue[100];
@@ -1209,6 +1261,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_doctor_manager_doctors_occupied = 0;
 	in_doctor_manager_free_doctors = 0;
 	in_doctor_manager_patientQueue = 0;
+	in_specialist_id = 0;
+	in_specialist_tick = 0;
+	in_specialist_rear = 0;
+	in_specialist_size = 0;
+	in_specialist_patientQueue = 0;
 	in_receptionist_x = 0;
 	in_receptionist_y = 0;
 	in_receptionist_patientQueue = 0;
@@ -1351,6 +1408,19 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
         }
 	}
 	
+	//set all specialist values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_specialist_MAX; k++)
+	{	
+		h_specialists->id[k] = 0;
+		h_specialists->tick[k] = 0;
+		h_specialists->rear[k] = 0;
+		h_specialists->size[k] = 0;
+        for (i=0;i<35;i++){
+            h_specialists->patientQueue[(i*xmachine_memory_specialist_MAX)+k] = {-1,-1};
+        }
+	}
+	
 	//set all receptionist values to 0
 	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
 	for (int k=0; k<xmachine_memory_receptionist_MAX; k++)
@@ -1481,6 +1551,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     doctor_manager_free_doctors = 4;
     for (i=0;i<35;i++){
         doctor_manager_patientQueue[i] = {-1,-1};
+    }
+    specialist_id = 0;
+    specialist_tick = 0;
+    specialist_rear = 0;
+    specialist_size = 0;
+    for (i=0;i<35;i++){
+        specialist_patientQueue[i] = {-1,-1};
     }
     receptionist_x = 0.093750;
     receptionist_y = -0.375000;
@@ -1779,6 +1856,24 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     }
 					(*h_xmachine_memory_doctor_manager_count) ++;	
 				}
+				else if(strcmp(agentname, "specialist") == 0)
+				{
+					if (*h_xmachine_memory_specialist_count > xmachine_memory_specialist_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent specialist exceeded whilst reading data\n", xmachine_memory_specialist_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_specialists->id[*h_xmachine_memory_specialist_count] = specialist_id;
+					h_specialists->tick[*h_xmachine_memory_specialist_count] = specialist_tick;
+					h_specialists->rear[*h_xmachine_memory_specialist_count] = specialist_rear;
+					h_specialists->size[*h_xmachine_memory_specialist_count] = specialist_size;
+                    for (int k=0;k<35;k++){
+                        h_specialists->patientQueue[(k*xmachine_memory_specialist_MAX)+(*h_xmachine_memory_specialist_count)] = specialist_patientQueue[k];
+                    }
+					(*h_xmachine_memory_specialist_count) ++;	
+				}
 				else if(strcmp(agentname, "receptionist") == 0)
 				{
 					if (*h_xmachine_memory_receptionist_count > xmachine_memory_receptionist_MAX){
@@ -1958,6 +2053,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 for (i=0;i<35;i++){
                     doctor_manager_patientQueue[i] = {-1,-1};
                 }
+                specialist_id = 0;
+                specialist_tick = 0;
+                specialist_rear = 0;
+                specialist_size = 0;
+                for (i=0;i<35;i++){
+                    specialist_patientQueue[i] = {-1,-1};
+                }
                 receptionist_x = 0.093750;
                 receptionist_y = -0.375000;
                 for (i=0;i<100;i++){
@@ -2104,6 +2206,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/free_doctors") == 0) in_doctor_manager_free_doctors = 0;
 			if(strcmp(buffer, "patientQueue") == 0) in_doctor_manager_patientQueue = 1;
 			if(strcmp(buffer, "/patientQueue") == 0) in_doctor_manager_patientQueue = 0;
+			if(strcmp(buffer, "id") == 0) in_specialist_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_specialist_id = 0;
+			if(strcmp(buffer, "tick") == 0) in_specialist_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_specialist_tick = 0;
+			if(strcmp(buffer, "rear") == 0) in_specialist_rear = 1;
+			if(strcmp(buffer, "/rear") == 0) in_specialist_rear = 0;
+			if(strcmp(buffer, "size") == 0) in_specialist_size = 1;
+			if(strcmp(buffer, "/size") == 0) in_specialist_size = 0;
+			if(strcmp(buffer, "patientQueue") == 0) in_specialist_patientQueue = 1;
+			if(strcmp(buffer, "/patientQueue") == 0) in_specialist_patientQueue = 0;
 			if(strcmp(buffer, "x") == 0) in_receptionist_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_receptionist_x = 0;
 			if(strcmp(buffer, "y") == 0) in_receptionist_y = 1;
@@ -2405,6 +2517,21 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_doctor_manager_patientQueue){
                     readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, doctor_manager_patientQueue, 35);    
+                }
+				if(in_specialist_id){
+                    specialist_id = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_specialist_tick){
+                    specialist_tick = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_specialist_rear){
+                    specialist_rear = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_specialist_size){
+                    specialist_size = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_specialist_patientQueue){
+                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, specialist_patientQueue, 35);    
                 }
 				if(in_receptionist_x){
                     receptionist_x = (int) fpgu_strtol(buffer); 

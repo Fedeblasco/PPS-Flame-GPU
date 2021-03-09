@@ -82,6 +82,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_memory_doctor_manager
 #define xmachine_memory_doctor_manager_MAX 65536
 
+//Maximum population size of xmachine_memory_specialist
+#define xmachine_memory_specialist_MAX 65536
+
 //Maximum population size of xmachine_memory_receptionist
 #define xmachine_memory_receptionist_MAX 65536
 
@@ -103,6 +106,8 @@ typedef glm::dvec4 dvec4;
 #define xmachine_memory_doctor_manager_doctors_occupied_LENGTH 4 
 //Agent variable array length for xmachine_memory_doctor_manager->patientQueue
 #define xmachine_memory_doctor_manager_patientQueue_LENGTH 35 
+//Agent variable array length for xmachine_memory_specialist->patientQueue
+#define xmachine_memory_specialist_patientQueue_LENGTH 35 
 //Agent variable array length for xmachine_memory_receptionist->patientQueue
 #define xmachine_memory_receptionist_patientQueue_LENGTH 100 
 //Agent variable array length for xmachine_memory_chair_admin->chairArray
@@ -152,6 +157,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_doctor_reached
 #define xmachine_message_doctor_reached_MAX 65536
 
+//Maximum population size of xmachine_mmessage_specialist_reached
+#define xmachine_message_specialist_reached_MAX 65536
+
 //Maximum population size of xmachine_mmessage_free_doctor
 #define xmachine_message_free_doctor_MAX 65536
 
@@ -185,6 +193,7 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_box_petition_partitioningNone
 #define xmachine_message_box_response_partitioningNone
 #define xmachine_message_doctor_reached_partitioningNone
+#define xmachine_message_specialist_reached_partitioningNone
 #define xmachine_message_free_doctor_partitioningNone
 #define xmachine_message_attention_terminated_partitioningNone
 #define xmachine_message_doctor_petition_partitioningNone
@@ -317,6 +326,19 @@ struct __align__(16) xmachine_memory_doctor_manager
     unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
     int *doctors_occupied;    /**< X-machine memory variable doctors_occupied of type int.*/
     unsigned int free_doctors;    /**< X-machine memory variable free_doctors of type unsigned int.*/
+    ivec2 *patientQueue;    /**< X-machine memory variable patientQueue of type ivec2.*/
+};
+
+/** struct xmachine_memory_specialist
+ * continuous valued agent
+ * Holds all agent variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_memory_specialist
+{
+    unsigned int id;    /**< X-machine memory variable id of type unsigned int.*/
+    unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
+    unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
+    unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
     ivec2 *patientQueue;    /**< X-machine memory variable patientQueue of type ivec2.*/
 };
 
@@ -569,6 +591,19 @@ struct __align__(16) xmachine_message_doctor_reached
     unsigned int doctor_no;        /**< Message variable doctor_no of type unsigned int.*/
 };
 
+/** struct xmachine_message_specialist_reached
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_specialist_reached
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int specialist_no;        /**< Message variable specialist_no of type unsigned int.*/
+};
+
 /** struct xmachine_message_free_doctor
  * Brute force: No Partitioning
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
@@ -749,6 +784,23 @@ struct xmachine_memory_doctor_manager_list
     int doctors_occupied [xmachine_memory_doctor_manager_MAX*4];    /**< X-machine memory variable list doctors_occupied of type int.*/
     unsigned int free_doctors [xmachine_memory_doctor_manager_MAX];    /**< X-machine memory variable list free_doctors of type unsigned int.*/
     ivec2 patientQueue [xmachine_memory_doctor_manager_MAX*35];    /**< X-machine memory variable list patientQueue of type ivec2.*/
+};
+
+/** struct xmachine_memory_specialist_list
+ * continuous valued agent
+ * Variables lists for all agent variables
+ */
+struct xmachine_memory_specialist_list
+{	
+    /* Temp variables for agents. Used for parallel operations such as prefix sum */
+    int _position [xmachine_memory_specialist_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_memory_specialist_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_memory_specialist_MAX];    /**< X-machine memory variable list id of type unsigned int.*/
+    unsigned int tick [xmachine_memory_specialist_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
+    unsigned int rear [xmachine_memory_specialist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
+    unsigned int size [xmachine_memory_specialist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
+    ivec2 patientQueue [xmachine_memory_specialist_MAX*35];    /**< X-machine memory variable list patientQueue of type ivec2.*/
 };
 
 /** struct xmachine_memory_receptionist_list
@@ -1034,6 +1086,21 @@ struct xmachine_message_doctor_reached_list
     
     unsigned int id [xmachine_message_doctor_reached_MAX];    /**< Message memory variable list id of type unsigned int.*/
     unsigned int doctor_no [xmachine_message_doctor_reached_MAX];    /**< Message memory variable list doctor_no of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_specialist_reached_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_specialist_reached_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_specialist_reached_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_specialist_reached_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_specialist_reached_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    unsigned int specialist_no [xmachine_message_specialist_reached_MAX];    /**< Message memory variable list specialist_no of type unsigned int.*/
     
 };
 
@@ -1354,6 +1421,13 @@ __FLAME_GPU_FUNC__ int receive_doctor_petitions(xmachine_memory_doctor_manager* 
  * @param free_doctor_messages  free_doctor_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_free_doctor_message and get_next_free_doctor_message functions.
  */
 __FLAME_GPU_FUNC__ int receive_free_doctors(xmachine_memory_doctor_manager* agent, xmachine_message_free_doctor_list* free_doctor_messages);
+
+/**
+ * specialist_server FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_specialist. This represents a single agent instance and can be modified directly.
+ * @param specialist_reached_messages  specialist_reached_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_reached_message and get_next_specialist_reached_message functions.* @param attention_terminated_messages Pointer to output message list of type xmachine_message_attention_terminated_list. Must be passed as an argument to the add_attention_terminated_message function ??.
+ */
+__FLAME_GPU_FUNC__ int specialist_server(xmachine_memory_specialist* agent, xmachine_message_specialist_reached_list* specialist_reached_messages, xmachine_message_attention_terminated_list* attention_terminated_messages);
 
 /**
  * receptionServer FLAMEGPU Agent Function
@@ -1781,6 +1855,34 @@ __FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_first_doctor_reached_me
 __FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_next_doctor_reached_message(xmachine_message_doctor_reached* current, xmachine_message_doctor_reached_list* doctor_reached_messages);
 
   
+/* Message Function Prototypes for Brute force (No Partitioning) specialist_reached message implemented in FLAMEGPU_Kernels */
+
+/** add_specialist_reached_message
+ * Function for all types of message partitioning
+ * Adds a new specialist_reached agent to the xmachine_memory_specialist_reached_list list using a linear mapping
+ * @param agents	xmachine_memory_specialist_reached_list agent list
+ * @param id	message variable of type unsigned int
+ * @param specialist_no	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_specialist_reached_message(xmachine_message_specialist_reached_list* specialist_reached_messages, unsigned int id, unsigned int specialist_no);
+ 
+/** get_first_specialist_reached_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param specialist_reached_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_reached * get_first_specialist_reached_message(xmachine_message_specialist_reached_list* specialist_reached_messages);
+
+/** get_next_specialist_reached_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param specialist_reached_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_reached * get_next_specialist_reached_message(xmachine_message_specialist_reached* current, xmachine_message_specialist_reached_list* specialist_reached_messages);
+
+  
 /* Message Function Prototypes for Brute force (No Partitioning) free_doctor message implemented in FLAMEGPU_Kernels */
 
 /** add_free_doctor_message
@@ -2019,6 +2121,37 @@ __FLAME_GPU_FUNC__ void set_doctor_manager_agent_array_value(T *array, unsigned 
 
   
 
+/** add_specialist_agent
+ * Adds a new continuous valued specialist agent to the xmachine_memory_specialist_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
+ * @param agents xmachine_memory_specialist_list agent list
+ * @param id	agent agent variable of type unsigned int
+ * @param tick	agent agent variable of type unsigned int
+ * @param rear	agent agent variable of type unsigned int
+ * @param size	agent agent variable of type unsigned int
+ */
+__FLAME_GPU_FUNC__ void add_specialist_agent(xmachine_memory_specialist_list* agents, unsigned int id, unsigned int tick, unsigned int rear, unsigned int size);
+
+/** get_specialist_agent_array_value
+ *  Template function for accessing specialist agent array memory variables.
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @return return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ T get_specialist_agent_array_value(T *array, unsigned int index);
+
+/** set_specialist_agent_array_value
+ *  Template function for setting specialist agent array memory variables.
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @param return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ void set_specialist_agent_array_value(T *array, unsigned int index, T value);
+
+
+  
+
 /** add_receptionist_agent
  * Adds a new continuous valued receptionist agent to the xmachine_memory_receptionist_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_receptionist_list agent list
@@ -2184,6 +2317,9 @@ extern void singleIteration();
  * @param h_doctor_managers Pointer to agent list on the host
  * @param d_doctor_managers Pointer to agent list on the GPU device
  * @param h_xmachine_memory_doctor_manager_count Pointer to agent counter
+ * @param h_specialists Pointer to agent list on the host
+ * @param d_specialists Pointer to agent list on the GPU device
+ * @param h_xmachine_memory_specialist_count Pointer to agent counter
  * @param h_receptionists Pointer to agent list on the host
  * @param d_receptionists Pointer to agent list on the GPU device
  * @param h_xmachine_memory_receptionist_count Pointer to agent counter
@@ -2203,7 +2339,7 @@ extern void singleIteration();
  * @param d_triages Pointer to agent list on the GPU device
  * @param h_xmachine_memory_triage_count Pointer to agent counter
  */
-extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_doctor_manager_list* h_doctor_managers_defaultDoctorManager, xmachine_memory_doctor_manager_list* d_doctor_managers_defaultDoctorManager, int h_xmachine_memory_doctor_manager_defaultDoctorManager_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_doctor_list* h_doctors_defaultDoctor, xmachine_memory_doctor_list* d_doctors_defaultDoctor, int h_xmachine_memory_doctor_defaultDoctor_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count);
+extern void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_doctor_manager_list* h_doctor_managers_defaultDoctorManager, xmachine_memory_doctor_manager_list* d_doctor_managers_defaultDoctorManager, int h_xmachine_memory_doctor_manager_defaultDoctorManager_count,xmachine_memory_specialist_list* h_specialists_defaultSpecialist, xmachine_memory_specialist_list* d_specialists_defaultSpecialist, int h_xmachine_memory_specialist_defaultSpecialist_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_doctor_list* h_doctors_defaultDoctor, xmachine_memory_doctor_list* d_doctors_defaultDoctor, int h_xmachine_memory_doctor_defaultDoctor_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count);
 
 
 /** readInitialStates
@@ -2217,6 +2353,8 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param h_xmachine_memory_chair_count Pointer to agent counter
  * @param h_doctor_managers Pointer to agent list on the host
  * @param h_xmachine_memory_doctor_manager_count Pointer to agent counter
+ * @param h_specialists Pointer to agent list on the host
+ * @param h_xmachine_memory_specialist_count Pointer to agent counter
  * @param h_receptionists Pointer to agent list on the host
  * @param h_xmachine_memory_receptionist_count Pointer to agent counter
  * @param h_agent_generators Pointer to agent list on the host
@@ -2230,7 +2368,7 @@ extern void saveIterationData(char* outputpath, int iteration_number, xmachine_m
  * @param h_triages Pointer to agent list on the host
  * @param h_xmachine_memory_triage_count Pointer to agent counter
  */
-extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_doctor_manager_list* h_doctor_managers, int* h_xmachine_memory_doctor_manager_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_doctor_list* h_doctors, int* h_xmachine_memory_doctor_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count);
+extern void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_doctor_manager_list* h_doctor_managers, int* h_xmachine_memory_doctor_manager_count,xmachine_memory_specialist_list* h_specialists, int* h_xmachine_memory_specialist_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_doctor_list* h_doctors, int* h_xmachine_memory_doctor_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count);
 
 
 /* Return functions used by external code to get agent data from device */
@@ -2392,6 +2530,46 @@ extern xmachine_memory_doctor_manager_list* get_host_doctor_manager_defaultDocto
  * @param		a pointer CUDA kernal function to generate key value pairs
  */
 void sort_doctor_managers_defaultDoctorManager(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_doctor_manager_list* agents));
+
+
+    
+/** get_agent_specialist_MAX_count
+ * Gets the max agent count for the specialist agent type 
+ * @return		the maximum specialist agent count
+ */
+extern int get_agent_specialist_MAX_count();
+
+
+
+/** get_agent_specialist_defaultSpecialist_count
+ * Gets the agent count for the specialist agent type in state defaultSpecialist
+ * @return		the current specialist agent count in state defaultSpecialist
+ */
+extern int get_agent_specialist_defaultSpecialist_count();
+
+/** reset_defaultSpecialist_count
+ * Resets the agent count of the specialist in state defaultSpecialist to 0. This is useful for interacting with some visualisations.
+ */
+extern void reset_specialist_defaultSpecialist_count();
+
+/** get_device_specialist_defaultSpecialist_agents
+ * Gets a pointer to xmachine_memory_specialist_list on the GPU device
+ * @return		a xmachine_memory_specialist_list on the GPU device
+ */
+extern xmachine_memory_specialist_list* get_device_specialist_defaultSpecialist_agents();
+
+/** get_host_specialist_defaultSpecialist_agents
+ * Gets a pointer to xmachine_memory_specialist_list on the CPU host
+ * @return		a xmachine_memory_specialist_list on the CPU host
+ */
+extern xmachine_memory_specialist_list* get_host_specialist_defaultSpecialist_agents();
+
+
+/** sort_specialists_defaultSpecialist
+ * Sorts an agent state list by providing a CUDA kernal to generate key value pairs
+ * @param		a pointer CUDA kernal function to generate key value pairs
+ */
+void sort_specialists_defaultSpecialist(void (*generate_key_value_pairs)(unsigned int* keys, unsigned int* values, xmachine_memory_specialist_list* agents));
 
 
     
@@ -3125,6 +3303,52 @@ __host__ unsigned int get_doctor_manager_defaultDoctorManager_variable_free_doct
  */
 __host__ ivec2 get_doctor_manager_defaultDoctorManager_variable_patientQueue(unsigned int index, unsigned int element);
 
+/** unsigned int get_specialist_defaultSpecialist_variable_id(unsigned int index)
+ * Gets the value of the id variable of an specialist agent in the defaultSpecialist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable id
+ */
+__host__ unsigned int get_specialist_defaultSpecialist_variable_id(unsigned int index);
+
+/** unsigned int get_specialist_defaultSpecialist_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an specialist agent in the defaultSpecialist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ unsigned int get_specialist_defaultSpecialist_variable_tick(unsigned int index);
+
+/** unsigned int get_specialist_defaultSpecialist_variable_rear(unsigned int index)
+ * Gets the value of the rear variable of an specialist agent in the defaultSpecialist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable rear
+ */
+__host__ unsigned int get_specialist_defaultSpecialist_variable_rear(unsigned int index);
+
+/** unsigned int get_specialist_defaultSpecialist_variable_size(unsigned int index)
+ * Gets the value of the size variable of an specialist agent in the defaultSpecialist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable size
+ */
+__host__ unsigned int get_specialist_defaultSpecialist_variable_size(unsigned int index);
+
+/** ivec2 get_specialist_defaultSpecialist_variable_patientQueue(unsigned int index, unsigned int element)
+ * Gets the element-th value of the patientQueue variable array of an specialist agent in the defaultSpecialist state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @param element the element index within the variable array
+ * @return element-th value of agent variable patientQueue
+ */
+__host__ ivec2 get_specialist_defaultSpecialist_variable_patientQueue(unsigned int index, unsigned int element);
+
 /** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
  * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -3540,6 +3764,47 @@ void h_add_agent_doctor_manager_defaultDoctorManager(xmachine_memory_doctor_mana
  * @param count the number of agents to copy from the host to the device.
  */
 void h_add_agents_doctor_manager_defaultDoctorManager(xmachine_memory_doctor_manager** agents, unsigned int count);
+
+/** h_allocate_agent_specialist
+ * Utility function to allocate and initialise an agent struct on the host.
+ * @return address of a host-allocated specialist struct.
+ */
+xmachine_memory_specialist* h_allocate_agent_specialist();
+/** h_free_agent_specialist
+ * Utility function to free a host-allocated agent struct.
+ * This also deallocates any agent variable arrays, and sets the pointer to null
+ * @param agent address of pointer to the host allocated struct
+ */
+void h_free_agent_specialist(xmachine_memory_specialist** agent);
+/** h_allocate_agent_specialist_array
+ * Utility function to allocate an array of structs for  specialist agents.
+ * @param count the number of structs to allocate memory for.
+ * @return pointer to the allocated array of structs
+ */
+xmachine_memory_specialist** h_allocate_agent_specialist_array(unsigned int count);
+/** h_free_agent_specialist_array(
+ * Utility function to deallocate a host array of agent structs, including agent variables, and set pointer values to NULL.
+ * @param agents the address of the pointer to the host array of structs.
+ * @param count the number of elements in the AoS, to deallocate individual elements.
+ */
+void h_free_agent_specialist_array(xmachine_memory_specialist*** agents, unsigned int count);
+
+
+/** h_add_agent_specialist_defaultSpecialist
+ * Host function to add a single agent of type specialist to the defaultSpecialist state on the device.
+ * This invokes many cudaMempcy, and an append kernel launch. 
+ * If multiple agents are to be created in a single iteration, consider h_add_agent_specialist_defaultSpecialist instead.
+ * @param agent pointer to agent struct on the host. Agent member arrays are supported.
+ */
+void h_add_agent_specialist_defaultSpecialist(xmachine_memory_specialist* agent);
+
+/** h_add_agents_specialist_defaultSpecialist(
+ * Host function to add multiple agents of type specialist to the defaultSpecialist state on the device if possible.
+ * This includes the transparent conversion from AoS to SoA, many calls to cudaMemcpy and an append kernel.
+ * @param agents pointer to host struct of arrays of specialist agents
+ * @param count the number of agents to copy from the host to the device.
+ */
+void h_add_agents_specialist_defaultSpecialist(xmachine_memory_specialist** agents, unsigned int count);
 
 /** h_allocate_agent_receptionist
  * Utility function to allocate and initialise an agent struct on the host.
@@ -4966,6 +5231,110 @@ unsigned int min_doctor_manager_defaultDoctorManager_free_doctors_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 unsigned int max_doctor_manager_defaultDoctorManager_free_doctors_variable();
+
+/** unsigned int reduce_specialist_defaultSpecialist_id_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_specialist_defaultSpecialist_id_variable();
+
+
+
+/** unsigned int count_specialist_defaultSpecialist_id_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_specialist_defaultSpecialist_id_variable(unsigned int count_value);
+
+/** unsigned int min_specialist_defaultSpecialist_id_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_specialist_defaultSpecialist_id_variable();
+/** unsigned int max_specialist_defaultSpecialist_id_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_specialist_defaultSpecialist_id_variable();
+
+/** unsigned int reduce_specialist_defaultSpecialist_tick_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_specialist_defaultSpecialist_tick_variable();
+
+
+
+/** unsigned int count_specialist_defaultSpecialist_tick_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_specialist_defaultSpecialist_tick_variable(unsigned int count_value);
+
+/** unsigned int min_specialist_defaultSpecialist_tick_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_specialist_defaultSpecialist_tick_variable();
+/** unsigned int max_specialist_defaultSpecialist_tick_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_specialist_defaultSpecialist_tick_variable();
+
+/** unsigned int reduce_specialist_defaultSpecialist_rear_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_specialist_defaultSpecialist_rear_variable();
+
+
+
+/** unsigned int count_specialist_defaultSpecialist_rear_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_specialist_defaultSpecialist_rear_variable(unsigned int count_value);
+
+/** unsigned int min_specialist_defaultSpecialist_rear_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_specialist_defaultSpecialist_rear_variable();
+/** unsigned int max_specialist_defaultSpecialist_rear_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_specialist_defaultSpecialist_rear_variable();
+
+/** unsigned int reduce_specialist_defaultSpecialist_size_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_specialist_defaultSpecialist_size_variable();
+
+
+
+/** unsigned int count_specialist_defaultSpecialist_size_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_specialist_defaultSpecialist_size_variable(unsigned int count_value);
+
+/** unsigned int min_specialist_defaultSpecialist_size_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_specialist_defaultSpecialist_size_variable();
+/** unsigned int max_specialist_defaultSpecialist_size_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_specialist_defaultSpecialist_size_variable();
 
 /** int reduce_receptionist_defaultReceptionist_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
