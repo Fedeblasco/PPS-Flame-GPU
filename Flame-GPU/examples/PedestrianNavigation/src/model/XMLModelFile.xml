@@ -601,6 +601,61 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+
+        <gpu:function>
+          <name>output_specialist_petition</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <outputs>
+            <gpu:output>
+              <messageName>specialist_petition</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs> 
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>27</value>
+                </rhs>
+              </condition>
+            </lhs>
+            <operator>and</operator>
+            <rhs>
+              <condition>
+                <lhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>doctor_no</agentVariable>
+                    </lhs>
+                    <operator>&gt;</operator>
+                    <rhs>
+                        <value>0</value>
+                    </rhs>
+                  </condition>
+                </lhs>
+                <operator>and</operator>
+                <rhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>doctor_no</agentVariable>
+                    </lhs>
+                    <operator>&lt;</operator>
+                    <rhs>
+                        <value>6</value>
+                    </rhs>
+                  </condition>
+                </rhs>
+              </condition>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
         
         <gpu:function>
           <name>receive_doctor_response</name>
@@ -1730,6 +1785,38 @@
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
+  <!-- Mensajes del especialista -->
+    <gpu:message> 
+      <name>specialist_reached</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>specialist_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>specialist_petition</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>specialist_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
   <!-- Mensajes del doctor -->
     <gpu:message> 
       <name>doctor_reached</name>
@@ -1741,22 +1828,6 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>doctor_no</name>
-        </gpu:variable>
-      </variables>
-      <gpu:partitioningNone/>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:message>
-
-    <gpu:message> 
-      <name>specialist_reached</name>
-      <variables>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>id</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>specialist_no</name>
         </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
@@ -1897,6 +1968,9 @@
       </gpu:layerFunction>
     </layer>
     <layer>
+      <gpu:layerFunction>
+        <name>output_specialist_petition</name>
+      </gpu:layerFunction>
       <gpu:layerFunction>
         <name>avoid_pedestrians</name>
       </gpu:layerFunction>

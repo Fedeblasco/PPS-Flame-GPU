@@ -158,6 +158,14 @@ __FLAME_GPU_FUNC__ int output_doctor_reached(xmachine_memory_agent* agent, xmach
 	return 0;
 }
 
+__FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, xmachine_message_specialist_petition_list* specialistPetitionMessages){
+	
+	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->doctor_no);
+	agent->estado_movimiento++;
+
+	return 0;
+}
+
 __FLAME_GPU_FUNC__ int output_box_petition(xmachine_memory_agent* agent, xmachine_message_box_petition_list* boxPetitionMessages){
 	
 	add_box_petition_message(boxPetitionMessages, agent->id, agent->box_no);
@@ -489,7 +497,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				agent->estado_movimiento++;
 			}
 			break;
-		case 33:
+		case 40:
 			if(go_to_exit(agent)){
 				return 1;
 			}
@@ -663,7 +671,7 @@ __FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent
 	while(current_message){
 		if(agent->id == current_message->id){
 			add_free_doctor_message(freeDoctorMessages, agent->doctor_no);
-			agent->estado_movimiento++;
+			agent->estado_movimiento = 40;
 		}
 		current_message = get_next_attention_terminated_message(current_message, attentionTerminatedMessages);
 	}

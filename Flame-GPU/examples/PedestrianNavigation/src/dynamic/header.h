@@ -154,11 +154,14 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_box_response
 #define xmachine_message_box_response_MAX 65536
 
-//Maximum population size of xmachine_mmessage_doctor_reached
-#define xmachine_message_doctor_reached_MAX 65536
-
 //Maximum population size of xmachine_mmessage_specialist_reached
 #define xmachine_message_specialist_reached_MAX 65536
+
+//Maximum population size of xmachine_mmessage_specialist_petition
+#define xmachine_message_specialist_petition_MAX 65536
+
+//Maximum population size of xmachine_mmessage_doctor_reached
+#define xmachine_message_doctor_reached_MAX 65536
 
 //Maximum population size of xmachine_mmessage_free_doctor
 #define xmachine_message_free_doctor_MAX 65536
@@ -192,8 +195,9 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_chair_contact_partitioningNone
 #define xmachine_message_box_petition_partitioningNone
 #define xmachine_message_box_response_partitioningNone
-#define xmachine_message_doctor_reached_partitioningNone
 #define xmachine_message_specialist_reached_partitioningNone
+#define xmachine_message_specialist_petition_partitioningNone
+#define xmachine_message_doctor_reached_partitioningNone
 #define xmachine_message_free_doctor_partitioningNone
 #define xmachine_message_attention_terminated_partitioningNone
 #define xmachine_message_doctor_petition_partitioningNone
@@ -578,19 +582,6 @@ struct __align__(16) xmachine_message_box_response
     unsigned int priority;        /**< Message variable priority of type unsigned int.*/
 };
 
-/** struct xmachine_message_doctor_reached
- * Brute force: No Partitioning
- * Holds all message variables and is aligned to help with coalesced reads on the GPU
- */
-struct __align__(16) xmachine_message_doctor_reached
-{	
-    /* Brute force Partitioning Variables */
-    int _position;          /**< 1D position of message in linear message list */   
-      
-    unsigned int id;        /**< Message variable id of type unsigned int.*/  
-    unsigned int doctor_no;        /**< Message variable doctor_no of type unsigned int.*/
-};
-
 /** struct xmachine_message_specialist_reached
  * Brute force: No Partitioning
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
@@ -602,6 +593,32 @@ struct __align__(16) xmachine_message_specialist_reached
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
     unsigned int specialist_no;        /**< Message variable specialist_no of type unsigned int.*/
+};
+
+/** struct xmachine_message_specialist_petition
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_specialist_petition
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int specialist_no;        /**< Message variable specialist_no of type unsigned int.*/
+};
+
+/** struct xmachine_message_doctor_reached
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_doctor_reached
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int doctor_no;        /**< Message variable doctor_no of type unsigned int.*/
 };
 
 /** struct xmachine_message_free_doctor
@@ -1074,21 +1091,6 @@ struct xmachine_message_box_response_list
     
 };
 
-/** struct xmachine_message_doctor_reached_list
- * Brute force: No Partitioning
- * Structure of Array for memory coalescing 
- */
-struct xmachine_message_doctor_reached_list
-{
-    /* Non discrete messages have temp variables used for reductions with optional message outputs */
-    int _position [xmachine_message_doctor_reached_MAX];    /**< Holds agents position in the 1D agent list */
-    int _scan_input [xmachine_message_doctor_reached_MAX];  /**< Used during parallel prefix sum */
-    
-    unsigned int id [xmachine_message_doctor_reached_MAX];    /**< Message memory variable list id of type unsigned int.*/
-    unsigned int doctor_no [xmachine_message_doctor_reached_MAX];    /**< Message memory variable list doctor_no of type unsigned int.*/
-    
-};
-
 /** struct xmachine_message_specialist_reached_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -1101,6 +1103,36 @@ struct xmachine_message_specialist_reached_list
     
     unsigned int id [xmachine_message_specialist_reached_MAX];    /**< Message memory variable list id of type unsigned int.*/
     unsigned int specialist_no [xmachine_message_specialist_reached_MAX];    /**< Message memory variable list specialist_no of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_specialist_petition_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_specialist_petition_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_specialist_petition_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_specialist_petition_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_specialist_petition_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    unsigned int specialist_no [xmachine_message_specialist_petition_MAX];    /**< Message memory variable list specialist_no of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_doctor_reached_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_doctor_reached_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_doctor_reached_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_doctor_reached_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_doctor_reached_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    unsigned int doctor_no [xmachine_message_doctor_reached_MAX];    /**< Message memory variable list doctor_no of type unsigned int.*/
     
 };
 
@@ -1351,6 +1383,13 @@ __FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachi
  * @param doctor_petition_messages Pointer to output message list of type xmachine_message_doctor_petition_list. Must be passed as an argument to the add_doctor_petition_message function ??.
  */
 __FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmachine_message_doctor_petition_list* doctor_petition_messages);
+
+/**
+ * output_specialist_petition FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param specialist_petition_messages Pointer to output message list of type xmachine_message_specialist_petition_list. Must be passed as an argument to the add_specialist_petition_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, xmachine_message_specialist_petition_list* specialist_petition_messages);
 
 /**
  * receive_doctor_response FLAMEGPU Agent Function
@@ -1827,34 +1866,6 @@ __FLAME_GPU_FUNC__ xmachine_message_box_response * get_first_box_response_messag
 __FLAME_GPU_FUNC__ xmachine_message_box_response * get_next_box_response_message(xmachine_message_box_response* current, xmachine_message_box_response_list* box_response_messages);
 
   
-/* Message Function Prototypes for Brute force (No Partitioning) doctor_reached message implemented in FLAMEGPU_Kernels */
-
-/** add_doctor_reached_message
- * Function for all types of message partitioning
- * Adds a new doctor_reached agent to the xmachine_memory_doctor_reached_list list using a linear mapping
- * @param agents	xmachine_memory_doctor_reached_list agent list
- * @param id	message variable of type unsigned int
- * @param doctor_no	message variable of type unsigned int
- */
- 
- __FLAME_GPU_FUNC__ void add_doctor_reached_message(xmachine_message_doctor_reached_list* doctor_reached_messages, unsigned int id, unsigned int doctor_no);
- 
-/** get_first_doctor_reached_message
- * Get first message function for non partitioned (brute force) messages
- * @param doctor_reached_messages message list
- * @return        returns the first message from the message list (offset depending on agent block)
- */
-__FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_first_doctor_reached_message(xmachine_message_doctor_reached_list* doctor_reached_messages);
-
-/** get_next_doctor_reached_message
- * Get first message function for non partitioned (brute force) messages
- * @param current the current message struct
- * @param doctor_reached_messages message list
- * @return        returns the first message from the message list (offset depending on agent block)
- */
-__FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_next_doctor_reached_message(xmachine_message_doctor_reached* current, xmachine_message_doctor_reached_list* doctor_reached_messages);
-
-  
 /* Message Function Prototypes for Brute force (No Partitioning) specialist_reached message implemented in FLAMEGPU_Kernels */
 
 /** add_specialist_reached_message
@@ -1881,6 +1892,62 @@ __FLAME_GPU_FUNC__ xmachine_message_specialist_reached * get_first_specialist_re
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_specialist_reached * get_next_specialist_reached_message(xmachine_message_specialist_reached* current, xmachine_message_specialist_reached_list* specialist_reached_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) specialist_petition message implemented in FLAMEGPU_Kernels */
+
+/** add_specialist_petition_message
+ * Function for all types of message partitioning
+ * Adds a new specialist_petition agent to the xmachine_memory_specialist_petition_list list using a linear mapping
+ * @param agents	xmachine_memory_specialist_petition_list agent list
+ * @param id	message variable of type unsigned int
+ * @param specialist_no	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_specialist_petition_message(xmachine_message_specialist_petition_list* specialist_petition_messages, unsigned int id, unsigned int specialist_no);
+ 
+/** get_first_specialist_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param specialist_petition_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_petition * get_first_specialist_petition_message(xmachine_message_specialist_petition_list* specialist_petition_messages);
+
+/** get_next_specialist_petition_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param specialist_petition_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_petition * get_next_specialist_petition_message(xmachine_message_specialist_petition* current, xmachine_message_specialist_petition_list* specialist_petition_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) doctor_reached message implemented in FLAMEGPU_Kernels */
+
+/** add_doctor_reached_message
+ * Function for all types of message partitioning
+ * Adds a new doctor_reached agent to the xmachine_memory_doctor_reached_list list using a linear mapping
+ * @param agents	xmachine_memory_doctor_reached_list agent list
+ * @param id	message variable of type unsigned int
+ * @param doctor_no	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_doctor_reached_message(xmachine_message_doctor_reached_list* doctor_reached_messages, unsigned int id, unsigned int doctor_no);
+ 
+/** get_first_doctor_reached_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param doctor_reached_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_first_doctor_reached_message(xmachine_message_doctor_reached_list* doctor_reached_messages);
+
+/** get_next_doctor_reached_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param doctor_reached_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_doctor_reached * get_next_doctor_reached_message(xmachine_message_doctor_reached* current, xmachine_message_doctor_reached_list* doctor_reached_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) free_doctor message implemented in FLAMEGPU_Kernels */

@@ -21,6 +21,7 @@
 
 # Problemas que encontre en flame
 1. No hubo manera de hacer que ande la liberación de sillas dentro de la función receive_doctor_response, hubo que hacerlo en la funcion output_chair_petition
+2. Las capas de funciones tienen un límite de mensajes que pueden pasar
 
 # Cosas de Flame-GPU
 
