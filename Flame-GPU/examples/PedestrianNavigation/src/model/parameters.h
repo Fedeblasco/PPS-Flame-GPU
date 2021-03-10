@@ -47,7 +47,7 @@
 #endif
 
 #ifndef TICKS_PER_MINUTE
-#define TICKS_PER_MINUTE 10
+#define TICKS_PER_MINUTE 1
 #endif
 
 //Probabilidades de prioridad del triage

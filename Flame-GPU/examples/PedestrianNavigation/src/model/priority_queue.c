@@ -62,7 +62,7 @@ __FLAME_GPU_FUNC__ ivec2 priorityDequeue(ivec2 patientQueue[], unsigned int * si
     return item;
 }
 
-__FLAME_GPU_FUNC__ int probando(ivec2 patientQueue[]){ 
+__FLAME_GPU_FUNC__ int printQueue(ivec2 patientQueue[]){ 
     for(int i=0;i<35;i++){
         printf("Posicion %d, paciente %d, prioridad %d\n",i,patientQueue[i].x,patientQueue[i].y);
     }

@@ -33,7 +33,7 @@ __constant__ int d_xmachine_memory_chair_count;
 
 __constant__ int d_xmachine_memory_doctor_manager_count;
 
-__constant__ int d_xmachine_memory_specialist_count;
+__constant__ int d_xmachine_memory_specialist_manager_count;
 
 __constant__ int d_xmachine_memory_receptionist_count;
 
@@ -57,7 +57,7 @@ __constant__ int d_xmachine_memory_chair_defaultChair_count;
 
 __constant__ int d_xmachine_memory_doctor_manager_defaultDoctorManager_count;
 
-__constant__ int d_xmachine_memory_specialist_defaultSpecialist_count;
+__constant__ int d_xmachine_memory_specialist_manager_defaultSpecialist_count;
 
 __constant__ int d_xmachine_memory_receptionist_defaultReceptionist_count;
 
@@ -373,6 +373,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -424,6 +425,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -475,6 +477,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -526,6 +529,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -577,6 +581,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -604,7 +609,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if ((currentState->estado_movimiento[index]==27)and(currentState->doctor_no[index]==0))
+		if ((currentState->estado_movimiento[index]==27)and(currentState->specialist_no[index]==0))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -628,6 +633,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -655,7 +661,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if ((currentState->estado_movimiento[index]==27)and((currentState->doctor_no[index]>0)and(currentState->doctor_no[index]<6)))
+		if ((currentState->estado_movimiento[index]==27)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -679,6 +685,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -730,6 +737,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -781,6 +789,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -832,6 +841,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -883,6 +893,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -934,6 +945,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chair_no[index] = currentState->chair_no[index];
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
@@ -966,6 +978,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
+			nextState->specialists_generated[index] = currentState->specialists_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -997,6 +1010,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
+			nextState->specialists_generated[index] = currentState->specialists_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1028,6 +1042,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
+			nextState->specialists_generated[index] = currentState->specialists_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1161,6 +1176,7 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 		agents_dst->chair_no[output_index] = agents_src->chair_no[index];        
 		agents_dst->box_no[output_index] = agents_src->box_no[index];        
 		agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];        
+		agents_dst->specialist_no[output_index] = agents_src->specialist_no[index];        
 		agents_dst->priority[output_index] = agents_src->priority[index];
 	}
 }
@@ -1203,6 +1219,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 	    agents_dst->chair_no[output_index] = agents_src->chair_no[index];
 	    agents_dst->box_no[output_index] = agents_src->box_no[index];
 	    agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];
+	    agents_dst->specialist_no[output_index] = agents_src->specialist_no[index];
 	    agents_dst->priority[output_index] = agents_src->priority[index];
     }
 }
@@ -1232,10 +1249,11 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param chair_no agent variable of type int
  * @param box_no agent variable of type unsigned int
  * @param doctor_no agent variable of type unsigned int
+ * @param specialist_no agent variable of type unsigned int
  * @param priority agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
 	
 	int index;
     
@@ -1276,13 +1294,14 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int
 	agents->chair_no[index] = chair_no;
 	agents->box_no[index] = box_no;
 	agents->doctor_no[index] = doctor_no;
+	agents->specialist_no[index] = specialist_no;
 	agents->priority[index] = priority;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int priority){
-    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, priority);
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, specialist_no, priority);
 }
 
 /** reorder_agent_agents
@@ -1320,6 +1339,7 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 	ordered_agents->chair_no[index] = unordered_agents->chair_no[old_pos];
 	ordered_agents->box_no[index] = unordered_agents->box_no[old_pos];
 	ordered_agents->doctor_no[index] = unordered_agents->doctor_no[old_pos];
+	ordered_agents->specialist_no[index] = unordered_agents->specialist_no[old_pos];
 	ordered_agents->priority[index] = unordered_agents->priority[old_pos];
 }
 
@@ -1644,13 +1664,13 @@ __FLAME_GPU_FUNC__ void set_doctor_manager_agent_array_value(T *array, uint inde
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* Dynamically created specialist agent functions */
+/* Dynamically created specialist_manager agent functions */
 
-/** reset_specialist_scan_input
- * specialist agent reset scan input function
- * @param agents The xmachine_memory_specialist_list agent list
+/** reset_specialist_manager_scan_input
+ * specialist_manager agent reset scan input function
+ * @param agents The xmachine_memory_specialist_manager_list agent list
  */
-__global__ void reset_specialist_scan_input(xmachine_memory_specialist_list* agents){
+__global__ void reset_specialist_manager_scan_input(xmachine_memory_specialist_manager_list* agents){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
@@ -1661,13 +1681,13 @@ __global__ void reset_specialist_scan_input(xmachine_memory_specialist_list* age
 
 
 
-/** scatter_specialist_Agents
- * specialist scatter agents function (used after agent birth/death)
- * @param agents_dst xmachine_memory_specialist_list agent list destination
- * @param agents_src xmachine_memory_specialist_list agent list source
+/** scatter_specialist_manager_Agents
+ * specialist_manager scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_specialist_manager_list agent list destination
+ * @param agents_src xmachine_memory_specialist_manager_list agent list source
  * @param dst_agent_count index to start scattering agents from
  */
-__global__ void scatter_specialist_Agents(xmachine_memory_specialist_list* agents_dst, xmachine_memory_specialist_list* agents_src, int dst_agent_count, int number_to_scatter){
+__global__ void scatter_specialist_manager_Agents(xmachine_memory_specialist_manager_list* agents_dst, xmachine_memory_specialist_manager_list* agents_src, int dst_agent_count, int number_to_scatter){
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
 
@@ -1680,23 +1700,44 @@ __global__ void scatter_specialist_Agents(xmachine_memory_specialist_list* agent
 
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
-		agents_dst->id[output_index] = agents_src->id[index];        
-		agents_dst->tick[output_index] = agents_src->tick[index];        
-		agents_dst->rear[output_index] = agents_src->rear[index];        
-		agents_dst->size[output_index] = agents_src->size[index];
+		agents_dst->id[output_index] = agents_src->id[index];
+	    for (int i=0; i<5; i++){
+	      agents_dst->tick[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->tick[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<5; i++){
+	      agents_dst->free_specialist[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->free_specialist[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<5; i++){
+	      agents_dst->rear[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->rear[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<5; i++){
+	      agents_dst->size[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->size[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
 	    for (int i=0; i<35; i++){
-	      agents_dst->patientQueue[(i*xmachine_memory_specialist_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_specialist_MAX)+index];
+	      agents_dst->surgicalQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->surgicalQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->pediatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->pediatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->gynecologistQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->gynecologistQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->geriatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->geriatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->psychiatristQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->psychiatristQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
 	    }
 	}
 }
 
-/** append_specialist_Agents
- * specialist scatter agents function (used after agent birth/death)
- * @param agents_dst xmachine_memory_specialist_list agent list destination
- * @param agents_src xmachine_memory_specialist_list agent list source
+/** append_specialist_manager_Agents
+ * specialist_manager scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_specialist_manager_list agent list destination
+ * @param agents_src xmachine_memory_specialist_manager_list agent list source
  * @param dst_agent_count index to start scattering agents from
  */
-__global__ void append_specialist_Agents(xmachine_memory_specialist_list* agents_dst, xmachine_memory_specialist_list* agents_src, int dst_agent_count, int number_to_append){
+__global__ void append_specialist_manager_Agents(xmachine_memory_specialist_manager_list* agents_dst, xmachine_memory_specialist_manager_list* agents_src, int dst_agent_count, int number_to_append){
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
 
@@ -1707,26 +1748,52 @@ __global__ void append_specialist_Agents(xmachine_memory_specialist_list* agents
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->id[output_index] = agents_src->id[index];
-	    agents_dst->tick[output_index] = agents_src->tick[index];
-	    agents_dst->rear[output_index] = agents_src->rear[index];
-	    agents_dst->size[output_index] = agents_src->size[index];
+	    for (int i=0; i<5; i++){
+	      agents_dst->tick[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->tick[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<5; i++){
+	      agents_dst->free_specialist[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->free_specialist[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<5; i++){
+	      agents_dst->rear[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->rear[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<5; i++){
+	      agents_dst->size[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->size[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
 	    for (int i=0; i<35; i++){
-	      agents_dst->patientQueue[(i*xmachine_memory_specialist_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_specialist_MAX)+index];
+	      agents_dst->surgicalQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->surgicalQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->pediatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->pediatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->gynecologistQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->gynecologistQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->geriatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->geriatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
+	    }
+	    for (int i=0; i<35; i++){
+	      agents_dst->psychiatristQueue[(i*xmachine_memory_specialist_manager_MAX)+output_index] = agents_src->psychiatristQueue[(i*xmachine_memory_specialist_manager_MAX)+index];
 	    }
     }
 }
 
-/** add_specialist_agent
- * Continuous specialist agent add agent function writes agent data to agent swap
- * @param agents xmachine_memory_specialist_list to add agents to 
+/** add_specialist_manager_agent
+ * Continuous specialist_manager agent add agent function writes agent data to agent swap
+ * @param agents xmachine_memory_specialist_manager_list to add agents to 
  * @param id agent variable of type unsigned int
  * @param tick agent variable of type unsigned int
+ * @param free_specialist agent variable of type unsigned int
  * @param rear agent variable of type unsigned int
  * @param size agent variable of type unsigned int
- * @param patientQueue agent variable of type ivec2
+ * @param surgicalQueue agent variable of type ivec2
+ * @param pediatricsQueue agent variable of type ivec2
+ * @param gynecologistQueue agent variable of type ivec2
+ * @param geriatricsQueue agent variable of type ivec2
+ * @param psychiatristQueue agent variable of type ivec2
  */
 template <int AGENT_TYPE>
-__device__ void add_specialist_agent(xmachine_memory_specialist_list* agents, unsigned int id, unsigned int tick, unsigned int rear, unsigned int size){
+__device__ void add_specialist_manager_agent(xmachine_memory_specialist_manager_list* agents, unsigned int id){
 	
 	int index;
     
@@ -1746,24 +1813,21 @@ __device__ void add_specialist_agent(xmachine_memory_specialist_list* agents, un
 
 	//write data to new buffer
 	agents->id[index] = id;
-	agents->tick[index] = tick;
-	agents->rear[index] = rear;
-	agents->size[index] = size;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_specialist_agent(xmachine_memory_specialist_list* agents, unsigned int id, unsigned int tick, unsigned int rear, unsigned int size){
-    add_specialist_agent<DISCRETE_2D>(agents, id, tick, rear, size);
+__device__ void add_specialist_manager_agent(xmachine_memory_specialist_manager_list* agents, unsigned int id){
+    add_specialist_manager_agent<DISCRETE_2D>(agents, id);
 }
 
-/** reorder_specialist_agents
- * Continuous specialist agent areorder function used after key value pairs have been sorted
+/** reorder_specialist_manager_agents
+ * Continuous specialist_manager agent areorder function used after key value pairs have been sorted
  * @param values sorted index values
  * @param unordered_agents list of unordered agents
  * @ param ordered_agents list used to output ordered agents
  */
-__global__ void reorder_specialist_agents(unsigned int* values, xmachine_memory_specialist_list* unordered_agents, xmachine_memory_specialist_list* ordered_agents)
+__global__ void reorder_specialist_manager_agents(unsigned int* values, xmachine_memory_specialist_manager_list* unordered_agents, xmachine_memory_specialist_manager_list* ordered_agents)
 {
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
 
@@ -1771,42 +1835,63 @@ __global__ void reorder_specialist_agents(unsigned int* values, xmachine_memory_
 
 	//reorder agent data
 	ordered_agents->id[index] = unordered_agents->id[old_pos];
-	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
-	ordered_agents->rear[index] = unordered_agents->rear[old_pos];
-	ordered_agents->size[index] = unordered_agents->size[old_pos];
+	for (int i=0; i<5; i++){
+	  ordered_agents->tick[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->tick[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<5; i++){
+	  ordered_agents->free_specialist[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->free_specialist[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<5; i++){
+	  ordered_agents->rear[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->rear[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<5; i++){
+	  ordered_agents->size[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->size[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
 	for (int i=0; i<35; i++){
-	  ordered_agents->patientQueue[(i*xmachine_memory_specialist_MAX)+index] = unordered_agents->patientQueue[(i*xmachine_memory_specialist_MAX)+old_pos];
+	  ordered_agents->surgicalQueue[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->surgicalQueue[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->pediatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->pediatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->gynecologistQueue[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->gynecologistQueue[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->geriatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->geriatricsQueue[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
+	}
+	for (int i=0; i<35; i++){
+	  ordered_agents->psychiatristQueue[(i*xmachine_memory_specialist_manager_MAX)+index] = unordered_agents->psychiatristQueue[(i*xmachine_memory_specialist_manager_MAX)+old_pos];
 	}
 }
 
-/** get_specialist_agent_array_value
- *  Template function for accessing specialist agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
+/** get_specialist_manager_agent_array_value
+ *  Template function for accessing specialist_manager agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
  *  @param array Agent memory array
  *  @param index to lookup
  *  @return return value
  */
 template<typename T>
-__FLAME_GPU_FUNC__ T get_specialist_agent_array_value(T *array, uint index){
+__FLAME_GPU_FUNC__ T get_specialist_manager_agent_array_value(T *array, uint index){
 	// Null check for out of bounds agents (brute force communication. )
 	if(array != nullptr){
-	    return array[index*xmachine_memory_specialist_MAX];
+	    return array[index*xmachine_memory_specialist_manager_MAX];
     } else {
     	// Return the default value for this data type 
 	    return 0;
     }
 }
 
-/** set_specialist_agent_array_value
- *  Template function for setting specialist agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
+/** set_specialist_manager_agent_array_value
+ *  Template function for setting specialist_manager agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
  *  @param array Agent memory array
  *  @param index to lookup
  *  @param return value
  */
 template<typename T>
-__FLAME_GPU_FUNC__ void set_specialist_agent_array_value(T *array, uint index, T value){
+__FLAME_GPU_FUNC__ void set_specialist_manager_agent_array_value(T *array, uint index, T value){
 	// Null check for out of bounds agents (brute force communication. )
 	if(array != nullptr){
-	    array[index*xmachine_memory_specialist_MAX] = value;
+	    array[index*xmachine_memory_specialist_manager_MAX] = value;
     }
 }
 
@@ -2041,7 +2126,8 @@ __global__ void scatter_agent_generator_Agents(xmachine_memory_agent_generator_l
         agents_dst->_position[output_index] = output_index;        
 		agents_dst->chairs_generated[output_index] = agents_src->chairs_generated[index];        
 		agents_dst->boxes_generated[output_index] = agents_src->boxes_generated[index];        
-		agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];
+		agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];        
+		agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];
 	}
 }
 
@@ -2064,6 +2150,7 @@ __global__ void append_agent_generator_Agents(xmachine_memory_agent_generator_li
 	    agents_dst->chairs_generated[output_index] = agents_src->chairs_generated[index];
 	    agents_dst->boxes_generated[output_index] = agents_src->boxes_generated[index];
 	    agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];
+	    agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];
     }
 }
 
@@ -2073,9 +2160,10 @@ __global__ void append_agent_generator_Agents(xmachine_memory_agent_generator_li
  * @param chairs_generated agent variable of type int
  * @param boxes_generated agent variable of type int
  * @param doctors_generated agent variable of type int
+ * @param specialists_generated agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated){
+__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated){
 	
 	int index;
     
@@ -2097,12 +2185,13 @@ __device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* 
 	agents->chairs_generated[index] = chairs_generated;
 	agents->boxes_generated[index] = boxes_generated;
 	agents->doctors_generated[index] = doctors_generated;
+	agents->specialists_generated[index] = specialists_generated;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated){
-    add_agent_generator_agent<DISCRETE_2D>(agents, chairs_generated, boxes_generated, doctors_generated);
+__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated){
+    add_agent_generator_agent<DISCRETE_2D>(agents, chairs_generated, boxes_generated, doctors_generated, specialists_generated);
 }
 
 /** reorder_agent_generator_agents
@@ -2121,6 +2210,7 @@ __global__ void reorder_agent_generator_agents(unsigned int* values, xmachine_me
 	ordered_agents->chairs_generated[index] = unordered_agents->chairs_generated[old_pos];
 	ordered_agents->boxes_generated[index] = unordered_agents->boxes_generated[old_pos];
 	ordered_agents->doctors_generated[index] = unordered_agents->doctors_generated[old_pos];
+	ordered_agents->specialists_generated[index] = unordered_agents->specialists_generated[old_pos];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6549,6 +6639,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -6581,6 +6672,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -6624,6 +6716,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -6656,6 +6749,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -6699,6 +6793,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -6731,6 +6826,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -6774,6 +6870,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -6806,6 +6903,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -6849,6 +6947,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -6881,6 +6980,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -6923,6 +7023,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -6948,6 +7049,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -6984,6 +7086,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -7028,6 +7131,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -7060,6 +7164,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -7103,6 +7208,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -7135,6 +7241,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -7177,6 +7284,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -7202,6 +7310,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -7238,6 +7347,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -7281,6 +7391,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -7306,6 +7417,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -7342,6 +7454,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -7386,6 +7499,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -7418,6 +7532,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -7460,6 +7575,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -7485,6 +7601,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -7521,6 +7638,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -7565,6 +7683,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -7597,6 +7716,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -7640,6 +7760,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -7672,6 +7793,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -7714,6 +7836,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -7739,6 +7862,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -7775,6 +7899,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -7818,6 +7943,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -7843,6 +7969,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -7879,6 +8006,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -7923,6 +8051,7 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -7955,6 +8084,7 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -7998,6 +8128,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 
 	//FLAME function call
@@ -8030,6 +8161,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 }
 
@@ -8072,6 +8204,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.chair_no = agents->chair_no[index];
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
 	} else {
 	
@@ -8097,6 +8230,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.chair_no = 0;
 	agent.box_no = 0;
 	agent.doctor_no = 0;
+	agent.specialist_no = 0;
 	agent.priority = 0;
 	}
 
@@ -8133,6 +8267,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agents->chair_no[index] = agent.chair_no;
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
 	}
 }
@@ -8431,56 +8566,7 @@ __global__ void GPUFLAME_receive_free_doctors(xmachine_memory_doctor_manager_lis
 /**
  *
  */
-__global__ void GPUFLAME_specialist_server(xmachine_memory_specialist_list* agents, xmachine_message_specialist_reached_list* specialist_reached_messages, xmachine_message_attention_terminated_list* attention_terminated_messages){
-	
-	//continuous agent: index is agent position in 1D agent list
-	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-  
-    
-    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
-    
-
-	//SoA to AoS - xmachine_memory_specialist_server Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_specialist agent;
-    //No partitioned input may launch more threads than required - only load agent data within bounds. 
-    if (index < d_xmachine_memory_specialist_count){
-    
-	agent.id = agents->id[index];
-	agent.tick = agents->tick[index];
-	agent.rear = agents->rear[index];
-	agent.size = agents->size[index];
-    agent.patientQueue = &(agents->patientQueue[index]);
-	} else {
-	
-	agent.id = 0;
-	agent.tick = 0;
-	agent.rear = 0;
-	agent.size = 0;
-    agent.patientQueue = nullptr;
-	}
-
-	//FLAME function call
-	int dead = !specialist_server(&agent, specialist_reached_messages, attention_terminated_messages	);
-	
-
-	
-    //No partitioned input may launch more threads than required - only write agent data within bounds. 
-    if (index < d_xmachine_memory_specialist_count){
-    //continuous agent: set reallocation flag
-	agents->_scan_input[index]  = dead; 
-
-	//AoS to SoA - xmachine_memory_specialist_server Coalesced memory write (ignore arrays)
-	agents->id[index] = agent.id;
-	agents->tick[index] = agent.tick;
-	agents->rear[index] = agent.rear;
-	agents->size[index] = agent.size;
-	}
-}
-
-/**
- *
- */
-__global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_specialist_response_list* specialist_response_messages){
+__global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist_manager_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_doctor_response_list* doctor_response_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -8490,39 +8576,46 @@ __global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist
     
 
 	//SoA to AoS - xmachine_memory_receive_specialist_petitions Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_specialist agent;
+	xmachine_memory_specialist_manager agent;
     //No partitioned input may launch more threads than required - only load agent data within bounds. 
-    if (index < d_xmachine_memory_specialist_count){
+    if (index < d_xmachine_memory_specialist_manager_count){
     
 	agent.id = agents->id[index];
-	agent.tick = agents->tick[index];
-	agent.rear = agents->rear[index];
-	agent.size = agents->size[index];
-    agent.patientQueue = &(agents->patientQueue[index]);
+    agent.tick = &(agents->tick[index]);
+    agent.free_specialist = &(agents->free_specialist[index]);
+    agent.rear = &(agents->rear[index]);
+    agent.size = &(agents->size[index]);
+    agent.surgicalQueue = &(agents->surgicalQueue[index]);
+    agent.pediatricsQueue = &(agents->pediatricsQueue[index]);
+    agent.gynecologistQueue = &(agents->gynecologistQueue[index]);
+    agent.geriatricsQueue = &(agents->geriatricsQueue[index]);
+    agent.psychiatristQueue = &(agents->psychiatristQueue[index]);
 	} else {
 	
 	agent.id = 0;
-	agent.tick = 0;
-	agent.rear = 0;
-	agent.size = 0;
-    agent.patientQueue = nullptr;
+    agent.tick = nullptr;
+    agent.free_specialist = nullptr;
+    agent.rear = nullptr;
+    agent.size = nullptr;
+    agent.surgicalQueue = nullptr;
+    agent.pediatricsQueue = nullptr;
+    agent.gynecologistQueue = nullptr;
+    agent.geriatricsQueue = nullptr;
+    agent.psychiatristQueue = nullptr;
 	}
 
 	//FLAME function call
-	int dead = !receive_specialist_petitions(&agent, specialist_petition_messages, specialist_response_messages	);
+	int dead = !receive_specialist_petitions(&agent, specialist_petition_messages, doctor_response_messages	);
 	
 
 	
     //No partitioned input may launch more threads than required - only write agent data within bounds. 
-    if (index < d_xmachine_memory_specialist_count){
+    if (index < d_xmachine_memory_specialist_manager_count){
     //continuous agent: set reallocation flag
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_receive_specialist_petitions Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
-	agents->tick[index] = agent.tick;
-	agents->rear[index] = agent.rear;
-	agents->size[index] = agent.size;
 	}
 }
 
@@ -8659,6 +8752,7 @@ __global__ void GPUFLAME_generate_chairs(xmachine_memory_agent_generator_list* a
 	agent.chairs_generated = agents->chairs_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
+	agent.specialists_generated = agents->specialists_generated[index];
 
 	//FLAME function call
 	int dead = !generate_chairs(&agent, chair_agents);
@@ -8671,6 +8765,7 @@ __global__ void GPUFLAME_generate_chairs(xmachine_memory_agent_generator_list* a
 	agents->chairs_generated[index] = agent.chairs_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
+	agents->specialists_generated[index] = agent.specialists_generated;
 }
 
 /**
@@ -8694,6 +8789,7 @@ __global__ void GPUFLAME_generate_boxes(xmachine_memory_agent_generator_list* ag
 	agent.chairs_generated = agents->chairs_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
+	agent.specialists_generated = agents->specialists_generated[index];
 
 	//FLAME function call
 	int dead = !generate_boxes(&agent, box_agents);
@@ -8706,6 +8802,7 @@ __global__ void GPUFLAME_generate_boxes(xmachine_memory_agent_generator_list* ag
 	agents->chairs_generated[index] = agent.chairs_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
+	agents->specialists_generated[index] = agent.specialists_generated;
 }
 
 /**
@@ -8729,6 +8826,7 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
 	agent.chairs_generated = agents->chairs_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
+	agent.specialists_generated = agents->specialists_generated[index];
 
 	//FLAME function call
 	int dead = !generate_doctors(&agent, doctor_agents);
@@ -8741,6 +8839,7 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
 	agents->chairs_generated[index] = agent.chairs_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
+	agents->specialists_generated[index] = agent.specialists_generated;
 }
 
 /**

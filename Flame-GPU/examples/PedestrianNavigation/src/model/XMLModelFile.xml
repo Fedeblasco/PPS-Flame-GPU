@@ -247,6 +247,10 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
+          <name>specialist_no</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
           <name>priority</name>
         </gpu:variable>
       </memory>
@@ -589,7 +593,7 @@
             <rhs>
               <condition>
                 <lhs>
-                  <agentVariable>doctor_no</agentVariable>
+                  <agentVariable>specialist_no</agentVariable>
                 </lhs>
                 <operator>==</operator>
                 <rhs>
@@ -630,7 +634,7 @@
                 <lhs>
                   <condition>
                     <lhs>
-                      <agentVariable>doctor_no</agentVariable>
+                      <agentVariable>specialist_no</agentVariable>
                     </lhs>
                     <operator>&gt;</operator>
                     <rhs>
@@ -642,7 +646,7 @@
                 <rhs>
                   <condition>
                     <lhs>
-                      <agentVariable>doctor_no</agentVariable>
+                      <agentVariable>specialist_no</agentVariable>
                     </lhs>
                     <operator>&lt;</operator>
                     <rhs>
@@ -1077,7 +1081,7 @@
 
 <!-- Agente specialist -->   
     <gpu:xagent>
-      <name>specialist</name>
+      <name>specialist_manager</name>
       <memory>
         <gpu:variable>
           <type>unsigned int</type>
@@ -1086,42 +1090,61 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>tick</name>
+          <arrayLength>5</arrayLength>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>free_specialist</name>
+          <arrayLength>5</arrayLength>
+          <defaultValue>1</defaultValue>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
           <name>rear</name>
+          <arrayLength>5</arrayLength>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
           <name>size</name>
+          <arrayLength>5</arrayLength>
         </gpu:variable>
+        
         <gpu:variable>
           <type>ivec2</type>
-          <name>patientQueue</name>
+          <name>surgicalQueue</name>
+          <arrayLength>35</arrayLength>
+          <defaultValue>-1,-1</defaultValue>
+        </gpu:variable>
+
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>pediatricsQueue</name>
+          <arrayLength>35</arrayLength>
+          <defaultValue>-1,-1</defaultValue>
+        </gpu:variable>
+
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>gynecologistQueue</name>
+          <arrayLength>35</arrayLength>
+          <defaultValue>-1,-1</defaultValue>
+        </gpu:variable>
+
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>geriatricsQueue</name>
+          <arrayLength>35</arrayLength>
+          <defaultValue>-1,-1</defaultValue>
+        </gpu:variable>
+
+        <gpu:variable>
+          <type>ivec2</type>
+          <name>psychiatristQueue</name>
           <arrayLength>35</arrayLength>
           <defaultValue>-1,-1</defaultValue>
         </gpu:variable>
       </memory>
       <functions>
-        <gpu:function>
-          <name>specialist_server</name>
-          <currentState>defaultSpecialist</currentState>
-          <nextState>defaultSpecialist</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>specialist_reached</messageName>
-            </gpu:input>
-          </inputs>
-          <outputs>
-            <gpu:output>
-              <messageName>attention_terminated</messageName>
-              <gpu:type>optional_message</gpu:type>
-            </gpu:output>
-          </outputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
-
         <gpu:function>
           <name>receive_specialist_petitions</name>
           <currentState>defaultSpecialist</currentState>
@@ -1133,7 +1156,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>specialist_response</messageName>
+              <messageName>doctor_response</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -1264,6 +1287,11 @@
         <gpu:variable>
           <type>int</type>
           <name>doctors_generated</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>specialists_generated</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
       </memory>
@@ -2018,9 +2046,6 @@
       <gpu:layerFunction>
         <name>doctor_server</name>
       </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>specialist_server</name>
-      </gpu:layerFunction>
     </layer>
     <layer>
       <gpu:layerFunction>
@@ -2039,13 +2064,13 @@
         <name>receive_doctor_petitions</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>receive_specialist_petitions</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
         <name>receive_attention_terminated</name>
       </gpu:layerFunction>
     </layer>
     <layer>
+      <gpu:layerFunction>
+        <name>receive_specialist_petitions</name>
+      </gpu:layerFunction>
       <gpu:layerFunction>
         <name>move</name>
       </gpu:layerFunction>

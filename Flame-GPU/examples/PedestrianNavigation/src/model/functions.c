@@ -23,7 +23,7 @@
 #include "priority_queue.c"
 #include "CustomVisualisation.h"
 
-#include "specialist.c"
+#include "specialist_manager.c"
 #include "receptionist.c"
 #include "chair_admin.c"
 #include "doctor_manager.c"
@@ -76,6 +76,14 @@ __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
 	h_add_agent_doctor_manager_defaultDoctorManager(h_doctor_manager);
 	// Freeing the previously allocated memory
 	h_free_agent_doctor_manager(&h_doctor_manager);
+
+	//Agregado del manejador de especialistas
+	// Allocating memory in CPU to save the agent
+	xmachine_memory_specialist_manager * h_specialist_manager = h_allocate_agent_specialist_manager();
+	// Copying the agent from the CPU to GPU
+	h_add_agent_specialist_manager_defaultSpecialist(h_specialist_manager);
+	// Freeing the previously allocated memory
+	h_free_agent_specialist_manager(&h_specialist_manager);
 
 }
 
@@ -160,7 +168,8 @@ __FLAME_GPU_FUNC__ int output_doctor_reached(xmachine_memory_agent* agent, xmach
 
 __FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, xmachine_message_specialist_petition_list* specialistPetitionMessages){
 	
-	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->priority,agent->doctor_no);
+	printf("Enviando mensaje\n");
+	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->priority,agent->specialist_no);
 	agent->estado_movimiento++;
 
 	return 0;
@@ -544,7 +553,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 				
 				/*if(agent->cant_generados==0){
 					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 0, 0, 0, 0, 0);
@@ -645,7 +654,7 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 	
 	xmachine_message_doctor_response* current_message = get_first_doctor_response_message(doctorResponseMessages);
 	while(current_message){
-		if(agent->id == current_message->id){
+		if(agent->id == current_message->id){ 
 			if(current_message->doctor_no !=-1){
 				agent->go_to_x = firstDoctor_x;
 				agent->go_to_y = firstDoctor_y - (space_between_doctors * current_message->doctor_no);;
@@ -655,6 +664,8 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 				//printf("Tengo que ir al doctor %d, soy %d\n",current_message->doctor_no,agent->id);
 			}else{
 				//printf("No hay doctores disponibles, soy %d\n",agent->id);
+				agent->checkpoint = 1;
+				agent->estado_movimiento = 40;
 			}
 			//printf("Enviando un mensaje, soy %d\n",agent->id);
 			//add_chair_petition_message(chairPetitionMessages, agent->id);
@@ -686,8 +697,8 @@ __FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachi
 		if(agent->id == current_message->id){
 			agent->estado_movimiento++;
 			agent->priority = current_message->priority;
-			agent->doctor_no = current_message->doctor_no;
-			printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,current_message->doctor_no,agent->id);
+			agent->specialist_no = current_message->doctor_no;
+			printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,agent->specialist_no,agent->id);
 		}
 		current_message = get_next_box_response_message(current_message, boxResponseMessages);
 	}
