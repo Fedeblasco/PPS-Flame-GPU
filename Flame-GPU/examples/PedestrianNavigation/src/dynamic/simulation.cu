@@ -2826,14 +2826,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_receive_attention_terminated");
-	agent_receive_attention_terminated(stream6);
+    PROFILE_PUSH_RANGE("specialist_receive_specialist_reached");
+	specialist_receive_specialist_reached(stream6);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_receive_attention_terminated = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: specialist_receive_specialist_reached = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
@@ -2871,14 +2871,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("specialist_receive_specialist_reached");
-	specialist_receive_specialist_reached(stream2);
+    PROFILE_PUSH_RANGE("agent_receive_attention_terminated");
+	agent_receive_attention_terminated(stream2);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: specialist_receive_specialist_reached = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: agent_receive_attention_terminated = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS

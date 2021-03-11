@@ -770,7 +770,10 @@ __FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent
 	xmachine_message_attention_terminated* current_message = get_first_attention_terminated_message(attentionTerminatedMessages);
 	while(current_message){
 		if(agent->id == current_message->id){
-			add_free_doctor_message(freeDoctorMessages, agent->doctor_no);
+			printf("Me estoy yendo, soy %d\n",agent->id);
+			if(agent->specialist_no == 0){
+				add_free_doctor_message(freeDoctorMessages, agent->doctor_no);
+			}
 			agent->estado_movimiento = 40;
 		}
 		current_message = get_next_attention_terminated_message(current_message, attentionTerminatedMessages);

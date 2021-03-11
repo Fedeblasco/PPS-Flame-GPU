@@ -2325,7 +2325,7 @@
         <name>receive_doctor_petitions</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>receive_attention_terminated</name>
+        <name>receive_specialist_reached</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_free_chair</name>
@@ -2336,7 +2336,7 @@
         <name>receive_specialist_petitions</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>receive_specialist_reached</name>
+        <name>receive_attention_terminated</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>move</name>
