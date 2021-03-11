@@ -32,3 +32,13 @@ __FLAME_GPU_FUNC__ int generate_doctors(xmachine_memory_agent_generator* agent, 
     agent->doctors_generated++;
     return 0;
 }
+
+__FLAME_GPU_FUNC__ int generate_specialists(xmachine_memory_agent_generator* agent, xmachine_memory_specialist_list* specialist_agents){
+    
+    printf("Especialista generado\n"); 
+    
+    add_specialist_agent(specialist_agents, agent->specialists_generated+1,0,0);
+
+    agent->specialists_generated++;
+    return 0;
+}

@@ -24,6 +24,7 @@
 #include "CustomVisualisation.h"
 
 #include "specialist_manager.c"
+#include "specialist.c"
 #include "receptionist.c"
 #include "chair_admin.c"
 #include "doctor_manager.c"
@@ -81,7 +82,7 @@ __FLAME_GPU_INIT_FUNC__ void inicializarMapa(){
 	// Allocating memory in CPU to save the agent
 	xmachine_memory_specialist_manager * h_specialist_manager = h_allocate_agent_specialist_manager();
 	// Copying the agent from the CPU to GPU
-	h_add_agent_specialist_manager_defaultSpecialist(h_specialist_manager);
+	h_add_agent_specialist_manager_defaultSpecialistManager(h_specialist_manager);
 	// Freeing the previously allocated memory
 	h_free_agent_specialist_manager(&h_specialist_manager);
 
@@ -175,6 +176,15 @@ __FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, 
 	
 	//printf("Enviando mensaje\n");
 	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->priority,agent->specialist_no);
+	agent->estado_movimiento++;
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int output_specialist_reached(xmachine_memory_agent* agent, xmachine_message_specialist_reached_list* specialistReachedMessages){
+	
+	printf("Enviando mensaje del especialista\n");
+	add_specialist_reached_message(specialistReachedMessages, agent->id, agent->specialist_no);
 	agent->estado_movimiento++;
 
 	return 0;
@@ -550,7 +560,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				}
 			}else{
 				if(go_to_specialist(agent)){
-					printf("Llegue al especialista\n");
+					printf("Llegue al especialista %d, soy %d\n",agent->specialist_no,agent->id);
 					agent->checkpoint=0;
 					agent->estado_movimiento++;
 				}

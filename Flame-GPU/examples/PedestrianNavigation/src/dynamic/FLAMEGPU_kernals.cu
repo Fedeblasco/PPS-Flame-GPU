@@ -35,6 +35,8 @@ __constant__ int d_xmachine_memory_doctor_manager_count;
 
 __constant__ int d_xmachine_memory_specialist_manager_count;
 
+__constant__ int d_xmachine_memory_specialist_count;
+
 __constant__ int d_xmachine_memory_receptionist_count;
 
 __constant__ int d_xmachine_memory_agent_generator_count;
@@ -57,7 +59,9 @@ __constant__ int d_xmachine_memory_chair_defaultChair_count;
 
 __constant__ int d_xmachine_memory_doctor_manager_defaultDoctorManager_count;
 
-__constant__ int d_xmachine_memory_specialist_manager_defaultSpecialist_count;
+__constant__ int d_xmachine_memory_specialist_manager_defaultSpecialistManager_count;
+
+__constant__ int d_xmachine_memory_specialist_defaultSpecialist_count;
 
 __constant__ int d_xmachine_memory_receptionist_defaultReceptionist_count;
 
@@ -705,58 +709,6 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	}
  }
 
-/** output_specialist_petition_function_filter
- *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
- * @param currentState xmachine_memory_agent_list representing agent i the current state
- * @param nextState xmachine_memory_agent_list representing agent i the next state
- */
- __global__ void output_specialist_petition_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
- {
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
-	
-	//check thread max
-	if (index < d_xmachine_memory_agent_count){
-	
-		//apply the filter
-		if ((currentState->estado_movimiento[index]==27)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
-		{	//copy agent data to newstate list
-			nextState->id[index] = currentState->id[index];
-			nextState->x[index] = currentState->x[index];
-			nextState->y[index] = currentState->y[index];
-			nextState->velx[index] = currentState->velx[index];
-			nextState->vely[index] = currentState->vely[index];
-			nextState->steer_x[index] = currentState->steer_x[index];
-			nextState->steer_y[index] = currentState->steer_y[index];
-			nextState->height[index] = currentState->height[index];
-			nextState->exit_no[index] = currentState->exit_no[index];
-			nextState->speed[index] = currentState->speed[index];
-			nextState->lod[index] = currentState->lod[index];
-			nextState->animate[index] = currentState->animate[index];
-			nextState->animate_dir[index] = currentState->animate_dir[index];
-			nextState->estado[index] = currentState->estado[index];
-			nextState->tick[index] = currentState->tick[index];
-			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
-			nextState->go_to_x[index] = currentState->go_to_x[index];
-			nextState->go_to_y[index] = currentState->go_to_y[index];
-			nextState->checkpoint[index] = currentState->checkpoint[index];
-			nextState->chair_no[index] = currentState->chair_no[index];
-			nextState->box_no[index] = currentState->box_no[index];
-			nextState->doctor_no[index] = currentState->doctor_no[index];
-			nextState->specialist_no[index] = currentState->specialist_no[index];
-			nextState->priority[index] = currentState->priority[index];
-			//set scan input flag to 1
-			nextState->_scan_input[index] = 1;
-		}
-		else
-		{
-			//set scan input flag of current state to 1 (keep agent)
-			currentState->_scan_input[index] = 1;
-		}
-	
-	}
- }
-
 /** receive_doctor_response_function_filter
  *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
  * @param currentState xmachine_memory_agent_list representing agent i the current state
@@ -772,58 +724,6 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	
 		//apply the filter
 		if ((currentState->estado_movimiento[index]==28)and(currentState->specialist_no[index]==0))
-		{	//copy agent data to newstate list
-			nextState->id[index] = currentState->id[index];
-			nextState->x[index] = currentState->x[index];
-			nextState->y[index] = currentState->y[index];
-			nextState->velx[index] = currentState->velx[index];
-			nextState->vely[index] = currentState->vely[index];
-			nextState->steer_x[index] = currentState->steer_x[index];
-			nextState->steer_y[index] = currentState->steer_y[index];
-			nextState->height[index] = currentState->height[index];
-			nextState->exit_no[index] = currentState->exit_no[index];
-			nextState->speed[index] = currentState->speed[index];
-			nextState->lod[index] = currentState->lod[index];
-			nextState->animate[index] = currentState->animate[index];
-			nextState->animate_dir[index] = currentState->animate_dir[index];
-			nextState->estado[index] = currentState->estado[index];
-			nextState->tick[index] = currentState->tick[index];
-			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
-			nextState->go_to_x[index] = currentState->go_to_x[index];
-			nextState->go_to_y[index] = currentState->go_to_y[index];
-			nextState->checkpoint[index] = currentState->checkpoint[index];
-			nextState->chair_no[index] = currentState->chair_no[index];
-			nextState->box_no[index] = currentState->box_no[index];
-			nextState->doctor_no[index] = currentState->doctor_no[index];
-			nextState->specialist_no[index] = currentState->specialist_no[index];
-			nextState->priority[index] = currentState->priority[index];
-			//set scan input flag to 1
-			nextState->_scan_input[index] = 1;
-		}
-		else
-		{
-			//set scan input flag of current state to 1 (keep agent)
-			currentState->_scan_input[index] = 1;
-		}
-	
-	}
- }
-
-/** receive_specialist_response_function_filter
- *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
- * @param currentState xmachine_memory_agent_list representing agent i the current state
- * @param nextState xmachine_memory_agent_list representing agent i the next state
- */
- __global__ void receive_specialist_response_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
- {
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
-	
-	//check thread max
-	if (index < d_xmachine_memory_agent_count){
-	
-		//apply the filter
-		if ((currentState->estado_movimiento[index]==28)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -927,7 +827,163 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if (currentState->estado_movimiento[index]==31)
+		if ((currentState->estado_movimiento[index]==31)and(currentState->specialist_no[index]==0))
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** receive_specialist_response_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void receive_specialist_response_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if ((currentState->estado_movimiento[index]==28)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** output_specialist_petition_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void output_specialist_petition_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if ((currentState->estado_movimiento[index]==27)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** output_specialist_reached_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void output_specialist_reached_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if ((currentState->estado_movimiento[index]==31)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -1148,6 +1204,38 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	
 		//apply the filter
 		if (currentState->doctors_generated[index]<4)
+		{	//copy agent data to newstate list
+			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->boxes_generated[index] = currentState->boxes_generated[index];
+			nextState->doctors_generated[index] = currentState->doctors_generated[index];
+			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** generate_specialists_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_generator_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_generator_list representing agent i the next state
+ */
+ __global__ void generate_specialists_function_filter(xmachine_memory_agent_generator_list* currentState, xmachine_memory_agent_generator_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_generator_count){
+	
+		//apply the filter
+		if (currentState->specialists_generated[index]<5)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
@@ -2006,6 +2094,127 @@ __FLAME_GPU_FUNC__ void set_specialist_manager_agent_array_value(T *array, uint 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created specialist agent functions */
+
+/** reset_specialist_scan_input
+ * specialist agent reset scan input function
+ * @param agents The xmachine_memory_specialist_list agent list
+ */
+__global__ void reset_specialist_scan_input(xmachine_memory_specialist_list* agents){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 0;
+}
+
+
+
+/** scatter_specialist_Agents
+ * specialist scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_specialist_list agent list destination
+ * @param agents_src xmachine_memory_specialist_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void scatter_specialist_Agents(xmachine_memory_specialist_list* agents_dst, xmachine_memory_specialist_list* agents_src, int dst_agent_count, int number_to_scatter){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = agents_src->_scan_input[index];
+
+	//if optional message is to be written. 
+	//must check agent is within number to scatter as unused threads may have scan input = 1
+	if ((_scan_input == 1)&&(index < number_to_scatter)){
+		int output_index = agents_src->_position[index] + dst_agent_count;
+
+		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
+        agents_dst->_position[output_index] = output_index;        
+		agents_dst->id[output_index] = agents_src->id[index];        
+		agents_dst->current_patient[output_index] = agents_src->current_patient[index];        
+		agents_dst->tick[output_index] = agents_src->tick[index];
+	}
+}
+
+/** append_specialist_Agents
+ * specialist scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_specialist_list agent list destination
+ * @param agents_src xmachine_memory_specialist_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void append_specialist_Agents(xmachine_memory_specialist_list* agents_dst, xmachine_memory_specialist_list* agents_src, int dst_agent_count, int number_to_append){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//must check agent is within number to append as unused threads may have scan input = 1
+    if (index < number_to_append){
+	    int output_index = index + dst_agent_count;
+
+	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
+	    agents_dst->_position[output_index] = output_index;
+	    agents_dst->id[output_index] = agents_src->id[index];
+	    agents_dst->current_patient[output_index] = agents_src->current_patient[index];
+	    agents_dst->tick[output_index] = agents_src->tick[index];
+    }
+}
+
+/** add_specialist_agent
+ * Continuous specialist agent add agent function writes agent data to agent swap
+ * @param agents xmachine_memory_specialist_list to add agents to 
+ * @param id agent variable of type unsigned int
+ * @param current_patient agent variable of type unsigned int
+ * @param tick agent variable of type unsigned int
+ */
+template <int AGENT_TYPE>
+__device__ void add_specialist_agent(xmachine_memory_specialist_list* agents, unsigned int id, unsigned int current_patient, unsigned int tick){
+	
+	int index;
+    
+    //calculate the agents index in global agent list (depends on agent type)
+	if (AGENT_TYPE == DISCRETE_2D){
+		int width = (blockDim.x* gridDim.x);
+		glm::ivec2 global_position;
+		global_position.x = (blockIdx.x*blockDim.x) + threadIdx.x;
+		global_position.y = (blockIdx.y*blockDim.y) + threadIdx.y;
+		index = global_position.x + (global_position.y* width);
+	}else//AGENT_TYPE == CONTINOUS
+		index = threadIdx.x + blockIdx.x*blockDim.x;
+
+	//for prefix sum
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 1;
+
+	//write data to new buffer
+	agents->id[index] = id;
+	agents->current_patient[index] = current_patient;
+	agents->tick[index] = tick;
+
+}
+
+//non templated version assumes DISCRETE_2D but works also for CONTINUOUS
+__device__ void add_specialist_agent(xmachine_memory_specialist_list* agents, unsigned int id, unsigned int current_patient, unsigned int tick){
+    add_specialist_agent<DISCRETE_2D>(agents, id, current_patient, tick);
+}
+
+/** reorder_specialist_agents
+ * Continuous specialist agent areorder function used after key value pairs have been sorted
+ * @param values sorted index values
+ * @param unordered_agents list of unordered agents
+ * @ param ordered_agents list used to output ordered agents
+ */
+__global__ void reorder_specialist_agents(unsigned int* values, xmachine_memory_specialist_list* unordered_agents, xmachine_memory_specialist_list* ordered_agents)
+{
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	uint old_pos = values[index];
+
+	//reorder agent data
+	ordered_agents->id[index] = unordered_agents->id[old_pos];
+	ordered_agents->current_patient[index] = unordered_agents->current_patient[old_pos];
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created receptionist agent functions */
 
 /** reset_receptionist_scan_input
@@ -2634,7 +2843,7 @@ __global__ void scatter_doctor_Agents(xmachine_memory_doctor_list* agents_dst, x
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
 		agents_dst->id[output_index] = agents_src->id[index];        
-		agents_dst->attending[output_index] = agents_src->attending[index];        
+		agents_dst->current_patient[output_index] = agents_src->current_patient[index];        
 		agents_dst->tick[output_index] = agents_src->tick[index];
 	}
 }
@@ -2656,7 +2865,7 @@ __global__ void append_doctor_Agents(xmachine_memory_doctor_list* agents_dst, xm
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->id[output_index] = agents_src->id[index];
-	    agents_dst->attending[output_index] = agents_src->attending[index];
+	    agents_dst->current_patient[output_index] = agents_src->current_patient[index];
 	    agents_dst->tick[output_index] = agents_src->tick[index];
     }
 }
@@ -2665,11 +2874,11 @@ __global__ void append_doctor_Agents(xmachine_memory_doctor_list* agents_dst, xm
  * Continuous doctor agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_doctor_list to add agents to 
  * @param id agent variable of type unsigned int
- * @param attending agent variable of type int
+ * @param current_patient agent variable of type int
  * @param tick agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_doctor_agent(xmachine_memory_doctor_list* agents, unsigned int id, int attending, unsigned int tick){
+__device__ void add_doctor_agent(xmachine_memory_doctor_list* agents, unsigned int id, int current_patient, unsigned int tick){
 	
 	int index;
     
@@ -2689,14 +2898,14 @@ __device__ void add_doctor_agent(xmachine_memory_doctor_list* agents, unsigned i
 
 	//write data to new buffer
 	agents->id[index] = id;
-	agents->attending[index] = attending;
+	agents->current_patient[index] = current_patient;
 	agents->tick[index] = tick;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_doctor_agent(xmachine_memory_doctor_list* agents, unsigned int id, int attending, unsigned int tick){
-    add_doctor_agent<DISCRETE_2D>(agents, id, attending, tick);
+__device__ void add_doctor_agent(xmachine_memory_doctor_list* agents, unsigned int id, int current_patient, unsigned int tick){
+    add_doctor_agent<DISCRETE_2D>(agents, id, current_patient, tick);
 }
 
 /** reorder_doctor_agents
@@ -2713,7 +2922,7 @@ __global__ void reorder_doctor_agents(unsigned int* values, xmachine_memory_doct
 
 	//reorder agent data
 	ordered_agents->id[index] = unordered_agents->id[old_pos];
-	ordered_agents->attending[index] = unordered_agents->attending[old_pos];
+	ordered_agents->current_patient[index] = unordered_agents->current_patient[old_pos];
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 }
 
@@ -8061,83 +8270,6 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 /**
  *
  */
-__global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages){
-	
-	//continuous agent: index is agent position in 1D agent list
-	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-  
-    //For agents not using non partitioned message input check the agent bounds
-    if (index >= d_xmachine_memory_agent_count)
-        return;
-    
-
-	//SoA to AoS - xmachine_memory_output_specialist_petition Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_agent agent;
-    
-    // Thread bounds already checked, but the agent function will still execute. load default values?
-	
-	agent.id = agents->id[index];
-	agent.x = agents->x[index];
-	agent.y = agents->y[index];
-	agent.velx = agents->velx[index];
-	agent.vely = agents->vely[index];
-	agent.steer_x = agents->steer_x[index];
-	agent.steer_y = agents->steer_y[index];
-	agent.height = agents->height[index];
-	agent.exit_no = agents->exit_no[index];
-	agent.speed = agents->speed[index];
-	agent.lod = agents->lod[index];
-	agent.animate = agents->animate[index];
-	agent.animate_dir = agents->animate_dir[index];
-	agent.estado = agents->estado[index];
-	agent.tick = agents->tick[index];
-	agent.estado_movimiento = agents->estado_movimiento[index];
-	agent.go_to_x = agents->go_to_x[index];
-	agent.go_to_y = agents->go_to_y[index];
-	agent.checkpoint = agents->checkpoint[index];
-	agent.chair_no = agents->chair_no[index];
-	agent.box_no = agents->box_no[index];
-	agent.doctor_no = agents->doctor_no[index];
-	agent.specialist_no = agents->specialist_no[index];
-	agent.priority = agents->priority[index];
-
-	//FLAME function call
-	int dead = !output_specialist_petition(&agent, specialist_petition_messages	);
-	
-
-	//continuous agent: set reallocation flag
-	agents->_scan_input[index]  = dead; 
-
-	//AoS to SoA - xmachine_memory_output_specialist_petition Coalesced memory write (ignore arrays)
-	agents->id[index] = agent.id;
-	agents->x[index] = agent.x;
-	agents->y[index] = agent.y;
-	agents->velx[index] = agent.velx;
-	agents->vely[index] = agent.vely;
-	agents->steer_x[index] = agent.steer_x;
-	agents->steer_y[index] = agent.steer_y;
-	agents->height[index] = agent.height;
-	agents->exit_no[index] = agent.exit_no;
-	agents->speed[index] = agent.speed;
-	agents->lod[index] = agent.lod;
-	agents->animate[index] = agent.animate;
-	agents->animate_dir[index] = agent.animate_dir;
-	agents->estado[index] = agent.estado;
-	agents->tick[index] = agent.tick;
-	agents->estado_movimiento[index] = agent.estado_movimiento;
-	agents->go_to_x[index] = agent.go_to_x;
-	agents->go_to_y[index] = agent.go_to_y;
-	agents->checkpoint[index] = agent.checkpoint;
-	agents->chair_no[index] = agent.chair_no;
-	agents->box_no[index] = agent.box_no;
-	agents->doctor_no[index] = agent.doctor_no;
-	agents->specialist_no[index] = agent.specialist_no;
-	agents->priority[index] = agent.priority;
-}
-
-/**
- *
- */
 __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
@@ -8215,113 +8347,6 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_receive_doctor_response Coalesced memory write (ignore arrays)
-	agents->id[index] = agent.id;
-	agents->x[index] = agent.x;
-	agents->y[index] = agent.y;
-	agents->velx[index] = agent.velx;
-	agents->vely[index] = agent.vely;
-	agents->steer_x[index] = agent.steer_x;
-	agents->steer_y[index] = agent.steer_y;
-	agents->height[index] = agent.height;
-	agents->exit_no[index] = agent.exit_no;
-	agents->speed[index] = agent.speed;
-	agents->lod[index] = agent.lod;
-	agents->animate[index] = agent.animate;
-	agents->animate_dir[index] = agent.animate_dir;
-	agents->estado[index] = agent.estado;
-	agents->tick[index] = agent.tick;
-	agents->estado_movimiento[index] = agent.estado_movimiento;
-	agents->go_to_x[index] = agent.go_to_x;
-	agents->go_to_y[index] = agent.go_to_y;
-	agents->checkpoint[index] = agent.checkpoint;
-	agents->chair_no[index] = agent.chair_no;
-	agents->box_no[index] = agent.box_no;
-	agents->doctor_no[index] = agent.doctor_no;
-	agents->specialist_no[index] = agent.specialist_no;
-	agents->priority[index] = agent.priority;
-	}
-}
-
-/**
- *
- */
-__global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list* agents, xmachine_message_specialist_response_list* specialist_response_messages){
-	
-	//continuous agent: index is agent position in 1D agent list
-	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-  
-    
-    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
-    
-
-	//SoA to AoS - xmachine_memory_receive_specialist_response Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_agent agent;
-    //No partitioned input may launch more threads than required - only load agent data within bounds. 
-    if (index < d_xmachine_memory_agent_count){
-    
-	agent.id = agents->id[index];
-	agent.x = agents->x[index];
-	agent.y = agents->y[index];
-	agent.velx = agents->velx[index];
-	agent.vely = agents->vely[index];
-	agent.steer_x = agents->steer_x[index];
-	agent.steer_y = agents->steer_y[index];
-	agent.height = agents->height[index];
-	agent.exit_no = agents->exit_no[index];
-	agent.speed = agents->speed[index];
-	agent.lod = agents->lod[index];
-	agent.animate = agents->animate[index];
-	agent.animate_dir = agents->animate_dir[index];
-	agent.estado = agents->estado[index];
-	agent.tick = agents->tick[index];
-	agent.estado_movimiento = agents->estado_movimiento[index];
-	agent.go_to_x = agents->go_to_x[index];
-	agent.go_to_y = agents->go_to_y[index];
-	agent.checkpoint = agents->checkpoint[index];
-	agent.chair_no = agents->chair_no[index];
-	agent.box_no = agents->box_no[index];
-	agent.doctor_no = agents->doctor_no[index];
-	agent.specialist_no = agents->specialist_no[index];
-	agent.priority = agents->priority[index];
-	} else {
-	
-	agent.id = 0;
-	agent.x = 0;
-	agent.y = 0;
-	agent.velx = 0;
-	agent.vely = 0;
-	agent.steer_x = 0;
-	agent.steer_y = 0;
-	agent.height = 0;
-	agent.exit_no = 0;
-	agent.speed = 0;
-	agent.lod = 0;
-	agent.animate = 0;
-	agent.animate_dir = 0;
-	agent.estado = 0;
-	agent.tick = 0;
-	agent.estado_movimiento = 0;
-	agent.go_to_x = 0;
-	agent.go_to_y = 0;
-	agent.checkpoint = 0;
-	agent.chair_no = 0;
-	agent.box_no = 0;
-	agent.doctor_no = 0;
-	agent.specialist_no = 0;
-	agent.priority = 0;
-	}
-
-	//FLAME function call
-	int dead = !receive_specialist_response(&agent, specialist_response_messages);
-	
-
-	
-    //No partitioned input may launch more threads than required - only write agent data within bounds. 
-    if (index < d_xmachine_memory_agent_count){
-    //continuous agent: set reallocation flag
-	agents->_scan_input[index]  = dead; 
-
-	//AoS to SoA - xmachine_memory_receive_specialist_response Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
@@ -8507,6 +8532,267 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_output_doctor_reached Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->priority[index] = agent.priority;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list* agents, xmachine_message_specialist_response_list* specialist_response_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_specialist_response Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.priority = agents->priority[index];
+	} else {
+	
+	agent.id = 0;
+	agent.x = 0;
+	agent.y = 0;
+	agent.velx = 0;
+	agent.vely = 0;
+	agent.steer_x = 0;
+	agent.steer_y = 0;
+	agent.height = 0;
+	agent.exit_no = 0;
+	agent.speed = 0;
+	agent.lod = 0;
+	agent.animate = 0;
+	agent.animate_dir = 0;
+	agent.estado = 0;
+	agent.tick = 0;
+	agent.estado_movimiento = 0;
+	agent.go_to_x = 0;
+	agent.go_to_y = 0;
+	agent.checkpoint = 0;
+	agent.chair_no = 0;
+	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.specialist_no = 0;
+	agent.priority = 0;
+	}
+
+	//FLAME function call
+	int dead = !receive_specialist_response(&agent, specialist_response_messages);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_specialist_response Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->priority[index] = agent.priority;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_output_specialist_petition Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.priority = agents->priority[index];
+
+	//FLAME function call
+	int dead = !output_specialist_petition(&agent, specialist_petition_messages	);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_output_specialist_petition Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->priority[index] = agent.priority;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_output_specialist_reached(xmachine_memory_agent_list* agents, xmachine_message_specialist_reached_list* specialist_reached_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_output_specialist_reached Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.priority = agents->priority[index];
+
+	//FLAME function call
+	int dead = !output_specialist_reached(&agent, specialist_reached_messages	);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_output_specialist_reached Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
@@ -9067,6 +9353,50 @@ __global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist
 /**
  *
  */
+__global__ void GPUFLAME_receive_specialist_reached(xmachine_memory_specialist_list* agents, xmachine_message_specialist_reached_list* specialist_reached_messages, xmachine_message_attention_terminated_list* attention_terminated_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_specialist_reached Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_specialist agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_specialist_count){
+    
+	agent.id = agents->id[index];
+	agent.current_patient = agents->current_patient[index];
+	agent.tick = agents->tick[index];
+	} else {
+	
+	agent.id = 0;
+	agent.current_patient = 0;
+	agent.tick = 0;
+	}
+
+	//FLAME function call
+	int dead = !receive_specialist_reached(&agent, specialist_reached_messages, attention_terminated_messages	);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_specialist_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_specialist_reached Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->current_patient[index] = agent.current_patient;
+	agents->tick[index] = agent.tick;
+	}
+}
+
+/**
+ *
+ */
 __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agents, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_response_list* check_in_response_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
@@ -9290,6 +9620,43 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
 /**
  *
  */
+__global__ void GPUFLAME_generate_specialists(xmachine_memory_agent_generator_list* agents, xmachine_memory_specialist_list* specialist_agents){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_generator_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_generate_specialists Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent_generator agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.chairs_generated = agents->chairs_generated[index];
+	agent.boxes_generated = agents->boxes_generated[index];
+	agent.doctors_generated = agents->doctors_generated[index];
+	agent.specialists_generated = agents->specialists_generated[index];
+
+	//FLAME function call
+	int dead = !generate_specialists(&agent, specialist_agents);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_generate_specialists Coalesced memory write (ignore arrays)
+	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->boxes_generated[index] = agent.boxes_generated;
+	agents->doctors_generated[index] = agent.doctors_generated;
+	agents->specialists_generated[index] = agent.specialists_generated;
+}
+
+/**
+ *
+ */
 __global__ void GPUFLAME_attend_chair_petitions(xmachine_memory_chair_admin_list* agents, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages, RNG_rand48* rand48){
 	
 	//continuous agent: index is agent position in 1D agent list
@@ -9464,12 +9831,12 @@ __global__ void GPUFLAME_doctor_server(xmachine_memory_doctor_list* agents, xmac
     if (index < d_xmachine_memory_doctor_count){
     
 	agent.id = agents->id[index];
-	agent.attending = agents->attending[index];
+	agent.current_patient = agents->current_patient[index];
 	agent.tick = agents->tick[index];
 	} else {
 	
 	agent.id = 0;
-	agent.attending = 0;
+	agent.current_patient = 0;
 	agent.tick = 0;
 	}
 
@@ -9485,7 +9852,7 @@ __global__ void GPUFLAME_doctor_server(xmachine_memory_doctor_list* agents, xmac
 
 	//AoS to SoA - xmachine_memory_doctor_server Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
-	agents->attending[index] = agent.attending;
+	agents->current_patient[index] = agent.current_patient;
 	agents->tick[index] = agent.tick;
 	}
 }
