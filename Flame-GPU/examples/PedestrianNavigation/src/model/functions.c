@@ -379,6 +379,43 @@ __FLAME_GPU_FUNC__ int go_to_doctor(xmachine_memory_agent* agent){
 
 }
 
+__FLAME_GPU_FUNC__ int go_to_specialist(xmachine_memory_agent* agent){
+	
+	switch(agent->checkpoint){
+		case 0:
+			//El que va al geriatrico se maneja distinto
+			if(agent->specialist_no == 5){
+				if(mover_a_destino(agent,40,60) == 0){
+					agent->checkpoint++;
+				}
+			}else{
+				if(mover_a_destino(agent,firstSpecialist_x,firstSpecialist_y+20) == 0){
+					agent->checkpoint++;
+				}
+			}
+			break;
+		case 1:
+			if(agent->specialist_no == 5){
+				if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+					agent->checkpoint++;
+				}
+			}else{
+				if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+20) == 0){
+					agent->checkpoint++;
+				}
+			}
+			break;
+		case 2:
+			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+				return 1;
+			}
+			break;
+	}
+
+	return 0;
+
+}
+
 __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
 
 	switch(agent->checkpoint){
@@ -512,15 +549,11 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 					agent->estado_movimiento++;
 				}
 			}else{
-				if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
-					agent->estado_movimiento = 38;
-					//printf("Llegue al especialista\n");
-				}
-				/*if(go_to_specialist(agent)){
-					//printf("Llegue al doctor\n");
+				if(go_to_specialist(agent)){
+					printf("Llegue al especialista\n");
 					agent->checkpoint=0;
 					agent->estado_movimiento++;
-				}*/
+				}
 			}
 			break;
 		case 40:
