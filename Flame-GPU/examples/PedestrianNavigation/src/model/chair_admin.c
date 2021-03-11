@@ -54,4 +54,13 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 	return 0;
 }
 
-
+__FLAME_GPU_FUNC__ int receive_free_chair(xmachine_memory_chair_admin* agent, xmachine_message_free_chair_list* freeChairMessages){
+	
+	xmachine_message_free_chair* current_message = get_first_free_chair_message(freeChairMessages);
+	while(current_message){
+		agent->chairArray[current_message->chair_no] = 0;
+		printf("Libere la silla número %d\n",current_message->chair_no);
+		current_message = get_next_free_chair_message(current_message, freeChairMessages);
+	}
+	return 0;
+}

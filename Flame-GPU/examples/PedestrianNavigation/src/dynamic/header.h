@@ -161,6 +161,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_chair_state
 #define xmachine_message_chair_state_MAX 65536
 
+//Maximum population size of xmachine_mmessage_free_chair
+#define xmachine_message_free_chair_MAX 65536
+
 //Maximum population size of xmachine_mmessage_chair_contact
 #define xmachine_message_chair_contact_MAX 65536
 
@@ -211,6 +214,7 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_chair_petition_partitioningNone
 #define xmachine_message_chair_response_partitioningNone
 #define xmachine_message_chair_state_partitioningNone
+#define xmachine_message_free_chair_partitioningNone
 #define xmachine_message_chair_contact_partitioningNone
 #define xmachine_message_box_petition_partitioningNone
 #define xmachine_message_box_response_partitioningNone
@@ -566,6 +570,18 @@ struct __align__(16) xmachine_message_chair_state
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
     int state;        /**< Message variable state of type int.*/
+};
+
+/** struct xmachine_message_free_chair
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_free_chair
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int chair_no;        /**< Message variable chair_no of type unsigned int.*/
 };
 
 /** struct xmachine_message_chair_contact
@@ -1092,6 +1108,20 @@ struct xmachine_message_chair_state_list
     
 };
 
+/** struct xmachine_message_free_chair_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_free_chair_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_free_chair_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_free_chair_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int chair_no [xmachine_message_free_chair_MAX];    /**< Message memory variable list chair_no of type unsigned int.*/
+    
+};
+
 /** struct xmachine_message_chair_contact_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -1407,6 +1437,13 @@ __FLAME_GPU_FUNC__ int receive_chair_state(xmachine_memory_agent* agent, xmachin
 __FLAME_GPU_FUNC__ int output_chair_contact(xmachine_memory_agent* agent, xmachine_message_chair_contact_list* chair_contact_messages);
 
 /**
+ * output_free_chair FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param free_chair_messages Pointer to output message list of type xmachine_message_free_chair_list. Must be passed as an argument to the add_free_chair_message function ??.
+ */
+__FLAME_GPU_FUNC__ int output_free_chair(xmachine_memory_agent* agent, xmachine_message_free_chair_list* free_chair_messages);
+
+/**
  * output_chair_petition FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
@@ -1580,6 +1617,13 @@ __FLAME_GPU_FUNC__ int generate_doctors(xmachine_memory_agent_generator* agent, 
  * @param chair_petition_messages  chair_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_chair_petition_message and get_next_chair_petition_message functions.* @param chair_response_messages Pointer to output message list of type xmachine_message_chair_response_list. Must be passed as an argument to the add_chair_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
 __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent, xmachine_message_chair_petition_list* chair_petition_messages, xmachine_message_chair_response_list* chair_response_messages, RNG_rand48* rand48);
+
+/**
+ * receive_free_chair FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_chair_admin. This represents a single agent instance and can be modified directly.
+ * @param free_chair_messages  free_chair_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_free_chair_message and get_next_free_chair_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_free_chair(xmachine_memory_chair_admin* agent, xmachine_message_free_chair_list* free_chair_messages);
 
 /**
  * box_server FLAMEGPU Agent Function
@@ -1849,6 +1893,33 @@ __FLAME_GPU_FUNC__ xmachine_message_chair_state * get_first_chair_state_message(
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_chair_state * get_next_chair_state_message(xmachine_message_chair_state* current, xmachine_message_chair_state_list* chair_state_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) free_chair message implemented in FLAMEGPU_Kernels */
+
+/** add_free_chair_message
+ * Function for all types of message partitioning
+ * Adds a new free_chair agent to the xmachine_memory_free_chair_list list using a linear mapping
+ * @param agents	xmachine_memory_free_chair_list agent list
+ * @param chair_no	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_free_chair_message(xmachine_message_free_chair_list* free_chair_messages, unsigned int chair_no);
+ 
+/** get_first_free_chair_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param free_chair_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_chair * get_first_free_chair_message(xmachine_message_free_chair_list* free_chair_messages);
+
+/** get_next_free_chair_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param free_chair_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_chair * get_next_free_chair_message(xmachine_message_free_chair* current, xmachine_message_free_chair_list* free_chair_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) chair_contact message implemented in FLAMEGPU_Kernels */
