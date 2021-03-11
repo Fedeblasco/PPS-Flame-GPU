@@ -670,19 +670,83 @@
               <messageName>doctor_response</messageName>
             </gpu:input>
           </inputs>
-          <outputs>
-            <gpu:output>
-              <messageName>chair_petition</messageName>
-              <gpu:type>optional_message</gpu:type>
-            </gpu:output>
-          </outputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>28</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>and</operator>
             <rhs>
-                <value>28</value>
+              <condition>
+                <lhs>
+                  <agentVariable>specialist_no</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>0</value>
+                </rhs>
+              </condition>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>receive_specialist_response</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>specialist_response</messageName>
+            </gpu:input>
+          </inputs>
+          <condition>
+            <lhs> 
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>28</value>
+                </rhs>
+              </condition>
+            </lhs>
+            <operator>and</operator>
+            <rhs>
+              <condition>
+                <lhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>specialist_no</agentVariable>
+                    </lhs>
+                    <operator>&gt;</operator>
+                    <rhs>
+                        <value>0</value>
+                    </rhs>
+                  </condition>
+                </lhs>
+                <operator>and</operator>
+                <rhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>specialist_no</agentVariable>
+                    </lhs>
+                    <operator>&lt;</operator>
+                    <rhs>
+                        <value>6</value>
+                    </rhs>
+                  </condition>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -1156,7 +1220,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>doctor_response</messageName>
+              <messageName>specialist_response</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -1952,6 +2016,10 @@
           <type>unsigned int</type>
           <name>id</name>
         </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>specialist_ready</name>
+        </gpu:variable>
       </variables>
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
@@ -2076,6 +2144,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_doctor_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_specialist_response</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_free_doctors</name>

@@ -168,7 +168,7 @@ __FLAME_GPU_FUNC__ int output_doctor_reached(xmachine_memory_agent* agent, xmach
 
 __FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, xmachine_message_specialist_petition_list* specialistPetitionMessages){
 	
-	printf("Enviando mensaje\n");
+	//printf("Enviando mensaje\n");
 	add_specialist_petition_message(specialistPetitionMessages, agent->id, agent->priority,agent->specialist_no);
 	agent->estado_movimiento++;
 
@@ -500,14 +500,27 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			}
 			break;
 		case 30:
-			if(go_to_doctor(agent)){
-				printf("Llegue al doctor\n");
-				agent->checkpoint=0;
-				agent->estado_movimiento++;
+			if(agent->specialist_no == 0){
+				if(go_to_doctor(agent)){
+					//printf("Llegue al doctor\n");
+					agent->checkpoint=0;
+					agent->estado_movimiento++;
+				}
+			}else{
+				if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+					agent->estado_movimiento = 39;
+					printf("Llegue al especialista\n");
+				}
+				/*if(go_to_specialist(agent)){
+					//printf("Llegue al doctor\n");
+					agent->checkpoint=0;
+					agent->estado_movimiento++;
+				}*/
 			}
 			break;
 		case 40:
 			if(go_to_exit(agent)){
+				printf("Me re mori, soy %d\n",agent->id);
 				return 1;
 			}
 			break;
@@ -650,7 +663,7 @@ __FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xma
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctorResponseMessages, xmachine_message_chair_petition_list* chairPetitionMessages){
+__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctorResponseMessages){
 	
 	xmachine_message_doctor_response* current_message = get_first_doctor_response_message(doctorResponseMessages);
 	while(current_message){
@@ -671,6 +684,36 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 			//add_chair_petition_message(chairPetitionMessages, agent->id);
 		}
 		current_message = get_next_doctor_response_message(current_message, doctorResponseMessages);
+	}
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int receive_specialist_response(xmachine_memory_agent* agent, xmachine_message_specialist_response_list* specialistResponseMessages){
+	
+	xmachine_message_specialist_response* current_message = get_first_specialist_response_message(specialistResponseMessages);
+	while(current_message){
+		if(current_message->id == agent->id){
+			printf("Soy %d y me llego el mensaje %d\n",agent->id, current_message->specialist_ready);
+			//Si el especialista está listo, voy hacia él
+			if(current_message->specialist_ready != -1){
+				if((agent->specialist_no > 0) && (agent->specialist_no < 5)){
+					agent->go_to_x = firstSpecialist_x + (space_between_specialists * (agent->specialist_no-1));
+					agent->go_to_y = firstSpecialist_y;
+				}else{
+					agent->go_to_x = fifthSpecialist_x;
+					agent->go_to_y = fifthSpecialist_y; 
+				}
+				agent->chair_no = -1;
+				agent->estado_movimiento++;
+			//Sino, salgo del hospital
+			}else{
+				printf("El especialista no esta disponible, soy %d\n",agent->id);
+				agent->checkpoint = 1;
+				agent->estado_movimiento = 40;
+			}
+		}
+		current_message = get_next_specialist_response_message(current_message, specialistResponseMessages);
 	}
 
 	return 0;

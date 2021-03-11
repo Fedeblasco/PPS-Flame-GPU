@@ -5,7 +5,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 	xmachine_message_chair_petition* current_message = get_first_chair_petition_message(chairPetitionMessages);
 	int send_message = 1;
 	int corte_de_control = 0;
-	while((current_message)&&(corte_de_control<15)){
+	while((current_message)&&(corte_de_control<2)){
 		
 		//printf("Hola, me llego el mensaje %d",current_message->id);
 		int index = -1;  //Variable utilizada para el cálculo de índice random
@@ -16,7 +16,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 		for(int i=0;i<35;i++){
 			
 			if(index == -1){
-				int random = (rnd<CONTINUOUS>(rand48))*35;
+				int random = (rnd<DISCRETE_2D>(rand48))*35;
 				if((agent->chairArray[random] == 0) && (random < 35)){ //Se pone el random < 35 por la remota posibilidad devuelva 35
 					index = random;
 				}
@@ -47,8 +47,8 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 
         current_message = get_next_chair_petition_message(current_message, chairPetitionMessages);	
 	}
-	if(corte_de_control == 15){
-		printf("Tuve que cortar porque sino se rompia todo che\n");
+	if(corte_de_control == 2){
+		printf("Corte de control para %d\n",current_message->id);
 	}
 
 	return 0;

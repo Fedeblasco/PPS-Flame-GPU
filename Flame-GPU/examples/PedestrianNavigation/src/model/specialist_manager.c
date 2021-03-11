@@ -1,4 +1,4 @@
-__FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_manager* agent, xmachine_message_specialist_petition_list* specialistPetitionMessages, xmachine_message_doctor_response_list* doctorResponseMessages){
+__FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_manager* agent, xmachine_message_specialist_petition_list* specialistPetitionMessages, xmachine_message_specialist_response_list* specialistResponseMessages){
 	
     ivec2 * ptr[5];
     ptr[0] = agent->surgicalQueue;
@@ -17,20 +17,21 @@ __FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_m
 	}
 
     //Manejo de colas para cada uno de los especialistas
-    for(int i = 0; i<1; i++){
+    for(int i = 0; i<5; i++){
         if(!isPriorityEmpty(&agent->size[i])){
             if(agent->free_specialist[i] > 0){
                 agent->free_specialist[i]--;
                 ivec2 paciente = priorityDequeue(ptr[i],&agent->size[i],&agent->rear[i]);
-                add_doctor_response_message(doctorResponseMessages,paciente.x,52);
-                //printf("El paciente %d va al especialista %d\n",paciente.x,i);
+                add_specialist_response_message(specialistResponseMessages,paciente.x,1);
+                //printf("El paciente %d va al especialista 52\n",paciente.x);
                 //printQueue(ptr[i]);
             }
             if(agent->tick[i] == TICKS_PER_MINUTE){
                 for(int j=0;j<agent->rear[i];j++){
                     ptr[i][j].y--;
                     if(ptr[i][j].y < 0){
-                        add_doctor_response_message(doctorResponseMessages,ptr[i][j].x,-1);
+                        //printf("El paciente %d va al especialista -1\n",ptr[i][j].x);
+                        add_specialist_response_message(specialistResponseMessages,ptr[i][j].x,-1);
                         priorityDequeue(ptr[i],&agent->size[i],&agent->rear[i]);
                     }
                 }

@@ -713,7 +713,59 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if (currentState->estado_movimiento[index]==28)
+		if ((currentState->estado_movimiento[index]==28)and(currentState->specialist_no[index]==0))
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** receive_specialist_response_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void receive_specialist_response_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if ((currentState->estado_movimiento[index]==28)and((currentState->specialist_no[index]>0)and(currentState->specialist_no[index]<6)))
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -6158,8 +6210,9 @@ __device__ xmachine_message_doctor_response* get_next_doctor_response_message(xm
  * Add non partitioned or spatially partitioned specialist_response message
  * @param messages xmachine_message_specialist_response_list message list to add too
  * @param id agent variable of type unsigned int
+ * @param specialist_ready agent variable of type int
  */
-__device__ void add_specialist_response_message(xmachine_message_specialist_response_list* messages, unsigned int id){
+__device__ void add_specialist_response_message(xmachine_message_specialist_response_list* messages, unsigned int id, int specialist_ready){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_specialist_response_count;
@@ -6180,6 +6233,7 @@ __device__ void add_specialist_response_message(xmachine_message_specialist_resp
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
+	messages->specialist_ready[index] = specialist_ready;
 
 }
 
@@ -6200,7 +6254,8 @@ __global__ void scatter_optional_specialist_response_messages(xmachine_message_s
 
 		//AoS - xmachine_message_specialist_response Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
-		messages->id[output_index] = messages_swap->id[index];				
+		messages->id[output_index] = messages_swap->id[index];
+		messages->specialist_ready[output_index] = messages_swap->specialist_ready[index];				
 	}
 }
 
@@ -6241,6 +6296,7 @@ __device__ xmachine_message_specialist_response* get_first_specialist_response_m
 	xmachine_message_specialist_response temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
+	temp_message.specialist_ready = messages->specialist_ready[index];
 
 	//AoS to shared memory
 	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_specialist_response));
@@ -6283,6 +6339,7 @@ __device__ xmachine_message_specialist_response* get_next_specialist_response_me
 		xmachine_message_specialist_response temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
+		temp_message.specialist_ready = messages->specialist_ready[index];
 
 		//AoS to shared memory
 		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_specialist_response));
@@ -7800,7 +7857,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 /**
  *
  */
-__global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_chair_petition_list* chair_petition_messages){
+__global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* agents, xmachine_message_doctor_response_list* doctor_response_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -7867,7 +7924,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	}
 
 	//FLAME function call
-	int dead = !receive_doctor_response(&agent, doctor_response_messages, chair_petition_messages	);
+	int dead = !receive_doctor_response(&agent, doctor_response_messages);
 	
 
 	
@@ -7877,6 +7934,113 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_receive_doctor_response Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->priority[index] = agent.priority;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list* agents, xmachine_message_specialist_response_list* specialist_response_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_specialist_response Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.priority = agents->priority[index];
+	} else {
+	
+	agent.id = 0;
+	agent.x = 0;
+	agent.y = 0;
+	agent.velx = 0;
+	agent.vely = 0;
+	agent.steer_x = 0;
+	agent.steer_y = 0;
+	agent.height = 0;
+	agent.exit_no = 0;
+	agent.speed = 0;
+	agent.lod = 0;
+	agent.animate = 0;
+	agent.animate_dir = 0;
+	agent.estado = 0;
+	agent.tick = 0;
+	agent.estado_movimiento = 0;
+	agent.go_to_x = 0;
+	agent.go_to_y = 0;
+	agent.checkpoint = 0;
+	agent.chair_no = 0;
+	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.specialist_no = 0;
+	agent.priority = 0;
+	}
+
+	//FLAME function call
+	int dead = !receive_specialist_response(&agent, specialist_response_messages);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_specialist_response Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
@@ -8566,7 +8730,7 @@ __global__ void GPUFLAME_receive_free_doctors(xmachine_memory_doctor_manager_lis
 /**
  *
  */
-__global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist_manager_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_doctor_response_list* doctor_response_messages){
+__global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist_manager_list* agents, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_specialist_response_list* specialist_response_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -8605,7 +8769,7 @@ __global__ void GPUFLAME_receive_specialist_petitions(xmachine_memory_specialist
 	}
 
 	//FLAME function call
-	int dead = !receive_specialist_petitions(&agent, specialist_petition_messages, doctor_response_messages	);
+	int dead = !receive_specialist_petitions(&agent, specialist_petition_messages, specialist_response_messages	);
 	
 
 	

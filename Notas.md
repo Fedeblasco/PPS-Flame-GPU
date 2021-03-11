@@ -24,6 +24,7 @@
 1. No hubo manera de hacer que ande la liberación de sillas dentro de la función receive_doctor_response, hubo que hacerlo en la funcion output_chair_petition
 2. Las capas de funciones tienen un límite de mensajes que pueden pasar
 3. Los arreglos no funcionan cuando se los agrega desde el dispositivo, tiene que ser desde el host si o si, esto lo descubri al tratar de implementar las colas de prioridades de los especialistas. Al tratar de inicializar varios especialistas desde el dispositivo, no solo me genera mal el vector, poniendo 0 en la primera posicion, sino que el vector lo hace compartido entre todos los especialistas, haciendo imposible el manejo del mismo
+4. En chair_admin hubo que agregar un corte de control porque de vez en cuando se rompe
 
 # Cosas de Flame-GPU
 

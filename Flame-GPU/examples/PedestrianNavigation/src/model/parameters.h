@@ -41,6 +41,24 @@
 #define space_between_doctors 18
 #endif
 
+//Manejo de los especialistas
+#ifndef firstSpecialist_x
+#define firstSpecialist_x 58
+#endif
+#ifndef firstSpecialist_y
+#define firstSpecialist_y 40
+#endif
+#ifndef space_between_specialists
+#define space_between_specialists 27
+#endif
+
+#ifndef fifthSpecialist_x
+#define fifthSpecialist_x 15
+#endif
+#ifndef fifthSpecialist_y
+#define fifthSpecialist_y 16
+#endif
+
 //Constante de tiempo
 #ifndef MINUTES_PER_TICK
 #define MINUTES_PER_TICK 1

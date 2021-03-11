@@ -709,7 +709,8 @@ struct __align__(16) xmachine_message_specialist_response
     /* Brute force Partitioning Variables */
     int _position;          /**< 1D position of message in linear message list */   
       
-    unsigned int id;        /**< Message variable id of type unsigned int.*/
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    int specialist_ready;        /**< Message variable specialist_ready of type int.*/
 };
 
 /** struct xmachine_message_triage_petition
@@ -1254,6 +1255,7 @@ struct xmachine_message_specialist_response_list
     int _scan_input [xmachine_message_specialist_response_MAX];  /**< Used during parallel prefix sum */
     
     unsigned int id [xmachine_message_specialist_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    int specialist_ready [xmachine_message_specialist_response_MAX];    /**< Message memory variable list specialist_ready of type int.*/
     
 };
 
@@ -1456,9 +1458,16 @@ __FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, 
 /**
  * receive_doctor_response FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param doctor_response_messages  doctor_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_doctor_response_message and get_next_doctor_response_message functions.* @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
+ * @param doctor_response_messages  doctor_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_doctor_response_message and get_next_doctor_response_message functions.
  */
-__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctor_response_messages, xmachine_message_chair_petition_list* chair_petition_messages);
+__FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xmachine_message_doctor_response_list* doctor_response_messages);
+
+/**
+ * receive_specialist_response FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param specialist_response_messages  specialist_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_response_message and get_next_specialist_response_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_specialist_response(xmachine_memory_agent* agent, xmachine_message_specialist_response_list* specialist_response_messages);
 
 /**
  * receive_attention_terminated FLAMEGPU Agent Function
@@ -1526,9 +1535,9 @@ __FLAME_GPU_FUNC__ int receive_free_doctors(xmachine_memory_doctor_manager* agen
 /**
  * receive_specialist_petitions FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_specialist_manager. This represents a single agent instance and can be modified directly.
- * @param specialist_petition_messages  specialist_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_petition_message and get_next_specialist_petition_message functions.* @param doctor_response_messages Pointer to output message list of type xmachine_message_doctor_response_list. Must be passed as an argument to the add_doctor_response_message function ??.
+ * @param specialist_petition_messages  specialist_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_petition_message and get_next_specialist_petition_message functions.* @param specialist_response_messages Pointer to output message list of type xmachine_message_specialist_response_list. Must be passed as an argument to the add_specialist_response_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_manager* agent, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_doctor_response_list* doctor_response_messages);
+__FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_manager* agent, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_specialist_response_list* specialist_response_messages);
 
 /**
  * receptionServer FLAMEGPU Agent Function
@@ -2131,9 +2140,10 @@ __FLAME_GPU_FUNC__ xmachine_message_doctor_response * get_next_doctor_response_m
  * Adds a new specialist_response agent to the xmachine_memory_specialist_response_list list using a linear mapping
  * @param agents	xmachine_memory_specialist_response_list agent list
  * @param id	message variable of type unsigned int
+ * @param specialist_ready	message variable of type int
  */
  
- __FLAME_GPU_FUNC__ void add_specialist_response_message(xmachine_message_specialist_response_list* specialist_response_messages, unsigned int id);
+ __FLAME_GPU_FUNC__ void add_specialist_response_message(xmachine_message_specialist_response_list* specialist_response_messages, unsigned int id, int specialist_ready);
  
 /** get_first_specialist_response_message
  * Get first message function for non partitioned (brute force) messages
