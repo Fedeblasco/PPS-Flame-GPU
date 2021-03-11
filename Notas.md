@@ -25,6 +25,7 @@
 2. Las capas de funciones tienen un límite de mensajes que pueden pasar, me di cuenta tratando de agregar un output más a la capa de outputs inicial
 3. Los arreglos no funcionan cuando se los agrega desde el dispositivo, tiene que ser desde el host si o si, esto lo descubri al tratar de implementar las colas de prioridades de los especialistas. Al tratar de inicializar varios especialistas desde el dispositivo, no solo me genera mal el vector, poniendo 0 en la primera posicion, sino que el vector lo hace compartido entre todos los especialistas, haciendo imposible el manejo del mismo
 4. En chair_admin hubo que agregar un corte de control porque de vez en cuando se rompe
+5. Al tratar de enviar el mismo tipo de mensaje para que se libere el doctor o el especialista, se rompe todo, hubo que hacer dos mensajes aparte para que no falle
 
 # Cosas de Flame-GPU
 

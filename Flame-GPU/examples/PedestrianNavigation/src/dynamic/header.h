@@ -179,6 +179,12 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_specialist_reached
 #define xmachine_message_specialist_reached_MAX 65536
 
+//Maximum population size of xmachine_mmessage_specialist_terminated
+#define xmachine_message_specialist_terminated_MAX 65536
+
+//Maximum population size of xmachine_mmessage_free_specialist
+#define xmachine_message_free_specialist_MAX 65536
+
 //Maximum population size of xmachine_mmessage_specialist_petition
 #define xmachine_message_specialist_petition_MAX 65536
 
@@ -222,6 +228,8 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_box_petition_partitioningNone
 #define xmachine_message_box_response_partitioningNone
 #define xmachine_message_specialist_reached_partitioningNone
+#define xmachine_message_specialist_terminated_partitioningNone
+#define xmachine_message_free_specialist_partitioningNone
 #define xmachine_message_specialist_petition_partitioningNone
 #define xmachine_message_doctor_reached_partitioningNone
 #define xmachine_message_free_doctor_partitioningNone
@@ -649,6 +657,30 @@ struct __align__(16) xmachine_message_specialist_reached
     int _position;          /**< 1D position of message in linear message list */   
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    unsigned int specialist_no;        /**< Message variable specialist_no of type unsigned int.*/
+};
+
+/** struct xmachine_message_specialist_terminated
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_specialist_terminated
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/
+};
+
+/** struct xmachine_message_free_specialist
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_free_specialist
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
     unsigned int specialist_no;        /**< Message variable specialist_no of type unsigned int.*/
 };
 
@@ -1213,6 +1245,34 @@ struct xmachine_message_specialist_reached_list
     
 };
 
+/** struct xmachine_message_specialist_terminated_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_specialist_terminated_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_specialist_terminated_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_specialist_terminated_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_specialist_terminated_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    
+};
+
+/** struct xmachine_message_free_specialist_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_free_specialist_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_free_specialist_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_free_specialist_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int specialist_no [xmachine_message_free_specialist_MAX];    /**< Message memory variable list specialist_no of type unsigned int.*/
+    
+};
+
 /** struct xmachine_message_specialist_petition_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -1529,6 +1589,13 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 __FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent, xmachine_message_attention_terminated_list* attention_terminated_messages, xmachine_message_free_doctor_list* free_doctor_messages);
 
 /**
+ * receive_specialist_terminated FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param specialist_terminated_messages  specialist_terminated_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_terminated_message and get_next_specialist_terminated_message functions.* @param free_specialist_messages Pointer to output message list of type xmachine_message_free_specialist_list. Must be passed as an argument to the add_free_specialist_message function ??.
+ */
+__FLAME_GPU_FUNC__ int receive_specialist_terminated(xmachine_memory_agent* agent, xmachine_message_specialist_terminated_list* specialist_terminated_messages, xmachine_message_free_specialist_list* free_specialist_messages);
+
+/**
  * output_doctor_reached FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param doctor_reached_messages Pointer to output message list of type xmachine_message_doctor_reached_list. Must be passed as an argument to the add_doctor_reached_message function ??.
@@ -1613,11 +1680,18 @@ __FLAME_GPU_FUNC__ int receive_free_doctors(xmachine_memory_doctor_manager* agen
 __FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_manager* agent, xmachine_message_specialist_petition_list* specialist_petition_messages, xmachine_message_specialist_response_list* specialist_response_messages);
 
 /**
+ * receive_free_specialist FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_specialist_manager. This represents a single agent instance and can be modified directly.
+ * @param free_specialist_messages  free_specialist_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_free_specialist_message and get_next_free_specialist_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_free_specialist(xmachine_memory_specialist_manager* agent, xmachine_message_free_specialist_list* free_specialist_messages);
+
+/**
  * receive_specialist_reached FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_specialist. This represents a single agent instance and can be modified directly.
- * @param specialist_reached_messages  specialist_reached_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_reached_message and get_next_specialist_reached_message functions.* @param attention_terminated_messages Pointer to output message list of type xmachine_message_attention_terminated_list. Must be passed as an argument to the add_attention_terminated_message function ??.
+ * @param specialist_reached_messages  specialist_reached_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_specialist_reached_message and get_next_specialist_reached_message functions.* @param specialist_terminated_messages Pointer to output message list of type xmachine_message_specialist_terminated_list. Must be passed as an argument to the add_specialist_terminated_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_specialist_reached(xmachine_memory_specialist* agent, xmachine_message_specialist_reached_list* specialist_reached_messages, xmachine_message_attention_terminated_list* attention_terminated_messages);
+__FLAME_GPU_FUNC__ int receive_specialist_reached(xmachine_memory_specialist* agent, xmachine_message_specialist_reached_list* specialist_reached_messages, xmachine_message_specialist_terminated_list* specialist_terminated_messages);
 
 /**
  * receptionServer FLAMEGPU Agent Function
@@ -2084,6 +2158,60 @@ __FLAME_GPU_FUNC__ xmachine_message_specialist_reached * get_first_specialist_re
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_specialist_reached * get_next_specialist_reached_message(xmachine_message_specialist_reached* current, xmachine_message_specialist_reached_list* specialist_reached_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) specialist_terminated message implemented in FLAMEGPU_Kernels */
+
+/** add_specialist_terminated_message
+ * Function for all types of message partitioning
+ * Adds a new specialist_terminated agent to the xmachine_memory_specialist_terminated_list list using a linear mapping
+ * @param agents	xmachine_memory_specialist_terminated_list agent list
+ * @param id	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_specialist_terminated_message(xmachine_message_specialist_terminated_list* specialist_terminated_messages, unsigned int id);
+ 
+/** get_first_specialist_terminated_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param specialist_terminated_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_terminated * get_first_specialist_terminated_message(xmachine_message_specialist_terminated_list* specialist_terminated_messages);
+
+/** get_next_specialist_terminated_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param specialist_terminated_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_terminated * get_next_specialist_terminated_message(xmachine_message_specialist_terminated* current, xmachine_message_specialist_terminated_list* specialist_terminated_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) free_specialist message implemented in FLAMEGPU_Kernels */
+
+/** add_free_specialist_message
+ * Function for all types of message partitioning
+ * Adds a new free_specialist agent to the xmachine_memory_free_specialist_list list using a linear mapping
+ * @param agents	xmachine_memory_free_specialist_list agent list
+ * @param specialist_no	message variable of type unsigned int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_free_specialist_message(xmachine_message_free_specialist_list* free_specialist_messages, unsigned int specialist_no);
+ 
+/** get_first_free_specialist_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param free_specialist_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_specialist * get_first_free_specialist_message(xmachine_message_free_specialist_list* free_specialist_messages);
+
+/** get_next_free_specialist_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param free_specialist_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_specialist * get_next_free_specialist_message(xmachine_message_free_specialist* current, xmachine_message_free_specialist_list* free_specialist_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) specialist_petition message implemented in FLAMEGPU_Kernels */

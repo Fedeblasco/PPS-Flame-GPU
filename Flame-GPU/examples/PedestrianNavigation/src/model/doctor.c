@@ -11,7 +11,9 @@ __FLAME_GPU_FUNC__ int doctor_server(xmachine_memory_doctor* agent, xmachine_mes
 
     if(agent->current_patient!=0){
         if(agent->tick * MINUTES_PER_TICK == 600){
+            //printf("Soy el doctor %d y le aviso a %d que se vaya\n",agent->id,agent->current_patient);
             add_attention_terminated_message(attentionTerminatedMessages,agent->current_patient);
+            agent->current_patient = 0;
         }
         agent->tick++;
     }

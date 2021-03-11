@@ -166,6 +166,7 @@ __FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmac
 
 __FLAME_GPU_FUNC__ int output_doctor_reached(xmachine_memory_agent* agent, xmachine_message_doctor_reached_list* doctorReachedMessages){
 	
+	//printf("Soy %d y llegue al doctor %d\n",agent->id, agent->doctor_no);
 	add_doctor_reached_message(doctorReachedMessages, agent->id, agent->doctor_no);
 	agent->estado_movimiento++;
 
@@ -183,7 +184,7 @@ __FLAME_GPU_FUNC__ int output_specialist_petition(xmachine_memory_agent* agent, 
 
 __FLAME_GPU_FUNC__ int output_specialist_reached(xmachine_memory_agent* agent, xmachine_message_specialist_reached_list* specialistReachedMessages){
 	
-	printf("Enviando mensaje del especialista\n");
+	//printf("Enviando mensaje del especialista\n");
 	add_specialist_reached_message(specialistReachedMessages, agent->id, agent->specialist_no);
 	agent->estado_movimiento++;
 
@@ -432,16 +433,34 @@ __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
 		case 0:
 			if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
 				//printf("Llegue al primer checkpoint\n");
-				agent->checkpoint++;
+				if(agent->specialist_no == 5){
+					agent->checkpoint = 3;
+				}else{
+					agent->checkpoint = 4;
+				}
 			}
 			break;
 		case 1:
-			if(mover_a_destino(agent,88,96) == 0){
-				//printf("Llegue al segundo checkpoint\n");
+			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+20) == 0){
 				agent->checkpoint++;
 			}
 			break;
 		case 2:
+			if(mover_a_destino(agent,firstSpecialist_x,firstSpecialist_y+20) == 0){
+				agent->checkpoint = 4;
+			}
+			break;
+		case 3:
+			if(mover_a_destino(agent,40,60) == 0){
+				agent->checkpoint++;
+			}
+			break;
+		case 4:
+			if(mover_a_destino(agent,88,96) == 0){
+				agent->checkpoint++;
+			}
+			break;
+		case 5:
 			if(mover_a_destino(agent,150,102) == 0){
 				return 1;
 			}
@@ -560,8 +579,12 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 				}
 			}else{
 				if(go_to_specialist(agent)){
-					printf("Llegue al especialista %d, soy %d\n",agent->specialist_no,agent->id);
-					agent->checkpoint=0;
+					//printf("Llegue al especialista %d, soy %d\n",agent->specialist_no,agent->id);
+					if(agent->specialist_no == 5){
+						agent->checkpoint=0;
+					}else{
+						agent->checkpoint=1;
+					}
 					agent->estado_movimiento++;
 				}
 			}
@@ -770,13 +793,27 @@ __FLAME_GPU_FUNC__ int receive_attention_terminated(xmachine_memory_agent* agent
 	xmachine_message_attention_terminated* current_message = get_first_attention_terminated_message(attentionTerminatedMessages);
 	while(current_message){
 		if(agent->id == current_message->id){
-			printf("Me estoy yendo, soy %d\n",agent->id);
 			if(agent->specialist_no == 0){
 				add_free_doctor_message(freeDoctorMessages, agent->doctor_no);
 			}
 			agent->estado_movimiento = 40;
 		}
 		current_message = get_next_attention_terminated_message(current_message, attentionTerminatedMessages);
+	}
+
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int receive_specialist_terminated(xmachine_memory_agent* agent, xmachine_message_specialist_terminated_list* specialistTerminatedMessages, xmachine_message_free_specialist_list* freeSpecialistMessages){
+	
+	xmachine_message_specialist_terminated* current_message = get_first_specialist_terminated_message(specialistTerminatedMessages);
+	while(current_message){
+		if(agent->id == current_message->id){
+			//printf("Debería retirarme del especialista che\n");
+			add_free_specialist_message(freeSpecialistMessages, agent->specialist_no);
+			agent->estado_movimiento = 40;
+		}
+		current_message = get_next_specialist_terminated_message(current_message, specialistTerminatedMessages);
 	}
 
 	return 0;

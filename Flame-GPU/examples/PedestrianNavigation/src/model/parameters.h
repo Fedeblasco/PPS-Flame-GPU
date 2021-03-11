@@ -10,8 +10,8 @@
 #define RADIANS(x) (PI / 180.0f) * x
 
 //Probabilidades usadas para manejar la cantidad de enfermos
-#define probabilidad_estornudar 1.0
-#define probabilidad_contagio 1.0
+#define probabilidad_estornudar 0.2
+#define probabilidad_contagio 0.2
 #define probabilidad_generar_enfermo 0.2
 //Cantidad de ticks enfermo y portador 
 #define ticks_portador 10000

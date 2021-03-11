@@ -684,11 +684,87 @@
           </outputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>32</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>==</operator>
+            <operator>and</operator>
             <rhs>
-                <value>32</value>
+              <condition>
+                <lhs>
+                  <agentVariable>specialist_no</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>0</value>
+                </rhs>
+              </condition>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>receive_specialist_terminated</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>specialist_terminated</messageName>
+            </gpu:input>
+          </inputs>
+          <outputs>
+            <gpu:output>
+              <messageName>free_specialist</messageName>
+              <gpu:type>optional_message</gpu:type>
+            </gpu:output>
+          </outputs>
+          <condition>
+            <lhs> 
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>32</value>
+                </rhs>
+              </condition>
+            </lhs>
+            <operator>and</operator>
+            <rhs>
+              <condition>
+                <lhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>specialist_no</agentVariable>
+                    </lhs>
+                    <operator>&gt;</operator>
+                    <rhs>
+                        <value>0</value>
+                    </rhs>
+                  </condition>
+                </lhs>
+                <operator>and</operator>
+                <rhs>
+                  <condition>
+                    <lhs>
+                      <agentVariable>specialist_no</agentVariable>
+                    </lhs>
+                    <operator>&lt;</operator>
+                    <rhs>
+                        <value>6</value>
+                    </rhs>
+                  </condition>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -1317,6 +1393,19 @@
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>false</gpu:RNG>
         </gpu:function>
+
+        <gpu:function>
+          <name>receive_free_specialist</name>
+          <currentState>defaultSpecialistManager</currentState>
+          <nextState>defaultSpecialistManager</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>free_specialist</messageName>
+            </gpu:input>
+          </inputs>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
       </functions>
       <states>
         <gpu:state>
@@ -1356,7 +1445,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>attention_terminated</messageName>
+              <messageName>specialist_terminated</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -2098,6 +2187,30 @@
     </gpu:message>
 
     <gpu:message> 
+      <name>specialist_terminated</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
+      <name>free_specialist</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>specialist_no</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
+
+    <gpu:message> 
       <name>specialist_petition</name>
       <variables>
         <gpu:variable>
@@ -2304,8 +2417,15 @@
       <gpu:layerFunction>
         <name>receive_triage_petitions</name>
       </gpu:layerFunction>
+    </layer>
+    <layer>
       <gpu:layerFunction>
         <name>doctor_server</name>
+      </gpu:layerFunction>
+    </layer>
+    <layer>
+      <gpu:layerFunction>
+        <name>receive_specialist_reached</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -2325,9 +2445,6 @@
         <name>receive_doctor_petitions</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>receive_specialist_reached</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
         <name>receive_free_chair</name>
       </gpu:layerFunction>
     </layer>
@@ -2337,6 +2454,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_attention_terminated</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_specialist_terminated</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>move</name>
@@ -2374,6 +2494,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_box_response</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_free_specialist</name>
       </gpu:layerFunction>
     </layer>
   </layers>
