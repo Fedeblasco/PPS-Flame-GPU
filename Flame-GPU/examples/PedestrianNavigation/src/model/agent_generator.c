@@ -43,15 +43,31 @@ __FLAME_GPU_FUNC__ int generate_specialists(xmachine_memory_agent_generator* age
     return 0;
 }
 
-__FLAME_GPU_FUNC__ int generate_real_doctors(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents){
+__FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents){
     
-    printf("Doctor real generado\n"); 
+    printf("Personal generado\n"); 
+    float x = 0;
+    float y = 0;
+    if(agent->personal_generated<4){
+        x = ((firstDoctor_x-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+        y = ((firstDoctor_y-(space_between_doctors*agent->personal_generated))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+    }else{ 
+        if(agent->personal_generated<8){
+            x = ((firstSpecialist_x + (space_between_specialists*(agent->personal_generated-4)))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            y = ((firstSpecialist_y-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+        }else{ 
+            if(agent->personal_generated==8){
+                x = ((140)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                y = ((79)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            }else{
+                x = ((106)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                y = ((77)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            }
+        }
+    }
     
-    float x = ((firstDoctor_x-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-    float y = ((firstDoctor_y-(space_between_doctors*agent->real_doctors_generated))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-    
-    add_agent_agent(agent_agents, -(agent->real_doctors_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0);
+    add_agent_agent(agent_agents, -(agent->personal_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    agent->real_doctors_generated++;
+    agent->personal_generated++;
     return 0;
 }

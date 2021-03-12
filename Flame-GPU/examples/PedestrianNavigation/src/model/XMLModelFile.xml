@@ -1585,7 +1585,7 @@
         </gpu:variable>
         <gpu:variable>
           <type>int</type>
-          <name>real_doctors_generated</name>
+          <name>personal_generated</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
       </memory>
@@ -1683,7 +1683,7 @@
         </gpu:function>
 
         <gpu:function>
-          <name>generate_real_doctors</name>
+          <name>generate_personal</name>
           <currentState>defaultGenerator</currentState>
           <nextState>defaultGenerator</nextState>
           <xagentOutputs>
@@ -1694,11 +1694,11 @@
           </xagentOutputs>
           <condition>
             <lhs>
-              <agentVariable>real_doctors_generated</agentVariable>
+              <agentVariable>personal_generated</agentVariable>
             </lhs>
             <operator>&lt;</operator>
             <rhs>
-                <value>4</value>
+                <value>10</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -2397,7 +2397,7 @@
         <name>generate_specialists</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>generate_real_doctors</name>
+        <name>generate_personal</name>
       </gpu:layerFunction>
     </layer>
     <layer>
