@@ -42,3 +42,16 @@ __FLAME_GPU_FUNC__ int generate_specialists(xmachine_memory_agent_generator* age
     agent->specialists_generated++;
     return 0;
 }
+
+__FLAME_GPU_FUNC__ int generate_real_doctors(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents){
+    
+    printf("Doctor real generado\n"); 
+    
+    float x = ((firstDoctor_x-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+    float y = ((firstDoctor_y-(space_between_doctors*agent->real_doctors_generated))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+    
+    add_agent_agent(agent_agents, -(agent->real_doctors_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    agent->real_doctors_generated++;
+    return 0;
+}

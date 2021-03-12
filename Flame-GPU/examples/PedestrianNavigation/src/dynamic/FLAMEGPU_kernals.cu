@@ -1209,6 +1209,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			nextState->real_doctors_generated[index] = currentState->real_doctors_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1241,6 +1242,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			nextState->real_doctors_generated[index] = currentState->real_doctors_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1273,6 +1275,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			nextState->real_doctors_generated[index] = currentState->real_doctors_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1305,6 +1308,40 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			nextState->real_doctors_generated[index] = currentState->real_doctors_generated[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** generate_real_doctors_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_generator_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_generator_list representing agent i the next state
+ */
+ __global__ void generate_real_doctors_function_filter(xmachine_memory_agent_generator_list* currentState, xmachine_memory_agent_generator_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_generator_count){
+	
+		//apply the filter
+		if (currentState->real_doctors_generated[index]<4)
+		{	//copy agent data to newstate list
+			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->boxes_generated[index] = currentState->boxes_generated[index];
+			nextState->doctors_generated[index] = currentState->doctors_generated[index];
+			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			nextState->real_doctors_generated[index] = currentState->real_doctors_generated[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1489,7 +1526,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 /** add_agent_agent
  * Continuous agent agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_agent_list to add agents to 
- * @param id agent variable of type unsigned int
+ * @param id agent variable of type int
  * @param x agent variable of type float
  * @param y agent variable of type float
  * @param velx agent variable of type float
@@ -1515,7 +1552,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param priority agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
 	
 	int index;
     
@@ -1562,7 +1599,7 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, unsigned int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
     add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, specialist_no, priority);
 }
 
@@ -2510,7 +2547,8 @@ __global__ void scatter_agent_generator_Agents(xmachine_memory_agent_generator_l
 		agents_dst->chairs_generated[output_index] = agents_src->chairs_generated[index];        
 		agents_dst->boxes_generated[output_index] = agents_src->boxes_generated[index];        
 		agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];        
-		agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];
+		agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];        
+		agents_dst->real_doctors_generated[output_index] = agents_src->real_doctors_generated[index];
 	}
 }
 
@@ -2534,6 +2572,7 @@ __global__ void append_agent_generator_Agents(xmachine_memory_agent_generator_li
 	    agents_dst->boxes_generated[output_index] = agents_src->boxes_generated[index];
 	    agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];
 	    agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];
+	    agents_dst->real_doctors_generated[output_index] = agents_src->real_doctors_generated[index];
     }
 }
 
@@ -2544,9 +2583,10 @@ __global__ void append_agent_generator_Agents(xmachine_memory_agent_generator_li
  * @param boxes_generated agent variable of type int
  * @param doctors_generated agent variable of type int
  * @param specialists_generated agent variable of type int
+ * @param real_doctors_generated agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated){
+__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated, int real_doctors_generated){
 	
 	int index;
     
@@ -2569,12 +2609,13 @@ __device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* 
 	agents->boxes_generated[index] = boxes_generated;
 	agents->doctors_generated[index] = doctors_generated;
 	agents->specialists_generated[index] = specialists_generated;
+	agents->real_doctors_generated[index] = real_doctors_generated;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated){
-    add_agent_generator_agent<DISCRETE_2D>(agents, chairs_generated, boxes_generated, doctors_generated, specialists_generated);
+__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated, int real_doctors_generated){
+    add_agent_generator_agent<DISCRETE_2D>(agents, chairs_generated, boxes_generated, doctors_generated, specialists_generated, real_doctors_generated);
 }
 
 /** reorder_agent_generator_agents
@@ -2594,6 +2635,7 @@ __global__ void reorder_agent_generator_agents(unsigned int* values, xmachine_me
 	ordered_agents->boxes_generated[index] = unordered_agents->boxes_generated[old_pos];
 	ordered_agents->doctors_generated[index] = unordered_agents->doctors_generated[old_pos];
 	ordered_agents->specialists_generated[index] = unordered_agents->specialists_generated[old_pos];
+	ordered_agents->real_doctors_generated[index] = unordered_agents->real_doctors_generated[old_pos];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10047,6 +10089,7 @@ __global__ void GPUFLAME_generate_chairs(xmachine_memory_agent_generator_list* a
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
+	agent.real_doctors_generated = agents->real_doctors_generated[index];
 
 	//FLAME function call
 	int dead = !generate_chairs(&agent, chair_agents);
@@ -10060,6 +10103,7 @@ __global__ void GPUFLAME_generate_chairs(xmachine_memory_agent_generator_list* a
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
+	agents->real_doctors_generated[index] = agent.real_doctors_generated;
 }
 
 /**
@@ -10084,6 +10128,7 @@ __global__ void GPUFLAME_generate_boxes(xmachine_memory_agent_generator_list* ag
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
+	agent.real_doctors_generated = agents->real_doctors_generated[index];
 
 	//FLAME function call
 	int dead = !generate_boxes(&agent, box_agents);
@@ -10097,6 +10142,7 @@ __global__ void GPUFLAME_generate_boxes(xmachine_memory_agent_generator_list* ag
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
+	agents->real_doctors_generated[index] = agent.real_doctors_generated;
 }
 
 /**
@@ -10121,6 +10167,7 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
+	agent.real_doctors_generated = agents->real_doctors_generated[index];
 
 	//FLAME function call
 	int dead = !generate_doctors(&agent, doctor_agents);
@@ -10134,6 +10181,7 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
+	agents->real_doctors_generated[index] = agent.real_doctors_generated;
 }
 
 /**
@@ -10158,6 +10206,7 @@ __global__ void GPUFLAME_generate_specialists(xmachine_memory_agent_generator_li
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
+	agent.real_doctors_generated = agents->real_doctors_generated[index];
 
 	//FLAME function call
 	int dead = !generate_specialists(&agent, specialist_agents);
@@ -10171,6 +10220,46 @@ __global__ void GPUFLAME_generate_specialists(xmachine_memory_agent_generator_li
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
+	agents->real_doctors_generated[index] = agent.real_doctors_generated;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_generate_real_doctors(xmachine_memory_agent_generator_list* agents, xmachine_memory_agent_list* agent_agents){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_generator_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_generate_real_doctors Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent_generator agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.chairs_generated = agents->chairs_generated[index];
+	agent.boxes_generated = agents->boxes_generated[index];
+	agent.doctors_generated = agents->doctors_generated[index];
+	agent.specialists_generated = agents->specialists_generated[index];
+	agent.real_doctors_generated = agents->real_doctors_generated[index];
+
+	//FLAME function call
+	int dead = !generate_real_doctors(&agent, agent_agents);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_generate_real_doctors Coalesced memory write (ignore arrays)
+	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->boxes_generated[index] = agent.boxes_generated;
+	agents->doctors_generated[index] = agent.doctors_generated;
+	agents->specialists_generated[index] = agent.specialists_generated;
+	agents->real_doctors_generated[index] = agent.real_doctors_generated;
 }
 
 /**

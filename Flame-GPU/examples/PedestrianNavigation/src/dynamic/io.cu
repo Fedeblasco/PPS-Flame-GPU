@@ -354,7 +354,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs("<name>agent</name>\n", file);
         
 		fputs("<id>", file);
-        sprintf(data, "%u", h_agents_default->id[i]);
+        sprintf(data, "%d", h_agents_default->id[i]);
 		fputs(data, file);
 		fputs("</id>\n", file);
         
@@ -848,6 +848,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</specialists_generated>\n", file);
         
+		fputs("<real_doctors_generated>", file);
+        sprintf(data, "%d", h_agent_generators_defaultGenerator->real_doctors_generated[i]);
+		fputs(data, file);
+		fputs("</real_doctors_generated>\n", file);
+        
 		fputs("</xagent>\n", file);
 	}
 	//Write each chair_admin agent to xml
@@ -1069,6 +1074,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_generator_boxes_generated;
     int in_agent_generator_doctors_generated;
     int in_agent_generator_specialists_generated;
+    int in_agent_generator_real_doctors_generated;
     int in_chair_admin_id;
     int in_chair_admin_chairArray;
     int in_box_id;
@@ -1167,7 +1173,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	*h_xmachine_memory_triage_count = 0;
 	
 	/* Variables for initial state data */
-	unsigned int agent_id;
+	int agent_id;
 	float agent_x;
 	float agent_y;
 	float agent_velx;
@@ -1249,6 +1255,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int agent_generator_boxes_generated;
 	int agent_generator_doctors_generated;
 	int agent_generator_specialists_generated;
+	int agent_generator_real_doctors_generated;
 	unsigned int chair_admin_id;
     unsigned int chair_admin_chairArray[35];
 	unsigned int box_id;
@@ -1397,6 +1404,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_generator_boxes_generated = 0;
 	in_agent_generator_doctors_generated = 0;
 	in_agent_generator_specialists_generated = 0;
+	in_agent_generator_real_doctors_generated = 0;
 	in_chair_admin_id = 0;
 	in_chair_admin_chairArray = 0;
 	in_box_id = 0;
@@ -1596,6 +1604,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agent_generators->boxes_generated[k] = 0;
 		h_agent_generators->doctors_generated[k] = 0;
 		h_agent_generators->specialists_generated[k] = 0;
+		h_agent_generators->real_doctors_generated[k] = 0;
 	}
 	
 	//set all chair_admin values to 0
@@ -1750,6 +1759,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_generator_boxes_generated = 0;
     agent_generator_doctors_generated = 0;
     agent_generator_specialists_generated = 0;
+    agent_generator_real_doctors_generated = 0;
     chair_admin_id = 0;
     for (i=0;i<35;i++){
         chair_admin_chairArray[i] = 0;
@@ -2134,6 +2144,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agent_generators->boxes_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_boxes_generated;
 					h_agent_generators->doctors_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_doctors_generated;
 					h_agent_generators->specialists_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_specialists_generated;
+					h_agent_generators->real_doctors_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_real_doctors_generated;
 					(*h_xmachine_memory_agent_generator_count) ++;	
 				}
 				else if(strcmp(agentname, "chair_admin") == 0)
@@ -2314,6 +2325,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_generator_boxes_generated = 0;
                 agent_generator_doctors_generated = 0;
                 agent_generator_specialists_generated = 0;
+                agent_generator_real_doctors_generated = 0;
                 chair_admin_id = 0;
                 for (i=0;i<35;i++){
                     chair_admin_chairArray[i] = 0;
@@ -2501,6 +2513,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/doctors_generated") == 0) in_agent_generator_doctors_generated = 0;
 			if(strcmp(buffer, "specialists_generated") == 0) in_agent_generator_specialists_generated = 1;
 			if(strcmp(buffer, "/specialists_generated") == 0) in_agent_generator_specialists_generated = 0;
+			if(strcmp(buffer, "real_doctors_generated") == 0) in_agent_generator_real_doctors_generated = 1;
+			if(strcmp(buffer, "/real_doctors_generated") == 0) in_agent_generator_real_doctors_generated = 0;
 			if(strcmp(buffer, "id") == 0) in_chair_admin_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_chair_admin_id = 0;
 			if(strcmp(buffer, "chairArray") == 0) in_chair_admin_chairArray = 1;
@@ -2616,7 +2630,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			else if (in_xagent)
 			{
 				if(in_agent_id){
-                    agent_id = (unsigned int) fpgu_strtoul(buffer); 
+                    agent_id = (int) fpgu_strtol(buffer); 
                 }
 				if(in_agent_x){
                     agent_x = (float) fgpu_atof(buffer); 
@@ -2860,6 +2874,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_agent_generator_specialists_generated){
                     agent_generator_specialists_generated = (int) fpgu_strtol(buffer); 
+                }
+				if(in_agent_generator_real_doctors_generated){
+                    agent_generator_real_doctors_generated = (int) fpgu_strtol(buffer); 
                 }
 				if(in_chair_admin_id){
                     chair_admin_id = (unsigned int) fpgu_strtoul(buffer); 

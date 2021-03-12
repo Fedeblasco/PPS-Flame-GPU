@@ -153,7 +153,7 @@
   <!-- Variables -->
       <memory>
         <gpu:variable>
-          <type>unsigned int</type>
+          <type>int</type>
           <name>id</name>
         </gpu:variable>
         <gpu:variable>
@@ -1583,6 +1583,11 @@
           <name>specialists_generated</name>
           <defaultValue>0</defaultValue>
         </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>real_doctors_generated</name>
+          <defaultValue>0</defaultValue>
+        </gpu:variable>
       </memory>
       <functions>
         <gpu:function>
@@ -1671,6 +1676,29 @@
             <operator>&lt;</operator>
             <rhs>
                 <value>5</value>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>false</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>generate_real_doctors</name>
+          <currentState>defaultGenerator</currentState>
+          <nextState>defaultGenerator</nextState>
+          <xagentOutputs>
+            <gpu:xagentOutput>
+              <xagentName>agent</xagentName>
+              <state>default</state>
+            </gpu:xagentOutput>
+          </xagentOutputs>
+          <condition>
+            <lhs>
+              <agentVariable>real_doctors_generated</agentVariable>
+            </lhs>
+            <operator>&lt;</operator>
+            <rhs>
+                <value>4</value>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -2367,6 +2395,9 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>generate_specialists</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>generate_real_doctors</name>
       </gpu:layerFunction>
     </layer>
     <layer>

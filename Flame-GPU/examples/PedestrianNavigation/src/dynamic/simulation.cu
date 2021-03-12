@@ -326,6 +326,7 @@ unsigned int h_agent_generators_defaultGenerator_variable_chairs_generated_data_
 unsigned int h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration;
 unsigned int h_agent_generators_defaultGenerator_variable_doctors_generated_data_iteration;
 unsigned int h_agent_generators_defaultGenerator_variable_specialists_generated_data_iteration;
+unsigned int h_agent_generators_defaultGenerator_variable_real_doctors_generated_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
 unsigned int h_boxs_defaultBox_variable_id_data_iteration;
@@ -846,6 +847,11 @@ void agent_generator_generate_doctors(cudaStream_t &stream);
  */
 void agent_generator_generate_specialists(cudaStream_t &stream);
 
+/** agent_generator_generate_real_doctors
+ * Agent function prototype for generate_real_doctors function of agent_generator agent
+ */
+void agent_generator_generate_real_doctors(cudaStream_t &stream);
+
 /** chair_admin_attend_chair_petitions
  * Agent function prototype for attend_chair_petitions function of chair_admin agent
  */
@@ -1050,6 +1056,7 @@ void initialise(char * inputfile){
     h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = 0;
     h_agent_generators_defaultGenerator_variable_doctors_generated_data_iteration = 0;
     h_agent_generators_defaultGenerator_variable_specialists_generated_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_real_doctors_generated_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
     h_boxs_defaultBox_variable_id_data_iteration = 0;
@@ -2576,6 +2583,20 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: agent_generator_generate_specialists = %f (ms)\n", instrument_milliseconds);
 #endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_generator_generate_real_doctors");
+	agent_generator_generate_real_doctors(stream6);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_generator_generate_real_doctors = %f (ms)\n", instrument_milliseconds);
+#endif
 	cudaDeviceSynchronize();
   
 	/* Layer 2*/
@@ -3892,14 +3913,14 @@ xmachine_memory_triage_list* get_host_triage_defaultTriage_agents(){
 
 /* Host based access of agent variables*/
 
-/** unsigned int get_agent_default_variable_id(unsigned int index)
+/** int get_agent_default_variable_id(unsigned int index)
  * Gets the value of the id variable of an agent agent in the default state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @return value of agent variable id
  */
-__host__ unsigned int get_agent_default_variable_id(unsigned int index){
+__host__ int get_agent_default_variable_id(unsigned int index){
     unsigned int count = get_agent_agent_default_count();
     unsigned int currentIteration = getIterationNumber();
     
@@ -3911,7 +3932,7 @@ __host__ unsigned int get_agent_default_variable_id(unsigned int index){
                 cudaMemcpy(
                     h_agents_default->id,
                     d_agents_default->id,
-                    count * sizeof(unsigned int),
+                    count * sizeof(int),
                     cudaMemcpyDeviceToHost
                 )
             );
@@ -7068,6 +7089,44 @@ __host__ int get_agent_generator_defaultGenerator_variable_specialists_generated
     }
 }
 
+/** int get_agent_generator_defaultGenerator_variable_real_doctors_generated(unsigned int index)
+ * Gets the value of the real_doctors_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable real_doctors_generated
+ */
+__host__ int get_agent_generator_defaultGenerator_variable_real_doctors_generated(unsigned int index){
+    unsigned int count = get_agent_agent_generator_defaultGenerator_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agent_generators_defaultGenerator_variable_real_doctors_generated_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agent_generators_defaultGenerator->real_doctors_generated,
+                    d_agent_generators_defaultGenerator->real_doctors_generated,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agent_generators_defaultGenerator_variable_real_doctors_generated_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agent_generators_defaultGenerator->real_doctors_generated[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access real_doctors_generated for the %u th member of agent_generator_defaultGenerator. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 /** unsigned int get_chair_admin_defaultAdmin_variable_id(unsigned int index)
  * Gets the value of the id variable of an chair_admin agent in the defaultAdmin state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -7629,7 +7688,7 @@ __host__ unsigned int get_triage_defaultTriage_variable_patientQueue(unsigned in
  */
 void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list * d_dst, xmachine_memory_agent * h_agent){
  
-		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->x, &h_agent->x, sizeof(float), cudaMemcpyHostToDevice));
  
@@ -7692,7 +7751,7 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
     // Only copy elements if there is data to move.
     if (count > 0){
 	 
-		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->x, h_src->x, count * sizeof(float), cudaMemcpyHostToDevice));
  
@@ -8080,6 +8139,8 @@ void copy_single_xmachine_memory_agent_generator_hostToDevice(xmachine_memory_ag
 		gpuErrchk(cudaMemcpy(d_dst->doctors_generated, &h_agent->doctors_generated, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->specialists_generated, &h_agent->specialists_generated, sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->real_doctors_generated, &h_agent->real_doctors_generated, sizeof(int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -8103,6 +8164,8 @@ void copy_partial_xmachine_memory_agent_generator_hostToDevice(xmachine_memory_a
 		gpuErrchk(cudaMemcpy(d_dst->doctors_generated, h_src->doctors_generated, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->specialists_generated, h_src->specialists_generated, count * sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->real_doctors_generated, h_src->real_doctors_generated, count * sizeof(int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -9229,6 +9292,8 @@ xmachine_memory_agent_generator* h_allocate_agent_agent_generator(){
 
     agent->specialists_generated = 0;
 
+    agent->real_doctors_generated = 0;
+
 	return agent;
 }
 void h_free_agent_agent_generator(xmachine_memory_agent_generator** agent){
@@ -9262,6 +9327,8 @@ void h_unpack_agents_agent_generator_AoS_to_SoA(xmachine_memory_agent_generator_
 			dst->doctors_generated[i] = src[i]->doctors_generated;
 			 
 			dst->specialists_generated[i] = src[i]->specialists_generated;
+			 
+			dst->real_doctors_generated[i] = src[i]->real_doctors_generated;
 			
 		}
 	}
@@ -9297,6 +9364,7 @@ void h_add_agent_agent_generator_defaultGenerator(xmachine_memory_agent_generato
     h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = 0;
     h_agent_generators_defaultGenerator_variable_doctors_generated_data_iteration = 0;
     h_agent_generators_defaultGenerator_variable_specialists_generated_data_iteration = 0;
+    h_agent_generators_defaultGenerator_variable_real_doctors_generated_data_iteration = 0;
     
 
 }
@@ -9332,6 +9400,7 @@ void h_add_agents_agent_generator_defaultGenerator(xmachine_memory_agent_generat
         h_agent_generators_defaultGenerator_variable_boxes_generated_data_iteration = 0;
         h_agent_generators_defaultGenerator_variable_doctors_generated_data_iteration = 0;
         h_agent_generators_defaultGenerator_variable_specialists_generated_data_iteration = 0;
+        h_agent_generators_defaultGenerator_variable_real_doctors_generated_data_iteration = 0;
         
 
 	}
@@ -9814,24 +9883,24 @@ void h_add_agents_triage_defaultTriage(xmachine_memory_triage** agents, unsigned
 
 /*  Analytics Functions */
 
-unsigned int reduce_agent_default_id_variable(){
+int reduce_agent_default_id_variable(){
     //reduce in default stream
     return thrust::reduce(thrust::device_pointer_cast(d_agents_default->id),  thrust::device_pointer_cast(d_agents_default->id) + h_xmachine_memory_agent_default_count);
 }
 
-unsigned int count_agent_default_id_variable(unsigned int count_value){
+int count_agent_default_id_variable(int count_value){
     //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->id),  thrust::device_pointer_cast(d_agents_default->id) + h_xmachine_memory_agent_default_count, count_value);
+    return (int)thrust::count(thrust::device_pointer_cast(d_agents_default->id),  thrust::device_pointer_cast(d_agents_default->id) + h_xmachine_memory_agent_default_count, count_value);
 }
-unsigned int min_agent_default_id_variable(){
+int min_agent_default_id_variable(){
     //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->id);
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->id);
     size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int max_agent_default_id_variable(){
+int max_agent_default_id_variable(){
     //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->id);
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->id);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -11177,6 +11246,27 @@ int min_agent_generator_defaultGenerator_specialists_generated_variable(){
 int max_agent_generator_defaultGenerator_specialists_generated_variable(){
     //max in default stream
     thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->specialists_generated);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_agent_generator_defaultGenerator_real_doctors_generated_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->real_doctors_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->real_doctors_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count);
+}
+
+int count_agent_generator_defaultGenerator_real_doctors_generated_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_agent_generators_defaultGenerator->real_doctors_generated),  thrust::device_pointer_cast(d_agent_generators_defaultGenerator->real_doctors_generated) + h_xmachine_memory_agent_generator_defaultGenerator_count, count_value);
+}
+int min_agent_generator_defaultGenerator_real_doctors_generated_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->real_doctors_generated);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_agent_generator_defaultGenerator_real_doctors_generated_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_agent_generators_defaultGenerator->real_doctors_generated);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_generator_defaultGenerator_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -18297,6 +18387,226 @@ void agent_generator_generate_specialists(cudaStream_t &stream){
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_generator_defaultGenerator_count+h_xmachine_memory_agent_generator_count > xmachine_memory_agent_generator_MAX){
 		printf("Error: Buffer size of generate_specialists agents in state defaultGenerator will be exceeded moving working agents to next state in function generate_specialists\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_generator_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_generator_Agents<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator, d_agent_generators, h_xmachine_memory_agent_generator_defaultGenerator_count, h_xmachine_memory_agent_generator_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_generator_defaultGenerator_count += h_xmachine_memory_agent_generator_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_defaultGenerator_count, &h_xmachine_memory_agent_generator_defaultGenerator_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_generator_generate_real_doctors_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  
+	return sm_size;
+}
+
+/** agent_generator_generate_real_doctors
+ * Agent function prototype for generate_real_doctors function of agent_generator agent
+ */
+void agent_generator_generate_real_doctors(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_generator_defaultGenerator_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_generator_defaultGenerator_count;
+
+	
+	//FOR agent AGENT OUTPUT, RESET THE AGENT NEW LIST SCAN INPUT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_new);
+	gpuErrchkLaunch();
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_generator_count = h_xmachine_memory_agent_generator_defaultGenerator_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_count, &h_xmachine_memory_agent_generator_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_generator_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_generator_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_generator_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agent_generators);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, generate_real_doctors_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	generate_real_doctors_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_defaultGenerator, d_agent_generators);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_generator_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent_generator, 
+        temp_scan_storage_bytes_agent_generator, 
+        d_agent_generators_defaultGenerator->_scan_input,
+        d_agent_generators_defaultGenerator->_position,
+        h_xmachine_memory_agent_generator_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agent_generators_defaultGenerator->_position[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agent_generators_defaultGenerator->_scan_input[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_generator_defaultGenerator_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_generator_defaultGenerator_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_generator_Agents<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_swap, d_agent_generators_defaultGenerator, 0, h_xmachine_memory_agent_generator_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_generator_list* agent_generators_defaultGenerator_temp = d_agent_generators_defaultGenerator;
+	d_agent_generators_defaultGenerator = d_agent_generators_swap;
+	d_agent_generators_swap = agent_generators_defaultGenerator_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_defaultGenerator_count, &h_xmachine_memory_agent_generator_defaultGenerator_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent_generator, 
+        temp_scan_storage_bytes_agent_generator, 
+        d_agent_generators->_scan_input,
+        d_agent_generators->_position,
+        h_xmachine_memory_agent_generator_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agent_generators->_position[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agent_generators->_scan_input[h_xmachine_memory_agent_generator_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_generator_Agents<<<gridSize, blockSize, 0, stream>>>(d_agent_generators_swap, d_agent_generators, 0, h_xmachine_memory_agent_generator_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_generator_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_generator_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_generator_list* agent_generators_temp = d_agent_generators;
+	d_agent_generators = d_agent_generators_swap;
+	d_agent_generators_swap = agent_generators_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_generator_count, &h_xmachine_memory_agent_generator_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_generator_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_generator_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_generate_real_doctors, agent_generator_generate_real_doctors_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_generator_generate_real_doctors_sm_size(blockSize);
+	
+	
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (generate_real_doctors)
+	//Reallocate   : false
+	//Input        : 
+	//Output       : 
+	//Agent Output : agent
+	GPUFLAME_generate_real_doctors<<<g, b, sm_size, stream>>>(d_agent_generators, d_agents_new);
+	gpuErrchkLaunch();
+	
+	
+    //COPY ANY AGENT COUNT BEFORE agent_generator AGENTS ARE KILLED (needed for scatter)
+	int agent_generators_pre_death_count = h_xmachine_memory_agent_generator_count;
+	
+	//FOR agent AGENT OUTPUT SCATTER AGENTS 
+
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_new->_scan_input, 
+        d_agents_new->_position, 
+        agent_generators_pre_death_count,
+        stream
+    );
+
+	//reset agent count
+	int agent_after_birth_count;
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_new->_position[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_new->_scan_input[agent_generators_pre_death_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		agent_after_birth_count = h_xmachine_memory_agent_default_count + scan_last_sum+1;
+	else
+		agent_after_birth_count = h_xmachine_memory_agent_default_count + scan_last_sum;
+	//check buffer is not exceeded
+	if (agent_after_birth_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of agent agents in state default will be exceeded writing new agents in function generate_real_doctors\n");
+		exit(EXIT_FAILURE);
+	}
+	//Scatter into swap
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents_new, h_xmachine_memory_agent_default_count, agent_generators_pre_death_count);
+	gpuErrchkLaunch();
+	//Copy count to device
+	h_xmachine_memory_agent_default_count = agent_after_birth_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_generator_defaultGenerator_count+h_xmachine_memory_agent_generator_count > xmachine_memory_agent_generator_MAX){
+		printf("Error: Buffer size of generate_real_doctors agents in state defaultGenerator will be exceeded moving working agents to next state in function generate_real_doctors\n");
       exit(EXIT_FAILURE);
       }
       
