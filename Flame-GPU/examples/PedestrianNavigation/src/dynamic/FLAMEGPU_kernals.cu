@@ -1335,7 +1335,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_generator_count){
 	
 		//apply the filter
-		if (currentState->personal_generated[index]<10)
+		if (currentState->personal_generated[index]<11)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];

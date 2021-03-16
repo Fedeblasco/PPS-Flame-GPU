@@ -427,6 +427,30 @@ __FLAME_GPU_FUNC__ int go_to_specialist(xmachine_memory_agent* agent){
 
 }
 
+__FLAME_GPU_FUNC__ int go_to_UCI(xmachine_memory_agent* agent){
+	
+	switch(agent->checkpoint){
+		case 0:
+			if(mover_a_destino(agent,40,60) == 0){
+				agent->checkpoint++;
+			}
+			break;
+		case 1:
+			if(mover_a_destino(agent,35,16) == 0){
+				agent->checkpoint++;
+			}
+			break;
+		case 2:
+			if(mover_a_destino(agent,100,16) == 0){
+				return 1;
+			}
+			break;
+	}
+
+	return 0;
+
+}
+
 __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
 
 	switch(agent->checkpoint){
@@ -568,25 +592,38 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 		case 26:
 			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
 				agent->estado_movimiento++;
+				//Temporal para probar
+				if(agent->specialist_no == 6){
+					agent->estado_movimiento = 30;
+				}
 			}
 			break;
 		case 30:
-			if(agent->specialist_no == 0){
-				if(go_to_doctor(agent)){
-					//printf("Llegue al doctor\n");
-					agent->checkpoint=0;
-					agent->estado_movimiento++;
-				}
-			}else{
-				if(go_to_specialist(agent)){
-					//printf("Llegue al especialista %d, soy %d\n",agent->specialist_no,agent->id);
-					if(agent->specialist_no == 5){
+			switch(agent->specialist_no){
+				case 0:
+					if(go_to_doctor(agent)){
+						//printf("Llegue al doctor\n");
 						agent->checkpoint=0;
-					}else{
-						agent->checkpoint=1;
+						agent->estado_movimiento++;
 					}
-					agent->estado_movimiento++;
-				}
+					break;
+				case 6:
+					if(go_to_UCI(agent)){
+						agent->estado_movimiento = 36;
+					}
+					break;
+				default:
+					if(go_to_specialist(agent)){
+						//printf("Llegue al especialista %d, soy %d\n",agent->specialist_no,agent->id);
+						if(agent->specialist_no == 5){
+							agent->checkpoint=0;
+						}else{
+							agent->checkpoint=1;
+						}
+						agent->estado_movimiento++;
+					}
+					break;
+
 			}
 			break;
 		case 40:

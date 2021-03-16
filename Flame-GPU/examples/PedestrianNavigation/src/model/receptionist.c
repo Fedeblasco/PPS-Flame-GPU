@@ -13,7 +13,7 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
         }
         current_message = get_next_check_in_message(current_message, checkInMessages);	
 	}
-    
+
     //Si tengo algun paciente esperando y no estoy procesando a nadie
     if((!isEmpty(&agent->size)) && (agent->current_patient == -1)){
         unsigned int patient = dequeue(agent->patientQueue, &agent->size, &agent->front);
@@ -28,7 +28,7 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
         }*/
     }else if(agent->attend_patient == 1){
         agent->tick++;
-        if(agent->tick >= espera){
+        if(agent->tick*MINUTES_PER_TICK >= espera_recepcionista){
             //printf("Enviando mensaje 2 a %d\n",agent->current_patient);
             add_check_in_response_message(patientMessages, agent->current_patient);
             agent->tick = 0;

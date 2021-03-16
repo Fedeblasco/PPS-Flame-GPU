@@ -48,7 +48,7 @@ __FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_m
 __FLAME_GPU_FUNC__ int receive_free_specialist(xmachine_memory_specialist_manager* agent, xmachine_message_free_specialist_list* freeSpecialistMessages){
     xmachine_message_free_specialist* current_message = get_first_free_specialist_message(freeSpecialistMessages);
     while(current_message){
-        printf("Liberando el specialist %d\n",current_message->specialist_no);
+        //printf("Liberando el specialist %d\n",current_message->specialist_no);
         agent->free_specialist[current_message->specialist_no-1]++;
         current_message = get_next_free_specialist_message(current_message, freeSpecialistMessages);	
 	}

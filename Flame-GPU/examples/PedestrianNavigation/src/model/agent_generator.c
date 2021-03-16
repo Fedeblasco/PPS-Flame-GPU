@@ -45,7 +45,7 @@ __FLAME_GPU_FUNC__ int generate_specialists(xmachine_memory_agent_generator* age
 
 __FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents){
     
-    printf("Personal generado\n"); 
+    printf("Personal generado\n");
     float x = 0;
     float y = 0;
     if(agent->personal_generated<4){
@@ -59,9 +59,14 @@ __FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent,
             if(agent->personal_generated==8){
                 x = ((140)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
                 y = ((79)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-            }else{
+            }
+            if(agent->personal_generated==9){
                 x = ((106)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
                 y = ((77)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            }
+            if(agent->personal_generated==10){
+                x = ((fifthSpecialist_x-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                y = ((fifthSpecialist_y)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
             }
         }
     }
