@@ -6,58 +6,18 @@
 
 //#define NUM_EXITS 7  
 
-#define PI 3.1415f
-#define RADIANS(x) (PI / 180.0f) * x
-
-//Probabilidades usadas para manejar la cantidad de enfermos
-#define probabilidad_estornudar 0.1
-#define probabilidad_contagio 0.1
-#define probabilidad_generar_enfermo 0.2
 //Cantidad de ticks enfermo y portador 
 #define ticks_portador 500
 #define ticks_enfermo 500
+
 //Cantidad de personas a generar
 #define cant_personas 600
- 
-//Manejo de las sillas
-#ifndef firstChair_x
-#define firstChair_x 50
-#endif
-#ifndef firstChair_y
-#define firstChair_y 85
-#endif
-#ifndef space_between
-#define space_between 3
-#endif
 
-//Manejo de los doctores
-#ifndef firstDoctor_x
-#define firstDoctor_x 15
-#endif
-#ifndef firstDoctor_y
-#define firstDoctor_y 95
-#endif
-#ifndef space_between_doctors
-#define space_between_doctors 18
-#endif
+//Capacidad de las colas
+#define capacity 35
 
-//Manejo de los especialistas
-#ifndef firstSpecialist_x
-#define firstSpecialist_x 58
-#endif
-#ifndef firstSpecialist_y
-#define firstSpecialist_y 40
-#endif
-#ifndef space_between_specialists
-#define space_between_specialists 27
-#endif
-
-#ifndef fifthSpecialist_x
-#define fifthSpecialist_x 15
-#endif
-#ifndef fifthSpecialist_y
-#define fifthSpecialist_y 16
-#endif
+#define PI 3.1415f
+#define RADIANS(x) (PI / 180.0f) * x
 
 //Constante de tiempo
 #ifndef MINUTES_PER_TICK
@@ -68,8 +28,59 @@
 #define TICKS_PER_MINUTE 1
 #endif
 
+//Posición de la salida
+/*#define EXIT_X 150
+#define EXIT_Y 102*/
+
+//Probabilidades usadas para manejar la cantidad de enfermos
+/*#define probabilidad_estornudar 0.1
+#define probabilidad_contagio 0.1
+#define probabilidad_generar_enfermo 0.2
+#define probabilidad_contagio_personal 1.0
+#define probabilidad_contagiar_silla 1.0*/
+ 
+//Manejo de las sillas
+/*#ifndef firstChair_x
+#define firstChair_x 50
+#endif
+#ifndef firstChair_y
+#define firstChair_y 85
+#endif
+#ifndef space_between
+#define space_between 3
+#endif*/
+
+//Manejo de los doctores
+/*#ifndef firstDoctor_x
+#define firstDoctor_x 15
+#endif
+#ifndef firstDoctor_y
+#define firstDoctor_y 95
+#endif
+#ifndef space_between_doctors
+#define space_between_doctors 18
+#endif*/
+
+//Manejo de los especialistas
+/*#ifndef firstSpecialist_x
+#define firstSpecialist_x 58
+#endif
+#ifndef firstSpecialist_y
+#define firstSpecialist_y 40
+#endif
+#ifndef space_between_specialists
+#define space_between_specialists 27
+#endif*/
+
+/*#ifndef fifthSpecialist_x
+#define fifthSpecialist_x 15
+#endif
+#ifndef fifthSpecialist_y
+#define fifthSpecialist_y 16
+#endif*/
+
 //Probabilidades de prioridad del triage
-#ifndef prob_level_1
+/*#ifndef prob_level_1
 #define prob_level_1 0.0418719
 #endif
 #ifndef prob_level_2
@@ -83,10 +94,10 @@
 #endif
 #ifndef prob_level_5
 #define prob_level_5 0.0147783
-#endif
+#endif*/
 
 //Probabilidades de especialidad
-#ifndef prob_esp_quirurgicas
+/*#ifndef prob_esp_quirurgicas
 #define prob_esp_quirurgicas 0.292939087//Modificado del original para que sume 1
 #endif
 #ifndef prob_esp_medicas
@@ -106,10 +117,10 @@
 #endif
 #ifndef prob_psiquiatria
 #define prob_psiquiatria 0.045610876
-#endif
+#endif*/
 
-#define capacity 35
-#define espera_recepcionista 1
-#define probabilidad_contagio_personal 1.0
-
-#define probabilidad_contagiar_silla 1.0
+// Manejo del recepcionista
+/*#define min_espera_recepcionista 1
+  #define receptionist_x 1
+  #define receptionist_y 1
+*/

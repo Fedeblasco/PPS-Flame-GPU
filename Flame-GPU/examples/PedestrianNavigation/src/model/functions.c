@@ -649,15 +649,14 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 	{
 		float random = rnd<DISCRETE_2D>(rand48);
 		bool emit_agent = false;
-		
-		
+
 		if ((agent->exit_no == 1)&&((random < EMMISION_RATE_EXIT1*TIME_SCALER)))
 			emit_agent = true;
 			
 		if (agent->cant_generados<cant_personas){ 
 			if (emit_agent){
-				float x = ((agent->x+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-				float y = ((agent->y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+				float x = ((EXIT_X+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+				float y = ((EXIT_Y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				//int exit = getNewExitLocation(rand48);
 				float animate = rnd<DISCRETE_2D>(rand48);
 				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;

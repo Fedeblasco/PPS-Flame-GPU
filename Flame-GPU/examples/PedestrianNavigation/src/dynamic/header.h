@@ -6709,6 +6709,72 @@ __constant__ float COLLISION_WEIGHT;
 
 __constant__ float GOAL_WEIGHT;
 
+__constant__ int EXIT_X;
+
+__constant__ int EXIT_Y;
+
+__constant__ float probabilidad_estornudar;
+
+__constant__ float probabilidad_contagio;
+
+__constant__ float probabilidad_generar_enfermo;
+
+__constant__ float probabilidad_contagio_personal;
+
+__constant__ float probabilidad_contagiar_silla;
+
+__constant__ int firstChair_x;
+
+__constant__ int firstChair_y;
+
+__constant__ int space_between;
+
+__constant__ int firstDoctor_x;
+
+__constant__ int firstDoctor_y;
+
+__constant__ int space_between_doctors;
+
+__constant__ int firstSpecialist_x;
+
+__constant__ int firstSpecialist_y;
+
+__constant__ int space_between_specialists;
+
+__constant__ int fifthSpecialist_x;
+
+__constant__ int fifthSpecialist_y;
+
+__constant__ float prob_level_1;
+
+__constant__ float prob_level_2;
+
+__constant__ float prob_level_3;
+
+__constant__ float prob_level_4;
+
+__constant__ float prob_level_5;
+
+__constant__ float prob_esp_quirurgicas;
+
+__constant__ float prob_esp_medicas;
+
+__constant__ float prob_pediatria;
+
+__constant__ float prob_cuid_intensivos;
+
+__constant__ float prob_ginecologia;
+
+__constant__ float prob_geriatria;
+
+__constant__ float prob_psiquiatria;
+
+__constant__ int min_espera_recepcionista;
+
+__constant__ int receptionist_x;
+
+__constant__ int receptionist_y;
+
 /** set_EMMISION_RATE_EXIT1
  * Sets the constant variable EMMISION_RATE_EXIT1 on the device which can then be used in the agent functions.
  * @param h_EMMISION_RATE_EXIT1 value to set the variable
@@ -7071,6 +7137,369 @@ extern const float* get_GOAL_WEIGHT();
 
 
 extern float h_env_GOAL_WEIGHT;
+
+/** set_EXIT_X
+ * Sets the constant variable EXIT_X on the device which can then be used in the agent functions.
+ * @param h_EXIT_X value to set the variable
+ */
+extern void set_EXIT_X(int* h_EXIT_X);
+
+extern const int* get_EXIT_X();
+
+
+extern int h_env_EXIT_X;
+
+/** set_EXIT_Y
+ * Sets the constant variable EXIT_Y on the device which can then be used in the agent functions.
+ * @param h_EXIT_Y value to set the variable
+ */
+extern void set_EXIT_Y(int* h_EXIT_Y);
+
+extern const int* get_EXIT_Y();
+
+
+extern int h_env_EXIT_Y;
+
+/** set_probabilidad_estornudar
+ * Sets the constant variable probabilidad_estornudar on the device which can then be used in the agent functions.
+ * @param h_probabilidad_estornudar value to set the variable
+ */
+extern void set_probabilidad_estornudar(float* h_probabilidad_estornudar);
+
+extern const float* get_probabilidad_estornudar();
+
+
+extern float h_env_probabilidad_estornudar;
+
+/** set_probabilidad_contagio
+ * Sets the constant variable probabilidad_contagio on the device which can then be used in the agent functions.
+ * @param h_probabilidad_contagio value to set the variable
+ */
+extern void set_probabilidad_contagio(float* h_probabilidad_contagio);
+
+extern const float* get_probabilidad_contagio();
+
+
+extern float h_env_probabilidad_contagio;
+
+/** set_probabilidad_generar_enfermo
+ * Sets the constant variable probabilidad_generar_enfermo on the device which can then be used in the agent functions.
+ * @param h_probabilidad_generar_enfermo value to set the variable
+ */
+extern void set_probabilidad_generar_enfermo(float* h_probabilidad_generar_enfermo);
+
+extern const float* get_probabilidad_generar_enfermo();
+
+
+extern float h_env_probabilidad_generar_enfermo;
+
+/** set_probabilidad_contagio_personal
+ * Sets the constant variable probabilidad_contagio_personal on the device which can then be used in the agent functions.
+ * @param h_probabilidad_contagio_personal value to set the variable
+ */
+extern void set_probabilidad_contagio_personal(float* h_probabilidad_contagio_personal);
+
+extern const float* get_probabilidad_contagio_personal();
+
+
+extern float h_env_probabilidad_contagio_personal;
+
+/** set_probabilidad_contagiar_silla
+ * Sets the constant variable probabilidad_contagiar_silla on the device which can then be used in the agent functions.
+ * @param h_probabilidad_contagiar_silla value to set the variable
+ */
+extern void set_probabilidad_contagiar_silla(float* h_probabilidad_contagiar_silla);
+
+extern const float* get_probabilidad_contagiar_silla();
+
+
+extern float h_env_probabilidad_contagiar_silla;
+
+/** set_firstChair_x
+ * Sets the constant variable firstChair_x on the device which can then be used in the agent functions.
+ * @param h_firstChair_x value to set the variable
+ */
+extern void set_firstChair_x(int* h_firstChair_x);
+
+extern const int* get_firstChair_x();
+
+
+extern int h_env_firstChair_x;
+
+/** set_firstChair_y
+ * Sets the constant variable firstChair_y on the device which can then be used in the agent functions.
+ * @param h_firstChair_y value to set the variable
+ */
+extern void set_firstChair_y(int* h_firstChair_y);
+
+extern const int* get_firstChair_y();
+
+
+extern int h_env_firstChair_y;
+
+/** set_space_between
+ * Sets the constant variable space_between on the device which can then be used in the agent functions.
+ * @param h_space_between value to set the variable
+ */
+extern void set_space_between(int* h_space_between);
+
+extern const int* get_space_between();
+
+
+extern int h_env_space_between;
+
+/** set_firstDoctor_x
+ * Sets the constant variable firstDoctor_x on the device which can then be used in the agent functions.
+ * @param h_firstDoctor_x value to set the variable
+ */
+extern void set_firstDoctor_x(int* h_firstDoctor_x);
+
+extern const int* get_firstDoctor_x();
+
+
+extern int h_env_firstDoctor_x;
+
+/** set_firstDoctor_y
+ * Sets the constant variable firstDoctor_y on the device which can then be used in the agent functions.
+ * @param h_firstDoctor_y value to set the variable
+ */
+extern void set_firstDoctor_y(int* h_firstDoctor_y);
+
+extern const int* get_firstDoctor_y();
+
+
+extern int h_env_firstDoctor_y;
+
+/** set_space_between_doctors
+ * Sets the constant variable space_between_doctors on the device which can then be used in the agent functions.
+ * @param h_space_between_doctors value to set the variable
+ */
+extern void set_space_between_doctors(int* h_space_between_doctors);
+
+extern const int* get_space_between_doctors();
+
+
+extern int h_env_space_between_doctors;
+
+/** set_firstSpecialist_x
+ * Sets the constant variable firstSpecialist_x on the device which can then be used in the agent functions.
+ * @param h_firstSpecialist_x value to set the variable
+ */
+extern void set_firstSpecialist_x(int* h_firstSpecialist_x);
+
+extern const int* get_firstSpecialist_x();
+
+
+extern int h_env_firstSpecialist_x;
+
+/** set_firstSpecialist_y
+ * Sets the constant variable firstSpecialist_y on the device which can then be used in the agent functions.
+ * @param h_firstSpecialist_y value to set the variable
+ */
+extern void set_firstSpecialist_y(int* h_firstSpecialist_y);
+
+extern const int* get_firstSpecialist_y();
+
+
+extern int h_env_firstSpecialist_y;
+
+/** set_space_between_specialists
+ * Sets the constant variable space_between_specialists on the device which can then be used in the agent functions.
+ * @param h_space_between_specialists value to set the variable
+ */
+extern void set_space_between_specialists(int* h_space_between_specialists);
+
+extern const int* get_space_between_specialists();
+
+
+extern int h_env_space_between_specialists;
+
+/** set_fifthSpecialist_x
+ * Sets the constant variable fifthSpecialist_x on the device which can then be used in the agent functions.
+ * @param h_fifthSpecialist_x value to set the variable
+ */
+extern void set_fifthSpecialist_x(int* h_fifthSpecialist_x);
+
+extern const int* get_fifthSpecialist_x();
+
+
+extern int h_env_fifthSpecialist_x;
+
+/** set_fifthSpecialist_y
+ * Sets the constant variable fifthSpecialist_y on the device which can then be used in the agent functions.
+ * @param h_fifthSpecialist_y value to set the variable
+ */
+extern void set_fifthSpecialist_y(int* h_fifthSpecialist_y);
+
+extern const int* get_fifthSpecialist_y();
+
+
+extern int h_env_fifthSpecialist_y;
+
+/** set_prob_level_1
+ * Sets the constant variable prob_level_1 on the device which can then be used in the agent functions.
+ * @param h_prob_level_1 value to set the variable
+ */
+extern void set_prob_level_1(float* h_prob_level_1);
+
+extern const float* get_prob_level_1();
+
+
+extern float h_env_prob_level_1;
+
+/** set_prob_level_2
+ * Sets the constant variable prob_level_2 on the device which can then be used in the agent functions.
+ * @param h_prob_level_2 value to set the variable
+ */
+extern void set_prob_level_2(float* h_prob_level_2);
+
+extern const float* get_prob_level_2();
+
+
+extern float h_env_prob_level_2;
+
+/** set_prob_level_3
+ * Sets the constant variable prob_level_3 on the device which can then be used in the agent functions.
+ * @param h_prob_level_3 value to set the variable
+ */
+extern void set_prob_level_3(float* h_prob_level_3);
+
+extern const float* get_prob_level_3();
+
+
+extern float h_env_prob_level_3;
+
+/** set_prob_level_4
+ * Sets the constant variable prob_level_4 on the device which can then be used in the agent functions.
+ * @param h_prob_level_4 value to set the variable
+ */
+extern void set_prob_level_4(float* h_prob_level_4);
+
+extern const float* get_prob_level_4();
+
+
+extern float h_env_prob_level_4;
+
+/** set_prob_level_5
+ * Sets the constant variable prob_level_5 on the device which can then be used in the agent functions.
+ * @param h_prob_level_5 value to set the variable
+ */
+extern void set_prob_level_5(float* h_prob_level_5);
+
+extern const float* get_prob_level_5();
+
+
+extern float h_env_prob_level_5;
+
+/** set_prob_esp_quirurgicas
+ * Sets the constant variable prob_esp_quirurgicas on the device which can then be used in the agent functions.
+ * @param h_prob_esp_quirurgicas value to set the variable
+ */
+extern void set_prob_esp_quirurgicas(float* h_prob_esp_quirurgicas);
+
+extern const float* get_prob_esp_quirurgicas();
+
+
+extern float h_env_prob_esp_quirurgicas;
+
+/** set_prob_esp_medicas
+ * Sets the constant variable prob_esp_medicas on the device which can then be used in the agent functions.
+ * @param h_prob_esp_medicas value to set the variable
+ */
+extern void set_prob_esp_medicas(float* h_prob_esp_medicas);
+
+extern const float* get_prob_esp_medicas();
+
+
+extern float h_env_prob_esp_medicas;
+
+/** set_prob_pediatria
+ * Sets the constant variable prob_pediatria on the device which can then be used in the agent functions.
+ * @param h_prob_pediatria value to set the variable
+ */
+extern void set_prob_pediatria(float* h_prob_pediatria);
+
+extern const float* get_prob_pediatria();
+
+
+extern float h_env_prob_pediatria;
+
+/** set_prob_cuid_intensivos
+ * Sets the constant variable prob_cuid_intensivos on the device which can then be used in the agent functions.
+ * @param h_prob_cuid_intensivos value to set the variable
+ */
+extern void set_prob_cuid_intensivos(float* h_prob_cuid_intensivos);
+
+extern const float* get_prob_cuid_intensivos();
+
+
+extern float h_env_prob_cuid_intensivos;
+
+/** set_prob_ginecologia
+ * Sets the constant variable prob_ginecologia on the device which can then be used in the agent functions.
+ * @param h_prob_ginecologia value to set the variable
+ */
+extern void set_prob_ginecologia(float* h_prob_ginecologia);
+
+extern const float* get_prob_ginecologia();
+
+
+extern float h_env_prob_ginecologia;
+
+/** set_prob_geriatria
+ * Sets the constant variable prob_geriatria on the device which can then be used in the agent functions.
+ * @param h_prob_geriatria value to set the variable
+ */
+extern void set_prob_geriatria(float* h_prob_geriatria);
+
+extern const float* get_prob_geriatria();
+
+
+extern float h_env_prob_geriatria;
+
+/** set_prob_psiquiatria
+ * Sets the constant variable prob_psiquiatria on the device which can then be used in the agent functions.
+ * @param h_prob_psiquiatria value to set the variable
+ */
+extern void set_prob_psiquiatria(float* h_prob_psiquiatria);
+
+extern const float* get_prob_psiquiatria();
+
+
+extern float h_env_prob_psiquiatria;
+
+/** set_min_espera_recepcionista
+ * Sets the constant variable min_espera_recepcionista on the device which can then be used in the agent functions.
+ * @param h_min_espera_recepcionista value to set the variable
+ */
+extern void set_min_espera_recepcionista(int* h_min_espera_recepcionista);
+
+extern const int* get_min_espera_recepcionista();
+
+
+extern int h_env_min_espera_recepcionista;
+
+/** set_receptionist_x
+ * Sets the constant variable receptionist_x on the device which can then be used in the agent functions.
+ * @param h_receptionist_x value to set the variable
+ */
+extern void set_receptionist_x(int* h_receptionist_x);
+
+extern const int* get_receptionist_x();
+
+
+extern int h_env_receptionist_x;
+
+/** set_receptionist_y
+ * Sets the constant variable receptionist_y on the device which can then be used in the agent functions.
+ * @param h_receptionist_y value to set the variable
+ */
+extern void set_receptionist_y(int* h_receptionist_y);
+
+extern const int* get_receptionist_y();
+
+
+extern int h_env_receptionist_y;
 
 
 /** getMaximumBound

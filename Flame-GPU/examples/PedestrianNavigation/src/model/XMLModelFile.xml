@@ -136,6 +136,146 @@
         <type>float</type>
         <name>GOAL_WEIGHT</name>
       </gpu:variable>
+<!-- Posición de la salida -->
+      <gpu:variable>
+        <type>int</type>
+        <name>EXIT_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>EXIT_Y</name>
+      </gpu:variable>
+<!-- Probabilidades usadas para manejar la cantidad de enfermos -->	
+      <gpu:variable>
+        <type>float</type>
+        <name>probabilidad_estornudar</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>probabilidad_contagio</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>probabilidad_generar_enfermo</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>probabilidad_contagio_personal</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>probabilidad_contagiar_silla</name>
+      </gpu:variable>
+<!-- Manejo de las sillas -->
+      <gpu:variable>
+        <type>int</type>
+        <name>firstChair_x</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>firstChair_y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>space_between</name>
+      </gpu:variable>
+<!-- Manejo de los doctores -->
+      <gpu:variable>
+        <type>int</type>
+        <name>firstDoctor_x</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>firstDoctor_y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>space_between_doctors</name>
+      </gpu:variable>
+<!-- Manejo de los especialistas -->
+      <gpu:variable>
+        <type>int</type>
+        <name>firstSpecialist_x</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>firstSpecialist_y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>space_between_specialists</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>fifthSpecialist_x</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>fifthSpecialist_y</name>
+      </gpu:variable>
+<!-- Probabilidades de prioridad del triage -->
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_level_1</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_level_2</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_level_3</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_level_4</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_level_5</name>
+      </gpu:variable>
+<!-- Probabilidades de especialidad -->
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_esp_quirurgicas</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_esp_medicas</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_pediatria</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_cuid_intensivos</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_ginecologia</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_geriatria</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>prob_psiquiatria</name>
+      </gpu:variable>
+<!-- Probabilidades de especialidad -->
+      <gpu:variable>
+        <type>int</type>
+        <name>min_espera_recepcionista</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>receptionist_x</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>receptionist_y</name>
+      </gpu:variable>
     </gpu:constants>
     <gpu:functionFiles>
       <file>functions.c</file>

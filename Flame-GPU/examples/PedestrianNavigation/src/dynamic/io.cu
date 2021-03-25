@@ -346,6 +346,138 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%f", (*get_GOAL_WEIGHT()));
     fputs(data, file);
     fputs("</GOAL_WEIGHT>\n", file);
+    fputs("\t<EXIT_X>", file);
+    sprintf(data, "%d", (*get_EXIT_X()));
+    fputs(data, file);
+    fputs("</EXIT_X>\n", file);
+    fputs("\t<EXIT_Y>", file);
+    sprintf(data, "%d", (*get_EXIT_Y()));
+    fputs(data, file);
+    fputs("</EXIT_Y>\n", file);
+    fputs("\t<probabilidad_estornudar>", file);
+    sprintf(data, "%f", (*get_probabilidad_estornudar()));
+    fputs(data, file);
+    fputs("</probabilidad_estornudar>\n", file);
+    fputs("\t<probabilidad_contagio>", file);
+    sprintf(data, "%f", (*get_probabilidad_contagio()));
+    fputs(data, file);
+    fputs("</probabilidad_contagio>\n", file);
+    fputs("\t<probabilidad_generar_enfermo>", file);
+    sprintf(data, "%f", (*get_probabilidad_generar_enfermo()));
+    fputs(data, file);
+    fputs("</probabilidad_generar_enfermo>\n", file);
+    fputs("\t<probabilidad_contagio_personal>", file);
+    sprintf(data, "%f", (*get_probabilidad_contagio_personal()));
+    fputs(data, file);
+    fputs("</probabilidad_contagio_personal>\n", file);
+    fputs("\t<probabilidad_contagiar_silla>", file);
+    sprintf(data, "%f", (*get_probabilidad_contagiar_silla()));
+    fputs(data, file);
+    fputs("</probabilidad_contagiar_silla>\n", file);
+    fputs("\t<firstChair_x>", file);
+    sprintf(data, "%d", (*get_firstChair_x()));
+    fputs(data, file);
+    fputs("</firstChair_x>\n", file);
+    fputs("\t<firstChair_y>", file);
+    sprintf(data, "%d", (*get_firstChair_y()));
+    fputs(data, file);
+    fputs("</firstChair_y>\n", file);
+    fputs("\t<space_between>", file);
+    sprintf(data, "%d", (*get_space_between()));
+    fputs(data, file);
+    fputs("</space_between>\n", file);
+    fputs("\t<firstDoctor_x>", file);
+    sprintf(data, "%d", (*get_firstDoctor_x()));
+    fputs(data, file);
+    fputs("</firstDoctor_x>\n", file);
+    fputs("\t<firstDoctor_y>", file);
+    sprintf(data, "%d", (*get_firstDoctor_y()));
+    fputs(data, file);
+    fputs("</firstDoctor_y>\n", file);
+    fputs("\t<space_between_doctors>", file);
+    sprintf(data, "%d", (*get_space_between_doctors()));
+    fputs(data, file);
+    fputs("</space_between_doctors>\n", file);
+    fputs("\t<firstSpecialist_x>", file);
+    sprintf(data, "%d", (*get_firstSpecialist_x()));
+    fputs(data, file);
+    fputs("</firstSpecialist_x>\n", file);
+    fputs("\t<firstSpecialist_y>", file);
+    sprintf(data, "%d", (*get_firstSpecialist_y()));
+    fputs(data, file);
+    fputs("</firstSpecialist_y>\n", file);
+    fputs("\t<space_between_specialists>", file);
+    sprintf(data, "%d", (*get_space_between_specialists()));
+    fputs(data, file);
+    fputs("</space_between_specialists>\n", file);
+    fputs("\t<fifthSpecialist_x>", file);
+    sprintf(data, "%d", (*get_fifthSpecialist_x()));
+    fputs(data, file);
+    fputs("</fifthSpecialist_x>\n", file);
+    fputs("\t<fifthSpecialist_y>", file);
+    sprintf(data, "%d", (*get_fifthSpecialist_y()));
+    fputs(data, file);
+    fputs("</fifthSpecialist_y>\n", file);
+    fputs("\t<prob_level_1>", file);
+    sprintf(data, "%f", (*get_prob_level_1()));
+    fputs(data, file);
+    fputs("</prob_level_1>\n", file);
+    fputs("\t<prob_level_2>", file);
+    sprintf(data, "%f", (*get_prob_level_2()));
+    fputs(data, file);
+    fputs("</prob_level_2>\n", file);
+    fputs("\t<prob_level_3>", file);
+    sprintf(data, "%f", (*get_prob_level_3()));
+    fputs(data, file);
+    fputs("</prob_level_3>\n", file);
+    fputs("\t<prob_level_4>", file);
+    sprintf(data, "%f", (*get_prob_level_4()));
+    fputs(data, file);
+    fputs("</prob_level_4>\n", file);
+    fputs("\t<prob_level_5>", file);
+    sprintf(data, "%f", (*get_prob_level_5()));
+    fputs(data, file);
+    fputs("</prob_level_5>\n", file);
+    fputs("\t<prob_esp_quirurgicas>", file);
+    sprintf(data, "%f", (*get_prob_esp_quirurgicas()));
+    fputs(data, file);
+    fputs("</prob_esp_quirurgicas>\n", file);
+    fputs("\t<prob_esp_medicas>", file);
+    sprintf(data, "%f", (*get_prob_esp_medicas()));
+    fputs(data, file);
+    fputs("</prob_esp_medicas>\n", file);
+    fputs("\t<prob_pediatria>", file);
+    sprintf(data, "%f", (*get_prob_pediatria()));
+    fputs(data, file);
+    fputs("</prob_pediatria>\n", file);
+    fputs("\t<prob_cuid_intensivos>", file);
+    sprintf(data, "%f", (*get_prob_cuid_intensivos()));
+    fputs(data, file);
+    fputs("</prob_cuid_intensivos>\n", file);
+    fputs("\t<prob_ginecologia>", file);
+    sprintf(data, "%f", (*get_prob_ginecologia()));
+    fputs(data, file);
+    fputs("</prob_ginecologia>\n", file);
+    fputs("\t<prob_geriatria>", file);
+    sprintf(data, "%f", (*get_prob_geriatria()));
+    fputs(data, file);
+    fputs("</prob_geriatria>\n", file);
+    fputs("\t<prob_psiquiatria>", file);
+    sprintf(data, "%f", (*get_prob_psiquiatria()));
+    fputs(data, file);
+    fputs("</prob_psiquiatria>\n", file);
+    fputs("\t<min_espera_recepcionista>", file);
+    sprintf(data, "%d", (*get_min_espera_recepcionista()));
+    fputs(data, file);
+    fputs("</min_espera_recepcionista>\n", file);
+    fputs("\t<receptionist_x>", file);
+    sprintf(data, "%d", (*get_receptionist_x()));
+    fputs(data, file);
+    fputs("</receptionist_x>\n", file);
+    fputs("\t<receptionist_y>", file);
+    sprintf(data, "%d", (*get_receptionist_y()));
+    fputs(data, file);
+    fputs("</receptionist_y>\n", file);
 	fputs("</environment>\n" , file);
 
 	//Write each agent agent to xml
@@ -1158,6 +1290,72 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_GOAL_WEIGHT;
     
+    int in_env_EXIT_X;
+    
+    int in_env_EXIT_Y;
+    
+    int in_env_probabilidad_estornudar;
+    
+    int in_env_probabilidad_contagio;
+    
+    int in_env_probabilidad_generar_enfermo;
+    
+    int in_env_probabilidad_contagio_personal;
+    
+    int in_env_probabilidad_contagiar_silla;
+    
+    int in_env_firstChair_x;
+    
+    int in_env_firstChair_y;
+    
+    int in_env_space_between;
+    
+    int in_env_firstDoctor_x;
+    
+    int in_env_firstDoctor_y;
+    
+    int in_env_space_between_doctors;
+    
+    int in_env_firstSpecialist_x;
+    
+    int in_env_firstSpecialist_y;
+    
+    int in_env_space_between_specialists;
+    
+    int in_env_fifthSpecialist_x;
+    
+    int in_env_fifthSpecialist_y;
+    
+    int in_env_prob_level_1;
+    
+    int in_env_prob_level_2;
+    
+    int in_env_prob_level_3;
+    
+    int in_env_prob_level_4;
+    
+    int in_env_prob_level_5;
+    
+    int in_env_prob_esp_quirurgicas;
+    
+    int in_env_prob_esp_medicas;
+    
+    int in_env_prob_pediatria;
+    
+    int in_env_prob_cuid_intensivos;
+    
+    int in_env_prob_ginecologia;
+    
+    int in_env_prob_geriatria;
+    
+    int in_env_prob_psiquiatria;
+    
+    int in_env_min_espera_recepcionista;
+    
+    int in_env_receptionist_x;
+    
+    int in_env_receptionist_y;
+    
 	/* set agent count to zero */
 	*h_xmachine_memory_agent_count = 0;
 	*h_xmachine_memory_navmap_count = 0;
@@ -1305,6 +1503,39 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     float env_AVOID_WEIGHT;
     float env_COLLISION_WEIGHT;
     float env_GOAL_WEIGHT;
+    int env_EXIT_X;
+    int env_EXIT_Y;
+    float env_probabilidad_estornudar;
+    float env_probabilidad_contagio;
+    float env_probabilidad_generar_enfermo;
+    float env_probabilidad_contagio_personal;
+    float env_probabilidad_contagiar_silla;
+    int env_firstChair_x;
+    int env_firstChair_y;
+    int env_space_between;
+    int env_firstDoctor_x;
+    int env_firstDoctor_y;
+    int env_space_between_doctors;
+    int env_firstSpecialist_x;
+    int env_firstSpecialist_y;
+    int env_space_between_specialists;
+    int env_fifthSpecialist_x;
+    int env_fifthSpecialist_y;
+    float env_prob_level_1;
+    float env_prob_level_2;
+    float env_prob_level_3;
+    float env_prob_level_4;
+    float env_prob_level_5;
+    float env_prob_esp_quirurgicas;
+    float env_prob_esp_medicas;
+    float env_prob_pediatria;
+    float env_prob_cuid_intensivos;
+    float env_prob_ginecologia;
+    float env_prob_geriatria;
+    float env_prob_psiquiatria;
+    int env_min_espera_recepcionista;
+    int env_receptionist_x;
+    int env_receptionist_y;
     
 
 
@@ -1452,6 +1683,39 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_AVOID_WEIGHT = 0;
     in_env_COLLISION_WEIGHT = 0;
     in_env_GOAL_WEIGHT = 0;
+    in_env_EXIT_X = 0;
+    in_env_EXIT_Y = 0;
+    in_env_probabilidad_estornudar = 0;
+    in_env_probabilidad_contagio = 0;
+    in_env_probabilidad_generar_enfermo = 0;
+    in_env_probabilidad_contagio_personal = 0;
+    in_env_probabilidad_contagiar_silla = 0;
+    in_env_firstChair_x = 0;
+    in_env_firstChair_y = 0;
+    in_env_space_between = 0;
+    in_env_firstDoctor_x = 0;
+    in_env_firstDoctor_y = 0;
+    in_env_space_between_doctors = 0;
+    in_env_firstSpecialist_x = 0;
+    in_env_firstSpecialist_y = 0;
+    in_env_space_between_specialists = 0;
+    in_env_fifthSpecialist_x = 0;
+    in_env_fifthSpecialist_y = 0;
+    in_env_prob_level_1 = 0;
+    in_env_prob_level_2 = 0;
+    in_env_prob_level_3 = 0;
+    in_env_prob_level_4 = 0;
+    in_env_prob_level_5 = 0;
+    in_env_prob_esp_quirurgicas = 0;
+    in_env_prob_esp_medicas = 0;
+    in_env_prob_pediatria = 0;
+    in_env_prob_cuid_intensivos = 0;
+    in_env_prob_ginecologia = 0;
+    in_env_prob_geriatria = 0;
+    in_env_prob_psiquiatria = 0;
+    in_env_min_espera_recepcionista = 0;
+    in_env_receptionist_x = 0;
+    in_env_receptionist_y = 0;
 	//set all agent values to 0
 	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
 	for (int k=0; k<xmachine_memory_agent_MAX; k++)
@@ -1815,6 +2079,39 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_AVOID_WEIGHT = 0;
     env_COLLISION_WEIGHT = 0;
     env_GOAL_WEIGHT = 0;
+    env_EXIT_X = 0;
+    env_EXIT_Y = 0;
+    env_probabilidad_estornudar = 0;
+    env_probabilidad_contagio = 0;
+    env_probabilidad_generar_enfermo = 0;
+    env_probabilidad_contagio_personal = 0;
+    env_probabilidad_contagiar_silla = 0;
+    env_firstChair_x = 0;
+    env_firstChair_y = 0;
+    env_space_between = 0;
+    env_firstDoctor_x = 0;
+    env_firstDoctor_y = 0;
+    env_space_between_doctors = 0;
+    env_firstSpecialist_x = 0;
+    env_firstSpecialist_y = 0;
+    env_space_between_specialists = 0;
+    env_fifthSpecialist_x = 0;
+    env_fifthSpecialist_y = 0;
+    env_prob_level_1 = 0;
+    env_prob_level_2 = 0;
+    env_prob_level_3 = 0;
+    env_prob_level_4 = 0;
+    env_prob_level_5 = 0;
+    env_prob_esp_quirurgicas = 0;
+    env_prob_esp_medicas = 0;
+    env_prob_pediatria = 0;
+    env_prob_cuid_intensivos = 0;
+    env_prob_ginecologia = 0;
+    env_prob_geriatria = 0;
+    env_prob_psiquiatria = 0;
+    env_min_espera_recepcionista = 0;
+    env_receptionist_x = 0;
+    env_receptionist_y = 0;
     
     
     // If no input path was specified, issue a message and return.
@@ -2611,6 +2908,72 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/COLLISION_WEIGHT") == 0) in_env_COLLISION_WEIGHT = 0;
 			if(strcmp(buffer, "GOAL_WEIGHT") == 0) in_env_GOAL_WEIGHT = 1;
             if(strcmp(buffer, "/GOAL_WEIGHT") == 0) in_env_GOAL_WEIGHT = 0;
+			if(strcmp(buffer, "EXIT_X") == 0) in_env_EXIT_X = 1;
+            if(strcmp(buffer, "/EXIT_X") == 0) in_env_EXIT_X = 0;
+			if(strcmp(buffer, "EXIT_Y") == 0) in_env_EXIT_Y = 1;
+            if(strcmp(buffer, "/EXIT_Y") == 0) in_env_EXIT_Y = 0;
+			if(strcmp(buffer, "probabilidad_estornudar") == 0) in_env_probabilidad_estornudar = 1;
+            if(strcmp(buffer, "/probabilidad_estornudar") == 0) in_env_probabilidad_estornudar = 0;
+			if(strcmp(buffer, "probabilidad_contagio") == 0) in_env_probabilidad_contagio = 1;
+            if(strcmp(buffer, "/probabilidad_contagio") == 0) in_env_probabilidad_contagio = 0;
+			if(strcmp(buffer, "probabilidad_generar_enfermo") == 0) in_env_probabilidad_generar_enfermo = 1;
+            if(strcmp(buffer, "/probabilidad_generar_enfermo") == 0) in_env_probabilidad_generar_enfermo = 0;
+			if(strcmp(buffer, "probabilidad_contagio_personal") == 0) in_env_probabilidad_contagio_personal = 1;
+            if(strcmp(buffer, "/probabilidad_contagio_personal") == 0) in_env_probabilidad_contagio_personal = 0;
+			if(strcmp(buffer, "probabilidad_contagiar_silla") == 0) in_env_probabilidad_contagiar_silla = 1;
+            if(strcmp(buffer, "/probabilidad_contagiar_silla") == 0) in_env_probabilidad_contagiar_silla = 0;
+			if(strcmp(buffer, "firstChair_x") == 0) in_env_firstChair_x = 1;
+            if(strcmp(buffer, "/firstChair_x") == 0) in_env_firstChair_x = 0;
+			if(strcmp(buffer, "firstChair_y") == 0) in_env_firstChair_y = 1;
+            if(strcmp(buffer, "/firstChair_y") == 0) in_env_firstChair_y = 0;
+			if(strcmp(buffer, "space_between") == 0) in_env_space_between = 1;
+            if(strcmp(buffer, "/space_between") == 0) in_env_space_between = 0;
+			if(strcmp(buffer, "firstDoctor_x") == 0) in_env_firstDoctor_x = 1;
+            if(strcmp(buffer, "/firstDoctor_x") == 0) in_env_firstDoctor_x = 0;
+			if(strcmp(buffer, "firstDoctor_y") == 0) in_env_firstDoctor_y = 1;
+            if(strcmp(buffer, "/firstDoctor_y") == 0) in_env_firstDoctor_y = 0;
+			if(strcmp(buffer, "space_between_doctors") == 0) in_env_space_between_doctors = 1;
+            if(strcmp(buffer, "/space_between_doctors") == 0) in_env_space_between_doctors = 0;
+			if(strcmp(buffer, "firstSpecialist_x") == 0) in_env_firstSpecialist_x = 1;
+            if(strcmp(buffer, "/firstSpecialist_x") == 0) in_env_firstSpecialist_x = 0;
+			if(strcmp(buffer, "firstSpecialist_y") == 0) in_env_firstSpecialist_y = 1;
+            if(strcmp(buffer, "/firstSpecialist_y") == 0) in_env_firstSpecialist_y = 0;
+			if(strcmp(buffer, "space_between_specialists") == 0) in_env_space_between_specialists = 1;
+            if(strcmp(buffer, "/space_between_specialists") == 0) in_env_space_between_specialists = 0;
+			if(strcmp(buffer, "fifthSpecialist_x") == 0) in_env_fifthSpecialist_x = 1;
+            if(strcmp(buffer, "/fifthSpecialist_x") == 0) in_env_fifthSpecialist_x = 0;
+			if(strcmp(buffer, "fifthSpecialist_y") == 0) in_env_fifthSpecialist_y = 1;
+            if(strcmp(buffer, "/fifthSpecialist_y") == 0) in_env_fifthSpecialist_y = 0;
+			if(strcmp(buffer, "prob_level_1") == 0) in_env_prob_level_1 = 1;
+            if(strcmp(buffer, "/prob_level_1") == 0) in_env_prob_level_1 = 0;
+			if(strcmp(buffer, "prob_level_2") == 0) in_env_prob_level_2 = 1;
+            if(strcmp(buffer, "/prob_level_2") == 0) in_env_prob_level_2 = 0;
+			if(strcmp(buffer, "prob_level_3") == 0) in_env_prob_level_3 = 1;
+            if(strcmp(buffer, "/prob_level_3") == 0) in_env_prob_level_3 = 0;
+			if(strcmp(buffer, "prob_level_4") == 0) in_env_prob_level_4 = 1;
+            if(strcmp(buffer, "/prob_level_4") == 0) in_env_prob_level_4 = 0;
+			if(strcmp(buffer, "prob_level_5") == 0) in_env_prob_level_5 = 1;
+            if(strcmp(buffer, "/prob_level_5") == 0) in_env_prob_level_5 = 0;
+			if(strcmp(buffer, "prob_esp_quirurgicas") == 0) in_env_prob_esp_quirurgicas = 1;
+            if(strcmp(buffer, "/prob_esp_quirurgicas") == 0) in_env_prob_esp_quirurgicas = 0;
+			if(strcmp(buffer, "prob_esp_medicas") == 0) in_env_prob_esp_medicas = 1;
+            if(strcmp(buffer, "/prob_esp_medicas") == 0) in_env_prob_esp_medicas = 0;
+			if(strcmp(buffer, "prob_pediatria") == 0) in_env_prob_pediatria = 1;
+            if(strcmp(buffer, "/prob_pediatria") == 0) in_env_prob_pediatria = 0;
+			if(strcmp(buffer, "prob_cuid_intensivos") == 0) in_env_prob_cuid_intensivos = 1;
+            if(strcmp(buffer, "/prob_cuid_intensivos") == 0) in_env_prob_cuid_intensivos = 0;
+			if(strcmp(buffer, "prob_ginecologia") == 0) in_env_prob_ginecologia = 1;
+            if(strcmp(buffer, "/prob_ginecologia") == 0) in_env_prob_ginecologia = 0;
+			if(strcmp(buffer, "prob_geriatria") == 0) in_env_prob_geriatria = 1;
+            if(strcmp(buffer, "/prob_geriatria") == 0) in_env_prob_geriatria = 0;
+			if(strcmp(buffer, "prob_psiquiatria") == 0) in_env_prob_psiquiatria = 1;
+            if(strcmp(buffer, "/prob_psiquiatria") == 0) in_env_prob_psiquiatria = 0;
+			if(strcmp(buffer, "min_espera_recepcionista") == 0) in_env_min_espera_recepcionista = 1;
+            if(strcmp(buffer, "/min_espera_recepcionista") == 0) in_env_min_espera_recepcionista = 0;
+			if(strcmp(buffer, "receptionist_x") == 0) in_env_receptionist_x = 1;
+            if(strcmp(buffer, "/receptionist_x") == 0) in_env_receptionist_x = 0;
+			if(strcmp(buffer, "receptionist_y") == 0) in_env_receptionist_y = 1;
+            if(strcmp(buffer, "/receptionist_y") == 0) in_env_receptionist_y = 0;
 			
 
 			/* End of tag and reset buffer */
@@ -3152,6 +3515,237 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_GOAL_WEIGHT = (float) fgpu_atof(buffer);
                     
                     set_GOAL_WEIGHT(&env_GOAL_WEIGHT);
+                  
+              }
+            if(in_env_EXIT_X){
+              
+                    env_EXIT_X = (int) fpgu_strtol(buffer);
+                    
+                    set_EXIT_X(&env_EXIT_X);
+                  
+              }
+            if(in_env_EXIT_Y){
+              
+                    env_EXIT_Y = (int) fpgu_strtol(buffer);
+                    
+                    set_EXIT_Y(&env_EXIT_Y);
+                  
+              }
+            if(in_env_probabilidad_estornudar){
+              
+                    env_probabilidad_estornudar = (float) fgpu_atof(buffer);
+                    
+                    set_probabilidad_estornudar(&env_probabilidad_estornudar);
+                  
+              }
+            if(in_env_probabilidad_contagio){
+              
+                    env_probabilidad_contagio = (float) fgpu_atof(buffer);
+                    
+                    set_probabilidad_contagio(&env_probabilidad_contagio);
+                  
+              }
+            if(in_env_probabilidad_generar_enfermo){
+              
+                    env_probabilidad_generar_enfermo = (float) fgpu_atof(buffer);
+                    
+                    set_probabilidad_generar_enfermo(&env_probabilidad_generar_enfermo);
+                  
+              }
+            if(in_env_probabilidad_contagio_personal){
+              
+                    env_probabilidad_contagio_personal = (float) fgpu_atof(buffer);
+                    
+                    set_probabilidad_contagio_personal(&env_probabilidad_contagio_personal);
+                  
+              }
+            if(in_env_probabilidad_contagiar_silla){
+              
+                    env_probabilidad_contagiar_silla = (float) fgpu_atof(buffer);
+                    
+                    set_probabilidad_contagiar_silla(&env_probabilidad_contagiar_silla);
+                  
+              }
+            if(in_env_firstChair_x){
+              
+                    env_firstChair_x = (int) fpgu_strtol(buffer);
+                    
+                    set_firstChair_x(&env_firstChair_x);
+                  
+              }
+            if(in_env_firstChair_y){
+              
+                    env_firstChair_y = (int) fpgu_strtol(buffer);
+                    
+                    set_firstChair_y(&env_firstChair_y);
+                  
+              }
+            if(in_env_space_between){
+              
+                    env_space_between = (int) fpgu_strtol(buffer);
+                    
+                    set_space_between(&env_space_between);
+                  
+              }
+            if(in_env_firstDoctor_x){
+              
+                    env_firstDoctor_x = (int) fpgu_strtol(buffer);
+                    
+                    set_firstDoctor_x(&env_firstDoctor_x);
+                  
+              }
+            if(in_env_firstDoctor_y){
+              
+                    env_firstDoctor_y = (int) fpgu_strtol(buffer);
+                    
+                    set_firstDoctor_y(&env_firstDoctor_y);
+                  
+              }
+            if(in_env_space_between_doctors){
+              
+                    env_space_between_doctors = (int) fpgu_strtol(buffer);
+                    
+                    set_space_between_doctors(&env_space_between_doctors);
+                  
+              }
+            if(in_env_firstSpecialist_x){
+              
+                    env_firstSpecialist_x = (int) fpgu_strtol(buffer);
+                    
+                    set_firstSpecialist_x(&env_firstSpecialist_x);
+                  
+              }
+            if(in_env_firstSpecialist_y){
+              
+                    env_firstSpecialist_y = (int) fpgu_strtol(buffer);
+                    
+                    set_firstSpecialist_y(&env_firstSpecialist_y);
+                  
+              }
+            if(in_env_space_between_specialists){
+              
+                    env_space_between_specialists = (int) fpgu_strtol(buffer);
+                    
+                    set_space_between_specialists(&env_space_between_specialists);
+                  
+              }
+            if(in_env_fifthSpecialist_x){
+              
+                    env_fifthSpecialist_x = (int) fpgu_strtol(buffer);
+                    
+                    set_fifthSpecialist_x(&env_fifthSpecialist_x);
+                  
+              }
+            if(in_env_fifthSpecialist_y){
+              
+                    env_fifthSpecialist_y = (int) fpgu_strtol(buffer);
+                    
+                    set_fifthSpecialist_y(&env_fifthSpecialist_y);
+                  
+              }
+            if(in_env_prob_level_1){
+              
+                    env_prob_level_1 = (float) fgpu_atof(buffer);
+                    
+                    set_prob_level_1(&env_prob_level_1);
+                  
+              }
+            if(in_env_prob_level_2){
+              
+                    env_prob_level_2 = (float) fgpu_atof(buffer);
+                    
+                    set_prob_level_2(&env_prob_level_2);
+                  
+              }
+            if(in_env_prob_level_3){
+              
+                    env_prob_level_3 = (float) fgpu_atof(buffer);
+                    
+                    set_prob_level_3(&env_prob_level_3);
+                  
+              }
+            if(in_env_prob_level_4){
+              
+                    env_prob_level_4 = (float) fgpu_atof(buffer);
+                    
+                    set_prob_level_4(&env_prob_level_4);
+                  
+              }
+            if(in_env_prob_level_5){
+              
+                    env_prob_level_5 = (float) fgpu_atof(buffer);
+                    
+                    set_prob_level_5(&env_prob_level_5);
+                  
+              }
+            if(in_env_prob_esp_quirurgicas){
+              
+                    env_prob_esp_quirurgicas = (float) fgpu_atof(buffer);
+                    
+                    set_prob_esp_quirurgicas(&env_prob_esp_quirurgicas);
+                  
+              }
+            if(in_env_prob_esp_medicas){
+              
+                    env_prob_esp_medicas = (float) fgpu_atof(buffer);
+                    
+                    set_prob_esp_medicas(&env_prob_esp_medicas);
+                  
+              }
+            if(in_env_prob_pediatria){
+              
+                    env_prob_pediatria = (float) fgpu_atof(buffer);
+                    
+                    set_prob_pediatria(&env_prob_pediatria);
+                  
+              }
+            if(in_env_prob_cuid_intensivos){
+              
+                    env_prob_cuid_intensivos = (float) fgpu_atof(buffer);
+                    
+                    set_prob_cuid_intensivos(&env_prob_cuid_intensivos);
+                  
+              }
+            if(in_env_prob_ginecologia){
+              
+                    env_prob_ginecologia = (float) fgpu_atof(buffer);
+                    
+                    set_prob_ginecologia(&env_prob_ginecologia);
+                  
+              }
+            if(in_env_prob_geriatria){
+              
+                    env_prob_geriatria = (float) fgpu_atof(buffer);
+                    
+                    set_prob_geriatria(&env_prob_geriatria);
+                  
+              }
+            if(in_env_prob_psiquiatria){
+              
+                    env_prob_psiquiatria = (float) fgpu_atof(buffer);
+                    
+                    set_prob_psiquiatria(&env_prob_psiquiatria);
+                  
+              }
+            if(in_env_min_espera_recepcionista){
+              
+                    env_min_espera_recepcionista = (int) fpgu_strtol(buffer);
+                    
+                    set_min_espera_recepcionista(&env_min_espera_recepcionista);
+                  
+              }
+            if(in_env_receptionist_x){
+              
+                    env_receptionist_x = (int) fpgu_strtol(buffer);
+                    
+                    set_receptionist_x(&env_receptionist_x);
+                  
+              }
+            if(in_env_receptionist_y){
+              
+                    env_receptionist_y = (int) fpgu_strtol(buffer);
+                    
+                    set_receptionist_y(&env_receptionist_y);
                   
               }
             
