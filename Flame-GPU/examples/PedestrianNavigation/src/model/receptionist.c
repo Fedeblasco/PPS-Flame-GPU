@@ -28,7 +28,7 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
         }*/
     }else if(agent->attend_patient == 1){
         agent->tick++;
-        if(agent->tick*MINUTES_PER_TICK >= min_espera_recepcionista){
+        if(agent->tick*MINUTES_PER_TICK >= RECEPTION_MINUTES){
             //printf("Enviando mensaje 2 a %d\n",agent->current_patient);
             add_check_in_response_message(patientMessages, agent->current_patient);
             agent->tick = 0;
@@ -58,7 +58,7 @@ __FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, 
             if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
                     float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-					if(temp<probabilidad_estornudar*probabilidad_contagio_personal){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
+					if(temp<PROB_SNIFF*PROB_INFECT_PERSONAL){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
 						agent->estado = 1;
 						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);

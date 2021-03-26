@@ -4,6 +4,7 @@
 <!-- Variables de entorno -->
   <gpu:environment>
     <gpu:constants>
+<!-- Variables del ejemplo -->
       <gpu:variable>
         <type>float</type>
         <name>EMMISION_RATE_EXIT1</name>
@@ -148,133 +149,192 @@
 <!-- Probabilidades usadas para manejar la cantidad de enfermos -->	
       <gpu:variable>
         <type>float</type>
-        <name>probabilidad_estornudar</name>
+        <name>PROB_SNIFF</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>probabilidad_contagio</name>
+        <name>PROB_INFECT</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>probabilidad_generar_enfermo</name>
+        <name>PROB_SPAWN_SICK</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>probabilidad_contagio_personal</name>
+        <name>PROB_INFECT_PERSONAL</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>probabilidad_contagiar_silla</name>
+        <name>PROB_INFECT_CHAIR</name>
       </gpu:variable>
 <!-- Manejo de las sillas -->
       <gpu:variable>
         <type>int</type>
-        <name>firstChair_x</name>
+        <name>FIRSTCHAIR_X</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>firstChair_y</name>
+        <name>FIRSTCHAIR_Y</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>space_between</name>
+        <name>SPACE_BETWEEN</name>
       </gpu:variable>
 <!-- Manejo de los doctores -->
       <gpu:variable>
         <type>int</type>
-        <name>firstDoctor_x</name>
+        <name>FIRSTDOCTOR_X</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>firstDoctor_y</name>
+        <name>FIRSTDOCTOR_Y</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>space_between_doctors</name>
+        <name>SPACE_BETWEEN_DOCTORS</name>
+      </gpu:variable>
+<!-- Manejo del triage -->
+      <gpu:variable>
+        <type>int</type>
+        <name>TRIAGE_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>TRIAGE_Y</name>
+      </gpu:variable>
+<!-- Manejo de la UCI -->
+      <gpu:variable>
+        <type>int</type>
+        <name>UCI_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>UCI_Y</name>
+      </gpu:variable>
+<!-- Checkpoints -->
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_1_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_1_Y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_2_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_2_Y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_3_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_3_Y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_4_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_4_Y</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_5_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CHECKPOINT_5_Y</name>
       </gpu:variable>
 <!-- Manejo de los especialistas -->
       <gpu:variable>
         <type>int</type>
-        <name>firstSpecialist_x</name>
+        <name>FIRSTSPECIALIST_X</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>firstSpecialist_y</name>
+        <name>FIRSTSPECIALIST_Y</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>space_between_specialists</name>
+        <name>SPACE_BETWEEN_SPECIALISTS</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>fifthSpecialist_x</name>
+        <name>FIFTHSPECIALIST_X</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>fifthSpecialist_y</name>
+        <name>FIFTHSPECIALIST_Y</name>
       </gpu:variable>
 <!-- Probabilidades de prioridad del triage -->
       <gpu:variable>
         <type>float</type>
-        <name>prob_level_1</name>
+        <name>PROB_LEVEL_1</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_level_2</name>
+        <name>PROB_LEVEL_2</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_level_3</name>
+        <name>PROB_LEVEL_3</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_level_4</name>
+        <name>PROB_LEVEL_4</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_level_5</name>
+        <name>PROB_LEVEL_5</name>
       </gpu:variable>
 <!-- Probabilidades de especialidad -->
       <gpu:variable>
         <type>float</type>
-        <name>prob_esp_quirurgicas</name>
+        <name>PROB_SURGICAL</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_esp_medicas</name>
+        <name>PROB_MEDICAL</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_pediatria</name>
+        <name>PROB_PEDIATRICS</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_cuid_intensivos</name>
+        <name>PROB_UCI</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_ginecologia</name>
+        <name>PROB_GYNECOLOGIST</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_geriatria</name>
+        <name>PROB_GERIATRICS</name>
       </gpu:variable>
       <gpu:variable>
         <type>float</type>
-        <name>prob_psiquiatria</name>
+        <name>PROB_PSYCHIATRY</name>
       </gpu:variable>
-<!-- Probabilidades de especialidad -->
+<!-- Manejo del recepcionista -->
       <gpu:variable>
         <type>int</type>
-        <name>min_espera_recepcionista</name>
-      </gpu:variable>
-      <gpu:variable>
-        <type>int</type>
-        <name>receptionist_x</name>
+        <name>RECEPTION_MINUTES</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>
-        <name>receptionist_y</name>
+        <name>RECEPTIONIST_X</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>RECEPTIONIST_Y</name>
       </gpu:variable>
     </gpu:constants>
     <gpu:functionFiles>

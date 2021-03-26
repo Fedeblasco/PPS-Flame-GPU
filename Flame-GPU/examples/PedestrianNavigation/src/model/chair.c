@@ -8,7 +8,7 @@ __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine
 		if(current_message->chair_no == agent->id){
 			if((current_message->state == 1) || (current_message->state == 2)){
                 float rand = rnd<CONTINUOUS>(rand48);
-                if(rand <= probabilidad_contagiar_silla){
+                if(rand <= PROB_INFECT_CHAIR){
                     agent->state = 1;
                 }
             }

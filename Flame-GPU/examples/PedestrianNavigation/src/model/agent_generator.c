@@ -2,8 +2,8 @@
 
 __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, xmachine_memory_chair_list* chair_agents){
     
-    int x = firstChair_x + (space_between * ((agent->chairs_generated+7)%7));
-    int y = firstChair_y - (space_between * int(agent->chairs_generated/7));
+    int x = FIRSTCHAIR_X + (SPACE_BETWEEN * ((agent->chairs_generated+7)%7));
+    int y = FIRSTCHAIR_Y - (SPACE_BETWEEN * int(agent->chairs_generated/7));
     
     //printf("Silla %d, x:%d, y:%d\n", agent->chairs_generated, x, y); 
     
@@ -48,25 +48,25 @@ __FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent,
     printf("Personal generado\n");
     float x = 0;
     float y = 0;
-    if(agent->personal_generated<4){
-        x = ((firstDoctor_x-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-        y = ((firstDoctor_y-(space_between_doctors*agent->personal_generated))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+    if(agent->personal_generated<4){//Creación de doctores
+        x = ((FIRSTDOCTOR_X-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+        y = ((FIRSTDOCTOR_Y-(SPACE_BETWEEN_DOCTORS*agent->personal_generated))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
     }else{ 
-        if(agent->personal_generated<8){
-            x = ((firstSpecialist_x + (space_between_specialists*(agent->personal_generated-4)))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-            y = ((firstSpecialist_y-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+        if(agent->personal_generated<8){//Creación de especialistas
+            x = ((FIRSTSPECIALIST_X + (SPACE_BETWEEN_SPECIALISTS*(agent->personal_generated-4)))/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            y = ((FIRSTSPECIALIST_Y-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
         }else{ 
             if(agent->personal_generated==8){//Creación del recepcionista
-                x = ((receptionist_x)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-                y = ((receptionist_y)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                x = ((RECEPTIONIST_X)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                y = ((RECEPTIONIST_Y)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
             }
-            if(agent->personal_generated==9){
-                x = ((106)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-                y = ((77)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            if(agent->personal_generated==9){//Creación del triage
+                x = ((TRIAGE_X)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                y = ((TRIAGE_Y)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
             }
-            if(agent->personal_generated==10){
-                x = ((fifthSpecialist_x-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
-                y = ((fifthSpecialist_y)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+            if(agent->personal_generated==10){//Creación del quinto especialista
+                x = ((FIFTHSPECIALIST_X-1.0f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
+                y = ((FIFTHSPECIALIST_Y)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
             }
         }
     }

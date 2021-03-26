@@ -3234,37 +3234,51 @@ float h_env_COLLISION_WEIGHT;
 float h_env_GOAL_WEIGHT;
 int h_env_EXIT_X;
 int h_env_EXIT_Y;
-float h_env_probabilidad_estornudar;
-float h_env_probabilidad_contagio;
-float h_env_probabilidad_generar_enfermo;
-float h_env_probabilidad_contagio_personal;
-float h_env_probabilidad_contagiar_silla;
-int h_env_firstChair_x;
-int h_env_firstChair_y;
-int h_env_space_between;
-int h_env_firstDoctor_x;
-int h_env_firstDoctor_y;
-int h_env_space_between_doctors;
-int h_env_firstSpecialist_x;
-int h_env_firstSpecialist_y;
-int h_env_space_between_specialists;
-int h_env_fifthSpecialist_x;
-int h_env_fifthSpecialist_y;
-float h_env_prob_level_1;
-float h_env_prob_level_2;
-float h_env_prob_level_3;
-float h_env_prob_level_4;
-float h_env_prob_level_5;
-float h_env_prob_esp_quirurgicas;
-float h_env_prob_esp_medicas;
-float h_env_prob_pediatria;
-float h_env_prob_cuid_intensivos;
-float h_env_prob_ginecologia;
-float h_env_prob_geriatria;
-float h_env_prob_psiquiatria;
-int h_env_min_espera_recepcionista;
-int h_env_receptionist_x;
-int h_env_receptionist_y;
+float h_env_PROB_SNIFF;
+float h_env_PROB_INFECT;
+float h_env_PROB_SPAWN_SICK;
+float h_env_PROB_INFECT_PERSONAL;
+float h_env_PROB_INFECT_CHAIR;
+int h_env_FIRSTCHAIR_X;
+int h_env_FIRSTCHAIR_Y;
+int h_env_SPACE_BETWEEN;
+int h_env_FIRSTDOCTOR_X;
+int h_env_FIRSTDOCTOR_Y;
+int h_env_SPACE_BETWEEN_DOCTORS;
+int h_env_TRIAGE_X;
+int h_env_TRIAGE_Y;
+int h_env_UCI_X;
+int h_env_UCI_Y;
+int h_env_CHECKPOINT_1_X;
+int h_env_CHECKPOINT_1_Y;
+int h_env_CHECKPOINT_2_X;
+int h_env_CHECKPOINT_2_Y;
+int h_env_CHECKPOINT_3_X;
+int h_env_CHECKPOINT_3_Y;
+int h_env_CHECKPOINT_4_X;
+int h_env_CHECKPOINT_4_Y;
+int h_env_CHECKPOINT_5_X;
+int h_env_CHECKPOINT_5_Y;
+int h_env_FIRSTSPECIALIST_X;
+int h_env_FIRSTSPECIALIST_Y;
+int h_env_SPACE_BETWEEN_SPECIALISTS;
+int h_env_FIFTHSPECIALIST_X;
+int h_env_FIFTHSPECIALIST_Y;
+float h_env_PROB_LEVEL_1;
+float h_env_PROB_LEVEL_2;
+float h_env_PROB_LEVEL_3;
+float h_env_PROB_LEVEL_4;
+float h_env_PROB_LEVEL_5;
+float h_env_PROB_SURGICAL;
+float h_env_PROB_MEDICAL;
+float h_env_PROB_PEDIATRICS;
+float h_env_PROB_UCI;
+float h_env_PROB_GYNECOLOGIST;
+float h_env_PROB_GERIATRICS;
+float h_env_PROB_PSYCHIATRY;
+int h_env_RECEPTION_MINUTES;
+int h_env_RECEPTIONIST_X;
+int h_env_RECEPTIONIST_Y;
 
 
 //constant setter
@@ -3723,404 +3737,586 @@ const int* get_EXIT_Y(){
 
 
 //constant setter
-void set_probabilidad_estornudar(float* h_probabilidad_estornudar){
-    gpuErrchk(cudaMemcpyToSymbol(probabilidad_estornudar, h_probabilidad_estornudar, sizeof(float)));
-    memcpy(&h_env_probabilidad_estornudar, h_probabilidad_estornudar,sizeof(float));
+void set_PROB_SNIFF(float* h_PROB_SNIFF){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_SNIFF, h_PROB_SNIFF, sizeof(float)));
+    memcpy(&h_env_PROB_SNIFF, h_PROB_SNIFF,sizeof(float));
 }
 
 //constant getter
-const float* get_probabilidad_estornudar(){
-    return &h_env_probabilidad_estornudar;
+const float* get_PROB_SNIFF(){
+    return &h_env_PROB_SNIFF;
 }
 
 
 
 //constant setter
-void set_probabilidad_contagio(float* h_probabilidad_contagio){
-    gpuErrchk(cudaMemcpyToSymbol(probabilidad_contagio, h_probabilidad_contagio, sizeof(float)));
-    memcpy(&h_env_probabilidad_contagio, h_probabilidad_contagio,sizeof(float));
+void set_PROB_INFECT(float* h_PROB_INFECT){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_INFECT, h_PROB_INFECT, sizeof(float)));
+    memcpy(&h_env_PROB_INFECT, h_PROB_INFECT,sizeof(float));
 }
 
 //constant getter
-const float* get_probabilidad_contagio(){
-    return &h_env_probabilidad_contagio;
+const float* get_PROB_INFECT(){
+    return &h_env_PROB_INFECT;
 }
 
 
 
 //constant setter
-void set_probabilidad_generar_enfermo(float* h_probabilidad_generar_enfermo){
-    gpuErrchk(cudaMemcpyToSymbol(probabilidad_generar_enfermo, h_probabilidad_generar_enfermo, sizeof(float)));
-    memcpy(&h_env_probabilidad_generar_enfermo, h_probabilidad_generar_enfermo,sizeof(float));
+void set_PROB_SPAWN_SICK(float* h_PROB_SPAWN_SICK){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_SPAWN_SICK, h_PROB_SPAWN_SICK, sizeof(float)));
+    memcpy(&h_env_PROB_SPAWN_SICK, h_PROB_SPAWN_SICK,sizeof(float));
 }
 
 //constant getter
-const float* get_probabilidad_generar_enfermo(){
-    return &h_env_probabilidad_generar_enfermo;
+const float* get_PROB_SPAWN_SICK(){
+    return &h_env_PROB_SPAWN_SICK;
 }
 
 
 
 //constant setter
-void set_probabilidad_contagio_personal(float* h_probabilidad_contagio_personal){
-    gpuErrchk(cudaMemcpyToSymbol(probabilidad_contagio_personal, h_probabilidad_contagio_personal, sizeof(float)));
-    memcpy(&h_env_probabilidad_contagio_personal, h_probabilidad_contagio_personal,sizeof(float));
+void set_PROB_INFECT_PERSONAL(float* h_PROB_INFECT_PERSONAL){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_INFECT_PERSONAL, h_PROB_INFECT_PERSONAL, sizeof(float)));
+    memcpy(&h_env_PROB_INFECT_PERSONAL, h_PROB_INFECT_PERSONAL,sizeof(float));
 }
 
 //constant getter
-const float* get_probabilidad_contagio_personal(){
-    return &h_env_probabilidad_contagio_personal;
+const float* get_PROB_INFECT_PERSONAL(){
+    return &h_env_PROB_INFECT_PERSONAL;
 }
 
 
 
 //constant setter
-void set_probabilidad_contagiar_silla(float* h_probabilidad_contagiar_silla){
-    gpuErrchk(cudaMemcpyToSymbol(probabilidad_contagiar_silla, h_probabilidad_contagiar_silla, sizeof(float)));
-    memcpy(&h_env_probabilidad_contagiar_silla, h_probabilidad_contagiar_silla,sizeof(float));
+void set_PROB_INFECT_CHAIR(float* h_PROB_INFECT_CHAIR){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_INFECT_CHAIR, h_PROB_INFECT_CHAIR, sizeof(float)));
+    memcpy(&h_env_PROB_INFECT_CHAIR, h_PROB_INFECT_CHAIR,sizeof(float));
 }
 
 //constant getter
-const float* get_probabilidad_contagiar_silla(){
-    return &h_env_probabilidad_contagiar_silla;
+const float* get_PROB_INFECT_CHAIR(){
+    return &h_env_PROB_INFECT_CHAIR;
 }
 
 
 
 //constant setter
-void set_firstChair_x(int* h_firstChair_x){
-    gpuErrchk(cudaMemcpyToSymbol(firstChair_x, h_firstChair_x, sizeof(int)));
-    memcpy(&h_env_firstChair_x, h_firstChair_x,sizeof(int));
+void set_FIRSTCHAIR_X(int* h_FIRSTCHAIR_X){
+    gpuErrchk(cudaMemcpyToSymbol(FIRSTCHAIR_X, h_FIRSTCHAIR_X, sizeof(int)));
+    memcpy(&h_env_FIRSTCHAIR_X, h_FIRSTCHAIR_X,sizeof(int));
 }
 
 //constant getter
-const int* get_firstChair_x(){
-    return &h_env_firstChair_x;
+const int* get_FIRSTCHAIR_X(){
+    return &h_env_FIRSTCHAIR_X;
 }
 
 
 
 //constant setter
-void set_firstChair_y(int* h_firstChair_y){
-    gpuErrchk(cudaMemcpyToSymbol(firstChair_y, h_firstChair_y, sizeof(int)));
-    memcpy(&h_env_firstChair_y, h_firstChair_y,sizeof(int));
+void set_FIRSTCHAIR_Y(int* h_FIRSTCHAIR_Y){
+    gpuErrchk(cudaMemcpyToSymbol(FIRSTCHAIR_Y, h_FIRSTCHAIR_Y, sizeof(int)));
+    memcpy(&h_env_FIRSTCHAIR_Y, h_FIRSTCHAIR_Y,sizeof(int));
 }
 
 //constant getter
-const int* get_firstChair_y(){
-    return &h_env_firstChair_y;
+const int* get_FIRSTCHAIR_Y(){
+    return &h_env_FIRSTCHAIR_Y;
 }
 
 
 
 //constant setter
-void set_space_between(int* h_space_between){
-    gpuErrchk(cudaMemcpyToSymbol(space_between, h_space_between, sizeof(int)));
-    memcpy(&h_env_space_between, h_space_between,sizeof(int));
+void set_SPACE_BETWEEN(int* h_SPACE_BETWEEN){
+    gpuErrchk(cudaMemcpyToSymbol(SPACE_BETWEEN, h_SPACE_BETWEEN, sizeof(int)));
+    memcpy(&h_env_SPACE_BETWEEN, h_SPACE_BETWEEN,sizeof(int));
 }
 
 //constant getter
-const int* get_space_between(){
-    return &h_env_space_between;
+const int* get_SPACE_BETWEEN(){
+    return &h_env_SPACE_BETWEEN;
 }
 
 
 
 //constant setter
-void set_firstDoctor_x(int* h_firstDoctor_x){
-    gpuErrchk(cudaMemcpyToSymbol(firstDoctor_x, h_firstDoctor_x, sizeof(int)));
-    memcpy(&h_env_firstDoctor_x, h_firstDoctor_x,sizeof(int));
+void set_FIRSTDOCTOR_X(int* h_FIRSTDOCTOR_X){
+    gpuErrchk(cudaMemcpyToSymbol(FIRSTDOCTOR_X, h_FIRSTDOCTOR_X, sizeof(int)));
+    memcpy(&h_env_FIRSTDOCTOR_X, h_FIRSTDOCTOR_X,sizeof(int));
 }
 
 //constant getter
-const int* get_firstDoctor_x(){
-    return &h_env_firstDoctor_x;
+const int* get_FIRSTDOCTOR_X(){
+    return &h_env_FIRSTDOCTOR_X;
 }
 
 
 
 //constant setter
-void set_firstDoctor_y(int* h_firstDoctor_y){
-    gpuErrchk(cudaMemcpyToSymbol(firstDoctor_y, h_firstDoctor_y, sizeof(int)));
-    memcpy(&h_env_firstDoctor_y, h_firstDoctor_y,sizeof(int));
+void set_FIRSTDOCTOR_Y(int* h_FIRSTDOCTOR_Y){
+    gpuErrchk(cudaMemcpyToSymbol(FIRSTDOCTOR_Y, h_FIRSTDOCTOR_Y, sizeof(int)));
+    memcpy(&h_env_FIRSTDOCTOR_Y, h_FIRSTDOCTOR_Y,sizeof(int));
 }
 
 //constant getter
-const int* get_firstDoctor_y(){
-    return &h_env_firstDoctor_y;
+const int* get_FIRSTDOCTOR_Y(){
+    return &h_env_FIRSTDOCTOR_Y;
 }
 
 
 
 //constant setter
-void set_space_between_doctors(int* h_space_between_doctors){
-    gpuErrchk(cudaMemcpyToSymbol(space_between_doctors, h_space_between_doctors, sizeof(int)));
-    memcpy(&h_env_space_between_doctors, h_space_between_doctors,sizeof(int));
+void set_SPACE_BETWEEN_DOCTORS(int* h_SPACE_BETWEEN_DOCTORS){
+    gpuErrchk(cudaMemcpyToSymbol(SPACE_BETWEEN_DOCTORS, h_SPACE_BETWEEN_DOCTORS, sizeof(int)));
+    memcpy(&h_env_SPACE_BETWEEN_DOCTORS, h_SPACE_BETWEEN_DOCTORS,sizeof(int));
 }
 
 //constant getter
-const int* get_space_between_doctors(){
-    return &h_env_space_between_doctors;
+const int* get_SPACE_BETWEEN_DOCTORS(){
+    return &h_env_SPACE_BETWEEN_DOCTORS;
 }
 
 
 
 //constant setter
-void set_firstSpecialist_x(int* h_firstSpecialist_x){
-    gpuErrchk(cudaMemcpyToSymbol(firstSpecialist_x, h_firstSpecialist_x, sizeof(int)));
-    memcpy(&h_env_firstSpecialist_x, h_firstSpecialist_x,sizeof(int));
+void set_TRIAGE_X(int* h_TRIAGE_X){
+    gpuErrchk(cudaMemcpyToSymbol(TRIAGE_X, h_TRIAGE_X, sizeof(int)));
+    memcpy(&h_env_TRIAGE_X, h_TRIAGE_X,sizeof(int));
 }
 
 //constant getter
-const int* get_firstSpecialist_x(){
-    return &h_env_firstSpecialist_x;
+const int* get_TRIAGE_X(){
+    return &h_env_TRIAGE_X;
 }
 
 
 
 //constant setter
-void set_firstSpecialist_y(int* h_firstSpecialist_y){
-    gpuErrchk(cudaMemcpyToSymbol(firstSpecialist_y, h_firstSpecialist_y, sizeof(int)));
-    memcpy(&h_env_firstSpecialist_y, h_firstSpecialist_y,sizeof(int));
+void set_TRIAGE_Y(int* h_TRIAGE_Y){
+    gpuErrchk(cudaMemcpyToSymbol(TRIAGE_Y, h_TRIAGE_Y, sizeof(int)));
+    memcpy(&h_env_TRIAGE_Y, h_TRIAGE_Y,sizeof(int));
 }
 
 //constant getter
-const int* get_firstSpecialist_y(){
-    return &h_env_firstSpecialist_y;
+const int* get_TRIAGE_Y(){
+    return &h_env_TRIAGE_Y;
 }
 
 
 
 //constant setter
-void set_space_between_specialists(int* h_space_between_specialists){
-    gpuErrchk(cudaMemcpyToSymbol(space_between_specialists, h_space_between_specialists, sizeof(int)));
-    memcpy(&h_env_space_between_specialists, h_space_between_specialists,sizeof(int));
+void set_UCI_X(int* h_UCI_X){
+    gpuErrchk(cudaMemcpyToSymbol(UCI_X, h_UCI_X, sizeof(int)));
+    memcpy(&h_env_UCI_X, h_UCI_X,sizeof(int));
 }
 
 //constant getter
-const int* get_space_between_specialists(){
-    return &h_env_space_between_specialists;
+const int* get_UCI_X(){
+    return &h_env_UCI_X;
 }
 
 
 
 //constant setter
-void set_fifthSpecialist_x(int* h_fifthSpecialist_x){
-    gpuErrchk(cudaMemcpyToSymbol(fifthSpecialist_x, h_fifthSpecialist_x, sizeof(int)));
-    memcpy(&h_env_fifthSpecialist_x, h_fifthSpecialist_x,sizeof(int));
+void set_UCI_Y(int* h_UCI_Y){
+    gpuErrchk(cudaMemcpyToSymbol(UCI_Y, h_UCI_Y, sizeof(int)));
+    memcpy(&h_env_UCI_Y, h_UCI_Y,sizeof(int));
 }
 
 //constant getter
-const int* get_fifthSpecialist_x(){
-    return &h_env_fifthSpecialist_x;
+const int* get_UCI_Y(){
+    return &h_env_UCI_Y;
 }
 
 
 
 //constant setter
-void set_fifthSpecialist_y(int* h_fifthSpecialist_y){
-    gpuErrchk(cudaMemcpyToSymbol(fifthSpecialist_y, h_fifthSpecialist_y, sizeof(int)));
-    memcpy(&h_env_fifthSpecialist_y, h_fifthSpecialist_y,sizeof(int));
+void set_CHECKPOINT_1_X(int* h_CHECKPOINT_1_X){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_1_X, h_CHECKPOINT_1_X, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_1_X, h_CHECKPOINT_1_X,sizeof(int));
 }
 
 //constant getter
-const int* get_fifthSpecialist_y(){
-    return &h_env_fifthSpecialist_y;
+const int* get_CHECKPOINT_1_X(){
+    return &h_env_CHECKPOINT_1_X;
 }
 
 
 
 //constant setter
-void set_prob_level_1(float* h_prob_level_1){
-    gpuErrchk(cudaMemcpyToSymbol(prob_level_1, h_prob_level_1, sizeof(float)));
-    memcpy(&h_env_prob_level_1, h_prob_level_1,sizeof(float));
+void set_CHECKPOINT_1_Y(int* h_CHECKPOINT_1_Y){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_1_Y, h_CHECKPOINT_1_Y, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_1_Y, h_CHECKPOINT_1_Y,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_level_1(){
-    return &h_env_prob_level_1;
+const int* get_CHECKPOINT_1_Y(){
+    return &h_env_CHECKPOINT_1_Y;
 }
 
 
 
 //constant setter
-void set_prob_level_2(float* h_prob_level_2){
-    gpuErrchk(cudaMemcpyToSymbol(prob_level_2, h_prob_level_2, sizeof(float)));
-    memcpy(&h_env_prob_level_2, h_prob_level_2,sizeof(float));
+void set_CHECKPOINT_2_X(int* h_CHECKPOINT_2_X){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_2_X, h_CHECKPOINT_2_X, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_2_X, h_CHECKPOINT_2_X,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_level_2(){
-    return &h_env_prob_level_2;
+const int* get_CHECKPOINT_2_X(){
+    return &h_env_CHECKPOINT_2_X;
 }
 
 
 
 //constant setter
-void set_prob_level_3(float* h_prob_level_3){
-    gpuErrchk(cudaMemcpyToSymbol(prob_level_3, h_prob_level_3, sizeof(float)));
-    memcpy(&h_env_prob_level_3, h_prob_level_3,sizeof(float));
+void set_CHECKPOINT_2_Y(int* h_CHECKPOINT_2_Y){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_2_Y, h_CHECKPOINT_2_Y, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_2_Y, h_CHECKPOINT_2_Y,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_level_3(){
-    return &h_env_prob_level_3;
+const int* get_CHECKPOINT_2_Y(){
+    return &h_env_CHECKPOINT_2_Y;
 }
 
 
 
 //constant setter
-void set_prob_level_4(float* h_prob_level_4){
-    gpuErrchk(cudaMemcpyToSymbol(prob_level_4, h_prob_level_4, sizeof(float)));
-    memcpy(&h_env_prob_level_4, h_prob_level_4,sizeof(float));
+void set_CHECKPOINT_3_X(int* h_CHECKPOINT_3_X){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_3_X, h_CHECKPOINT_3_X, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_3_X, h_CHECKPOINT_3_X,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_level_4(){
-    return &h_env_prob_level_4;
+const int* get_CHECKPOINT_3_X(){
+    return &h_env_CHECKPOINT_3_X;
 }
 
 
 
 //constant setter
-void set_prob_level_5(float* h_prob_level_5){
-    gpuErrchk(cudaMemcpyToSymbol(prob_level_5, h_prob_level_5, sizeof(float)));
-    memcpy(&h_env_prob_level_5, h_prob_level_5,sizeof(float));
+void set_CHECKPOINT_3_Y(int* h_CHECKPOINT_3_Y){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_3_Y, h_CHECKPOINT_3_Y, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_3_Y, h_CHECKPOINT_3_Y,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_level_5(){
-    return &h_env_prob_level_5;
+const int* get_CHECKPOINT_3_Y(){
+    return &h_env_CHECKPOINT_3_Y;
 }
 
 
 
 //constant setter
-void set_prob_esp_quirurgicas(float* h_prob_esp_quirurgicas){
-    gpuErrchk(cudaMemcpyToSymbol(prob_esp_quirurgicas, h_prob_esp_quirurgicas, sizeof(float)));
-    memcpy(&h_env_prob_esp_quirurgicas, h_prob_esp_quirurgicas,sizeof(float));
+void set_CHECKPOINT_4_X(int* h_CHECKPOINT_4_X){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_4_X, h_CHECKPOINT_4_X, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_4_X, h_CHECKPOINT_4_X,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_esp_quirurgicas(){
-    return &h_env_prob_esp_quirurgicas;
+const int* get_CHECKPOINT_4_X(){
+    return &h_env_CHECKPOINT_4_X;
 }
 
 
 
 //constant setter
-void set_prob_esp_medicas(float* h_prob_esp_medicas){
-    gpuErrchk(cudaMemcpyToSymbol(prob_esp_medicas, h_prob_esp_medicas, sizeof(float)));
-    memcpy(&h_env_prob_esp_medicas, h_prob_esp_medicas,sizeof(float));
+void set_CHECKPOINT_4_Y(int* h_CHECKPOINT_4_Y){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_4_Y, h_CHECKPOINT_4_Y, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_4_Y, h_CHECKPOINT_4_Y,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_esp_medicas(){
-    return &h_env_prob_esp_medicas;
+const int* get_CHECKPOINT_4_Y(){
+    return &h_env_CHECKPOINT_4_Y;
 }
 
 
 
 //constant setter
-void set_prob_pediatria(float* h_prob_pediatria){
-    gpuErrchk(cudaMemcpyToSymbol(prob_pediatria, h_prob_pediatria, sizeof(float)));
-    memcpy(&h_env_prob_pediatria, h_prob_pediatria,sizeof(float));
+void set_CHECKPOINT_5_X(int* h_CHECKPOINT_5_X){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_5_X, h_CHECKPOINT_5_X, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_5_X, h_CHECKPOINT_5_X,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_pediatria(){
-    return &h_env_prob_pediatria;
+const int* get_CHECKPOINT_5_X(){
+    return &h_env_CHECKPOINT_5_X;
 }
 
 
 
 //constant setter
-void set_prob_cuid_intensivos(float* h_prob_cuid_intensivos){
-    gpuErrchk(cudaMemcpyToSymbol(prob_cuid_intensivos, h_prob_cuid_intensivos, sizeof(float)));
-    memcpy(&h_env_prob_cuid_intensivos, h_prob_cuid_intensivos,sizeof(float));
+void set_CHECKPOINT_5_Y(int* h_CHECKPOINT_5_Y){
+    gpuErrchk(cudaMemcpyToSymbol(CHECKPOINT_5_Y, h_CHECKPOINT_5_Y, sizeof(int)));
+    memcpy(&h_env_CHECKPOINT_5_Y, h_CHECKPOINT_5_Y,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_cuid_intensivos(){
-    return &h_env_prob_cuid_intensivos;
+const int* get_CHECKPOINT_5_Y(){
+    return &h_env_CHECKPOINT_5_Y;
 }
 
 
 
 //constant setter
-void set_prob_ginecologia(float* h_prob_ginecologia){
-    gpuErrchk(cudaMemcpyToSymbol(prob_ginecologia, h_prob_ginecologia, sizeof(float)));
-    memcpy(&h_env_prob_ginecologia, h_prob_ginecologia,sizeof(float));
+void set_FIRSTSPECIALIST_X(int* h_FIRSTSPECIALIST_X){
+    gpuErrchk(cudaMemcpyToSymbol(FIRSTSPECIALIST_X, h_FIRSTSPECIALIST_X, sizeof(int)));
+    memcpy(&h_env_FIRSTSPECIALIST_X, h_FIRSTSPECIALIST_X,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_ginecologia(){
-    return &h_env_prob_ginecologia;
+const int* get_FIRSTSPECIALIST_X(){
+    return &h_env_FIRSTSPECIALIST_X;
 }
 
 
 
 //constant setter
-void set_prob_geriatria(float* h_prob_geriatria){
-    gpuErrchk(cudaMemcpyToSymbol(prob_geriatria, h_prob_geriatria, sizeof(float)));
-    memcpy(&h_env_prob_geriatria, h_prob_geriatria,sizeof(float));
+void set_FIRSTSPECIALIST_Y(int* h_FIRSTSPECIALIST_Y){
+    gpuErrchk(cudaMemcpyToSymbol(FIRSTSPECIALIST_Y, h_FIRSTSPECIALIST_Y, sizeof(int)));
+    memcpy(&h_env_FIRSTSPECIALIST_Y, h_FIRSTSPECIALIST_Y,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_geriatria(){
-    return &h_env_prob_geriatria;
+const int* get_FIRSTSPECIALIST_Y(){
+    return &h_env_FIRSTSPECIALIST_Y;
 }
 
 
 
 //constant setter
-void set_prob_psiquiatria(float* h_prob_psiquiatria){
-    gpuErrchk(cudaMemcpyToSymbol(prob_psiquiatria, h_prob_psiquiatria, sizeof(float)));
-    memcpy(&h_env_prob_psiquiatria, h_prob_psiquiatria,sizeof(float));
+void set_SPACE_BETWEEN_SPECIALISTS(int* h_SPACE_BETWEEN_SPECIALISTS){
+    gpuErrchk(cudaMemcpyToSymbol(SPACE_BETWEEN_SPECIALISTS, h_SPACE_BETWEEN_SPECIALISTS, sizeof(int)));
+    memcpy(&h_env_SPACE_BETWEEN_SPECIALISTS, h_SPACE_BETWEEN_SPECIALISTS,sizeof(int));
 }
 
 //constant getter
-const float* get_prob_psiquiatria(){
-    return &h_env_prob_psiquiatria;
+const int* get_SPACE_BETWEEN_SPECIALISTS(){
+    return &h_env_SPACE_BETWEEN_SPECIALISTS;
 }
 
 
 
 //constant setter
-void set_min_espera_recepcionista(int* h_min_espera_recepcionista){
-    gpuErrchk(cudaMemcpyToSymbol(min_espera_recepcionista, h_min_espera_recepcionista, sizeof(int)));
-    memcpy(&h_env_min_espera_recepcionista, h_min_espera_recepcionista,sizeof(int));
+void set_FIFTHSPECIALIST_X(int* h_FIFTHSPECIALIST_X){
+    gpuErrchk(cudaMemcpyToSymbol(FIFTHSPECIALIST_X, h_FIFTHSPECIALIST_X, sizeof(int)));
+    memcpy(&h_env_FIFTHSPECIALIST_X, h_FIFTHSPECIALIST_X,sizeof(int));
 }
 
 //constant getter
-const int* get_min_espera_recepcionista(){
-    return &h_env_min_espera_recepcionista;
+const int* get_FIFTHSPECIALIST_X(){
+    return &h_env_FIFTHSPECIALIST_X;
 }
 
 
 
 //constant setter
-void set_receptionist_x(int* h_receptionist_x){
-    gpuErrchk(cudaMemcpyToSymbol(receptionist_x, h_receptionist_x, sizeof(int)));
-    memcpy(&h_env_receptionist_x, h_receptionist_x,sizeof(int));
+void set_FIFTHSPECIALIST_Y(int* h_FIFTHSPECIALIST_Y){
+    gpuErrchk(cudaMemcpyToSymbol(FIFTHSPECIALIST_Y, h_FIFTHSPECIALIST_Y, sizeof(int)));
+    memcpy(&h_env_FIFTHSPECIALIST_Y, h_FIFTHSPECIALIST_Y,sizeof(int));
 }
 
 //constant getter
-const int* get_receptionist_x(){
-    return &h_env_receptionist_x;
+const int* get_FIFTHSPECIALIST_Y(){
+    return &h_env_FIFTHSPECIALIST_Y;
 }
 
 
 
 //constant setter
-void set_receptionist_y(int* h_receptionist_y){
-    gpuErrchk(cudaMemcpyToSymbol(receptionist_y, h_receptionist_y, sizeof(int)));
-    memcpy(&h_env_receptionist_y, h_receptionist_y,sizeof(int));
+void set_PROB_LEVEL_1(float* h_PROB_LEVEL_1){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_LEVEL_1, h_PROB_LEVEL_1, sizeof(float)));
+    memcpy(&h_env_PROB_LEVEL_1, h_PROB_LEVEL_1,sizeof(float));
 }
 
 //constant getter
-const int* get_receptionist_y(){
-    return &h_env_receptionist_y;
+const float* get_PROB_LEVEL_1(){
+    return &h_env_PROB_LEVEL_1;
+}
+
+
+
+//constant setter
+void set_PROB_LEVEL_2(float* h_PROB_LEVEL_2){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_LEVEL_2, h_PROB_LEVEL_2, sizeof(float)));
+    memcpy(&h_env_PROB_LEVEL_2, h_PROB_LEVEL_2,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_LEVEL_2(){
+    return &h_env_PROB_LEVEL_2;
+}
+
+
+
+//constant setter
+void set_PROB_LEVEL_3(float* h_PROB_LEVEL_3){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_LEVEL_3, h_PROB_LEVEL_3, sizeof(float)));
+    memcpy(&h_env_PROB_LEVEL_3, h_PROB_LEVEL_3,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_LEVEL_3(){
+    return &h_env_PROB_LEVEL_3;
+}
+
+
+
+//constant setter
+void set_PROB_LEVEL_4(float* h_PROB_LEVEL_4){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_LEVEL_4, h_PROB_LEVEL_4, sizeof(float)));
+    memcpy(&h_env_PROB_LEVEL_4, h_PROB_LEVEL_4,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_LEVEL_4(){
+    return &h_env_PROB_LEVEL_4;
+}
+
+
+
+//constant setter
+void set_PROB_LEVEL_5(float* h_PROB_LEVEL_5){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_LEVEL_5, h_PROB_LEVEL_5, sizeof(float)));
+    memcpy(&h_env_PROB_LEVEL_5, h_PROB_LEVEL_5,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_LEVEL_5(){
+    return &h_env_PROB_LEVEL_5;
+}
+
+
+
+//constant setter
+void set_PROB_SURGICAL(float* h_PROB_SURGICAL){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_SURGICAL, h_PROB_SURGICAL, sizeof(float)));
+    memcpy(&h_env_PROB_SURGICAL, h_PROB_SURGICAL,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_SURGICAL(){
+    return &h_env_PROB_SURGICAL;
+}
+
+
+
+//constant setter
+void set_PROB_MEDICAL(float* h_PROB_MEDICAL){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_MEDICAL, h_PROB_MEDICAL, sizeof(float)));
+    memcpy(&h_env_PROB_MEDICAL, h_PROB_MEDICAL,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_MEDICAL(){
+    return &h_env_PROB_MEDICAL;
+}
+
+
+
+//constant setter
+void set_PROB_PEDIATRICS(float* h_PROB_PEDIATRICS){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_PEDIATRICS, h_PROB_PEDIATRICS, sizeof(float)));
+    memcpy(&h_env_PROB_PEDIATRICS, h_PROB_PEDIATRICS,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_PEDIATRICS(){
+    return &h_env_PROB_PEDIATRICS;
+}
+
+
+
+//constant setter
+void set_PROB_UCI(float* h_PROB_UCI){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_UCI, h_PROB_UCI, sizeof(float)));
+    memcpy(&h_env_PROB_UCI, h_PROB_UCI,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_UCI(){
+    return &h_env_PROB_UCI;
+}
+
+
+
+//constant setter
+void set_PROB_GYNECOLOGIST(float* h_PROB_GYNECOLOGIST){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_GYNECOLOGIST, h_PROB_GYNECOLOGIST, sizeof(float)));
+    memcpy(&h_env_PROB_GYNECOLOGIST, h_PROB_GYNECOLOGIST,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_GYNECOLOGIST(){
+    return &h_env_PROB_GYNECOLOGIST;
+}
+
+
+
+//constant setter
+void set_PROB_GERIATRICS(float* h_PROB_GERIATRICS){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_GERIATRICS, h_PROB_GERIATRICS, sizeof(float)));
+    memcpy(&h_env_PROB_GERIATRICS, h_PROB_GERIATRICS,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_GERIATRICS(){
+    return &h_env_PROB_GERIATRICS;
+}
+
+
+
+//constant setter
+void set_PROB_PSYCHIATRY(float* h_PROB_PSYCHIATRY){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_PSYCHIATRY, h_PROB_PSYCHIATRY, sizeof(float)));
+    memcpy(&h_env_PROB_PSYCHIATRY, h_PROB_PSYCHIATRY,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_PSYCHIATRY(){
+    return &h_env_PROB_PSYCHIATRY;
+}
+
+
+
+//constant setter
+void set_RECEPTION_MINUTES(int* h_RECEPTION_MINUTES){
+    gpuErrchk(cudaMemcpyToSymbol(RECEPTION_MINUTES, h_RECEPTION_MINUTES, sizeof(int)));
+    memcpy(&h_env_RECEPTION_MINUTES, h_RECEPTION_MINUTES,sizeof(int));
+}
+
+//constant getter
+const int* get_RECEPTION_MINUTES(){
+    return &h_env_RECEPTION_MINUTES;
+}
+
+
+
+//constant setter
+void set_RECEPTIONIST_X(int* h_RECEPTIONIST_X){
+    gpuErrchk(cudaMemcpyToSymbol(RECEPTIONIST_X, h_RECEPTIONIST_X, sizeof(int)));
+    memcpy(&h_env_RECEPTIONIST_X, h_RECEPTIONIST_X,sizeof(int));
+}
+
+//constant getter
+const int* get_RECEPTIONIST_X(){
+    return &h_env_RECEPTIONIST_X;
+}
+
+
+
+//constant setter
+void set_RECEPTIONIST_Y(int* h_RECEPTIONIST_Y){
+    gpuErrchk(cudaMemcpyToSymbol(RECEPTIONIST_Y, h_RECEPTIONIST_Y, sizeof(int)));
+    memcpy(&h_env_RECEPTIONIST_Y, h_RECEPTIONIST_Y,sizeof(int));
+}
+
+//constant getter
+const int* get_RECEPTIONIST_Y(){
+    return &h_env_RECEPTIONIST_Y;
 }
 
 

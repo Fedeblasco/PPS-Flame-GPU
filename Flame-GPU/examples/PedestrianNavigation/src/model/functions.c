@@ -243,7 +243,7 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 			/*if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
 					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-					if(temp<probabilidad_estornudar*probabilidad_contagio){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
+					if(temp<PROB_SNIFF*PROB_INFECT){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
 						agent->estado = 1;
 						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
@@ -282,7 +282,7 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 			if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
 					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-					if(temp<probabilidad_estornudar*probabilidad_contagio){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
+					if(temp<PROB_SNIFF*PROB_INFECT){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
 						agent->estado = 1;
 						//int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						//int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
@@ -363,19 +363,19 @@ __FLAME_GPU_FUNC__ int go_to_doctor(xmachine_memory_agent* agent){
 	switch(agent->checkpoint){
 		case 0:
 			//El que va al cuarto doctor se maneja distinto para que esquive la esquina
-			if(agent->go_to_y == 41){
-				if(mover_a_destino(agent,agent->go_to_x+20,59) == 0){
+			if(agent->go_to_y == (FIRSTDOCTOR_Y-(SPACE_BETWEEN_DOCTORS*3))){
+				if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
 					agent->checkpoint++;
 				}
 			}else{
-				if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+				if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
 					agent->checkpoint = 2;
 				}
 			}
 			break;
 		//Utilizado solo por el que va al cuarto doctor
 		case 1:
-			if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+			if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
 					agent->checkpoint++;
 			}
 			break;
@@ -396,22 +396,22 @@ __FLAME_GPU_FUNC__ int go_to_specialist(xmachine_memory_agent* agent){
 		case 0:
 			//El que va al geriatrico se maneja distinto
 			if(agent->specialist_no == 5){
-				if(mover_a_destino(agent,40,60) == 0){
+				if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
 					agent->checkpoint++;
 				}
 			}else{
-				if(mover_a_destino(agent,firstSpecialist_x,firstSpecialist_y+20) == 0){
+				if(mover_a_destino(agent,FIRSTSPECIALIST_X,FIRSTSPECIALIST_Y+13) == 0){
 					agent->checkpoint++;
 				}
 			}
 			break;
 		case 1:
 			if(agent->specialist_no == 5){
-				if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+				if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
 					agent->checkpoint++;
 				}
 			}else{
-				if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+20) == 0){
+				if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+13) == 0){
 					agent->checkpoint++;
 				}
 			}
@@ -431,17 +431,17 @@ __FLAME_GPU_FUNC__ int go_to_UCI(xmachine_memory_agent* agent){
 	
 	switch(agent->checkpoint){
 		case 0:
-			if(mover_a_destino(agent,40,60) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
 				agent->checkpoint++;
 			}
 			break;
 		case 1:
-			if(mover_a_destino(agent,35,16) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_5_X,CHECKPOINT_5_Y) == 0){
 				agent->checkpoint++;
 			}
 			break;
 		case 2:
-			if(mover_a_destino(agent,100,16) == 0){
+			if(mover_a_destino(agent,UCI_X,UCI_Y) == 0){
 				return 1;
 			}
 			break;
@@ -455,7 +455,7 @@ __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
 
 	switch(agent->checkpoint){
 		case 0:
-			if(mover_a_destino(agent,agent->go_to_x+20,agent->go_to_y) == 0){
+			if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
 				//printf("Llegue al primer checkpoint\n");
 				if(agent->specialist_no == 5){
 					agent->checkpoint = 3;
@@ -465,27 +465,27 @@ __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
 			}
 			break;
 		case 1:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+20) == 0){
+			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+13) == 0){
 				agent->checkpoint++;
 			}
 			break;
 		case 2:
-			if(mover_a_destino(agent,firstSpecialist_x,firstSpecialist_y+20) == 0){
+			if(mover_a_destino(agent,FIRSTSPECIALIST_X,FIRSTSPECIALIST_Y+13) == 0){
 				agent->checkpoint = 4;
 			}
 			break;
 		case 3:
-			if(mover_a_destino(agent,40,60) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
 				agent->checkpoint++;
 			}
 			break;
 		case 4:
-			if(mover_a_destino(agent,88,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
 				agent->checkpoint++;
 			}
 			break;
 		case 5:
-			if(mover_a_destino(agent,150,102) == 0){
+			if(mover_a_destino(agent,EXIT_X,EXIT_Y) == 0){
 				return 1;
 			}
 			break;
@@ -523,7 +523,7 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 	}
 	switch(agent->estado_movimiento){
 		case 0:
-			if(mover_a_destino(agent,88,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break; 
@@ -534,28 +534,28 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			}
 			break;
 		case 5:
-			if(mover_a_destino(agent,88,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 6:
-			if(mover_a_destino(agent,130,90) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_1_X,CHECKPOINT_1_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 7:
-			if(mover_a_destino(agent,140,80) == 0){
+			if(mover_a_destino(agent,RECEPTIONIST_X,RECEPTIONIST_Y) == 0){
 				agent->estado_movimiento ++;
 				add_check_in_message(checkInMessages, agent->id);
 			}
 			break;
 		case 9:
-			if(mover_a_destino(agent,130,90) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_1_X,CHECKPOINT_1_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 10:
-			if(mover_a_destino(agent,88,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
@@ -565,27 +565,27 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 			}
 			break;
 		case 16:
-			if(mover_a_destino(agent,88,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 17:
-			if(mover_a_destino(agent,106,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_2_X,CHECKPOINT_2_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 18:
-			if(mover_a_destino(agent,106,78) == 0){
+			if(mover_a_destino(agent,TRIAGE_X,TRIAGE_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 22:
-			if(mover_a_destino(agent,106,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_2_X,CHECKPOINT_2_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 23:
-			if(mover_a_destino(agent,88,96) == 0){
+			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
 				agent->estado_movimiento++;
 			}
 			break;
@@ -664,7 +664,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				//Hago el random e imprimo
 				float rand = rnd<CONTINUOUS>(rand48);//Valor de 0 a 1
 				int estado;
-				if(rand<=probabilidad_generar_enfermo){
+				if(rand<=PROB_SPAWN_SICK){
 					estado=2;
 					//printf("Enfermo");
 				}else{
@@ -722,8 +722,8 @@ __FLAME_GPU_FUNC__ int receive_chair_response(xmachine_memory_agent* agent, xmac
 	xmachine_message_chair_response* current_message = get_first_chair_response_message(chairResponseMessages);
 	while(current_message){
 		if((current_message->id == agent->id) && (current_message->chair_no != -1)){
-			agent->go_to_x = firstChair_x + (space_between * ((current_message->chair_no+7)%7));
-			agent->go_to_y = firstChair_y - (space_between * int(current_message->chair_no/7));
+			agent->go_to_x = FIRSTCHAIR_X + (SPACE_BETWEEN * ((current_message->chair_no+7)%7));
+			agent->go_to_y = FIRSTCHAIR_Y - (SPACE_BETWEEN * int(current_message->chair_no/7));
 			agent->estado_movimiento++;
 			agent->chair_no = current_message->chair_no;
 			//printf("Soy %d y me voy a sentar en la silla %d, posX %d, posY %d\n\n",agent->id,current_message->chair_no,agent->go_to_x,agent->go_to_y);
@@ -775,8 +775,8 @@ __FLAME_GPU_FUNC__ int receive_doctor_response(xmachine_memory_agent* agent, xma
 	while(current_message){
 		if(agent->id == current_message->id){ 
 			if(current_message->doctor_no !=-1){
-				agent->go_to_x = firstDoctor_x;
-				agent->go_to_y = firstDoctor_y - (space_between_doctors * current_message->doctor_no);;
+				agent->go_to_x = FIRSTDOCTOR_X;
+				agent->go_to_y = FIRSTDOCTOR_Y - (SPACE_BETWEEN_DOCTORS * current_message->doctor_no);;
 				agent->estado_movimiento++;
 				agent->doctor_no = current_message->doctor_no;
 				//printf("Tengo que ir al doctor %d, soy %d\n",current_message->doctor_no,agent->id);
@@ -803,11 +803,11 @@ __FLAME_GPU_FUNC__ int receive_specialist_response(xmachine_memory_agent* agent,
 			//Si el especialista está listo, voy hacia él
 			if(current_message->specialist_ready != -1){
 				if((agent->specialist_no > 0) && (agent->specialist_no < 5)){
-					agent->go_to_x = firstSpecialist_x + (space_between_specialists * (agent->specialist_no-1));
-					agent->go_to_y = firstSpecialist_y;
+					agent->go_to_x = FIRSTSPECIALIST_X + (SPACE_BETWEEN_SPECIALISTS * (agent->specialist_no-1));
+					agent->go_to_y = FIRSTSPECIALIST_Y;
 				}else{
-					agent->go_to_x = fifthSpecialist_x;
-					agent->go_to_y = fifthSpecialist_y; 
+					agent->go_to_x = FIFTHSPECIALIST_X;
+					agent->go_to_y = FIFTHSPECIALIST_Y; 
 				}
 				agent->estado_movimiento++;
 			//Sino, salgo del hospital

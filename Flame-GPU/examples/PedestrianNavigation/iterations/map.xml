@@ -2,47 +2,63 @@
 <itno>0</itno>
 <environment>
 <!-- Posición de la salida -->
-	<EXIT_X>150</EXIT_X>
-	<EXIT_Y>102</EXIT_Y>
+	<EXIT_X>100</EXIT_X>
+	<EXIT_Y>68</EXIT_Y>
 <!-- Probabilidades usadas para manejar la cantidad de enfermos -->	
-	<probabilidad_estornudar>0.1</probabilidad_estornudar>
-	<probabilidad_contagio>0.1</probabilidad_contagio>
-	<probabilidad_generar_enfermo>0.2</probabilidad_generar_enfermo>
-	<probabilidad_contagio_personal>1.0</probabilidad_contagio_personal>
-	<probabilidad_contagiar_silla>1.0</probabilidad_contagiar_silla>
-
+	<PROB_SNIFF>0.1</PROB_SNIFF>
+	<PROB_INFECT>0.1</PROB_INFECT>
+	<PROB_SPAWN_SICK>0.2</PROB_SPAWN_SICK>
+	<PROB_INFECT_PERSONAL>1.0</PROB_INFECT_PERSONAL>
+	<PROB_INFECT_CHAIR>1.0</PROB_INFECT_CHAIR>
 <!-- Manejo de las sillas -->   
-	<firstChair_x>50</firstChair_x>
-	<firstChair_y>85</firstChair_y>
-	<space_between>3</space_between>
+	<FIRSTCHAIR_X>33</FIRSTCHAIR_X>
+	<FIRSTCHAIR_Y>57</FIRSTCHAIR_Y>
+	<SPACE_BETWEEN>2</SPACE_BETWEEN>
 <!-- Manejo de los doctores -->
-	<firstDoctor_x>15</firstDoctor_x>
-	<firstDoctor_y>95</firstDoctor_y>
-	<space_between_doctors>18</space_between_doctors>
+	<FIRSTDOCTOR_X>10</FIRSTDOCTOR_X>
+	<FIRSTDOCTOR_Y>63</FIRSTDOCTOR_Y>
+	<SPACE_BETWEEN_DOCTORS>12</SPACE_BETWEEN_DOCTORS>
 <!-- Manejo de los especialistas -->
-	<firstSpecialist_x>58</firstSpecialist_x>
-	<firstSpecialist_y>40</firstSpecialist_y>
-	<space_between_specialists>27</space_between_specialists>
-	<fifthSpecialist_x>15</fifthSpecialist_x>
-	<fifthSpecialist_y>16</fifthSpecialist_y>
+	<FIRSTSPECIALIST_X>39</FIRSTSPECIALIST_X>
+	<FIRSTSPECIALIST_Y>27</FIRSTSPECIALIST_Y>
+	<SPACE_BETWEEN_SPECIALISTS>18</SPACE_BETWEEN_SPECIALISTS>
+	<FIFTHSPECIALIST_X>10</FIFTHSPECIALIST_X>
+	<FIFTHSPECIALIST_Y>11</FIFTHSPECIALIST_Y>
 <!-- Manejo del recepcionista -->
-	<receptionist_x>140</receptionist_x>
-	<receptionist_y>79</receptionist_y>
-	<min_espera_recepcionista>1</min_espera_recepcionista>
+	<RECEPTIONIST_X>93</RECEPTIONIST_X>
+	<RECEPTIONIST_Y>53</RECEPTIONIST_Y>
+	<RECEPTION_MINUTES>1</RECEPTION_MINUTES>
+<!-- Manejo del triage -->
+	<TRIAGE_X>71</TRIAGE_X>
+	<TRIAGE_Y>51</TRIAGE_Y>
 <!-- Probabilidades de prioridad del triage -->
-	<prob_level_1>0.0418719</prob_level_1>
-	<prob_level_2>0.0862069</prob_level_2>
-	<prob_level_3>0.6305419</prob_level_3>
-	<prob_level_4>0.2266010</prob_level_4>
-	<prob_level_5>0.0147783</prob_level_5>
+	<PROB_LEVEL_1>0.0418719</PROB_LEVEL_1>
+	<PROB_LEVEL_2>0.0862069</PROB_LEVEL_2>
+	<PROB_LEVEL_3>0.6305419</PROB_LEVEL_3>
+	<PROB_LEVEL_4>0.2266010</PROB_LEVEL_4>
+	<PROB_LEVEL_5>0.0147783</PROB_LEVEL_5>
 <!-- Probabilidades de especialidad -->
-	<prob_esp_quirurgicas>0.292939087</prob_esp_quirurgicas>
-	<prob_esp_medicas>0.444567551</prob_esp_medicas>
-	<prob_pediatria>0.051335318</prob_pediatria>
-	<prob_cuid_intensivos>0.070724557</prob_cuid_intensivos>
-	<prob_ginecologia>0.075895021</prob_ginecologia>
-	<prob_geriatria>0.01892759</prob_geriatria>
-	<prob_psiquiatria>0.045610876</prob_psiquiatria>
+	<PROB_SURGICAL>0.292939087</PROB_SURGICAL>
+	<PROB_MEDICAL>0.444567551</PROB_MEDICAL>
+	<PROB_PEDIATRICS>0.051335318</PROB_PEDIATRICS>
+	<PROB_UCI>0.070724557</PROB_UCI>
+	<PROB_GYNECOLOGIST>0.075895021</PROB_GYNECOLOGIST>
+	<PROB_GERIATRICS>0.01892759</PROB_GERIATRICS>
+	<PROB_PSYCHIATRY>0.045610876</PROB_PSYCHIATRY>
+<!-- Checkpoints -->
+	<CHECKPOINT_1_X>87</CHECKPOINT_1_X>
+	<CHECKPOINT_1_Y>60</CHECKPOINT_1_Y>
+	<CHECKPOINT_2_X>71</CHECKPOINT_2_X>
+	<CHECKPOINT_2_Y>64</CHECKPOINT_2_Y>
+	<CHECKPOINT_3_X>59</CHECKPOINT_3_X>
+	<CHECKPOINT_3_Y>64</CHECKPOINT_3_Y>
+	<CHECKPOINT_4_X>26</CHECKPOINT_4_X>
+	<CHECKPOINT_4_Y>40</CHECKPOINT_4_Y>
+	<CHECKPOINT_5_X>26</CHECKPOINT_5_X>
+	<CHECKPOINT_5_Y>11</CHECKPOINT_5_Y>
+<!-- UCI -->
+	<UCI_X>66</UCI_X>
+	<UCI_Y>11</UCI_Y>
 
 	<EMMISION_RATE_EXIT1>1.000000</EMMISION_RATE_EXIT1>
 	<EXIT1_PROBABILITY>1</EXIT1_PROBABILITY>

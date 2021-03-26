@@ -124,3 +124,19 @@
   #define receptionist_x 1
   #define receptionist_y 1
 */
+
+// Checkpoints
+/*  #define CHECKPOINT_1_X 87
+  #define CHECKPOINT_1_Y 60
+  #define CHECKPOINT_2_X 71
+  #define CHECKPOINT_2_Y 64
+  #define CHECKPOINT_3_X 59
+  #define CHECKPOINT_3_Y 64
+  #define CHECKPOINT_4_X 26
+  #define CHECKPOINT_4_Y 40
+  #define CHECKPOINT_5_X 26
+  #define CHECKPOINT_5_Y 11
+
+//UCI
+  #define UCI_X 66
+  #define UCI_Y 11*/
