@@ -43,7 +43,7 @@
 /*#ifndef firstChair_x
 #define firstChair_x 50
 #endif
-#ifndef firstChair_y
+#ifndef firstChair_y 
 #define firstChair_y 85
 #endif
 #ifndef space_between

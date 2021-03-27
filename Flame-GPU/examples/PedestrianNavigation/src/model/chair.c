@@ -17,5 +17,5 @@ __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine
 		current_message = get_next_chair_contact_message(current_message, chairContactMessages);
 	}
     
-    return 0;
+    return 0; 
 }
