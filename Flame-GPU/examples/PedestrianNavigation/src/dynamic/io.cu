@@ -374,6 +374,14 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%f", (*get_PROB_INFECT_CHAIR()));
     fputs(data, file);
     fputs("</PROB_INFECT_CHAIR>\n", file);
+    fputs("\t<PROB_VACCINE>", file);
+    sprintf(data, "%f", (*get_PROB_VACCINE()));
+    fputs(data, file);
+    fputs("</PROB_VACCINE>\n", file);
+    fputs("\t<PROB_VACCINE_STAFF>", file);
+    sprintf(data, "%f", (*get_PROB_VACCINE_STAFF()));
+    fputs(data, file);
+    fputs("</PROB_VACCINE_STAFF>\n", file);
     fputs("\t<FIRSTCHAIR_X>", file);
     sprintf(data, "%d", (*get_FIRSTCHAIR_X()));
     fputs(data, file);
@@ -660,6 +668,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         sprintf(data, "%u", h_agents_default->priority[i]);
 		fputs(data, file);
 		fputs("</priority>\n", file);
+        
+		fputs("<vaccine>", file);
+        sprintf(data, "%u", h_agents_default->vaccine[i]);
+		fputs(data, file);
+		fputs("</vaccine>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -1204,6 +1217,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_doctor_no;
     int in_agent_specialist_no;
     int in_agent_priority;
+    int in_agent_vaccine;
     int in_navmap_x;
     int in_navmap_y;
     int in_navmap_exit_no;
@@ -1360,6 +1374,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_PROB_INFECT_CHAIR;
     
+    int in_env_PROB_VACCINE;
+    
+    int in_env_PROB_VACCINE_STAFF;
+    
     int in_env_FIRSTCHAIR_X;
     
     int in_env_FIRSTCHAIR_Y;
@@ -1479,6 +1497,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int agent_doctor_no;
 	unsigned int agent_specialist_no;
 	unsigned int agent_priority;
+	unsigned int agent_vaccine;
 	int navmap_x;
 	int navmap_y;
 	int navmap_exit_no;
@@ -1594,6 +1613,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     float env_PROB_SPAWN_SICK;
     float env_PROB_INFECT_PERSONAL;
     float env_PROB_INFECT_CHAIR;
+    float env_PROB_VACCINE;
+    float env_PROB_VACCINE_STAFF;
     int env_FIRSTCHAIR_X;
     int env_FIRSTCHAIR_Y;
     int env_SPACE_BETWEEN;
@@ -1675,6 +1696,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_doctor_no = 0;
 	in_agent_specialist_no = 0;
 	in_agent_priority = 0;
+	in_agent_vaccine = 0;
 	in_navmap_x = 0;
 	in_navmap_y = 0;
 	in_navmap_exit_no = 0;
@@ -1788,6 +1810,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_PROB_SPAWN_SICK = 0;
     in_env_PROB_INFECT_PERSONAL = 0;
     in_env_PROB_INFECT_CHAIR = 0;
+    in_env_PROB_VACCINE = 0;
+    in_env_PROB_VACCINE_STAFF = 0;
     in_env_FIRSTCHAIR_X = 0;
     in_env_FIRSTCHAIR_Y = 0;
     in_env_SPACE_BETWEEN = 0;
@@ -1856,6 +1880,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->doctor_no[k] = 0;
 		h_agents->specialist_no[k] = 0;
 		h_agents->priority[k] = 0;
+		h_agents->vaccine[k] = 0;
 	}
 	
 	//set all navmap values to 0
@@ -2053,6 +2078,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_doctor_no = 0;
     agent_specialist_no = 0;
     agent_priority = 0;
+    agent_vaccine = 0;
     navmap_x = 0;
     navmap_y = 0;
     navmap_exit_no = 0;
@@ -2198,6 +2224,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_PROB_SPAWN_SICK = 0;
     env_PROB_INFECT_PERSONAL = 0;
     env_PROB_INFECT_CHAIR = 0;
+    env_PROB_VACCINE = 0;
+    env_PROB_VACCINE_STAFF = 0;
     env_FIRSTCHAIR_X = 0;
     env_FIRSTCHAIR_Y = 0;
     env_SPACE_BETWEEN = 0;
@@ -2372,6 +2400,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->doctor_no[*h_xmachine_memory_agent_count] = agent_doctor_no;
 					h_agents->specialist_no[*h_xmachine_memory_agent_count] = agent_specialist_no;
 					h_agents->priority[*h_xmachine_memory_agent_count] = agent_priority;
+					h_agents->vaccine[*h_xmachine_memory_agent_count] = agent_vaccine;
 					(*h_xmachine_memory_agent_count) ++;	
 				}
 				else if(strcmp(agentname, "navmap") == 0)
@@ -2666,6 +2695,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_doctor_no = 0;
                 agent_specialist_no = 0;
                 agent_priority = 0;
+                agent_vaccine = 0;
                 navmap_x = 0;
                 navmap_y = 0;
                 navmap_exit_no = 0;
@@ -2820,6 +2850,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/specialist_no") == 0) in_agent_specialist_no = 0;
 			if(strcmp(buffer, "priority") == 0) in_agent_priority = 1;
 			if(strcmp(buffer, "/priority") == 0) in_agent_priority = 0;
+			if(strcmp(buffer, "vaccine") == 0) in_agent_vaccine = 1;
+			if(strcmp(buffer, "/vaccine") == 0) in_agent_vaccine = 0;
 			if(strcmp(buffer, "x") == 0) in_navmap_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_navmap_x = 0;
 			if(strcmp(buffer, "y") == 0) in_navmap_y = 1;
@@ -3048,6 +3080,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/PROB_INFECT_PERSONAL") == 0) in_env_PROB_INFECT_PERSONAL = 0;
 			if(strcmp(buffer, "PROB_INFECT_CHAIR") == 0) in_env_PROB_INFECT_CHAIR = 1;
             if(strcmp(buffer, "/PROB_INFECT_CHAIR") == 0) in_env_PROB_INFECT_CHAIR = 0;
+			if(strcmp(buffer, "PROB_VACCINE") == 0) in_env_PROB_VACCINE = 1;
+            if(strcmp(buffer, "/PROB_VACCINE") == 0) in_env_PROB_VACCINE = 0;
+			if(strcmp(buffer, "PROB_VACCINE_STAFF") == 0) in_env_PROB_VACCINE_STAFF = 1;
+            if(strcmp(buffer, "/PROB_VACCINE_STAFF") == 0) in_env_PROB_VACCINE_STAFF = 0;
 			if(strcmp(buffer, "FIRSTCHAIR_X") == 0) in_env_FIRSTCHAIR_X = 1;
             if(strcmp(buffer, "/FIRSTCHAIR_X") == 0) in_env_FIRSTCHAIR_X = 0;
 			if(strcmp(buffer, "FIRSTCHAIR_Y") == 0) in_env_FIRSTCHAIR_Y = 1;
@@ -3217,6 +3253,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_agent_priority){
                     agent_priority = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_agent_vaccine){
+                    agent_vaccine = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_navmap_x){
                     navmap_x = (int) fpgu_strtol(buffer); 
@@ -3718,6 +3757,20 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_PROB_INFECT_CHAIR = (float) fgpu_atof(buffer);
                     
                     set_PROB_INFECT_CHAIR(&env_PROB_INFECT_CHAIR);
+                  
+              }
+            if(in_env_PROB_VACCINE){
+              
+                    env_PROB_VACCINE = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_VACCINE(&env_PROB_VACCINE);
+                  
+              }
+            if(in_env_PROB_VACCINE_STAFF){
+              
+                    env_PROB_VACCINE_STAFF = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_VACCINE_STAFF(&env_PROB_VACCINE_STAFF);
                   
               }
             if(in_env_FIRSTCHAIR_X){

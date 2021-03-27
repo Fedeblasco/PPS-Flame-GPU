@@ -167,6 +167,14 @@
         <type>float</type>
         <name>PROB_INFECT_CHAIR</name>
       </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>PROB_VACCINE</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>PROB_VACCINE_STAFF</name>
+      </gpu:variable>
 <!-- Manejo de las sillas -->
       <gpu:variable>
         <type>int</type>
@@ -452,6 +460,10 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>priority</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>vaccine</name>
         </gpu:variable>
       </memory>
   <!-- Funciones -->
@@ -1902,7 +1914,7 @@
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
+          <gpu:RNG>true</gpu:RNG>
         </gpu:function>
       </functions>
       <states>

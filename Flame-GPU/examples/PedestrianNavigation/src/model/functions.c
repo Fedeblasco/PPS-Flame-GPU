@@ -282,7 +282,7 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 			if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
 					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-					if(temp<PROB_SNIFF*PROB_INFECT){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
+					if((temp<PROB_SNIFF*PROB_INFECT) && (!agent->vaccine)){//Si el random es mas chico que la probabilidad de contagiarme y no tengo la vacuna, me contagio
 						agent->estado = 1;
 						//int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						//int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
@@ -672,13 +672,13 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 					//printf("Sano");
 				}
 				
-				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+				int vaccine = 0;
+				float random = rnd<CONTINUOUS>(rand48);
+				if(random <= PROB_VACCINE){
+					vaccine = 1;
+				}
+				add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0/*exit*/, speed, 1, animate, 1, estado, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, vaccine);
 				
-				/*if(agent->cant_generados==0){
-					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 0, 0, 0, 0, 0);
-				}else{
-					add_agent_agent(agent_agents, agent->cant_generados+1, x, y, 0.0f, 0.0f, 0.0f, 0.0f, agent->height, 0, speed, 1, animate, 1, 2, 0, 0, 0, 0);
-				}*/
 				
 				//printf("%d\n",agent->cant_generados);
 
@@ -686,9 +686,9 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				//printf("Creado\n");
 				agent->cant_generados++;
 				
-				if(agent->cant_generados==cant_personas){
-					//printf("Termine de generar personas");
-				}
+				/*if(agent->cant_generados==cant_personas){
+					printf("Termine de generar personas");
+				}*/
 			}
 		}
 	}

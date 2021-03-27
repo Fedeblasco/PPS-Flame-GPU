@@ -312,6 +312,7 @@ struct __align__(16) xmachine_memory_agent
     unsigned int doctor_no;    /**< X-machine memory variable doctor_no of type unsigned int.*/
     unsigned int specialist_no;    /**< X-machine memory variable specialist_no of type unsigned int.*/
     unsigned int priority;    /**< X-machine memory variable priority of type unsigned int.*/
+    unsigned int vaccine;    /**< X-machine memory variable vaccine of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap
@@ -839,6 +840,7 @@ struct xmachine_memory_agent_list
     unsigned int doctor_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list doctor_no of type unsigned int.*/
     unsigned int specialist_no [xmachine_memory_agent_MAX];    /**< X-machine memory variable list specialist_no of type unsigned int.*/
     unsigned int priority [xmachine_memory_agent_MAX];    /**< X-machine memory variable list priority of type unsigned int.*/
+    unsigned int vaccine [xmachine_memory_agent_MAX];    /**< X-machine memory variable list vaccine of type unsigned int.*/
 };
 
 /** struct xmachine_memory_navmap_list
@@ -1740,9 +1742,9 @@ __FLAME_GPU_FUNC__ int generate_specialists(xmachine_memory_agent_generator* age
 /**
  * generate_personal FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent_generator. This represents a single agent instance and can be modified directly.
- * @param agent_agents Pointer to agent list of type xmachine_memory_agent_list. This must be passed as an argument to the add_agent_agent function to add a new agent.
+ * @param agent_agents Pointer to agent list of type xmachine_memory_agent_list. This must be passed as an argument to the add_agent_agent function to add a new agent.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
-__FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents);
+__FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents, RNG_rand48* rand48);
 
 /**
  * attend_chair_petitions FLAMEGPU Agent Function
@@ -2503,8 +2505,9 @@ __FLAME_GPU_FUNC__ xmachine_message_triage_response * get_next_triage_response_m
  * @param doctor_no	agent agent variable of type unsigned int
  * @param specialist_no	agent agent variable of type unsigned int
  * @param priority	agent agent variable of type unsigned int
+ * @param vaccine	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority);
+__FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority, unsigned int vaccine);
 
 /** add_chair_agent
  * Adds a new continuous valued chair agent to the xmachine_memory_chair_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -3509,6 +3512,15 @@ __host__ unsigned int get_agent_default_variable_specialist_no(unsigned int inde
  * @return value of agent variable priority
  */
 __host__ unsigned int get_agent_default_variable_priority(unsigned int index);
+
+/** unsigned int get_agent_default_variable_vaccine(unsigned int index)
+ * Gets the value of the vaccine variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable vaccine
+ */
+__host__ unsigned int get_agent_default_variable_vaccine(unsigned int index);
 
 /** int get_navmap_static_variable_x(unsigned int index)
  * Gets the value of the x variable of an navmap agent in the static state on the host. 
@@ -5250,6 +5262,32 @@ unsigned int min_agent_default_priority_variable();
  */
 unsigned int max_agent_default_priority_variable();
 
+/** unsigned int reduce_agent_default_vaccine_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+unsigned int reduce_agent_default_vaccine_variable();
+
+
+
+/** unsigned int count_agent_default_vaccine_variable(unsigned int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+unsigned int count_agent_default_vaccine_variable(unsigned int count_value);
+
+/** unsigned int min_agent_default_vaccine_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int min_agent_default_vaccine_variable();
+/** unsigned int max_agent_default_vaccine_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+unsigned int max_agent_default_vaccine_variable();
+
 /** int reduce_navmap_static_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
@@ -6723,6 +6761,10 @@ __constant__ float PROB_INFECT_PERSONAL;
 
 __constant__ float PROB_INFECT_CHAIR;
 
+__constant__ float PROB_VACCINE;
+
+__constant__ float PROB_VACCINE_STAFF;
+
 __constant__ int FIRSTCHAIR_X;
 
 __constant__ int FIRSTCHAIR_Y;
@@ -7242,6 +7284,28 @@ extern const float* get_PROB_INFECT_CHAIR();
 
 
 extern float h_env_PROB_INFECT_CHAIR;
+
+/** set_PROB_VACCINE
+ * Sets the constant variable PROB_VACCINE on the device which can then be used in the agent functions.
+ * @param h_PROB_VACCINE value to set the variable
+ */
+extern void set_PROB_VACCINE(float* h_PROB_VACCINE);
+
+extern const float* get_PROB_VACCINE();
+
+
+extern float h_env_PROB_VACCINE;
+
+/** set_PROB_VACCINE_STAFF
+ * Sets the constant variable PROB_VACCINE_STAFF on the device which can then be used in the agent functions.
+ * @param h_PROB_VACCINE_STAFF value to set the variable
+ */
+extern void set_PROB_VACCINE_STAFF(float* h_PROB_VACCINE_STAFF);
+
+extern const float* get_PROB_VACCINE_STAFF();
+
+
+extern float h_env_PROB_VACCINE_STAFF;
 
 /** set_FIRSTCHAIR_X
  * Sets the constant variable FIRSTCHAIR_X on the device which can then be used in the agent functions.

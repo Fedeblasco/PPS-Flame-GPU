@@ -397,6 +397,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -449,6 +450,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -501,6 +503,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -553,6 +556,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -605,6 +609,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -657,6 +662,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -709,6 +715,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -761,6 +768,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -813,6 +821,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -865,6 +874,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -917,6 +927,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -969,6 +980,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1021,6 +1033,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1073,6 +1086,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1125,6 +1139,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1177,6 +1192,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
 			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
 			nextState->_scan_input[index] = 1;
 		}
@@ -1476,7 +1492,8 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 		agents_dst->box_no[output_index] = agents_src->box_no[index];        
 		agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];        
 		agents_dst->specialist_no[output_index] = agents_src->specialist_no[index];        
-		agents_dst->priority[output_index] = agents_src->priority[index];
+		agents_dst->priority[output_index] = agents_src->priority[index];        
+		agents_dst->vaccine[output_index] = agents_src->vaccine[index];
 	}
 }
 
@@ -1520,6 +1537,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 	    agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];
 	    agents_dst->specialist_no[output_index] = agents_src->specialist_no[index];
 	    agents_dst->priority[output_index] = agents_src->priority[index];
+	    agents_dst->vaccine[output_index] = agents_src->vaccine[index];
     }
 }
 
@@ -1550,9 +1568,10 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param doctor_no agent variable of type unsigned int
  * @param specialist_no agent variable of type unsigned int
  * @param priority agent variable of type unsigned int
+ * @param vaccine agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority, unsigned int vaccine){
 	
 	int index;
     
@@ -1595,12 +1614,13 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, floa
 	agents->doctor_no[index] = doctor_no;
 	agents->specialist_no[index] = specialist_no;
 	agents->priority[index] = priority;
+	agents->vaccine[index] = vaccine;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority){
-    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, specialist_no, priority);
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority, unsigned int vaccine){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, specialist_no, priority, vaccine);
 }
 
 /** reorder_agent_agents
@@ -1640,6 +1660,7 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 	ordered_agents->doctor_no[index] = unordered_agents->doctor_no[old_pos];
 	ordered_agents->specialist_no[index] = unordered_agents->specialist_no[old_pos];
 	ordered_agents->priority[index] = unordered_agents->priority[old_pos];
+	ordered_agents->vaccine[index] = unordered_agents->vaccine[old_pos];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7509,6 +7530,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_pedestrian_location(&agent, pedestrian_location_messages	);
@@ -7542,6 +7564,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -7586,6 +7609,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !avoid_pedestrians(&agent, pedestrian_location_messages, partition_matrix, rand48);
@@ -7619,6 +7643,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -7663,6 +7688,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_pedestrian_state(&agent, pedestrian_state_messages	);
@@ -7696,6 +7722,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -7740,6 +7767,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !infect_pedestrians(&agent, pedestrian_state_messages, partition_matrix, rand48);
@@ -7773,6 +7801,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -7817,6 +7846,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !move(&agent, check_in_messages	);
@@ -7850,6 +7880,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -7893,6 +7924,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -7919,6 +7951,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -7956,6 +7989,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -8001,6 +8035,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_chair_contact(&agent, chair_contact_messages	);
@@ -8034,6 +8069,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -8078,6 +8114,7 @@ __global__ void GPUFLAME_output_free_chair(xmachine_memory_agent_list* agents, x
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_free_chair(&agent, free_chair_messages	);
@@ -8111,6 +8148,7 @@ __global__ void GPUFLAME_output_free_chair(xmachine_memory_agent_list* agents, x
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -8155,6 +8193,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_chair_petition(&agent, chair_petition_messages	);
@@ -8188,6 +8227,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -8231,6 +8271,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -8257,6 +8298,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -8294,6 +8336,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -8338,6 +8381,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -8364,6 +8408,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -8401,6 +8446,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -8446,6 +8492,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_box_petition(&agent, box_petition_messages	);
@@ -8479,6 +8526,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -8522,6 +8570,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -8548,6 +8597,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -8585,6 +8635,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -8630,6 +8681,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_doctor_petition(&agent, doctor_petition_messages	);
@@ -8663,6 +8715,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -8706,6 +8759,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -8732,6 +8786,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -8769,6 +8824,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -8813,6 +8869,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -8839,6 +8896,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -8876,6 +8934,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -8920,6 +8979,7 @@ __global__ void GPUFLAME_receive_specialist_terminated(xmachine_memory_agent_lis
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -8946,6 +9006,7 @@ __global__ void GPUFLAME_receive_specialist_terminated(xmachine_memory_agent_lis
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -8983,6 +9044,7 @@ __global__ void GPUFLAME_receive_specialist_terminated(xmachine_memory_agent_lis
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -9028,6 +9090,7 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_doctor_reached(&agent, doctor_reached_messages	);
@@ -9061,6 +9124,7 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -9104,6 +9168,7 @@ __global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list*
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -9130,6 +9195,7 @@ __global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list*
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -9167,6 +9233,7 @@ __global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list*
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -9212,6 +9279,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_specialist_petition(&agent, specialist_petition_messages	);
@@ -9245,6 +9313,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -9289,6 +9358,7 @@ __global__ void GPUFLAME_output_specialist_reached(xmachine_memory_agent_list* a
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_specialist_reached(&agent, specialist_reached_messages	);
@@ -9322,6 +9392,7 @@ __global__ void GPUFLAME_output_specialist_reached(xmachine_memory_agent_list* a
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -9366,6 +9437,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
 	int dead = !output_triage_petition(&agent, triage_petition_messages	);
@@ -9399,6 +9471,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 }
 
 /**
@@ -9442,6 +9515,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
 	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
 	} else {
 	
 	agent.id = 0;
@@ -9468,6 +9542,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
 	agent.priority = 0;
+	agent.vaccine = 0;
 	}
 
 	//FLAME function call
@@ -9505,6 +9580,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
 	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
 	}
 }
 
@@ -10226,7 +10302,7 @@ __global__ void GPUFLAME_generate_specialists(xmachine_memory_agent_generator_li
 /**
  *
  */
-__global__ void GPUFLAME_generate_personal(xmachine_memory_agent_generator_list* agents, xmachine_memory_agent_list* agent_agents){
+__global__ void GPUFLAME_generate_personal(xmachine_memory_agent_generator_list* agents, xmachine_memory_agent_list* agent_agents, RNG_rand48* rand48){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -10248,7 +10324,7 @@ __global__ void GPUFLAME_generate_personal(xmachine_memory_agent_generator_list*
 	agent.personal_generated = agents->personal_generated[index];
 
 	//FLAME function call
-	int dead = !generate_personal(&agent, agent_agents);
+	int dead = !generate_personal(&agent, agent_agents, rand48);
 	
 
 	//continuous agent: set reallocation flag

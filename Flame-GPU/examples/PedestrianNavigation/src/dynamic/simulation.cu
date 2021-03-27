@@ -268,6 +268,7 @@ unsigned int h_agents_default_variable_box_no_data_iteration;
 unsigned int h_agents_default_variable_doctor_no_data_iteration;
 unsigned int h_agents_default_variable_specialist_no_data_iteration;
 unsigned int h_agents_default_variable_priority_data_iteration;
+unsigned int h_agents_default_variable_vaccine_data_iteration;
 unsigned int h_navmaps_static_variable_x_data_iteration;
 unsigned int h_navmaps_static_variable_y_data_iteration;
 unsigned int h_navmaps_static_variable_exit_no_data_iteration;
@@ -998,6 +999,7 @@ void initialise(char * inputfile){
     h_agents_default_variable_doctor_no_data_iteration = 0;
     h_agents_default_variable_specialist_no_data_iteration = 0;
     h_agents_default_variable_priority_data_iteration = 0;
+    h_agents_default_variable_vaccine_data_iteration = 0;
     h_navmaps_static_variable_x_data_iteration = 0;
     h_navmaps_static_variable_y_data_iteration = 0;
     h_navmaps_static_variable_exit_no_data_iteration = 0;
@@ -3239,6 +3241,8 @@ float h_env_PROB_INFECT;
 float h_env_PROB_SPAWN_SICK;
 float h_env_PROB_INFECT_PERSONAL;
 float h_env_PROB_INFECT_CHAIR;
+float h_env_PROB_VACCINE;
+float h_env_PROB_VACCINE_STAFF;
 int h_env_FIRSTCHAIR_X;
 int h_env_FIRSTCHAIR_Y;
 int h_env_SPACE_BETWEEN;
@@ -3797,6 +3801,32 @@ void set_PROB_INFECT_CHAIR(float* h_PROB_INFECT_CHAIR){
 //constant getter
 const float* get_PROB_INFECT_CHAIR(){
     return &h_env_PROB_INFECT_CHAIR;
+}
+
+
+
+//constant setter
+void set_PROB_VACCINE(float* h_PROB_VACCINE){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_VACCINE, h_PROB_VACCINE, sizeof(float)));
+    memcpy(&h_env_PROB_VACCINE, h_PROB_VACCINE,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_VACCINE(){
+    return &h_env_PROB_VACCINE;
+}
+
+
+
+//constant setter
+void set_PROB_VACCINE_STAFF(float* h_PROB_VACCINE_STAFF){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_VACCINE_STAFF, h_PROB_VACCINE_STAFF, sizeof(float)));
+    memcpy(&h_env_PROB_VACCINE_STAFF, h_PROB_VACCINE_STAFF,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_VACCINE_STAFF(){
+    return &h_env_PROB_VACCINE_STAFF;
 }
 
 
@@ -5477,6 +5507,44 @@ __host__ unsigned int get_agent_default_variable_priority(unsigned int index){
 
     } else {
         fprintf(stderr, "Warning: Attempting to access priority for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
+/** unsigned int get_agent_default_variable_vaccine(unsigned int index)
+ * Gets the value of the vaccine variable of an agent agent in the default state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable vaccine
+ */
+__host__ unsigned int get_agent_default_variable_vaccine(unsigned int index){
+    unsigned int count = get_agent_agent_default_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_agents_default_variable_vaccine_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_agents_default->vaccine,
+                    d_agents_default->vaccine,
+                    count * sizeof(unsigned int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_agents_default_variable_vaccine_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_agents_default->vaccine[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access vaccine for the %u th member of agent_default. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -8393,6 +8461,8 @@ void copy_single_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list *
 		gpuErrchk(cudaMemcpy(d_dst->specialist_no, &h_agent->specialist_no, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->priority, &h_agent->priority, sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->vaccine, &h_agent->vaccine, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 }
 /*
@@ -8456,6 +8526,8 @@ void copy_partial_xmachine_memory_agent_hostToDevice(xmachine_memory_agent_list 
 		gpuErrchk(cudaMemcpy(d_dst->specialist_no, h_src->specialist_no, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->priority, h_src->priority, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->vaccine, h_src->vaccine, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
     }
 }
@@ -9085,6 +9157,8 @@ void h_unpack_agents_agent_AoS_to_SoA(xmachine_memory_agent_list * dst, xmachine
 			dst->specialist_no[i] = src[i]->specialist_no;
 			 
 			dst->priority[i] = src[i]->priority;
+			 
+			dst->vaccine[i] = src[i]->vaccine;
 			
 		}
 	}
@@ -9140,6 +9214,7 @@ void h_add_agent_agent_default(xmachine_memory_agent* agent){
     h_agents_default_variable_doctor_no_data_iteration = 0;
     h_agents_default_variable_specialist_no_data_iteration = 0;
     h_agents_default_variable_priority_data_iteration = 0;
+    h_agents_default_variable_vaccine_data_iteration = 0;
     
 
 }
@@ -9195,6 +9270,7 @@ void h_add_agents_agent_default(xmachine_memory_agent** agents, unsigned int cou
         h_agents_default_variable_doctor_no_data_iteration = 0;
         h_agents_default_variable_specialist_no_data_iteration = 0;
         h_agents_default_variable_priority_data_iteration = 0;
+        h_agents_default_variable_vaccine_data_iteration = 0;
         
 
 	}
@@ -11006,6 +11082,27 @@ unsigned int min_agent_default_priority_variable(){
 unsigned int max_agent_default_priority_variable(){
     //max in default stream
     thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->priority);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int reduce_agent_default_vaccine_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_agents_default->vaccine),  thrust::device_pointer_cast(d_agents_default->vaccine) + h_xmachine_memory_agent_default_count);
+}
+
+unsigned int count_agent_default_vaccine_variable(unsigned int count_value){
+    //count in default stream
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_agents_default->vaccine),  thrust::device_pointer_cast(d_agents_default->vaccine) + h_xmachine_memory_agent_default_count, count_value);
+}
+unsigned int min_agent_default_vaccine_variable(){
+    //min in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->vaccine);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+unsigned int max_agent_default_vaccine_variable(){
+    //max in default stream
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_agents_default->vaccine);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_agent_default_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
@@ -19219,7 +19316,7 @@ void agent_generator_generate_personal(cudaStream_t &stream){
 	//Input        : 
 	//Output       : 
 	//Agent Output : agent
-	GPUFLAME_generate_personal<<<g, b, sm_size, stream>>>(d_agent_generators, d_agents_new);
+	GPUFLAME_generate_personal<<<g, b, sm_size, stream>>>(d_agent_generators, d_agents_new, d_rand48);
 	gpuErrchkLaunch();
 	
 	

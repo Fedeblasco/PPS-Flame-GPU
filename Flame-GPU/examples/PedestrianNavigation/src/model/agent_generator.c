@@ -43,7 +43,7 @@ __FLAME_GPU_FUNC__ int generate_specialists(xmachine_memory_agent_generator* age
     return 0;
 }
 
-__FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents){
+__FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent, xmachine_memory_agent_list* agent_agents, RNG_rand48* rand48){
     
     printf("Personal generado\n");
     float x = 0;
@@ -70,8 +70,12 @@ __FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent,
             }
         }
     }
-    
-    add_agent_agent(agent_agents, -(agent->personal_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0);
+    int vaccine = 0;
+    float random = rnd<CONTINUOUS>(rand48);
+    if(random <= PROB_VACCINE_STAFF){
+        vaccine = 1;
+    }
+    add_agent_agent(agent_agents, -(agent->personal_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, vaccine);
 
     agent->personal_generated++;
     return 0;
