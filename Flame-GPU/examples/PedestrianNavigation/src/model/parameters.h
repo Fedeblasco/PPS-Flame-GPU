@@ -7,8 +7,8 @@
 //#define NUM_EXITS 7  
 
 //Cantidad de ticks enfermo y portador 
-#define ticks_portador 500
-#define ticks_enfermo 500
+/*#define ticks_portador 500
+#define ticks_enfermo 500*/
 
 //Cantidad de personas a generar
 #define cant_personas 600
@@ -20,13 +20,9 @@
 #define RADIANS(x) (PI / 180.0f) * x
 
 //Constante de tiempo
-#ifndef MINUTES_PER_TICK
-#define MINUTES_PER_TICK 1
-#endif
-
-#ifndef TICKS_PER_MINUTE
-#define TICKS_PER_MINUTE 1
-#endif
+/*#ifndef MINUTES_PER_TICK
+#define SECONDS_PER_TICK 60
+#endif*/
 
 //Posición de la salida
 /*#define EXIT_X 150

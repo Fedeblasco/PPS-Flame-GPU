@@ -28,7 +28,7 @@ __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmac
         }*/
     }else if(agent->attend_patient == 1){
         agent->tick++;
-        if(agent->tick*MINUTES_PER_TICK >= RECEPTION_MINUTES){
+        if(agent->tick * SECONDS_PER_TICK >= RECEPTION_SECONDS){
             //printf("Enviando mensaje 2 a %d\n",agent->current_patient);
             add_check_in_response_message(patientMessages, agent->current_patient);
             agent->tick = 0;

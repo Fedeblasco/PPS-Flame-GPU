@@ -137,6 +137,19 @@
         <type>float</type>
         <name>GOAL_WEIGHT</name>
       </gpu:variable>
+<!-- Manejo del tiempo -->
+      <gpu:variable>
+        <type>int</type>
+        <name>SECONDS_PER_TICK</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>SECONDS_INCUBATING</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>SECONDS_SICK</name>
+      </gpu:variable>
 <!-- Posición de la salida -->
       <gpu:variable>
         <type>int</type>
@@ -191,6 +204,10 @@
 <!-- Manejo de los doctores -->
       <gpu:variable>
         <type>int</type>
+        <name>DOCTOR_SECONDS</name>
+      </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
         <name>FIRSTDOCTOR_X</name>
       </gpu:variable>
       <gpu:variable>
@@ -200,6 +217,11 @@
       <gpu:variable>
         <type>int</type>
         <name>SPACE_BETWEEN_DOCTORS</name>
+      </gpu:variable>
+<!-- Manejo del box -->
+      <gpu:variable>
+        <type>int</type>
+        <name>BOX_SECONDS</name>
       </gpu:variable>
 <!-- Manejo del triage -->
       <gpu:variable>
@@ -261,6 +283,10 @@
         <name>CHECKPOINT_5_Y</name>
       </gpu:variable>
 <!-- Manejo de los especialistas -->
+      <gpu:variable>
+        <type>int</type>
+        <name>SPECIALIST_SECONDS</name>
+      </gpu:variable>
       <gpu:variable>
         <type>int</type>
         <name>FIRSTSPECIALIST_X</name>
@@ -334,7 +360,7 @@
 <!-- Manejo del recepcionista -->
       <gpu:variable>
         <type>int</type>
-        <name>RECEPTION_MINUTES</name>
+        <name>RECEPTION_SECONDS</name>
       </gpu:variable>
       <gpu:variable>
         <type>int</type>

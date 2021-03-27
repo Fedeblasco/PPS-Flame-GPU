@@ -346,6 +346,18 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%f", (*get_GOAL_WEIGHT()));
     fputs(data, file);
     fputs("</GOAL_WEIGHT>\n", file);
+    fputs("\t<SECONDS_PER_TICK>", file);
+    sprintf(data, "%d", (*get_SECONDS_PER_TICK()));
+    fputs(data, file);
+    fputs("</SECONDS_PER_TICK>\n", file);
+    fputs("\t<SECONDS_INCUBATING>", file);
+    sprintf(data, "%d", (*get_SECONDS_INCUBATING()));
+    fputs(data, file);
+    fputs("</SECONDS_INCUBATING>\n", file);
+    fputs("\t<SECONDS_SICK>", file);
+    sprintf(data, "%d", (*get_SECONDS_SICK()));
+    fputs(data, file);
+    fputs("</SECONDS_SICK>\n", file);
     fputs("\t<EXIT_X>", file);
     sprintf(data, "%d", (*get_EXIT_X()));
     fputs(data, file);
@@ -394,6 +406,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_SPACE_BETWEEN()));
     fputs(data, file);
     fputs("</SPACE_BETWEEN>\n", file);
+    fputs("\t<DOCTOR_SECONDS>", file);
+    sprintf(data, "%d", (*get_DOCTOR_SECONDS()));
+    fputs(data, file);
+    fputs("</DOCTOR_SECONDS>\n", file);
     fputs("\t<FIRSTDOCTOR_X>", file);
     sprintf(data, "%d", (*get_FIRSTDOCTOR_X()));
     fputs(data, file);
@@ -406,6 +422,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_SPACE_BETWEEN_DOCTORS()));
     fputs(data, file);
     fputs("</SPACE_BETWEEN_DOCTORS>\n", file);
+    fputs("\t<BOX_SECONDS>", file);
+    sprintf(data, "%d", (*get_BOX_SECONDS()));
+    fputs(data, file);
+    fputs("</BOX_SECONDS>\n", file);
     fputs("\t<TRIAGE_X>", file);
     sprintf(data, "%d", (*get_TRIAGE_X()));
     fputs(data, file);
@@ -462,6 +482,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_CHECKPOINT_5_Y()));
     fputs(data, file);
     fputs("</CHECKPOINT_5_Y>\n", file);
+    fputs("\t<SPECIALIST_SECONDS>", file);
+    sprintf(data, "%d", (*get_SPECIALIST_SECONDS()));
+    fputs(data, file);
+    fputs("</SPECIALIST_SECONDS>\n", file);
     fputs("\t<FIRSTSPECIALIST_X>", file);
     sprintf(data, "%d", (*get_FIRSTSPECIALIST_X()));
     fputs(data, file);
@@ -530,10 +554,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%f", (*get_PROB_PSYCHIATRY()));
     fputs(data, file);
     fputs("</PROB_PSYCHIATRY>\n", file);
-    fputs("\t<RECEPTION_MINUTES>", file);
-    sprintf(data, "%d", (*get_RECEPTION_MINUTES()));
+    fputs("\t<RECEPTION_SECONDS>", file);
+    sprintf(data, "%d", (*get_RECEPTION_SECONDS()));
     fputs(data, file);
-    fputs("</RECEPTION_MINUTES>\n", file);
+    fputs("</RECEPTION_SECONDS>\n", file);
     fputs("\t<RECEPTIONIST_X>", file);
     sprintf(data, "%d", (*get_RECEPTIONIST_X()));
     fputs(data, file);
@@ -1360,6 +1384,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_GOAL_WEIGHT;
     
+    int in_env_SECONDS_PER_TICK;
+    
+    int in_env_SECONDS_INCUBATING;
+    
+    int in_env_SECONDS_SICK;
+    
     int in_env_EXIT_X;
     
     int in_env_EXIT_Y;
@@ -1384,11 +1414,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_SPACE_BETWEEN;
     
+    int in_env_DOCTOR_SECONDS;
+    
     int in_env_FIRSTDOCTOR_X;
     
     int in_env_FIRSTDOCTOR_Y;
     
     int in_env_SPACE_BETWEEN_DOCTORS;
+    
+    int in_env_BOX_SECONDS;
     
     int in_env_TRIAGE_X;
     
@@ -1417,6 +1451,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_env_CHECKPOINT_5_X;
     
     int in_env_CHECKPOINT_5_Y;
+    
+    int in_env_SPECIALIST_SECONDS;
     
     int in_env_FIRSTSPECIALIST_X;
     
@@ -1452,7 +1488,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_PROB_PSYCHIATRY;
     
-    int in_env_RECEPTION_MINUTES;
+    int in_env_RECEPTION_SECONDS;
     
     int in_env_RECEPTIONIST_X;
     
@@ -1606,6 +1642,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     float env_AVOID_WEIGHT;
     float env_COLLISION_WEIGHT;
     float env_GOAL_WEIGHT;
+    int env_SECONDS_PER_TICK;
+    int env_SECONDS_INCUBATING;
+    int env_SECONDS_SICK;
     int env_EXIT_X;
     int env_EXIT_Y;
     float env_PROB_SNIFF;
@@ -1618,9 +1657,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int env_FIRSTCHAIR_X;
     int env_FIRSTCHAIR_Y;
     int env_SPACE_BETWEEN;
+    int env_DOCTOR_SECONDS;
     int env_FIRSTDOCTOR_X;
     int env_FIRSTDOCTOR_Y;
     int env_SPACE_BETWEEN_DOCTORS;
+    int env_BOX_SECONDS;
     int env_TRIAGE_X;
     int env_TRIAGE_Y;
     int env_UCI_X;
@@ -1635,6 +1676,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int env_CHECKPOINT_4_Y;
     int env_CHECKPOINT_5_X;
     int env_CHECKPOINT_5_Y;
+    int env_SPECIALIST_SECONDS;
     int env_FIRSTSPECIALIST_X;
     int env_FIRSTSPECIALIST_Y;
     int env_SPACE_BETWEEN_SPECIALISTS;
@@ -1652,7 +1694,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     float env_PROB_GYNECOLOGIST;
     float env_PROB_GERIATRICS;
     float env_PROB_PSYCHIATRY;
-    int env_RECEPTION_MINUTES;
+    int env_RECEPTION_SECONDS;
     int env_RECEPTIONIST_X;
     int env_RECEPTIONIST_Y;
     
@@ -1803,6 +1845,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_AVOID_WEIGHT = 0;
     in_env_COLLISION_WEIGHT = 0;
     in_env_GOAL_WEIGHT = 0;
+    in_env_SECONDS_PER_TICK = 0;
+    in_env_SECONDS_INCUBATING = 0;
+    in_env_SECONDS_SICK = 0;
     in_env_EXIT_X = 0;
     in_env_EXIT_Y = 0;
     in_env_PROB_SNIFF = 0;
@@ -1815,9 +1860,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_FIRSTCHAIR_X = 0;
     in_env_FIRSTCHAIR_Y = 0;
     in_env_SPACE_BETWEEN = 0;
+    in_env_DOCTOR_SECONDS = 0;
     in_env_FIRSTDOCTOR_X = 0;
     in_env_FIRSTDOCTOR_Y = 0;
     in_env_SPACE_BETWEEN_DOCTORS = 0;
+    in_env_BOX_SECONDS = 0;
     in_env_TRIAGE_X = 0;
     in_env_TRIAGE_Y = 0;
     in_env_UCI_X = 0;
@@ -1832,6 +1879,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_CHECKPOINT_4_Y = 0;
     in_env_CHECKPOINT_5_X = 0;
     in_env_CHECKPOINT_5_Y = 0;
+    in_env_SPECIALIST_SECONDS = 0;
     in_env_FIRSTSPECIALIST_X = 0;
     in_env_FIRSTSPECIALIST_Y = 0;
     in_env_SPACE_BETWEEN_SPECIALISTS = 0;
@@ -1849,7 +1897,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_PROB_GYNECOLOGIST = 0;
     in_env_PROB_GERIATRICS = 0;
     in_env_PROB_PSYCHIATRY = 0;
-    in_env_RECEPTION_MINUTES = 0;
+    in_env_RECEPTION_SECONDS = 0;
     in_env_RECEPTIONIST_X = 0;
     in_env_RECEPTIONIST_Y = 0;
 	//set all agent values to 0
@@ -2217,6 +2265,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_AVOID_WEIGHT = 0;
     env_COLLISION_WEIGHT = 0;
     env_GOAL_WEIGHT = 0;
+    env_SECONDS_PER_TICK = 0;
+    env_SECONDS_INCUBATING = 0;
+    env_SECONDS_SICK = 0;
     env_EXIT_X = 0;
     env_EXIT_Y = 0;
     env_PROB_SNIFF = 0;
@@ -2229,9 +2280,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_FIRSTCHAIR_X = 0;
     env_FIRSTCHAIR_Y = 0;
     env_SPACE_BETWEEN = 0;
+    env_DOCTOR_SECONDS = 0;
     env_FIRSTDOCTOR_X = 0;
     env_FIRSTDOCTOR_Y = 0;
     env_SPACE_BETWEEN_DOCTORS = 0;
+    env_BOX_SECONDS = 0;
     env_TRIAGE_X = 0;
     env_TRIAGE_Y = 0;
     env_UCI_X = 0;
@@ -2246,6 +2299,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_CHECKPOINT_4_Y = 0;
     env_CHECKPOINT_5_X = 0;
     env_CHECKPOINT_5_Y = 0;
+    env_SPECIALIST_SECONDS = 0;
     env_FIRSTSPECIALIST_X = 0;
     env_FIRSTSPECIALIST_Y = 0;
     env_SPACE_BETWEEN_SPECIALISTS = 0;
@@ -2263,7 +2317,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_PROB_GYNECOLOGIST = 0;
     env_PROB_GERIATRICS = 0;
     env_PROB_PSYCHIATRY = 0;
-    env_RECEPTION_MINUTES = 0;
+    env_RECEPTION_SECONDS = 0;
     env_RECEPTIONIST_X = 0;
     env_RECEPTIONIST_Y = 0;
     
@@ -3066,6 +3120,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/COLLISION_WEIGHT") == 0) in_env_COLLISION_WEIGHT = 0;
 			if(strcmp(buffer, "GOAL_WEIGHT") == 0) in_env_GOAL_WEIGHT = 1;
             if(strcmp(buffer, "/GOAL_WEIGHT") == 0) in_env_GOAL_WEIGHT = 0;
+			if(strcmp(buffer, "SECONDS_PER_TICK") == 0) in_env_SECONDS_PER_TICK = 1;
+            if(strcmp(buffer, "/SECONDS_PER_TICK") == 0) in_env_SECONDS_PER_TICK = 0;
+			if(strcmp(buffer, "SECONDS_INCUBATING") == 0) in_env_SECONDS_INCUBATING = 1;
+            if(strcmp(buffer, "/SECONDS_INCUBATING") == 0) in_env_SECONDS_INCUBATING = 0;
+			if(strcmp(buffer, "SECONDS_SICK") == 0) in_env_SECONDS_SICK = 1;
+            if(strcmp(buffer, "/SECONDS_SICK") == 0) in_env_SECONDS_SICK = 0;
 			if(strcmp(buffer, "EXIT_X") == 0) in_env_EXIT_X = 1;
             if(strcmp(buffer, "/EXIT_X") == 0) in_env_EXIT_X = 0;
 			if(strcmp(buffer, "EXIT_Y") == 0) in_env_EXIT_Y = 1;
@@ -3090,12 +3150,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/FIRSTCHAIR_Y") == 0) in_env_FIRSTCHAIR_Y = 0;
 			if(strcmp(buffer, "SPACE_BETWEEN") == 0) in_env_SPACE_BETWEEN = 1;
             if(strcmp(buffer, "/SPACE_BETWEEN") == 0) in_env_SPACE_BETWEEN = 0;
+			if(strcmp(buffer, "DOCTOR_SECONDS") == 0) in_env_DOCTOR_SECONDS = 1;
+            if(strcmp(buffer, "/DOCTOR_SECONDS") == 0) in_env_DOCTOR_SECONDS = 0;
 			if(strcmp(buffer, "FIRSTDOCTOR_X") == 0) in_env_FIRSTDOCTOR_X = 1;
             if(strcmp(buffer, "/FIRSTDOCTOR_X") == 0) in_env_FIRSTDOCTOR_X = 0;
 			if(strcmp(buffer, "FIRSTDOCTOR_Y") == 0) in_env_FIRSTDOCTOR_Y = 1;
             if(strcmp(buffer, "/FIRSTDOCTOR_Y") == 0) in_env_FIRSTDOCTOR_Y = 0;
 			if(strcmp(buffer, "SPACE_BETWEEN_DOCTORS") == 0) in_env_SPACE_BETWEEN_DOCTORS = 1;
             if(strcmp(buffer, "/SPACE_BETWEEN_DOCTORS") == 0) in_env_SPACE_BETWEEN_DOCTORS = 0;
+			if(strcmp(buffer, "BOX_SECONDS") == 0) in_env_BOX_SECONDS = 1;
+            if(strcmp(buffer, "/BOX_SECONDS") == 0) in_env_BOX_SECONDS = 0;
 			if(strcmp(buffer, "TRIAGE_X") == 0) in_env_TRIAGE_X = 1;
             if(strcmp(buffer, "/TRIAGE_X") == 0) in_env_TRIAGE_X = 0;
 			if(strcmp(buffer, "TRIAGE_Y") == 0) in_env_TRIAGE_Y = 1;
@@ -3124,6 +3188,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/CHECKPOINT_5_X") == 0) in_env_CHECKPOINT_5_X = 0;
 			if(strcmp(buffer, "CHECKPOINT_5_Y") == 0) in_env_CHECKPOINT_5_Y = 1;
             if(strcmp(buffer, "/CHECKPOINT_5_Y") == 0) in_env_CHECKPOINT_5_Y = 0;
+			if(strcmp(buffer, "SPECIALIST_SECONDS") == 0) in_env_SPECIALIST_SECONDS = 1;
+            if(strcmp(buffer, "/SPECIALIST_SECONDS") == 0) in_env_SPECIALIST_SECONDS = 0;
 			if(strcmp(buffer, "FIRSTSPECIALIST_X") == 0) in_env_FIRSTSPECIALIST_X = 1;
             if(strcmp(buffer, "/FIRSTSPECIALIST_X") == 0) in_env_FIRSTSPECIALIST_X = 0;
 			if(strcmp(buffer, "FIRSTSPECIALIST_Y") == 0) in_env_FIRSTSPECIALIST_Y = 1;
@@ -3158,8 +3224,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/PROB_GERIATRICS") == 0) in_env_PROB_GERIATRICS = 0;
 			if(strcmp(buffer, "PROB_PSYCHIATRY") == 0) in_env_PROB_PSYCHIATRY = 1;
             if(strcmp(buffer, "/PROB_PSYCHIATRY") == 0) in_env_PROB_PSYCHIATRY = 0;
-			if(strcmp(buffer, "RECEPTION_MINUTES") == 0) in_env_RECEPTION_MINUTES = 1;
-            if(strcmp(buffer, "/RECEPTION_MINUTES") == 0) in_env_RECEPTION_MINUTES = 0;
+			if(strcmp(buffer, "RECEPTION_SECONDS") == 0) in_env_RECEPTION_SECONDS = 1;
+            if(strcmp(buffer, "/RECEPTION_SECONDS") == 0) in_env_RECEPTION_SECONDS = 0;
 			if(strcmp(buffer, "RECEPTIONIST_X") == 0) in_env_RECEPTIONIST_X = 1;
             if(strcmp(buffer, "/RECEPTIONIST_X") == 0) in_env_RECEPTIONIST_X = 0;
 			if(strcmp(buffer, "RECEPTIONIST_Y") == 0) in_env_RECEPTIONIST_Y = 1;
@@ -3710,6 +3776,27 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     set_GOAL_WEIGHT(&env_GOAL_WEIGHT);
                   
               }
+            if(in_env_SECONDS_PER_TICK){
+              
+                    env_SECONDS_PER_TICK = (int) fpgu_strtol(buffer);
+                    
+                    set_SECONDS_PER_TICK(&env_SECONDS_PER_TICK);
+                  
+              }
+            if(in_env_SECONDS_INCUBATING){
+              
+                    env_SECONDS_INCUBATING = (int) fpgu_strtol(buffer);
+                    
+                    set_SECONDS_INCUBATING(&env_SECONDS_INCUBATING);
+                  
+              }
+            if(in_env_SECONDS_SICK){
+              
+                    env_SECONDS_SICK = (int) fpgu_strtol(buffer);
+                    
+                    set_SECONDS_SICK(&env_SECONDS_SICK);
+                  
+              }
             if(in_env_EXIT_X){
               
                     env_EXIT_X = (int) fpgu_strtol(buffer);
@@ -3794,6 +3881,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     set_SPACE_BETWEEN(&env_SPACE_BETWEEN);
                   
               }
+            if(in_env_DOCTOR_SECONDS){
+              
+                    env_DOCTOR_SECONDS = (int) fpgu_strtol(buffer);
+                    
+                    set_DOCTOR_SECONDS(&env_DOCTOR_SECONDS);
+                  
+              }
             if(in_env_FIRSTDOCTOR_X){
               
                     env_FIRSTDOCTOR_X = (int) fpgu_strtol(buffer);
@@ -3813,6 +3907,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_SPACE_BETWEEN_DOCTORS = (int) fpgu_strtol(buffer);
                     
                     set_SPACE_BETWEEN_DOCTORS(&env_SPACE_BETWEEN_DOCTORS);
+                  
+              }
+            if(in_env_BOX_SECONDS){
+              
+                    env_BOX_SECONDS = (int) fpgu_strtol(buffer);
+                    
+                    set_BOX_SECONDS(&env_BOX_SECONDS);
                   
               }
             if(in_env_TRIAGE_X){
@@ -3911,6 +4012,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_CHECKPOINT_5_Y = (int) fpgu_strtol(buffer);
                     
                     set_CHECKPOINT_5_Y(&env_CHECKPOINT_5_Y);
+                  
+              }
+            if(in_env_SPECIALIST_SECONDS){
+              
+                    env_SPECIALIST_SECONDS = (int) fpgu_strtol(buffer);
+                    
+                    set_SPECIALIST_SECONDS(&env_SPECIALIST_SECONDS);
                   
               }
             if(in_env_FIRSTSPECIALIST_X){
@@ -4032,11 +4140,11 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     set_PROB_PSYCHIATRY(&env_PROB_PSYCHIATRY);
                   
               }
-            if(in_env_RECEPTION_MINUTES){
+            if(in_env_RECEPTION_SECONDS){
               
-                    env_RECEPTION_MINUTES = (int) fpgu_strtol(buffer);
+                    env_RECEPTION_SECONDS = (int) fpgu_strtol(buffer);
                     
-                    set_RECEPTION_MINUTES(&env_RECEPTION_MINUTES);
+                    set_RECEPTION_SECONDS(&env_RECEPTION_SECONDS);
                   
               }
             if(in_env_RECEPTIONIST_X){

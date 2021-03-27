@@ -508,14 +508,14 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
     //Como el movimiento se hace cada un tick, se incrementa aca el tick del paciente
 	if(agent->estado==1){//Si el agente es portador
 		agent->tick++;
-		if(agent->tick>=ticks_portador){//Si paso los ticks de portador, me enfermo
+		if(agent->tick * SECONDS_PER_TICK >= SECONDS_INCUBATING){//Si paso los ticks de portador, me enfermo
 			agent->tick=0;
 			agent->estado=2;	
 		}
 	}
 	if(agent->estado==2){//Si el agente esta enfermo
 		agent->tick++;
-		if(agent->tick>=ticks_enfermo){//Si paso los ticks de enfermo, me curo
+		if(agent->tick * SECONDS_PER_TICK >= SECONDS_SICK){//Si paso los ticks de enfermo, me curo
 			agent->tick=0;
 			agent->estado=0;
 			//printf("Me cure");

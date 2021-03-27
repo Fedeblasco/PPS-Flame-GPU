@@ -11,7 +11,7 @@ __FLAME_GPU_FUNC__ int receive_specialist_reached(xmachine_memory_specialist* ag
 
     if(agent->current_patient != 0){
         agent->tick++;
-        if(agent->tick*TICKS_PER_MINUTE == 300){
+        if(agent->tick * SECONDS_PER_TICK >= SPECIALIST_SECONDS){
             //printf("Bueno ahi termine de atenderlo a %d\n",agent->current_patient);
             add_specialist_terminated_message(specialistTerminatedMessages,agent->current_patient);
             agent->tick = 0;

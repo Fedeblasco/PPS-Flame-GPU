@@ -26,7 +26,7 @@ __FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_m
                 //printf("El paciente %d va al especialista 52\n",paciente.x);
                 //printQueue(ptr[i]);
             }
-            if(agent->tick[i] == TICKS_PER_MINUTE){
+            if(agent->tick[i] * SECONDS_PER_TICK >= 60){
                 for(int j=0;j<agent->rear[i];j++){
                     ptr[i][j].y--;
                     if(ptr[i][j].y < 0){

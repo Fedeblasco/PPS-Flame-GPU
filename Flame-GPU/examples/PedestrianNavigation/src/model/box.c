@@ -45,7 +45,7 @@ __FLAME_GPU_FUNC__ int box_server(xmachine_memory_box* agent, xmachine_message_b
 __FLAME_GPU_FUNC__ int attend_box_patient(xmachine_memory_box* agent, xmachine_message_box_response_list* boxResponseMessages, RNG_rand48* rand48){
 	
 	agent->tick++;
-	if(agent->tick * MINUTES_PER_TICK == 15){
+	if(agent->tick * SECONDS_PER_TICK >= BOX_SECONDS){
 		int room = determine_room(rand48);
 		int priority = determine_priority(rand48);
 		//printf("Soy el box %d y le estoy mandando al paciente %d que vaya a %d con prioridad %d\n",agent->id,agent->attending,room,priority);

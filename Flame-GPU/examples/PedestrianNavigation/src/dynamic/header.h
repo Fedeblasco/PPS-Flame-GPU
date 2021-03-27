@@ -6747,6 +6747,12 @@ __constant__ float COLLISION_WEIGHT;
 
 __constant__ float GOAL_WEIGHT;
 
+__constant__ int SECONDS_PER_TICK;
+
+__constant__ int SECONDS_INCUBATING;
+
+__constant__ int SECONDS_SICK;
+
 __constant__ int EXIT_X;
 
 __constant__ int EXIT_Y;
@@ -6771,11 +6777,15 @@ __constant__ int FIRSTCHAIR_Y;
 
 __constant__ int SPACE_BETWEEN;
 
+__constant__ int DOCTOR_SECONDS;
+
 __constant__ int FIRSTDOCTOR_X;
 
 __constant__ int FIRSTDOCTOR_Y;
 
 __constant__ int SPACE_BETWEEN_DOCTORS;
+
+__constant__ int BOX_SECONDS;
 
 __constant__ int TRIAGE_X;
 
@@ -6804,6 +6814,8 @@ __constant__ int CHECKPOINT_4_Y;
 __constant__ int CHECKPOINT_5_X;
 
 __constant__ int CHECKPOINT_5_Y;
+
+__constant__ int SPECIALIST_SECONDS;
 
 __constant__ int FIRSTSPECIALIST_X;
 
@@ -6839,7 +6851,7 @@ __constant__ float PROB_GERIATRICS;
 
 __constant__ float PROB_PSYCHIATRY;
 
-__constant__ int RECEPTION_MINUTES;
+__constant__ int RECEPTION_SECONDS;
 
 __constant__ int RECEPTIONIST_X;
 
@@ -7208,6 +7220,39 @@ extern const float* get_GOAL_WEIGHT();
 
 extern float h_env_GOAL_WEIGHT;
 
+/** set_SECONDS_PER_TICK
+ * Sets the constant variable SECONDS_PER_TICK on the device which can then be used in the agent functions.
+ * @param h_SECONDS_PER_TICK value to set the variable
+ */
+extern void set_SECONDS_PER_TICK(int* h_SECONDS_PER_TICK);
+
+extern const int* get_SECONDS_PER_TICK();
+
+
+extern int h_env_SECONDS_PER_TICK;
+
+/** set_SECONDS_INCUBATING
+ * Sets the constant variable SECONDS_INCUBATING on the device which can then be used in the agent functions.
+ * @param h_SECONDS_INCUBATING value to set the variable
+ */
+extern void set_SECONDS_INCUBATING(int* h_SECONDS_INCUBATING);
+
+extern const int* get_SECONDS_INCUBATING();
+
+
+extern int h_env_SECONDS_INCUBATING;
+
+/** set_SECONDS_SICK
+ * Sets the constant variable SECONDS_SICK on the device which can then be used in the agent functions.
+ * @param h_SECONDS_SICK value to set the variable
+ */
+extern void set_SECONDS_SICK(int* h_SECONDS_SICK);
+
+extern const int* get_SECONDS_SICK();
+
+
+extern int h_env_SECONDS_SICK;
+
 /** set_EXIT_X
  * Sets the constant variable EXIT_X on the device which can then be used in the agent functions.
  * @param h_EXIT_X value to set the variable
@@ -7340,6 +7385,17 @@ extern const int* get_SPACE_BETWEEN();
 
 extern int h_env_SPACE_BETWEEN;
 
+/** set_DOCTOR_SECONDS
+ * Sets the constant variable DOCTOR_SECONDS on the device which can then be used in the agent functions.
+ * @param h_DOCTOR_SECONDS value to set the variable
+ */
+extern void set_DOCTOR_SECONDS(int* h_DOCTOR_SECONDS);
+
+extern const int* get_DOCTOR_SECONDS();
+
+
+extern int h_env_DOCTOR_SECONDS;
+
 /** set_FIRSTDOCTOR_X
  * Sets the constant variable FIRSTDOCTOR_X on the device which can then be used in the agent functions.
  * @param h_FIRSTDOCTOR_X value to set the variable
@@ -7372,6 +7428,17 @@ extern const int* get_SPACE_BETWEEN_DOCTORS();
 
 
 extern int h_env_SPACE_BETWEEN_DOCTORS;
+
+/** set_BOX_SECONDS
+ * Sets the constant variable BOX_SECONDS on the device which can then be used in the agent functions.
+ * @param h_BOX_SECONDS value to set the variable
+ */
+extern void set_BOX_SECONDS(int* h_BOX_SECONDS);
+
+extern const int* get_BOX_SECONDS();
+
+
+extern int h_env_BOX_SECONDS;
 
 /** set_TRIAGE_X
  * Sets the constant variable TRIAGE_X on the device which can then be used in the agent functions.
@@ -7526,6 +7593,17 @@ extern const int* get_CHECKPOINT_5_Y();
 
 
 extern int h_env_CHECKPOINT_5_Y;
+
+/** set_SPECIALIST_SECONDS
+ * Sets the constant variable SPECIALIST_SECONDS on the device which can then be used in the agent functions.
+ * @param h_SPECIALIST_SECONDS value to set the variable
+ */
+extern void set_SPECIALIST_SECONDS(int* h_SPECIALIST_SECONDS);
+
+extern const int* get_SPECIALIST_SECONDS();
+
+
+extern int h_env_SPECIALIST_SECONDS;
 
 /** set_FIRSTSPECIALIST_X
  * Sets the constant variable FIRSTSPECIALIST_X on the device which can then be used in the agent functions.
@@ -7714,16 +7792,16 @@ extern const float* get_PROB_PSYCHIATRY();
 
 extern float h_env_PROB_PSYCHIATRY;
 
-/** set_RECEPTION_MINUTES
- * Sets the constant variable RECEPTION_MINUTES on the device which can then be used in the agent functions.
- * @param h_RECEPTION_MINUTES value to set the variable
+/** set_RECEPTION_SECONDS
+ * Sets the constant variable RECEPTION_SECONDS on the device which can then be used in the agent functions.
+ * @param h_RECEPTION_SECONDS value to set the variable
  */
-extern void set_RECEPTION_MINUTES(int* h_RECEPTION_MINUTES);
+extern void set_RECEPTION_SECONDS(int* h_RECEPTION_SECONDS);
 
-extern const int* get_RECEPTION_MINUTES();
+extern const int* get_RECEPTION_SECONDS();
 
 
-extern int h_env_RECEPTION_MINUTES;
+extern int h_env_RECEPTION_SECONDS;
 
 /** set_RECEPTIONIST_X
  * Sets the constant variable RECEPTIONIST_X on the device which can then be used in the agent functions.

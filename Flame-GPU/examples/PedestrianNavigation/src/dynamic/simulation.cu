@@ -3234,6 +3234,9 @@ float h_env_STEER_WEIGHT;
 float h_env_AVOID_WEIGHT;
 float h_env_COLLISION_WEIGHT;
 float h_env_GOAL_WEIGHT;
+int h_env_SECONDS_PER_TICK;
+int h_env_SECONDS_INCUBATING;
+int h_env_SECONDS_SICK;
 int h_env_EXIT_X;
 int h_env_EXIT_Y;
 float h_env_PROB_SNIFF;
@@ -3246,9 +3249,11 @@ float h_env_PROB_VACCINE_STAFF;
 int h_env_FIRSTCHAIR_X;
 int h_env_FIRSTCHAIR_Y;
 int h_env_SPACE_BETWEEN;
+int h_env_DOCTOR_SECONDS;
 int h_env_FIRSTDOCTOR_X;
 int h_env_FIRSTDOCTOR_Y;
 int h_env_SPACE_BETWEEN_DOCTORS;
+int h_env_BOX_SECONDS;
 int h_env_TRIAGE_X;
 int h_env_TRIAGE_Y;
 int h_env_UCI_X;
@@ -3263,6 +3268,7 @@ int h_env_CHECKPOINT_4_X;
 int h_env_CHECKPOINT_4_Y;
 int h_env_CHECKPOINT_5_X;
 int h_env_CHECKPOINT_5_Y;
+int h_env_SPECIALIST_SECONDS;
 int h_env_FIRSTSPECIALIST_X;
 int h_env_FIRSTSPECIALIST_Y;
 int h_env_SPACE_BETWEEN_SPECIALISTS;
@@ -3280,7 +3286,7 @@ float h_env_PROB_UCI;
 float h_env_PROB_GYNECOLOGIST;
 float h_env_PROB_GERIATRICS;
 float h_env_PROB_PSYCHIATRY;
-int h_env_RECEPTION_MINUTES;
+int h_env_RECEPTION_SECONDS;
 int h_env_RECEPTIONIST_X;
 int h_env_RECEPTIONIST_Y;
 
@@ -3715,6 +3721,45 @@ const float* get_GOAL_WEIGHT(){
 
 
 //constant setter
+void set_SECONDS_PER_TICK(int* h_SECONDS_PER_TICK){
+    gpuErrchk(cudaMemcpyToSymbol(SECONDS_PER_TICK, h_SECONDS_PER_TICK, sizeof(int)));
+    memcpy(&h_env_SECONDS_PER_TICK, h_SECONDS_PER_TICK,sizeof(int));
+}
+
+//constant getter
+const int* get_SECONDS_PER_TICK(){
+    return &h_env_SECONDS_PER_TICK;
+}
+
+
+
+//constant setter
+void set_SECONDS_INCUBATING(int* h_SECONDS_INCUBATING){
+    gpuErrchk(cudaMemcpyToSymbol(SECONDS_INCUBATING, h_SECONDS_INCUBATING, sizeof(int)));
+    memcpy(&h_env_SECONDS_INCUBATING, h_SECONDS_INCUBATING,sizeof(int));
+}
+
+//constant getter
+const int* get_SECONDS_INCUBATING(){
+    return &h_env_SECONDS_INCUBATING;
+}
+
+
+
+//constant setter
+void set_SECONDS_SICK(int* h_SECONDS_SICK){
+    gpuErrchk(cudaMemcpyToSymbol(SECONDS_SICK, h_SECONDS_SICK, sizeof(int)));
+    memcpy(&h_env_SECONDS_SICK, h_SECONDS_SICK,sizeof(int));
+}
+
+//constant getter
+const int* get_SECONDS_SICK(){
+    return &h_env_SECONDS_SICK;
+}
+
+
+
+//constant setter
 void set_EXIT_X(int* h_EXIT_X){
     gpuErrchk(cudaMemcpyToSymbol(EXIT_X, h_EXIT_X, sizeof(int)));
     memcpy(&h_env_EXIT_X, h_EXIT_X,sizeof(int));
@@ -3871,6 +3916,19 @@ const int* get_SPACE_BETWEEN(){
 
 
 //constant setter
+void set_DOCTOR_SECONDS(int* h_DOCTOR_SECONDS){
+    gpuErrchk(cudaMemcpyToSymbol(DOCTOR_SECONDS, h_DOCTOR_SECONDS, sizeof(int)));
+    memcpy(&h_env_DOCTOR_SECONDS, h_DOCTOR_SECONDS,sizeof(int));
+}
+
+//constant getter
+const int* get_DOCTOR_SECONDS(){
+    return &h_env_DOCTOR_SECONDS;
+}
+
+
+
+//constant setter
 void set_FIRSTDOCTOR_X(int* h_FIRSTDOCTOR_X){
     gpuErrchk(cudaMemcpyToSymbol(FIRSTDOCTOR_X, h_FIRSTDOCTOR_X, sizeof(int)));
     memcpy(&h_env_FIRSTDOCTOR_X, h_FIRSTDOCTOR_X,sizeof(int));
@@ -3905,6 +3963,19 @@ void set_SPACE_BETWEEN_DOCTORS(int* h_SPACE_BETWEEN_DOCTORS){
 //constant getter
 const int* get_SPACE_BETWEEN_DOCTORS(){
     return &h_env_SPACE_BETWEEN_DOCTORS;
+}
+
+
+
+//constant setter
+void set_BOX_SECONDS(int* h_BOX_SECONDS){
+    gpuErrchk(cudaMemcpyToSymbol(BOX_SECONDS, h_BOX_SECONDS, sizeof(int)));
+    memcpy(&h_env_BOX_SECONDS, h_BOX_SECONDS,sizeof(int));
+}
+
+//constant getter
+const int* get_BOX_SECONDS(){
+    return &h_env_BOX_SECONDS;
 }
 
 
@@ -4087,6 +4158,19 @@ void set_CHECKPOINT_5_Y(int* h_CHECKPOINT_5_Y){
 //constant getter
 const int* get_CHECKPOINT_5_Y(){
     return &h_env_CHECKPOINT_5_Y;
+}
+
+
+
+//constant setter
+void set_SPECIALIST_SECONDS(int* h_SPECIALIST_SECONDS){
+    gpuErrchk(cudaMemcpyToSymbol(SPECIALIST_SECONDS, h_SPECIALIST_SECONDS, sizeof(int)));
+    memcpy(&h_env_SPECIALIST_SECONDS, h_SPECIALIST_SECONDS,sizeof(int));
+}
+
+//constant getter
+const int* get_SPECIALIST_SECONDS(){
+    return &h_env_SPECIALIST_SECONDS;
 }
 
 
@@ -4313,14 +4397,14 @@ const float* get_PROB_PSYCHIATRY(){
 
 
 //constant setter
-void set_RECEPTION_MINUTES(int* h_RECEPTION_MINUTES){
-    gpuErrchk(cudaMemcpyToSymbol(RECEPTION_MINUTES, h_RECEPTION_MINUTES, sizeof(int)));
-    memcpy(&h_env_RECEPTION_MINUTES, h_RECEPTION_MINUTES,sizeof(int));
+void set_RECEPTION_SECONDS(int* h_RECEPTION_SECONDS){
+    gpuErrchk(cudaMemcpyToSymbol(RECEPTION_SECONDS, h_RECEPTION_SECONDS, sizeof(int)));
+    memcpy(&h_env_RECEPTION_SECONDS, h_RECEPTION_SECONDS,sizeof(int));
 }
 
 //constant getter
-const int* get_RECEPTION_MINUTES(){
-    return &h_env_RECEPTION_MINUTES;
+const int* get_RECEPTION_SECONDS(){
+    return &h_env_RECEPTION_SECONDS;
 }
 
 

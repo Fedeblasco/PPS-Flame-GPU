@@ -26,7 +26,7 @@ __FLAME_GPU_FUNC__ int receive_doctor_petitions(xmachine_memory_doctor_manager* 
                 }
             }
         }
-        if(agent->tick == TICKS_PER_MINUTE){
+        if(agent->tick * SECONDS_PER_TICK >= 60){
             for(int i=0;i<agent->rear;i++){
                 agent->patientQueue[i].y--;
                 if(agent->patientQueue[i].y < 0){
