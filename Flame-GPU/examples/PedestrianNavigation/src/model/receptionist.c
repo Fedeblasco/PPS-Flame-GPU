@@ -1,7 +1,7 @@
 //Archivo con las funciones del recepcionista	
 
 //Función que chequea los pacientes que llegan y los atiende
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_check_in_response_list* patientMessages){
+__FLAME_GPU_FUNC__ int reception_server(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* checkInMessages, xmachine_message_check_in_response_list* patientMessages){
 	
 	xmachine_message_check_in* current_message = get_first_check_in_message(checkInMessages);
 	while(current_message){

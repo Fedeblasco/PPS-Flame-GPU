@@ -815,10 +815,10 @@ void specialist_manager_receive_free_specialist(cudaStream_t &stream);
  */
 void specialist_receive_specialist_reached(cudaStream_t &stream);
 
-/** receptionist_receptionServer
- * Agent function prototype for receptionServer function of receptionist agent
+/** receptionist_reception_server
+ * Agent function prototype for reception_server function of receptionist agent
  */
-void receptionist_receptionServer(cudaStream_t &stream);
+void receptionist_reception_server(cudaStream_t &stream);
 
 /** agent_generator_generate_chairs
  * Agent function prototype for generate_chairs function of agent_generator agent
@@ -3020,14 +3020,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("receptionist_receptionServer");
-	receptionist_receptionServer(stream1);
+    PROFILE_PUSH_RANGE("receptionist_reception_server");
+	receptionist_reception_server(stream1);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: receptionist_receptionServer = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: receptionist_reception_server = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
@@ -17832,7 +17832,7 @@ void specialist_receive_specialist_reached(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int receptionist_receptionServer_sm_size(int blockSize){
+int receptionist_reception_server_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   //Continuous agent and message input has no partitioning
@@ -17844,10 +17844,10 @@ int receptionist_receptionServer_sm_size(int blockSize){
 	return sm_size;
 }
 
-/** receptionist_receptionServer
- * Agent function prototype for receptionServer function of receptionist agent
+/** receptionist_reception_server
+ * Agent function prototype for reception_server function of receptionist agent
  */
-void receptionist_receptionServer(cudaStream_t &stream){
+void receptionist_reception_server(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -17892,18 +17892,18 @@ void receptionist_receptionServer(cudaStream_t &stream){
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
 	if (h_message_check_in_response_count + h_xmachine_memory_receptionist_count > xmachine_message_check_in_response_MAX){
-		printf("Error: Buffer size of check_in_response message will be exceeded in function receptionServer\n");
+		printf("Error: Buffer size of check_in_response message will be exceeded in function reception_server\n");
 		exit(EXIT_FAILURE);
 	}
 	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receptionServer, receptionist_receptionServer_sm_size, state_list_size);
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_reception_server, receptionist_reception_server_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
 	b.x = blockSize;
 	g.x = gridSize;
 	
-	sm_size = receptionist_receptionServer_sm_size(blockSize);
+	sm_size = receptionist_reception_server_sm_size(blockSize);
 	
 	
 	
@@ -17920,12 +17920,12 @@ void receptionist_receptionServer(cudaStream_t &stream){
 	gpuErrchkLaunch();
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (receptionServer)
+	//MAIN XMACHINE FUNCTION CALL (reception_server)
 	//Reallocate   : false
 	//Input        : check_in
 	//Output       : check_in_response
 	//Agent Output : 
-	GPUFLAME_receptionServer<<<g, b, sm_size, stream>>>(d_receptionists, d_check_ins, d_check_in_responses);
+	GPUFLAME_reception_server<<<g, b, sm_size, stream>>>(d_receptionists, d_check_ins, d_check_in_responses);
 	gpuErrchkLaunch();
 	
 	
@@ -17971,7 +17971,7 @@ void receptionist_receptionServer(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_receptionist_defaultReceptionist_count+h_xmachine_memory_receptionist_count > xmachine_memory_receptionist_MAX){
-		printf("Error: Buffer size of receptionServer agents in state defaultReceptionist will be exceeded moving working agents to next state in function receptionServer\n");
+		printf("Error: Buffer size of reception_server agents in state defaultReceptionist will be exceeded moving working agents to next state in function reception_server\n");
       exit(EXIT_FAILURE);
       }
       

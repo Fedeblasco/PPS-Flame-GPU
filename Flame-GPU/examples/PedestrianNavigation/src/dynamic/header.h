@@ -1692,11 +1692,11 @@ __FLAME_GPU_FUNC__ int receive_free_specialist(xmachine_memory_specialist_manage
 __FLAME_GPU_FUNC__ int receive_specialist_reached(xmachine_memory_specialist* agent, xmachine_message_specialist_reached_list* specialist_reached_messages, xmachine_message_specialist_terminated_list* specialist_terminated_messages);
 
 /**
- * receptionServer FLAMEGPU Agent Function
+ * reception_server FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_receptionist. This represents a single agent instance and can be modified directly.
  * @param check_in_messages  check_in_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_message and get_next_check_in_message functions.* @param check_in_response_messages Pointer to output message list of type xmachine_message_check_in_response_list. Must be passed as an argument to the add_check_in_response_message function ??.
  */
-__FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_response_list* check_in_response_messages);
+__FLAME_GPU_FUNC__ int reception_server(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_response_list* check_in_response_messages);
 
 /**
  * generate_chairs FLAMEGPU Agent Function

@@ -10019,7 +10019,7 @@ __global__ void GPUFLAME_receive_specialist_reached(xmachine_memory_specialist_l
 /**
  *
  */
-__global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agents, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_response_list* check_in_response_messages){
+__global__ void GPUFLAME_reception_server(xmachine_memory_receptionist_list* agents, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_response_list* check_in_response_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -10028,7 +10028,7 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
     //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
     
 
-	//SoA to AoS - xmachine_memory_receptionServer Coalesced memory read (arrays point to first item for agent index)
+	//SoA to AoS - xmachine_memory_reception_server Coalesced memory read (arrays point to first item for agent index)
 	xmachine_memory_receptionist agent;
     //No partitioned input may launch more threads than required - only load agent data within bounds. 
     if (index < d_xmachine_memory_receptionist_count){
@@ -10052,7 +10052,7 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	}
 
 	//FLAME function call
-	int dead = !receptionServer(&agent, check_in_messages, check_in_response_messages	);
+	int dead = !reception_server(&agent, check_in_messages, check_in_response_messages	);
 	
 
 	
@@ -10061,7 +10061,7 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
     //continuous agent: set reallocation flag
 	agents->_scan_input[index]  = dead; 
 
-	//AoS to SoA - xmachine_memory_receptionServer Coalesced memory write (ignore arrays)
+	//AoS to SoA - xmachine_memory_reception_server Coalesced memory write (ignore arrays)
 	agents->front[index] = agent.front;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;

@@ -1739,7 +1739,7 @@
       </memory>
       <functions>
         <gpu:function>
-          <name>receptionServer</name>
+          <name>reception_server</name>
           <currentState>defaultReceptionist</currentState>
           <nextState>defaultReceptionist</nextState>
           <inputs>
@@ -2710,7 +2710,7 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>receptionServer</name>
+        <name>reception_server</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>box_server</name>
