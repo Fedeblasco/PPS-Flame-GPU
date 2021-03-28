@@ -51,3 +51,11 @@ __FLAME_GPU_FUNC__ ivec2 priorityDequeue(ivec2 patientQueue[], unsigned int * si
     *size = *size - 1;
     return item;
 }
+
+//Función que permite imprimir la cola completa, sirve para debugear el simulador
+__FLAME_GPU_FUNC__ int printPriorityQueue(ivec2 patientQueue[]){ 
+    for(int i=0;i<35;i++){
+        printf("Posicion %d, paciente %d, prioridad %d\n",i,patientQueue[i].x,patientQueue[i].y);
+    }
+    return 0;
+}

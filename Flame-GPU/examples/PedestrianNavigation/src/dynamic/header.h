@@ -128,13 +128,13 @@ typedef glm::dvec4 dvec4;
 //Agent variable array length for xmachine_memory_specialist_manager->psychiatristQueue
 #define xmachine_memory_specialist_manager_psychiatristQueue_LENGTH 35 
 //Agent variable array length for xmachine_memory_receptionist->patientQueue
-#define xmachine_memory_receptionist_patientQueue_LENGTH 100 
+#define xmachine_memory_receptionist_patientQueue_LENGTH 35 
 //Agent variable array length for xmachine_memory_chair_admin->chairArray
 #define xmachine_memory_chair_admin_chairArray_LENGTH 35 
 //Agent variable array length for xmachine_memory_triage->boxArray
 #define xmachine_memory_triage_boxArray_LENGTH 3 
 //Agent variable array length for xmachine_memory_triage->patientQueue
-#define xmachine_memory_triage_patientQueue_LENGTH 100
+#define xmachine_memory_triage_patientQueue_LENGTH 35
 
 
   
@@ -405,8 +405,6 @@ struct __align__(16) xmachine_memory_specialist
  */
 struct __align__(16) xmachine_memory_receptionist
 {
-    int x;    /**< X-machine memory variable x of type int.*/
-    int y;    /**< X-machine memory variable y of type int.*/
     unsigned int *patientQueue;    /**< X-machine memory variable patientQueue of type unsigned int.*/
     unsigned int front;    /**< X-machine memory variable front of type unsigned int.*/
     unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
@@ -414,7 +412,6 @@ struct __align__(16) xmachine_memory_receptionist
     unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
     int current_patient;    /**< X-machine memory variable current_patient of type int.*/
     int attend_patient;    /**< X-machine memory variable attend_patient of type int.*/
-    int estado;    /**< X-machine memory variable estado of type int.*/
 };
 
 /** struct xmachine_memory_agent_generator
@@ -957,16 +954,13 @@ struct xmachine_memory_receptionist_list
     int _position [xmachine_memory_receptionist_MAX];    /**< Holds agents position in the 1D agent list */
     int _scan_input [xmachine_memory_receptionist_MAX];  /**< Used during parallel prefix sum */
     
-    int x [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list x of type int.*/
-    int y [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list y of type int.*/
-    unsigned int patientQueue [xmachine_memory_receptionist_MAX*100];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
+    unsigned int patientQueue [xmachine_memory_receptionist_MAX*35];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
     unsigned int front [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list front of type unsigned int.*/
     unsigned int rear [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
     unsigned int tick [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
     int current_patient [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list current_patient of type int.*/
     int attend_patient [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list attend_patient of type int.*/
-    int estado [xmachine_memory_receptionist_MAX];    /**< X-machine memory variable list estado of type int.*/
 };
 
 /** struct xmachine_memory_agent_generator_list
@@ -1045,7 +1039,7 @@ struct xmachine_memory_triage_list
     unsigned int size [xmachine_memory_triage_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
     unsigned int tick [xmachine_memory_triage_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
     unsigned int boxArray [xmachine_memory_triage_MAX*3];    /**< X-machine memory variable list boxArray of type unsigned int.*/
-    unsigned int patientQueue [xmachine_memory_triage_MAX*100];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
+    unsigned int patientQueue [xmachine_memory_triage_MAX*35];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
 };
 
 
@@ -1703,13 +1697,6 @@ __FLAME_GPU_FUNC__ int receive_specialist_reached(xmachine_memory_specialist* ag
  * @param check_in_messages  check_in_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_message and get_next_check_in_message functions.* @param check_in_response_messages Pointer to output message list of type xmachine_message_check_in_response_list. Must be passed as an argument to the add_check_in_response_message function ??.
  */
 __FLAME_GPU_FUNC__ int receptionServer(xmachine_memory_receptionist* agent, xmachine_message_check_in_list* check_in_messages, xmachine_message_check_in_response_list* check_in_response_messages);
-
-/**
- * infect_receptionist FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_receptionist. This represents a single agent instance and can be modified directly.
- * @param pedestrian_state_messages  pedestrian_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_state_message and get_next_pedestrian_state_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_state_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
- */
-__FLAME_GPU_FUNC__ int infect_receptionist(xmachine_memory_receptionist* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
 
 /**
  * generate_chairs FLAMEGPU Agent Function
@@ -2590,17 +2577,14 @@ __FLAME_GPU_FUNC__ void add_specialist_agent(xmachine_memory_specialist_list* ag
 /** add_receptionist_agent
  * Adds a new continuous valued receptionist agent to the xmachine_memory_receptionist_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_receptionist_list agent list
- * @param x	agent agent variable of type int
- * @param y	agent agent variable of type int
  * @param front	agent agent variable of type unsigned int
  * @param rear	agent agent variable of type unsigned int
  * @param size	agent agent variable of type unsigned int
  * @param tick	agent agent variable of type unsigned int
  * @param current_patient	agent agent variable of type int
  * @param attend_patient	agent agent variable of type int
- * @param estado	agent agent variable of type int
  */
-__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient, int estado);
+__FLAME_GPU_FUNC__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient);
 
 /** get_receptionist_agent_array_value
  *  Template function for accessing receptionist agent array memory variables.
@@ -3929,24 +3913,6 @@ __host__ unsigned int get_specialist_defaultSpecialist_variable_current_patient(
  */
 __host__ unsigned int get_specialist_defaultSpecialist_variable_tick(unsigned int index);
 
-/** int get_receptionist_defaultReceptionist_variable_x(unsigned int index)
- * Gets the value of the x variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable x
- */
-__host__ int get_receptionist_defaultReceptionist_variable_x(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_y(unsigned int index)
- * Gets the value of the y variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable y
- */
-__host__ int get_receptionist_defaultReceptionist_variable_y(unsigned int index);
-
 /** unsigned int get_receptionist_defaultReceptionist_variable_patientQueue(unsigned int index, unsigned int element)
  * Gets the element-th value of the patientQueue variable array of an receptionist agent in the defaultReceptionist state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -4010,15 +3976,6 @@ __host__ int get_receptionist_defaultReceptionist_variable_current_patient(unsig
  * @return value of agent variable attend_patient
  */
 __host__ int get_receptionist_defaultReceptionist_variable_attend_patient(unsigned int index);
-
-/** int get_receptionist_defaultReceptionist_variable_estado(unsigned int index)
- * Gets the value of the estado variable of an receptionist agent in the defaultReceptionist state on the host. 
- * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
- * This has a potentially significant performance impact if used improperly.
- * @param index the index of the agent within the list.
- * @return value of agent variable estado
- */
-__host__ int get_receptionist_defaultReceptionist_variable_estado(unsigned int index);
 
 /** int get_agent_generator_defaultGenerator_variable_chairs_generated(unsigned int index)
  * Gets the value of the chairs_generated variable of an agent_generator agent in the defaultGenerator state on the host. 
@@ -6027,58 +5984,6 @@ unsigned int min_specialist_defaultSpecialist_tick_variable();
  */
 unsigned int max_specialist_defaultSpecialist_tick_variable();
 
-/** int reduce_receptionist_defaultReceptionist_x_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_x_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_x_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_x_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_x_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_x_variable();
-/** int max_receptionist_defaultReceptionist_x_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_x_variable();
-
-/** int reduce_receptionist_defaultReceptionist_y_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_y_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_y_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_y_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_y_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_y_variable();
-/** int max_receptionist_defaultReceptionist_y_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_y_variable();
-
 /** unsigned int reduce_receptionist_defaultReceptionist_front_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
@@ -6234,32 +6139,6 @@ int min_receptionist_defaultReceptionist_attend_patient_variable();
  * @return the minimum variable value of the specified agent name and state
  */
 int max_receptionist_defaultReceptionist_attend_patient_variable();
-
-/** int reduce_receptionist_defaultReceptionist_estado_variable();
- * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the reduced variable value of the specified agent name and state
- */
-int reduce_receptionist_defaultReceptionist_estado_variable();
-
-
-
-/** int count_receptionist_defaultReceptionist_estado_variable(int count_value){
- * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
- * @param count_value The unique value which should be counted
- * @return The number of unique values of the count_value found in the agent state variable list
- */
-int count_receptionist_defaultReceptionist_estado_variable(int count_value);
-
-/** int min_receptionist_defaultReceptionist_estado_variable();
- * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int min_receptionist_defaultReceptionist_estado_variable();
-/** int max_receptionist_defaultReceptionist_estado_variable();
- * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
- * @return the minimum variable value of the specified agent name and state
- */
-int max_receptionist_defaultReceptionist_estado_variable();
 
 /** int reduce_agent_generator_defaultGenerator_chairs_generated_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

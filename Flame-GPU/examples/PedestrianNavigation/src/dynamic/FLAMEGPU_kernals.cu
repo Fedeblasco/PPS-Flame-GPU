@@ -2372,10 +2372,8 @@ __global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* a
 		int output_index = agents_src->_position[index] + dst_agent_count;
 
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
-        agents_dst->_position[output_index] = output_index;        
-		agents_dst->x[output_index] = agents_src->x[index];        
-		agents_dst->y[output_index] = agents_src->y[index];
-	    for (int i=0; i<100; i++){
+        agents_dst->_position[output_index] = output_index;
+	    for (int i=0; i<35; i++){
 	      agents_dst->patientQueue[(i*xmachine_memory_receptionist_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_receptionist_MAX)+index];
 	    }        
 		agents_dst->front[output_index] = agents_src->front[index];        
@@ -2383,8 +2381,7 @@ __global__ void scatter_receptionist_Agents(xmachine_memory_receptionist_list* a
 		agents_dst->size[output_index] = agents_src->size[index];        
 		agents_dst->tick[output_index] = agents_src->tick[index];        
 		agents_dst->current_patient[output_index] = agents_src->current_patient[index];        
-		agents_dst->attend_patient[output_index] = agents_src->attend_patient[index];        
-		agents_dst->estado[output_index] = agents_src->estado[index];
+		agents_dst->attend_patient[output_index] = agents_src->attend_patient[index];
 	}
 }
 
@@ -2404,9 +2401,7 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
 
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
-	    agents_dst->x[output_index] = agents_src->x[index];
-	    agents_dst->y[output_index] = agents_src->y[index];
-	    for (int i=0; i<100; i++){
+	    for (int i=0; i<35; i++){
 	      agents_dst->patientQueue[(i*xmachine_memory_receptionist_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_receptionist_MAX)+index];
 	    }
 	    agents_dst->front[output_index] = agents_src->front[index];
@@ -2415,15 +2410,12 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
 	    agents_dst->tick[output_index] = agents_src->tick[index];
 	    agents_dst->current_patient[output_index] = agents_src->current_patient[index];
 	    agents_dst->attend_patient[output_index] = agents_src->attend_patient[index];
-	    agents_dst->estado[output_index] = agents_src->estado[index];
     }
 }
 
 /** add_receptionist_agent
  * Continuous receptionist agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_receptionist_list to add agents to 
- * @param x agent variable of type int
- * @param y agent variable of type int
  * @param patientQueue agent variable of type unsigned int
  * @param front agent variable of type unsigned int
  * @param rear agent variable of type unsigned int
@@ -2431,10 +2423,9 @@ __global__ void append_receptionist_Agents(xmachine_memory_receptionist_list* ag
  * @param tick agent variable of type unsigned int
  * @param current_patient agent variable of type int
  * @param attend_patient agent variable of type int
- * @param estado agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient, int estado){
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient){
 	
 	int index;
     
@@ -2453,21 +2444,18 @@ __device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents
 	agents->_scan_input[index] = 1;
 
 	//write data to new buffer
-	agents->x[index] = x;
-	agents->y[index] = y;
 	agents->front[index] = front;
 	agents->rear[index] = rear;
 	agents->size[index] = size;
 	agents->tick[index] = tick;
 	agents->current_patient[index] = current_patient;
 	agents->attend_patient[index] = attend_patient;
-	agents->estado[index] = estado;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, int x, int y, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient, int estado){
-    add_receptionist_agent<DISCRETE_2D>(agents, x, y, front, rear, size, tick, current_patient, attend_patient, estado);
+__device__ void add_receptionist_agent(xmachine_memory_receptionist_list* agents, unsigned int front, unsigned int rear, unsigned int size, unsigned int tick, int current_patient, int attend_patient){
+    add_receptionist_agent<DISCRETE_2D>(agents, front, rear, size, tick, current_patient, attend_patient);
 }
 
 /** reorder_receptionist_agents
@@ -2483,9 +2471,7 @@ __global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memor
 	uint old_pos = values[index];
 
 	//reorder agent data
-	ordered_agents->x[index] = unordered_agents->x[old_pos];
-	ordered_agents->y[index] = unordered_agents->y[old_pos];
-	for (int i=0; i<100; i++){
+	for (int i=0; i<35; i++){
 	  ordered_agents->patientQueue[(i*xmachine_memory_receptionist_MAX)+index] = unordered_agents->patientQueue[(i*xmachine_memory_receptionist_MAX)+old_pos];
 	}
 	ordered_agents->front[index] = unordered_agents->front[old_pos];
@@ -2494,7 +2480,6 @@ __global__ void reorder_receptionist_agents(unsigned int* values, xmachine_memor
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 	ordered_agents->current_patient[index] = unordered_agents->current_patient[old_pos];
 	ordered_agents->attend_patient[index] = unordered_agents->attend_patient[old_pos];
-	ordered_agents->estado[index] = unordered_agents->estado[old_pos];
 }
 
 /** get_receptionist_agent_array_value
@@ -3097,7 +3082,7 @@ __global__ void scatter_triage_Agents(xmachine_memory_triage_list* agents_dst, x
 	    for (int i=0; i<3; i++){
 	      agents_dst->boxArray[(i*xmachine_memory_triage_MAX)+output_index] = agents_src->boxArray[(i*xmachine_memory_triage_MAX)+index];
 	    }
-	    for (int i=0; i<100; i++){
+	    for (int i=0; i<35; i++){
 	      agents_dst->patientQueue[(i*xmachine_memory_triage_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_triage_MAX)+index];
 	    }
 	}
@@ -3126,7 +3111,7 @@ __global__ void append_triage_Agents(xmachine_memory_triage_list* agents_dst, xm
 	    for (int i=0; i<3; i++){
 	      agents_dst->boxArray[(i*xmachine_memory_triage_MAX)+output_index] = agents_src->boxArray[(i*xmachine_memory_triage_MAX)+index];
 	    }
-	    for (int i=0; i<100; i++){
+	    for (int i=0; i<35; i++){
 	      agents_dst->patientQueue[(i*xmachine_memory_triage_MAX)+output_index] = agents_src->patientQueue[(i*xmachine_memory_triage_MAX)+index];
 	    }
     }
@@ -3194,7 +3179,7 @@ __global__ void reorder_triage_agents(unsigned int* values, xmachine_memory_tria
 	for (int i=0; i<3; i++){
 	  ordered_agents->boxArray[(i*xmachine_memory_triage_MAX)+index] = unordered_agents->boxArray[(i*xmachine_memory_triage_MAX)+old_pos];
 	}
-	for (int i=0; i<100; i++){
+	for (int i=0; i<35; i++){
 	  ordered_agents->patientQueue[(i*xmachine_memory_triage_MAX)+index] = unordered_agents->patientQueue[(i*xmachine_memory_triage_MAX)+old_pos];
 	}
 }
@@ -10048,8 +10033,6 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
     //No partitioned input may launch more threads than required - only load agent data within bounds. 
     if (index < d_xmachine_memory_receptionist_count){
     
-	agent.x = agents->x[index];
-	agent.y = agents->y[index];
     agent.patientQueue = &(agents->patientQueue[index]);
 	agent.front = agents->front[index];
 	agent.rear = agents->rear[index];
@@ -10057,11 +10040,8 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.tick = agents->tick[index];
 	agent.current_patient = agents->current_patient[index];
 	agent.attend_patient = agents->attend_patient[index];
-	agent.estado = agents->estado[index];
 	} else {
 	
-	agent.x = 0.093750;
-	agent.y = -0.375000;
     agent.patientQueue = nullptr;
 	agent.front = 0;
 	agent.rear = 0;
@@ -10069,7 +10049,6 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agent.tick = 0;
 	agent.current_patient = -1;
 	agent.attend_patient = 0;
-	agent.estado = 0;
 	}
 
 	//FLAME function call
@@ -10083,64 +10062,13 @@ __global__ void GPUFLAME_receptionServer(xmachine_memory_receptionist_list* agen
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_receptionServer Coalesced memory write (ignore arrays)
-	agents->x[index] = agent.x;
-	agents->y[index] = agent.y;
 	agents->front[index] = agent.front;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;
 	agents->tick[index] = agent.tick;
 	agents->current_patient[index] = agent.current_patient;
 	agents->attend_patient[index] = agent.attend_patient;
-	agents->estado[index] = agent.estado;
 	}
-}
-
-/**
- *
- */
-__global__ void GPUFLAME_infect_receptionist(xmachine_memory_receptionist_list* agents, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
-	
-	//continuous agent: index is agent position in 1D agent list
-	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-  
-    //For agents not using non partitioned message input check the agent bounds
-    if (index >= d_xmachine_memory_receptionist_count)
-        return;
-    
-
-	//SoA to AoS - xmachine_memory_infect_receptionist Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_receptionist agent;
-    
-    // Thread bounds already checked, but the agent function will still execute. load default values?
-	
-	agent.x = agents->x[index];
-	agent.y = agents->y[index];
-    agent.patientQueue = &(agents->patientQueue[index]);
-	agent.front = agents->front[index];
-	agent.rear = agents->rear[index];
-	agent.size = agents->size[index];
-	agent.tick = agents->tick[index];
-	agent.current_patient = agents->current_patient[index];
-	agent.attend_patient = agents->attend_patient[index];
-	agent.estado = agents->estado[index];
-
-	//FLAME function call
-	int dead = !infect_receptionist(&agent, pedestrian_state_messages, partition_matrix, rand48);
-	
-
-	//continuous agent: set reallocation flag
-	agents->_scan_input[index]  = dead; 
-
-	//AoS to SoA - xmachine_memory_infect_receptionist Coalesced memory write (ignore arrays)
-	agents->x[index] = agent.x;
-	agents->y[index] = agent.y;
-	agents->front[index] = agent.front;
-	agents->rear[index] = agent.rear;
-	agents->size[index] = agent.size;
-	agents->tick[index] = agent.tick;
-	agents->current_patient[index] = agent.current_patient;
-	agents->attend_patient[index] = agent.attend_patient;
-	agents->estado[index] = agent.estado;
 }
 
 /**

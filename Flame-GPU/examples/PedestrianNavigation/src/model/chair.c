@@ -1,6 +1,3 @@
-
-#include "parameters.h"
-
 __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine_message_chair_contact_list* chairContactMessages, xmachine_message_chair_state_list* chairStateMessages, RNG_rand48* rand48){
     
     xmachine_message_chair_contact* current_message = get_first_chair_contact_message(chairContactMessages);
