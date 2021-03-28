@@ -12,7 +12,7 @@ __FLAME_GPU_FUNC__ int receive_doctor_petitions(xmachine_memory_doctor_manager* 
         //probando(agent->patientQueue);
         current_message = get_next_doctor_petition_message(current_message, doctorPetitionMessages);	
 	}
-    if(!isPriorityEmpty(&agent->size)){
+    if(!isEmpty(&agent->size)){
         if(agent->free_doctors > 0){
             for (int i = 0; i<4; i++){
                 if(agent->doctors_occupied[i]==0){

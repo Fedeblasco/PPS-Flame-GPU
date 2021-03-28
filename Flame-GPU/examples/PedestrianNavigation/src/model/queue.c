@@ -31,3 +31,11 @@ __FLAME_GPU_FUNC__ unsigned int dequeue(unsigned int patientQueue[], unsigned in
     *size = *size - 1;
     return item;
 }
+
+//Función que permite imprimir la cola completa, sirve para debugear el simulador
+__FLAME_GPU_FUNC__ int printQueue(ivec2 patientQueue[]){ 
+    for(int i=0;i<35;i++){
+        printf("Posicion %d, paciente %d, prioridad %d\n",i,patientQueue[i].x,patientQueue[i].y);
+    }
+    return 0;
+}

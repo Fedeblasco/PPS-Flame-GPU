@@ -210,7 +210,7 @@ __FLAME_GPU_FUNC__ int output_box_petition(xmachine_memory_agent* agent, xmachin
  */
 __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_location_list* pedestrian_location_messages, xmachine_message_pedestrian_location_PBM* partition_matrix, RNG_rand48* rand48){
 
-	glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
+	/*glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
 	glm::vec2 agent_vel = glm::vec2(agent->velx, agent->vely);
 
 	glm::vec2 navigate_velocity = glm::vec2(0.0f, 0.0f);
@@ -240,7 +240,7 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 			avoid_velocity += a_velocity;
 
 			//Si estoy sano, y me cruce con un paciente que esta enfermo o es portador, cambio mi estado a portador
-			/*if(agent->estado==0){
+			if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
 					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
 					if(temp<PROB_SNIFF*PROB_INFECT){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
@@ -251,7 +251,7 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 					}
 				}	
 			}*/				
-		}
+		/*}
 		 current_message = get_next_pedestrian_location_message(current_message, pedestrian_location_messages, partition_matrix);
 	}
 
@@ -259,7 +259,7 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 	glm::vec2 steer_velocity = navigate_velocity + avoid_velocity;
 
 	agent->steer_x = steer_velocity.x;
-	agent->steer_y = steer_velocity.y;
+	agent->steer_y = steer_velocity.y;*/
 
     return 0;
 }

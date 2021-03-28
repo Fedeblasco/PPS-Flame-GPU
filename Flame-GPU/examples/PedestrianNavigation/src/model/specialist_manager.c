@@ -18,7 +18,7 @@ __FLAME_GPU_FUNC__ int receive_specialist_petitions(xmachine_memory_specialist_m
 
     //Manejo de colas para cada uno de los especialistas
     for(int i = 0; i<5; i++){
-        if(!isPriorityEmpty(&agent->size[i])){
+        if(!isEmpty(&agent->size[i])){
             if(agent->free_specialist[i] > 0){
                 agent->free_specialist[i]--;
                 ivec2 paciente = priorityDequeue(ptr[i],&agent->size[i],&agent->rear[i]);
