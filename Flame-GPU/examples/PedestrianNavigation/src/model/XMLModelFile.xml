@@ -1717,7 +1717,7 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>patientQueue</name>
-          <arrayLength>100</arrayLength>
+          <arrayLength>35</arrayLength>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
@@ -2161,7 +2161,7 @@
         <gpu:variable>
           <type>unsigned int</type>
           <name>patientQueue</name>
-          <arrayLength>100</arrayLength>
+          <arrayLength>35</arrayLength>
         </gpu:variable>
       </memory>
       <functions>
