@@ -33,20 +33,20 @@ __FLAME_GPU_FUNC__ int box_server(xmachine_memory_box* agent, xmachine_message_b
 	xmachine_message_box_petition* current_message = get_first_box_petition_message(boxPetitionMessages);
 	while(current_message){
         if(current_message->box_no == agent->id){
-			agent->attending = current_message->id;
+			agent->current_patient = current_message->id;
 			agent->tick = 0;
 		}
         current_message = get_next_box_petition_message(current_message, boxPetitionMessages);	
 	}
 
-	if(agent->attending != 0){
+	if(agent->current_patient != 0){
 		agent->tick++;
 		if(agent->tick * SECONDS_PER_TICK >= BOX_SECONDS){
 			int room = determine_room(rand48);
 			int priority = determine_priority(rand48);
-			//printf("Soy el box %d y le estoy mandando al paciente %d que vaya a %d con prioridad %d\n",agent->id,agent->attending,room,priority);
-			add_box_response_message(boxResponseMessages, agent->attending, room, priority);
-			agent->attending = 0;
+			//printf("Soy el box %d y le estoy mandando al paciente %d que vaya a %d con prioridad %d\n",agent->id,agent->current_patient,room,priority);
+			add_box_response_message(boxResponseMessages, agent->current_patient, room, priority);
+			agent->current_patient = 0;
 		}
 	}
 	

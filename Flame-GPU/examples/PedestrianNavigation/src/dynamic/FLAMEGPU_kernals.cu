@@ -2783,7 +2783,7 @@ __global__ void scatter_box_Agents(xmachine_memory_box_list* agents_dst, xmachin
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
 		agents_dst->id[output_index] = agents_src->id[index];        
-		agents_dst->attending[output_index] = agents_src->attending[index];        
+		agents_dst->current_patient[output_index] = agents_src->current_patient[index];        
 		agents_dst->tick[output_index] = agents_src->tick[index];
 	}
 }
@@ -2805,7 +2805,7 @@ __global__ void append_box_Agents(xmachine_memory_box_list* agents_dst, xmachine
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->id[output_index] = agents_src->id[index];
-	    agents_dst->attending[output_index] = agents_src->attending[index];
+	    agents_dst->current_patient[output_index] = agents_src->current_patient[index];
 	    agents_dst->tick[output_index] = agents_src->tick[index];
     }
 }
@@ -2814,11 +2814,11 @@ __global__ void append_box_Agents(xmachine_memory_box_list* agents_dst, xmachine
  * Continuous box agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_box_list to add agents to 
  * @param id agent variable of type unsigned int
- * @param attending agent variable of type unsigned int
+ * @param current_patient agent variable of type unsigned int
  * @param tick agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int attending, unsigned int tick){
+__device__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int current_patient, unsigned int tick){
 	
 	int index;
     
@@ -2838,14 +2838,14 @@ __device__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id,
 
 	//write data to new buffer
 	agents->id[index] = id;
-	agents->attending[index] = attending;
+	agents->current_patient[index] = current_patient;
 	agents->tick[index] = tick;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int attending, unsigned int tick){
-    add_box_agent<DISCRETE_2D>(agents, id, attending, tick);
+__device__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int current_patient, unsigned int tick){
+    add_box_agent<DISCRETE_2D>(agents, id, current_patient, tick);
 }
 
 /** reorder_box_agents
@@ -2862,7 +2862,7 @@ __global__ void reorder_box_agents(unsigned int* values, xmachine_memory_box_lis
 
 	//reorder agent data
 	ordered_agents->id[index] = unordered_agents->id[old_pos];
-	ordered_agents->attending[index] = unordered_agents->attending[old_pos];
+	ordered_agents->current_patient[index] = unordered_agents->current_patient[old_pos];
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 }
 
@@ -10457,12 +10457,12 @@ __global__ void GPUFLAME_box_server(xmachine_memory_box_list* agents, xmachine_m
     if (index < d_xmachine_memory_box_count){
     
 	agent.id = agents->id[index];
-	agent.attending = agents->attending[index];
+	agent.current_patient = agents->current_patient[index];
 	agent.tick = agents->tick[index];
 	} else {
 	
 	agent.id = 0;
-	agent.attending = 0;
+	agent.current_patient = 0;
 	agent.tick = 0;
 	}
 
@@ -10478,7 +10478,7 @@ __global__ void GPUFLAME_box_server(xmachine_memory_box_list* agents, xmachine_m
 
 	//AoS to SoA - xmachine_memory_box_server Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
-	agents->attending[index] = agent.attending;
+	agents->current_patient[index] = agent.current_patient;
 	agents->tick[index] = agent.tick;
 	}
 }

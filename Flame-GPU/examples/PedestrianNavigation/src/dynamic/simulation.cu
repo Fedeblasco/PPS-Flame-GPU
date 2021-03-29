@@ -329,7 +329,7 @@ unsigned int h_agent_generators_defaultGenerator_variable_personal_generated_dat
 unsigned int h_chair_admins_defaultAdmin_variable_id_data_iteration;
 unsigned int h_chair_admins_defaultAdmin_variable_chairArray_data_iteration;
 unsigned int h_boxs_defaultBox_variable_id_data_iteration;
-unsigned int h_boxs_defaultBox_variable_attending_data_iteration;
+unsigned int h_boxs_defaultBox_variable_current_patient_data_iteration;
 unsigned int h_boxs_defaultBox_variable_tick_data_iteration;
 unsigned int h_doctors_defaultDoctor_variable_id_data_iteration;
 unsigned int h_doctors_defaultDoctor_variable_current_patient_data_iteration;
@@ -1061,7 +1061,7 @@ void initialise(char * inputfile){
     h_chair_admins_defaultAdmin_variable_id_data_iteration = 0;
     h_chair_admins_defaultAdmin_variable_chairArray_data_iteration = 0;
     h_boxs_defaultBox_variable_id_data_iteration = 0;
-    h_boxs_defaultBox_variable_attending_data_iteration = 0;
+    h_boxs_defaultBox_variable_current_patient_data_iteration = 0;
     h_boxs_defaultBox_variable_tick_data_iteration = 0;
     h_doctors_defaultDoctor_variable_id_data_iteration = 0;
     h_doctors_defaultDoctor_variable_current_patient_data_iteration = 0;
@@ -7995,38 +7995,38 @@ __host__ unsigned int get_box_defaultBox_variable_id(unsigned int index){
     }
 }
 
-/** unsigned int get_box_defaultBox_variable_attending(unsigned int index)
- * Gets the value of the attending variable of an box agent in the defaultBox state on the host. 
+/** unsigned int get_box_defaultBox_variable_current_patient(unsigned int index)
+ * Gets the value of the current_patient variable of an box agent in the defaultBox state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable attending
+ * @return value of agent variable current_patient
  */
-__host__ unsigned int get_box_defaultBox_variable_attending(unsigned int index){
+__host__ unsigned int get_box_defaultBox_variable_current_patient(unsigned int index){
     unsigned int count = get_agent_box_defaultBox_count();
     unsigned int currentIteration = getIterationNumber();
     
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_boxs_defaultBox_variable_attending_data_iteration != currentIteration){
+        if(h_boxs_defaultBox_variable_current_patient_data_iteration != currentIteration){
             gpuErrchk(
                 cudaMemcpy(
-                    h_boxs_defaultBox->attending,
-                    d_boxs_defaultBox->attending,
+                    h_boxs_defaultBox->current_patient,
+                    d_boxs_defaultBox->current_patient,
                     count * sizeof(unsigned int),
                     cudaMemcpyDeviceToHost
                 )
             );
             // Update some global value indicating what data is currently present in that host array.
-            h_boxs_defaultBox_variable_attending_data_iteration = currentIteration;
+            h_boxs_defaultBox_variable_current_patient_data_iteration = currentIteration;
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_boxs_defaultBox->attending[index];
+        return h_boxs_defaultBox->current_patient[index];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access attending for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access current_patient for the %u th member of box_defaultBox. count is %u at iteration %u\n", index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -8964,7 +8964,7 @@ void copy_single_xmachine_memory_box_hostToDevice(xmachine_memory_box_list * d_d
  
 		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->attending, &h_agent->attending, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->current_patient, &h_agent->current_patient, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(unsigned int), cudaMemcpyHostToDevice));
 
@@ -8985,7 +8985,7 @@ void copy_partial_xmachine_memory_box_hostToDevice(xmachine_memory_box_list * d_
 	 
 		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
-		gpuErrchk(cudaMemcpy(d_dst->attending, h_src->attending, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->current_patient, h_src->current_patient, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
@@ -10290,7 +10290,7 @@ void h_unpack_agents_box_AoS_to_SoA(xmachine_memory_box_list * dst, xmachine_mem
 			 
 			dst->id[i] = src[i]->id;
 			 
-			dst->attending[i] = src[i]->attending;
+			dst->current_patient[i] = src[i]->current_patient;
 			 
 			dst->tick[i] = src[i]->tick;
 			
@@ -10325,7 +10325,7 @@ void h_add_agent_box_defaultBox(xmachine_memory_box* agent){
 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
     h_boxs_defaultBox_variable_id_data_iteration = 0;
-    h_boxs_defaultBox_variable_attending_data_iteration = 0;
+    h_boxs_defaultBox_variable_current_patient_data_iteration = 0;
     h_boxs_defaultBox_variable_tick_data_iteration = 0;
     
 
@@ -10359,7 +10359,7 @@ void h_add_agents_box_defaultBox(xmachine_memory_box** agents, unsigned int coun
 
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_boxs_defaultBox_variable_id_data_iteration = 0;
-        h_boxs_defaultBox_variable_attending_data_iteration = 0;
+        h_boxs_defaultBox_variable_current_patient_data_iteration = 0;
         h_boxs_defaultBox_variable_tick_data_iteration = 0;
         
 
@@ -12026,24 +12026,24 @@ unsigned int max_box_defaultBox_id_variable(){
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int reduce_box_defaultBox_attending_variable(){
+unsigned int reduce_box_defaultBox_current_patient_variable(){
     //reduce in default stream
-    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->attending),  thrust::device_pointer_cast(d_boxs_defaultBox->attending) + h_xmachine_memory_box_defaultBox_count);
+    return thrust::reduce(thrust::device_pointer_cast(d_boxs_defaultBox->current_patient),  thrust::device_pointer_cast(d_boxs_defaultBox->current_patient) + h_xmachine_memory_box_defaultBox_count);
 }
 
-unsigned int count_box_defaultBox_attending_variable(unsigned int count_value){
+unsigned int count_box_defaultBox_current_patient_variable(unsigned int count_value){
     //count in default stream
-    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->attending),  thrust::device_pointer_cast(d_boxs_defaultBox->attending) + h_xmachine_memory_box_defaultBox_count, count_value);
+    return (unsigned int)thrust::count(thrust::device_pointer_cast(d_boxs_defaultBox->current_patient),  thrust::device_pointer_cast(d_boxs_defaultBox->current_patient) + h_xmachine_memory_box_defaultBox_count, count_value);
 }
-unsigned int min_box_defaultBox_attending_variable(){
+unsigned int min_box_defaultBox_current_patient_variable(){
     //min in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->attending);
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->current_patient);
     size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
-unsigned int max_box_defaultBox_attending_variable(){
+unsigned int max_box_defaultBox_current_patient_variable(){
     //max in default stream
-    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->attending);
+    thrust::device_ptr<unsigned int> thrust_ptr = thrust::device_pointer_cast(d_boxs_defaultBox->current_patient);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_box_defaultBox_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }

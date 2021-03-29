@@ -1104,10 +1104,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</id>\n", file);
         
-		fputs("<attending>", file);
-        sprintf(data, "%u", h_boxs_defaultBox->attending[i]);
+		fputs("<current_patient>", file);
+        sprintf(data, "%u", h_boxs_defaultBox->current_patient[i]);
 		fputs(data, file);
-		fputs("</attending>\n", file);
+		fputs("</current_patient>\n", file);
         
 		fputs("<tick>", file);
         sprintf(data, "%u", h_boxs_defaultBox->tick[i]);
@@ -1296,7 +1296,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_chair_admin_id;
     int in_chair_admin_chairArray;
     int in_box_id;
-    int in_box_attending;
+    int in_box_current_patient;
     int in_box_tick;
     int in_doctor_id;
     int in_doctor_current_patient;
@@ -1588,7 +1588,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int chair_admin_id;
     unsigned int chair_admin_chairArray[35];
 	unsigned int box_id;
-	unsigned int box_attending;
+	unsigned int box_current_patient;
 	unsigned int box_tick;
 	unsigned int doctor_id;
 	int doctor_current_patient;
@@ -1792,7 +1792,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_chair_admin_id = 0;
 	in_chair_admin_chairArray = 0;
 	in_box_id = 0;
-	in_box_attending = 0;
+	in_box_current_patient = 0;
 	in_box_tick = 0;
 	in_doctor_id = 0;
 	in_doctor_current_patient = 0;
@@ -2061,7 +2061,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	for (int k=0; k<xmachine_memory_box_MAX; k++)
 	{	
 		h_boxs->id[k] = 0;
-		h_boxs->attending[k] = 0;
+		h_boxs->current_patient[k] = 0;
 		h_boxs->tick[k] = 0;
 	}
 	
@@ -2203,7 +2203,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
         chair_admin_chairArray[i] = 0;
     }
     box_id = 0;
-    box_attending = 0;
+    box_current_patient = 0;
     box_tick = 0;
     doctor_id = 0;
     doctor_current_patient = 0;
@@ -2653,7 +2653,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					}
                     
 					h_boxs->id[*h_xmachine_memory_box_count] = box_id;
-					h_boxs->attending[*h_xmachine_memory_box_count] = box_attending;
+					h_boxs->current_patient[*h_xmachine_memory_box_count] = box_current_patient;
 					h_boxs->tick[*h_xmachine_memory_box_count] = box_tick;
 					(*h_xmachine_memory_box_count) ++;	
 				}
@@ -2811,7 +2811,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     chair_admin_chairArray[i] = 0;
                 }
                 box_id = 0;
-                box_attending = 0;
+                box_current_patient = 0;
                 box_tick = 0;
                 doctor_id = 0;
                 doctor_current_patient = 0;
@@ -2999,8 +2999,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/chairArray") == 0) in_chair_admin_chairArray = 0;
 			if(strcmp(buffer, "id") == 0) in_box_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_box_id = 0;
-			if(strcmp(buffer, "attending") == 0) in_box_attending = 1;
-			if(strcmp(buffer, "/attending") == 0) in_box_attending = 0;
+			if(strcmp(buffer, "current_patient") == 0) in_box_current_patient = 1;
+			if(strcmp(buffer, "/current_patient") == 0) in_box_current_patient = 0;
 			if(strcmp(buffer, "tick") == 0) in_box_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_box_tick = 0;
 			if(strcmp(buffer, "id") == 0) in_doctor_id = 1;
@@ -3474,8 +3474,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_box_id){
                     box_id = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_box_attending){
-                    box_attending = (unsigned int) fpgu_strtoul(buffer); 
+				if(in_box_current_patient){
+                    box_current_patient = (unsigned int) fpgu_strtoul(buffer); 
                 }
 				if(in_box_tick){
                     box_tick = (unsigned int) fpgu_strtoul(buffer); 

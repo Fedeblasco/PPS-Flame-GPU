@@ -449,7 +449,7 @@ struct __align__(16) xmachine_memory_chair_admin
 struct __align__(16) xmachine_memory_box
 {
     unsigned int id;    /**< X-machine memory variable id of type unsigned int.*/
-    unsigned int attending;    /**< X-machine memory variable attending of type unsigned int.*/
+    unsigned int current_patient;    /**< X-machine memory variable current_patient of type unsigned int.*/
     unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
 };
 
@@ -1022,7 +1022,7 @@ struct xmachine_memory_box_list
     int _scan_input [xmachine_memory_box_MAX];  /**< Used during parallel prefix sum */
     
     unsigned int id [xmachine_memory_box_MAX];    /**< X-machine memory variable list id of type unsigned int.*/
-    unsigned int attending [xmachine_memory_box_MAX];    /**< X-machine memory variable list attending of type unsigned int.*/
+    unsigned int current_patient [xmachine_memory_box_MAX];    /**< X-machine memory variable list current_patient of type unsigned int.*/
     unsigned int tick [xmachine_memory_box_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
 };
 
@@ -2707,10 +2707,10 @@ __FLAME_GPU_FUNC__ void set_chair_admin_agent_array_value(T *array, unsigned int
  * Adds a new continuous valued box agent to the xmachine_memory_box_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_box_list agent list
  * @param id	agent agent variable of type unsigned int
- * @param attending	agent agent variable of type unsigned int
+ * @param current_patient	agent agent variable of type unsigned int
  * @param tick	agent agent variable of type unsigned int
  */
-__FLAME_GPU_FUNC__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int attending, unsigned int tick);
+__FLAME_GPU_FUNC__ void add_box_agent(xmachine_memory_box_list* agents, unsigned int id, unsigned int current_patient, unsigned int tick);
 
 /** add_doctor_agent
  * Adds a new continuous valued doctor agent to the xmachine_memory_doctor_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -4116,14 +4116,14 @@ __host__ unsigned int get_chair_admin_defaultAdmin_variable_chairArray(unsigned 
  */
 __host__ unsigned int get_box_defaultBox_variable_id(unsigned int index);
 
-/** unsigned int get_box_defaultBox_variable_attending(unsigned int index)
- * Gets the value of the attending variable of an box agent in the defaultBox state on the host. 
+/** unsigned int get_box_defaultBox_variable_current_patient(unsigned int index)
+ * Gets the value of the current_patient variable of an box agent in the defaultBox state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
- * @return value of agent variable attending
+ * @return value of agent variable current_patient
  */
-__host__ unsigned int get_box_defaultBox_variable_attending(unsigned int index);
+__host__ unsigned int get_box_defaultBox_variable_current_patient(unsigned int index);
 
 /** unsigned int get_box_defaultBox_variable_tick(unsigned int index)
  * Gets the value of the tick variable of an box agent in the defaultBox state on the host. 
@@ -6414,31 +6414,31 @@ unsigned int min_box_defaultBox_id_variable();
  */
 unsigned int max_box_defaultBox_id_variable();
 
-/** unsigned int reduce_box_defaultBox_attending_variable();
+/** unsigned int reduce_box_defaultBox_current_patient_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
  */
-unsigned int reduce_box_defaultBox_attending_variable();
+unsigned int reduce_box_defaultBox_current_patient_variable();
 
 
 
-/** unsigned int count_box_defaultBox_attending_variable(unsigned int count_value){
+/** unsigned int count_box_defaultBox_current_patient_variable(unsigned int count_value){
  * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
  * @param count_value The unique value which should be counted
  * @return The number of unique values of the count_value found in the agent state variable list
  */
-unsigned int count_box_defaultBox_attending_variable(unsigned int count_value);
+unsigned int count_box_defaultBox_current_patient_variable(unsigned int count_value);
 
-/** unsigned int min_box_defaultBox_attending_variable();
+/** unsigned int min_box_defaultBox_current_patient_variable();
  * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int min_box_defaultBox_attending_variable();
-/** unsigned int max_box_defaultBox_attending_variable();
+unsigned int min_box_defaultBox_current_patient_variable();
+/** unsigned int max_box_defaultBox_current_patient_variable();
  * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the minimum variable value of the specified agent name and state
  */
-unsigned int max_box_defaultBox_attending_variable();
+unsigned int max_box_defaultBox_current_patient_variable();
 
 /** unsigned int reduce_box_defaultBox_tick_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables

@@ -1991,7 +1991,7 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>attending</name>
+          <name>current_patient</name>
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
