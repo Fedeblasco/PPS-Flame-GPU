@@ -744,7 +744,6 @@ struct __align__(16) xmachine_message_doctor_petition
     int _position;          /**< 1D position of message in linear message list */   
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
-    unsigned int doctor_no;        /**< Message variable doctor_no of type unsigned int.*/  
     unsigned int priority;        /**< Message variable priority of type unsigned int.*/
 };
 
@@ -1341,7 +1340,6 @@ struct xmachine_message_doctor_petition_list
     int _scan_input [xmachine_message_doctor_petition_MAX];  /**< Used during parallel prefix sum */
     
     unsigned int id [xmachine_message_doctor_petition_MAX];    /**< Message memory variable list id of type unsigned int.*/
-    unsigned int doctor_no [xmachine_message_doctor_petition_MAX];    /**< Message memory variable list doctor_no of type unsigned int.*/
     unsigned int priority [xmachine_message_doctor_petition_MAX];    /**< Message memory variable list priority of type unsigned int.*/
     
 };
@@ -2330,11 +2328,10 @@ __FLAME_GPU_FUNC__ xmachine_message_attention_terminated * get_next_attention_te
  * Adds a new doctor_petition agent to the xmachine_memory_doctor_petition_list list using a linear mapping
  * @param agents	xmachine_memory_doctor_petition_list agent list
  * @param id	message variable of type unsigned int
- * @param doctor_no	message variable of type unsigned int
  * @param priority	message variable of type unsigned int
  */
  
- __FLAME_GPU_FUNC__ void add_doctor_petition_message(xmachine_message_doctor_petition_list* doctor_petition_messages, unsigned int id, unsigned int doctor_no, unsigned int priority);
+ __FLAME_GPU_FUNC__ void add_doctor_petition_message(xmachine_message_doctor_petition_list* doctor_petition_messages, unsigned int id, unsigned int priority);
  
 /** get_first_doctor_petition_message
  * Get first message function for non partitioned (brute force) messages

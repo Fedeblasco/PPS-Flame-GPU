@@ -158,7 +158,7 @@ __FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmac
 
 __FLAME_GPU_FUNC__ int output_doctor_petition(xmachine_memory_agent* agent, xmachine_message_doctor_petition_list* doctorPetitionMessages){
 	
-	add_doctor_petition_message(doctorPetitionMessages, agent->id, agent->doctor_no, agent->priority);
+	add_doctor_petition_message(doctorPetitionMessages, agent->id, agent->priority);
 	agent->estado_movimiento++;
 
 	return 0;

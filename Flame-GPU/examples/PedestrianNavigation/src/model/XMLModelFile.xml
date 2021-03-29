@@ -2516,10 +2516,6 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>doctor_no</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>unsigned int</type>
           <name>priority</name>
         </gpu:variable>
       </variables>

@@ -6720,10 +6720,9 @@ __device__ xmachine_message_attention_terminated* get_next_attention_terminated_
  * Add non partitioned or spatially partitioned doctor_petition message
  * @param messages xmachine_message_doctor_petition_list message list to add too
  * @param id agent variable of type unsigned int
- * @param doctor_no agent variable of type unsigned int
  * @param priority agent variable of type unsigned int
  */
-__device__ void add_doctor_petition_message(xmachine_message_doctor_petition_list* messages, unsigned int id, unsigned int doctor_no, unsigned int priority){
+__device__ void add_doctor_petition_message(xmachine_message_doctor_petition_list* messages, unsigned int id, unsigned int priority){
 
 	//global thread index
 	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_doctor_petition_count;
@@ -6744,7 +6743,6 @@ __device__ void add_doctor_petition_message(xmachine_message_doctor_petition_lis
 	messages->_scan_input[index] = _scan_input;	
 	messages->_position[index] = _position;
 	messages->id[index] = id;
-	messages->doctor_no[index] = doctor_no;
 	messages->priority[index] = priority;
 
 }
@@ -6767,7 +6765,6 @@ __global__ void scatter_optional_doctor_petition_messages(xmachine_message_docto
 		//AoS - xmachine_message_doctor_petition Un-Coalesced scattered memory write
 		messages->_position[output_index] = output_index;
 		messages->id[output_index] = messages_swap->id[index];
-		messages->doctor_no[output_index] = messages_swap->doctor_no[index];
 		messages->priority[output_index] = messages_swap->priority[index];				
 	}
 }
@@ -6809,7 +6806,6 @@ __device__ xmachine_message_doctor_petition* get_first_doctor_petition_message(x
 	xmachine_message_doctor_petition temp_message;
 	temp_message._position = messages->_position[index];
 	temp_message.id = messages->id[index];
-	temp_message.doctor_no = messages->doctor_no[index];
 	temp_message.priority = messages->priority[index];
 
 	//AoS to shared memory
@@ -6853,7 +6849,6 @@ __device__ xmachine_message_doctor_petition* get_next_doctor_petition_message(xm
 		xmachine_message_doctor_petition temp_message;
 		temp_message._position = messages->_position[index];
 		temp_message.id = messages->id[index];
-		temp_message.doctor_no = messages->doctor_no[index];
 		temp_message.priority = messages->priority[index];
 
 		//AoS to shared memory
