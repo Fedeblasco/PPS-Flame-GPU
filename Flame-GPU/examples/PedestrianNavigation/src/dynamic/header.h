@@ -1778,16 +1778,9 @@ __FLAME_GPU_FUNC__ int receive_free_chair(xmachine_memory_chair_admin* agent, xm
 /**
  * box_server FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_box. This represents a single agent instance and can be modified directly.
- * @param box_petition_messages  box_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_box_petition_message and get_next_box_petition_message functions.
+ * @param box_petition_messages  box_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_box_petition_message and get_next_box_petition_message functions.* @param box_response_messages Pointer to output message list of type xmachine_message_box_response_list. Must be passed as an argument to the add_box_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
-__FLAME_GPU_FUNC__ int box_server(xmachine_memory_box* agent, xmachine_message_box_petition_list* box_petition_messages);
-
-/**
- * attend_box_patient FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_box. This represents a single agent instance and can be modified directly.
- * @param box_response_messages Pointer to output message list of type xmachine_message_box_response_list. Must be passed as an argument to the add_box_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
- */
-__FLAME_GPU_FUNC__ int attend_box_patient(xmachine_memory_box* agent, xmachine_message_box_response_list* box_response_messages, RNG_rand48* rand48);
+__FLAME_GPU_FUNC__ int box_server(xmachine_memory_box* agent, xmachine_message_box_petition_list* box_petition_messages, xmachine_message_box_response_list* box_response_messages, RNG_rand48* rand48);
 
 /**
  * doctor_server FLAMEGPU Agent Function

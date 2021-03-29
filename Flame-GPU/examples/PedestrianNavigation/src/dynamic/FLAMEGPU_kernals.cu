@@ -1376,68 +1376,6 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	}
  }
 
-/** box_server_function_filter
- *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
- * @param currentState xmachine_memory_box_list representing agent i the current state
- * @param nextState xmachine_memory_box_list representing agent i the next state
- */
- __global__ void box_server_function_filter(xmachine_memory_box_list* currentState, xmachine_memory_box_list* nextState)
- {
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
-	
-	//check thread max
-	if (index < d_xmachine_memory_box_count){
-	
-		//apply the filter
-		if (currentState->attending[index]==0)
-		{	//copy agent data to newstate list
-			nextState->id[index] = currentState->id[index];
-			nextState->attending[index] = currentState->attending[index];
-			nextState->tick[index] = currentState->tick[index];
-			//set scan input flag to 1
-			nextState->_scan_input[index] = 1;
-		}
-		else
-		{
-			//set scan input flag of current state to 1 (keep agent)
-			currentState->_scan_input[index] = 1;
-		}
-	
-	}
- }
-
-/** attend_box_patient_function_filter
- *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
- * @param currentState xmachine_memory_box_list representing agent i the current state
- * @param nextState xmachine_memory_box_list representing agent i the next state
- */
- __global__ void attend_box_patient_function_filter(xmachine_memory_box_list* currentState, xmachine_memory_box_list* nextState)
- {
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
-	
-	//check thread max
-	if (index < d_xmachine_memory_box_count){
-	
-		//apply the filter
-		if (currentState->attending[index]>0)
-		{	//copy agent data to newstate list
-			nextState->id[index] = currentState->id[index];
-			nextState->attending[index] = currentState->attending[index];
-			nextState->tick[index] = currentState->tick[index];
-			//set scan input flag to 1
-			nextState->_scan_input[index] = 1;
-		}
-		else
-		{
-			//set scan input flag of current state to 1 (keep agent)
-			currentState->_scan_input[index] = 1;
-		}
-	
-	}
- }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created agent agent functions */
 
@@ -10496,7 +10434,7 @@ __global__ void GPUFLAME_receive_free_chair(xmachine_memory_chair_admin_list* ag
 /**
  *
  */
-__global__ void GPUFLAME_box_server(xmachine_memory_box_list* agents, xmachine_message_box_petition_list* box_petition_messages){
+__global__ void GPUFLAME_box_server(xmachine_memory_box_list* agents, xmachine_message_box_petition_list* box_petition_messages, xmachine_message_box_response_list* box_response_messages, RNG_rand48* rand48){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -10521,7 +10459,7 @@ __global__ void GPUFLAME_box_server(xmachine_memory_box_list* agents, xmachine_m
 	}
 
 	//FLAME function call
-	int dead = !box_server(&agent, box_petition_messages);
+	int dead = !box_server(&agent, box_petition_messages, box_response_messages	, rand48);
 	
 
 	
@@ -10535,41 +10473,6 @@ __global__ void GPUFLAME_box_server(xmachine_memory_box_list* agents, xmachine_m
 	agents->attending[index] = agent.attending;
 	agents->tick[index] = agent.tick;
 	}
-}
-
-/**
- *
- */
-__global__ void GPUFLAME_attend_box_patient(xmachine_memory_box_list* agents, xmachine_message_box_response_list* box_response_messages, RNG_rand48* rand48){
-	
-	//continuous agent: index is agent position in 1D agent list
-	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-  
-    //For agents not using non partitioned message input check the agent bounds
-    if (index >= d_xmachine_memory_box_count)
-        return;
-    
-
-	//SoA to AoS - xmachine_memory_attend_box_patient Coalesced memory read (arrays point to first item for agent index)
-	xmachine_memory_box agent;
-    
-    // Thread bounds already checked, but the agent function will still execute. load default values?
-	
-	agent.id = agents->id[index];
-	agent.attending = agents->attending[index];
-	agent.tick = agents->tick[index];
-
-	//FLAME function call
-	int dead = !attend_box_patient(&agent, box_response_messages	, rand48);
-	
-
-	//continuous agent: set reallocation flag
-	agents->_scan_input[index]  = dead; 
-
-	//AoS to SoA - xmachine_memory_attend_box_patient Coalesced memory write (ignore arrays)
-	agents->id[index] = agent.id;
-	agents->attending[index] = agent.attending;
-	agents->tick[index] = agent.tick;
 }
 
 /**

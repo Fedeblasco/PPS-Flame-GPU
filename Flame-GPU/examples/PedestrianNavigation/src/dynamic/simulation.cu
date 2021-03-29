@@ -868,11 +868,6 @@ void chair_admin_receive_free_chair(cudaStream_t &stream);
  */
 void box_box_server(cudaStream_t &stream);
 
-/** box_attend_box_patient
- * Agent function prototype for attend_box_patient function of box agent
- */
-void box_attend_box_patient(cudaStream_t &stream);
-
 /** doctor_doctor_server
  * Agent function prototype for doctor_server function of doctor agent
  */
@@ -3077,22 +3072,8 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("box_attend_box_patient");
-	box_attend_box_patient(stream3);
-    PROFILE_POP_RANGE();
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_stop);
-	cudaEventSynchronize(instrument_stop);
-	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: box_attend_box_patient = %f (ms)\n", instrument_milliseconds);
-#endif
-	
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_start);
-#endif
-	
     PROFILE_PUSH_RANGE("agent_receive_check_in_response");
-	agent_receive_check_in_response(stream4);
+	agent_receive_check_in_response(stream3);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3106,7 +3087,7 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("chair_admin_attend_chair_petitions");
-	chair_admin_attend_chair_petitions(stream5);
+	chair_admin_attend_chair_petitions(stream4);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -19493,100 +19474,28 @@ void box_box_server(cudaStream_t &stream){
 	
 
 	//******************************** AGENT FUNCTION CONDITION *********************
-	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
-  	
-	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	//THERE IS NOT A FUNCTION CONDITION
+	//currentState maps to working list
+	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs;
+	d_boxs = d_boxs_defaultBox;
+	d_boxs_defaultBox = boxs_defaultBox_temp;
+	//set working count to current state count
 	h_xmachine_memory_box_count = h_xmachine_memory_box_defaultBox_count;
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
-	
-	//RESET SCAN INPUTS
-	//reset scan input for currentState
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_scan_input, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox);
-	gpuErrchkLaunch();
-	//reset scan input for working lists
-	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs);
-	gpuErrchkLaunch();
-
-	//APPLY FUNCTION FILTER
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, box_server_function_filter, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	box_server_function_filter<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs);
-	gpuErrchkLaunch();
-
-	//GRID AND BLOCK SIZE FOR COMPACT
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_box_Agents, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	
-	//COMPACT CURRENT STATE LIST
-    cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_box, 
-        temp_scan_storage_bytes_box, 
-        d_boxs_defaultBox->_scan_input,
-        d_boxs_defaultBox->_position,
-        h_xmachine_memory_box_count, 
-        stream
-    );
-
-	//reset agent count
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs_defaultBox->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs_defaultBox->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	if (scan_last_included == 1)
-		h_xmachine_memory_box_defaultBox_count = scan_last_sum+1;
-	else		
-		h_xmachine_memory_box_defaultBox_count = scan_last_sum;
-	//Scatter into swap
-	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs_defaultBox, 0, h_xmachine_memory_box_count);
-	gpuErrchkLaunch();
-	//use a temp pointer change working swap list with current state list
-	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs_defaultBox;
-	d_boxs_defaultBox = d_boxs_swap;
-	d_boxs_swap = boxs_defaultBox_temp;
-	//update the device count
+	//set current state count to 0
+	h_xmachine_memory_box_defaultBox_count = 0;
 	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
-		
-	//COMPACT WORKING STATE LIST
-    cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_box, 
-        temp_scan_storage_bytes_box, 
-        d_boxs->_scan_input,
-        d_boxs->_position,
-        h_xmachine_memory_box_count, 
-        stream
-    );
-
-	//reset agent count
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	//Scatter into swap
-	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs, 0, h_xmachine_memory_box_count);
-	gpuErrchkLaunch();
-	//update working agent count after the scatter
-	if (scan_last_included == 1)
-		h_xmachine_memory_box_count = scan_last_sum+1;
-	else		
-		h_xmachine_memory_box_count = scan_last_sum;
-    //use a temp pointer change working swap list with current state list
-	xmachine_memory_box_list* boxs_temp = d_boxs;
-	d_boxs = d_boxs_swap;
-	d_boxs_swap = boxs_temp;
-	//update the device count
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
-	
-	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
-	if (h_xmachine_memory_box_count == 0)
-	{
-		return;
-	}
-	
-	//Update the state list size for occupancy calculations
-	state_list_size = h_xmachine_memory_box_count;
 	
  
 
 	//******************************** AGENT FUNCTION *******************************
 
+	
+	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
+	if (h_message_box_response_count + h_xmachine_memory_box_count > xmachine_message_box_response_MAX){
+		printf("Error: Buffer size of box_response message will be exceeded in function box_server\n");
+		exit(EXIT_FAILURE);
+	}
 	
 	
 	//calculate the grid block size for main agent function
@@ -19601,192 +19510,6 @@ void box_box_server(cudaStream_t &stream){
 	
 	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
 	
-	
-	//MAIN XMACHINE FUNCTION CALL (box_server)
-	//Reallocate   : false
-	//Input        : box_petition
-	//Output       : 
-	//Agent Output : 
-	GPUFLAME_box_server<<<g, b, sm_size, stream>>>(d_boxs, d_box_petitions);
-	gpuErrchkLaunch();
-	
-	
-	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
-	
-	
-	//************************ MOVE AGENTS TO NEXT STATE ****************************
-    
-	//check the working agents wont exceed the buffer size in the new state list
-	if (h_xmachine_memory_box_defaultBox_count+h_xmachine_memory_box_count > xmachine_memory_box_MAX){
-		printf("Error: Buffer size of box_server agents in state defaultBox will be exceeded moving working agents to next state in function box_server\n");
-      exit(EXIT_FAILURE);
-      }
-      
-  //append agents to next state list
-  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_box_Agents, no_sm, state_list_size);
-  gridSize = (state_list_size + blockSize - 1) / blockSize;
-  append_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs, h_xmachine_memory_box_defaultBox_count, h_xmachine_memory_box_count);
-  gpuErrchkLaunch();
-        
-	//update new state agent size
-	h_xmachine_memory_box_defaultBox_count += h_xmachine_memory_box_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
-	
-	
-}
-
-
-
-	
-/* Shared memory size calculator for agent function */
-int box_attend_box_patient_sm_size(int blockSize){
-	int sm_size;
-	sm_size = SM_START;
-  
-	return sm_size;
-}
-
-/** box_attend_box_patient
- * Agent function prototype for attend_box_patient function of box agent
- */
-void box_attend_box_patient(cudaStream_t &stream){
-
-    int sm_size;
-    int blockSize;
-    int minGridSize;
-    int gridSize;
-    int state_list_size;
-	dim3 g; //grid for agent func
-	dim3 b; //block for agent func
-
-	
-	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
-	
-	if (h_xmachine_memory_box_defaultBox_count == 0)
-	{
-		return;
-	}
-	
-	
-	//SET SM size to 0 and save state list size for occupancy calculations
-	sm_size = SM_START;
-	state_list_size = h_xmachine_memory_box_defaultBox_count;
-
-	
-
-	//******************************** AGENT FUNCTION CONDITION *********************
-	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
-  	
-	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
-	h_xmachine_memory_box_count = h_xmachine_memory_box_defaultBox_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
-	
-	//RESET SCAN INPUTS
-	//reset scan input for currentState
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_box_scan_input, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox);
-	gpuErrchkLaunch();
-	//reset scan input for working lists
-	reset_box_scan_input<<<gridSize, blockSize, 0, stream>>>(d_boxs);
-	gpuErrchkLaunch();
-
-	//APPLY FUNCTION FILTER
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, attend_box_patient_function_filter, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	attend_box_patient_function_filter<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs);
-	gpuErrchkLaunch();
-
-	//GRID AND BLOCK SIZE FOR COMPACT
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_box_Agents, no_sm, state_list_size); 
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	
-	//COMPACT CURRENT STATE LIST
-    cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_box, 
-        temp_scan_storage_bytes_box, 
-        d_boxs_defaultBox->_scan_input,
-        d_boxs_defaultBox->_position,
-        h_xmachine_memory_box_count, 
-        stream
-    );
-
-	//reset agent count
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs_defaultBox->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs_defaultBox->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	if (scan_last_included == 1)
-		h_xmachine_memory_box_defaultBox_count = scan_last_sum+1;
-	else		
-		h_xmachine_memory_box_defaultBox_count = scan_last_sum;
-	//Scatter into swap
-	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs_defaultBox, 0, h_xmachine_memory_box_count);
-	gpuErrchkLaunch();
-	//use a temp pointer change working swap list with current state list
-	xmachine_memory_box_list* boxs_defaultBox_temp = d_boxs_defaultBox;
-	d_boxs_defaultBox = d_boxs_swap;
-	d_boxs_swap = boxs_defaultBox_temp;
-	//update the device count
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_defaultBox_count, &h_xmachine_memory_box_defaultBox_count, sizeof(int)));	
-		
-	//COMPACT WORKING STATE LIST
-    cub::DeviceScan::ExclusiveSum(
-        d_temp_scan_storage_box, 
-        temp_scan_storage_bytes_box, 
-        d_boxs->_scan_input,
-        d_boxs->_position,
-        h_xmachine_memory_box_count, 
-        stream
-    );
-
-	//reset agent count
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_boxs->_position[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_boxs->_scan_input[h_xmachine_memory_box_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	//Scatter into swap
-	scatter_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_swap, d_boxs, 0, h_xmachine_memory_box_count);
-	gpuErrchkLaunch();
-	//update working agent count after the scatter
-	if (scan_last_included == 1)
-		h_xmachine_memory_box_count = scan_last_sum+1;
-	else		
-		h_xmachine_memory_box_count = scan_last_sum;
-    //use a temp pointer change working swap list with current state list
-	xmachine_memory_box_list* boxs_temp = d_boxs;
-	d_boxs = d_boxs_swap;
-	d_boxs_swap = boxs_temp;
-	//update the device count
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_box_count, &h_xmachine_memory_box_count, sizeof(int)));	
-	
-	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
-	if (h_xmachine_memory_box_count == 0)
-	{
-		return;
-	}
-	
-	//Update the state list size for occupancy calculations
-	state_list_size = h_xmachine_memory_box_count;
-	
- 
-
-	//******************************** AGENT FUNCTION *******************************
-
-	
-	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_box_response_count + h_xmachine_memory_box_count > xmachine_message_box_response_MAX){
-		printf("Error: Buffer size of box_response message will be exceeded in function attend_box_patient\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	
-	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_attend_box_patient, box_attend_box_patient_sm_size, state_list_size);
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	b.x = blockSize;
-	g.x = gridSize;
-	
-	sm_size = box_attend_box_patient_sm_size(blockSize);
-	
-	
-	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
 	h_message_box_response_output_type = optional_message;
@@ -19798,14 +19521,16 @@ void box_attend_box_patient(cudaStream_t &stream){
 	gpuErrchkLaunch();
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (attend_box_patient)
+	//MAIN XMACHINE FUNCTION CALL (box_server)
 	//Reallocate   : false
-	//Input        : 
+	//Input        : box_petition
 	//Output       : box_response
 	//Agent Output : 
-	GPUFLAME_attend_box_patient<<<g, b, sm_size, stream>>>(d_boxs, d_box_responses, d_rand48);
+	GPUFLAME_box_server<<<g, b, sm_size, stream>>>(d_boxs, d_box_petitions, d_box_responses, d_rand48);
 	gpuErrchkLaunch();
 	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
 	//box_response Message Type Prefix Sum
@@ -19847,15 +19572,14 @@ void box_attend_box_patient(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_box_defaultBox_count+h_xmachine_memory_box_count > xmachine_memory_box_MAX){
-		printf("Error: Buffer size of attend_box_patient agents in state defaultBox will be exceeded moving working agents to next state in function attend_box_patient\n");
+		printf("Error: Buffer size of box_server agents in state defaultBox will be exceeded moving working agents to next state in function box_server\n");
       exit(EXIT_FAILURE);
       }
       
-  //append agents to next state list
-  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_box_Agents, no_sm, state_list_size);
-  gridSize = (state_list_size + blockSize - 1) / blockSize;
-  append_box_Agents<<<gridSize, blockSize, 0, stream>>>(d_boxs_defaultBox, d_boxs, h_xmachine_memory_box_defaultBox_count, h_xmachine_memory_box_count);
-  gpuErrchkLaunch();
+  //pointer swap the updated data
+  boxs_defaultBox_temp = d_boxs;
+  d_boxs = d_boxs_defaultBox;
+  d_boxs_defaultBox = boxs_defaultBox_temp;
         
 	//update new state agent size
 	h_xmachine_memory_box_defaultBox_count += h_xmachine_memory_box_count;

@@ -2000,38 +2000,12 @@
               <messageName>box_petition</messageName>
             </gpu:input>
           </inputs>
-          <condition>
-            <lhs>
-              <agentVariable>attending</agentVariable>
-            </lhs>
-            <operator>==</operator>
-            <rhs>
-                <value>0</value>
-            </rhs>
-          </condition>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
-
-        <gpu:function>
-          <name>attend_box_patient</name>
-          <currentState>defaultBox</currentState>
-          <nextState>defaultBox</nextState>
           <outputs>
             <gpu:output>
               <messageName>box_response</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
-          <condition>
-            <lhs>
-              <agentVariable>attending</agentVariable>
-            </lhs>
-            <operator>></operator>
-            <rhs>
-                <value>0</value>
-            </rhs>
-          </condition>
           <gpu:reallocate>false</gpu:reallocate>
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
@@ -2725,9 +2699,6 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>box_server</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>attend_box_patient</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_check_in_response</name>
