@@ -1,10 +1,11 @@
 <states>
 <itno>0</itno>
 <environment>
-<!-- Posición de la salida -->
+<!-- Manejo del tiempo -->
 	<SECONDS_PER_TICK>60</SECONDS_PER_TICK>
 	<SECONDS_INCUBATING>30000</SECONDS_INCUBATING>
 	<SECONDS_SICK>30000</SECONDS_SICK>
+	<CLEANING_PERIOD_SECONDS>90000</CLEANING_PERIOD_SECONDS>
 <!-- Posición de la salida -->
 	<EXIT_X>100</EXIT_X>
 	<EXIT_Y>68</EXIT_Y>

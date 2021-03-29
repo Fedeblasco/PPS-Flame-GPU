@@ -13,6 +13,13 @@ __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine
         add_chair_state_message(chairStateMessages,current_message->id,agent->state);
 		current_message = get_next_chair_contact_message(current_message, chairContactMessages);
 	}
+
+    agent->tick++;
+    if(agent->tick * SECONDS_PER_TICK>=CLEANING_PERIOD_SECONDS){
+        //printf("Soy la silla %d y me limpio\n",agent->id);
+        agent->state = 0;
+        agent->tick = 0;
+    }
     
     return 0; 
 }

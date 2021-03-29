@@ -7,7 +7,7 @@ __FLAME_GPU_FUNC__ int generate_chairs(xmachine_memory_agent_generator* agent, x
     
     //printf("Silla %d, x:%d, y:%d\n", agent->chairs_generated, x, y); 
     
-    add_chair_agent(chair_agents, agent->chairs_generated, x, y, 0);
+    add_chair_agent(chair_agents, agent->chairs_generated, 0, x, y, 0);
 
     agent->chairs_generated++;
     return 0;

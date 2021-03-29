@@ -355,6 +355,7 @@ struct __align__(16) xmachine_memory_navmap
 struct __align__(16) xmachine_memory_chair
 {
     int id;    /**< X-machine memory variable id of type int.*/
+    int tick;    /**< X-machine memory variable tick of type int.*/
     int x;    /**< X-machine memory variable x of type int.*/
     int y;    /**< X-machine memory variable y of type int.*/
     int state;    /**< X-machine memory variable state of type int.*/
@@ -899,6 +900,7 @@ struct xmachine_memory_chair_list
     int _scan_input [xmachine_memory_chair_MAX];  /**< Used during parallel prefix sum */
     
     int id [xmachine_memory_chair_MAX];    /**< X-machine memory variable list id of type int.*/
+    int tick [xmachine_memory_chair_MAX];    /**< X-machine memory variable list tick of type int.*/
     int x [xmachine_memory_chair_MAX];    /**< X-machine memory variable list x of type int.*/
     int y [xmachine_memory_chair_MAX];    /**< X-machine memory variable list y of type int.*/
     int state [xmachine_memory_chair_MAX];    /**< X-machine memory variable list state of type int.*/
@@ -2554,11 +2556,12 @@ __FLAME_GPU_FUNC__ void add_agent_agent(xmachine_memory_agent_list* agents, int 
  * Adds a new continuous valued chair agent to the xmachine_memory_chair_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
  * @param agents xmachine_memory_chair_list agent list
  * @param id	agent agent variable of type int
+ * @param tick	agent agent variable of type int
  * @param x	agent agent variable of type int
  * @param y	agent agent variable of type int
  * @param state	agent agent variable of type int
  */
-__FLAME_GPU_FUNC__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int x, int y, int state);
+__FLAME_GPU_FUNC__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int tick, int x, int y, int state);
 
 /** add_doctor_manager_agent
  * Adds a new continuous valued doctor_manager agent to the xmachine_memory_doctor_manager_list list using a linear mapping. Note that any agent variables with an arrayLength are ommited and not support during the creation of new agents on the fly.
@@ -3757,6 +3760,15 @@ __host__ unsigned int get_navmap_static_variable_cant_generados(unsigned int ind
  * @return value of agent variable id
  */
 __host__ int get_chair_defaultChair_variable_id(unsigned int index);
+
+/** int get_chair_defaultChair_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ int get_chair_defaultChair_variable_tick(unsigned int index);
 
 /** int get_chair_defaultChair_variable_x(unsigned int index)
  * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
@@ -5752,6 +5764,32 @@ int min_chair_defaultChair_id_variable();
  */
 int max_chair_defaultChair_id_variable();
 
+/** int reduce_chair_defaultChair_tick_variable();
+ * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the reduced variable value of the specified agent name and state
+ */
+int reduce_chair_defaultChair_tick_variable();
+
+
+
+/** int count_chair_defaultChair_tick_variable(int count_value){
+ * Count can be used for integer only agent variables and allows unique values to be counted using a reduction. Useful for generating histograms.
+ * @param count_value The unique value which should be counted
+ * @return The number of unique values of the count_value found in the agent state variable list
+ */
+int count_chair_defaultChair_tick_variable(int count_value);
+
+/** int min_chair_defaultChair_tick_variable();
+ * Min functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int min_chair_defaultChair_tick_variable();
+/** int max_chair_defaultChair_tick_variable();
+ * Max functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
+ * @return the minimum variable value of the specified agent name and state
+ */
+int max_chair_defaultChair_tick_variable();
+
 /** int reduce_chair_defaultChair_x_variable();
  * Reduction functions can be used by visualisations, step and exit functions to gather data for plotting or updating global variables
  * @return the reduced variable value of the specified agent name and state
@@ -6686,6 +6724,8 @@ __constant__ int SECONDS_INCUBATING;
 
 __constant__ int SECONDS_SICK;
 
+__constant__ int CLEANING_PERIOD_SECONDS;
+
 __constant__ int EXIT_X;
 
 __constant__ int EXIT_Y;
@@ -7185,6 +7225,17 @@ extern const int* get_SECONDS_SICK();
 
 
 extern int h_env_SECONDS_SICK;
+
+/** set_CLEANING_PERIOD_SECONDS
+ * Sets the constant variable CLEANING_PERIOD_SECONDS on the device which can then be used in the agent functions.
+ * @param h_CLEANING_PERIOD_SECONDS value to set the variable
+ */
+extern void set_CLEANING_PERIOD_SECONDS(int* h_CLEANING_PERIOD_SECONDS);
+
+extern const int* get_CLEANING_PERIOD_SECONDS();
+
+
+extern int h_env_CLEANING_PERIOD_SECONDS;
 
 /** set_EXIT_X
  * Sets the constant variable EXIT_X on the device which can then be used in the agent functions.

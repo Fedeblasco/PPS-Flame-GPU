@@ -358,6 +358,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_SECONDS_SICK()));
     fputs(data, file);
     fputs("</SECONDS_SICK>\n", file);
+    fputs("\t<CLEANING_PERIOD_SECONDS>", file);
+    sprintf(data, "%d", (*get_CLEANING_PERIOD_SECONDS()));
+    fputs(data, file);
+    fputs("</CLEANING_PERIOD_SECONDS>\n", file);
     fputs("\t<EXIT_X>", file);
     sprintf(data, "%d", (*get_EXIT_X()));
     fputs(data, file);
@@ -822,6 +826,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</id>\n", file);
         
+		fputs("<tick>", file);
+        sprintf(data, "%d", h_chairs_defaultChair->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
 		fputs("<x>", file);
         sprintf(data, "%d", h_chairs_defaultChair->x[i]);
 		fputs(data, file);
@@ -1249,6 +1258,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_navmap_exit6_y;
     int in_navmap_cant_generados;
     int in_chair_id;
+    int in_chair_tick;
     int in_chair_x;
     int in_chair_y;
     int in_chair_state;
@@ -1371,6 +1381,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_env_SECONDS_INCUBATING;
     
     int in_env_SECONDS_SICK;
+    
+    int in_env_CLEANING_PERIOD_SECONDS;
     
     int in_env_EXIT_X;
     
@@ -1538,6 +1550,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	float navmap_exit6_y;
 	unsigned int navmap_cant_generados;
 	int chair_id;
+	int chair_tick;
 	int chair_x;
 	int chair_y;
 	int chair_state;
@@ -1624,6 +1637,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int env_SECONDS_PER_TICK;
     int env_SECONDS_INCUBATING;
     int env_SECONDS_SICK;
+    int env_CLEANING_PERIOD_SECONDS;
     int env_EXIT_X;
     int env_EXIT_Y;
     float env_PROB_SNIFF;
@@ -1740,6 +1754,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_navmap_exit6_y = 0;
 	in_navmap_cant_generados = 0;
 	in_chair_id = 0;
+	in_chair_tick = 0;
 	in_chair_x = 0;
 	in_chair_y = 0;
 	in_chair_state = 0;
@@ -1824,6 +1839,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_SECONDS_PER_TICK = 0;
     in_env_SECONDS_INCUBATING = 0;
     in_env_SECONDS_SICK = 0;
+    in_env_CLEANING_PERIOD_SECONDS = 0;
     in_env_EXIT_X = 0;
     in_env_EXIT_Y = 0;
     in_env_PROB_SNIFF = 0;
@@ -1939,6 +1955,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	for (int k=0; k<xmachine_memory_chair_MAX; k++)
 	{	
 		h_chairs->id[k] = 0;
+		h_chairs->tick[k] = 0;
 		h_chairs->x[k] = 0;
 		h_chairs->y[k] = 0;
 		h_chairs->state[k] = 0;
@@ -2122,6 +2139,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     navmap_exit6_y = 0;
     navmap_cant_generados = 0;
     chair_id = 0;
+    chair_tick = 0;
     chair_x = 0;
     chair_y = 0;
     chair_state = 0;
@@ -2238,6 +2256,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_SECONDS_PER_TICK = 0;
     env_SECONDS_INCUBATING = 0;
     env_SECONDS_SICK = 0;
+    env_CLEANING_PERIOD_SECONDS = 0;
     env_EXIT_X = 0;
     env_EXIT_Y = 0;
     env_PROB_SNIFF = 0;
@@ -2481,6 +2500,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					}
                     
 					h_chairs->id[*h_xmachine_memory_chair_count] = chair_id;
+					h_chairs->tick[*h_xmachine_memory_chair_count] = chair_tick;
 					h_chairs->x[*h_xmachine_memory_chair_count] = chair_x;//Check maximum x value
                     if(agent_maximum.x < chair_x)
                         agent_maximum.x = (float)chair_x;
@@ -2727,6 +2747,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 navmap_exit6_y = 0;
                 navmap_cant_generados = 0;
                 chair_id = 0;
+                chair_tick = 0;
                 chair_x = 0;
                 chair_y = 0;
                 chair_state = 0;
@@ -2902,6 +2923,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/cant_generados") == 0) in_navmap_cant_generados = 0;
 			if(strcmp(buffer, "id") == 0) in_chair_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_chair_id = 0;
+			if(strcmp(buffer, "tick") == 0) in_chair_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_chair_tick = 0;
 			if(strcmp(buffer, "x") == 0) in_chair_x = 1;
 			if(strcmp(buffer, "/x") == 0) in_chair_x = 0;
 			if(strcmp(buffer, "y") == 0) in_chair_y = 1;
@@ -3072,6 +3095,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/SECONDS_INCUBATING") == 0) in_env_SECONDS_INCUBATING = 0;
 			if(strcmp(buffer, "SECONDS_SICK") == 0) in_env_SECONDS_SICK = 1;
             if(strcmp(buffer, "/SECONDS_SICK") == 0) in_env_SECONDS_SICK = 0;
+			if(strcmp(buffer, "CLEANING_PERIOD_SECONDS") == 0) in_env_CLEANING_PERIOD_SECONDS = 1;
+            if(strcmp(buffer, "/CLEANING_PERIOD_SECONDS") == 0) in_env_CLEANING_PERIOD_SECONDS = 0;
 			if(strcmp(buffer, "EXIT_X") == 0) in_env_EXIT_X = 1;
             if(strcmp(buffer, "/EXIT_X") == 0) in_env_EXIT_X = 0;
 			if(strcmp(buffer, "EXIT_Y") == 0) in_env_EXIT_Y = 1;
@@ -3334,6 +3359,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_chair_id){
                     chair_id = (int) fpgu_strtol(buffer); 
+                }
+				if(in_chair_tick){
+                    chair_tick = (int) fpgu_strtol(buffer); 
                 }
 				if(in_chair_x){
                     chair_x = (int) fpgu_strtol(buffer); 
@@ -3732,6 +3760,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_SECONDS_SICK = (int) fpgu_strtol(buffer);
                     
                     set_SECONDS_SICK(&env_SECONDS_SICK);
+                  
+              }
+            if(in_env_CLEANING_PERIOD_SECONDS){
+              
+                    env_CLEANING_PERIOD_SECONDS = (int) fpgu_strtol(buffer);
+                    
+                    set_CLEANING_PERIOD_SECONDS(&env_CLEANING_PERIOD_SECONDS);
                   
               }
             if(in_env_EXIT_X){

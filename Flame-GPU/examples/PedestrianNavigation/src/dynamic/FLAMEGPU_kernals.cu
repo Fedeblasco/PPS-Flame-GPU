@@ -1662,6 +1662,7 @@ __global__ void scatter_chair_Agents(xmachine_memory_chair_list* agents_dst, xma
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
 		agents_dst->id[output_index] = agents_src->id[index];        
+		agents_dst->tick[output_index] = agents_src->tick[index];        
 		agents_dst->x[output_index] = agents_src->x[index];        
 		agents_dst->y[output_index] = agents_src->y[index];        
 		agents_dst->state[output_index] = agents_src->state[index];
@@ -1685,6 +1686,7 @@ __global__ void append_chair_Agents(xmachine_memory_chair_list* agents_dst, xmac
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->id[output_index] = agents_src->id[index];
+	    agents_dst->tick[output_index] = agents_src->tick[index];
 	    agents_dst->x[output_index] = agents_src->x[index];
 	    agents_dst->y[output_index] = agents_src->y[index];
 	    agents_dst->state[output_index] = agents_src->state[index];
@@ -1695,12 +1697,13 @@ __global__ void append_chair_Agents(xmachine_memory_chair_list* agents_dst, xmac
  * Continuous chair agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_chair_list to add agents to 
  * @param id agent variable of type int
+ * @param tick agent variable of type int
  * @param x agent variable of type int
  * @param y agent variable of type int
  * @param state agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int x, int y, int state){
+__device__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int tick, int x, int y, int state){
 	
 	int index;
     
@@ -1720,6 +1723,7 @@ __device__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int 
 
 	//write data to new buffer
 	agents->id[index] = id;
+	agents->tick[index] = tick;
 	agents->x[index] = x;
 	agents->y[index] = y;
 	agents->state[index] = state;
@@ -1727,8 +1731,8 @@ __device__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int x, int y, int state){
-    add_chair_agent<DISCRETE_2D>(agents, id, x, y, state);
+__device__ void add_chair_agent(xmachine_memory_chair_list* agents, int id, int tick, int x, int y, int state){
+    add_chair_agent<DISCRETE_2D>(agents, id, tick, x, y, state);
 }
 
 /** reorder_chair_agents
@@ -1745,6 +1749,7 @@ __global__ void reorder_chair_agents(unsigned int* values, xmachine_memory_chair
 
 	//reorder agent data
 	ordered_agents->id[index] = unordered_agents->id[old_pos];
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 	ordered_agents->x[index] = unordered_agents->x[old_pos];
 	ordered_agents->y[index] = unordered_agents->y[old_pos];
 	ordered_agents->state[index] = unordered_agents->state[old_pos];
@@ -9814,12 +9819,14 @@ __global__ void GPUFLAME_output_chair_state(xmachine_memory_chair_list* agents, 
     if (index < d_xmachine_memory_chair_count){
     
 	agent.id = agents->id[index];
+	agent.tick = agents->tick[index];
 	agent.x = agents->x[index];
 	agent.y = agents->y[index];
 	agent.state = agents->state[index];
 	} else {
 	
 	agent.id = 0;
+	agent.tick = 0;
 	agent.x = 0;
 	agent.y = 0;
 	agent.state = 0;
@@ -9837,6 +9844,7 @@ __global__ void GPUFLAME_output_chair_state(xmachine_memory_chair_list* agents, 
 
 	//AoS to SoA - xmachine_memory_output_chair_state Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
+	agents->tick[index] = agent.tick;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
 	agents->state[index] = agent.state;

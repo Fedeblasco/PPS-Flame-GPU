@@ -150,6 +150,10 @@
         <type>int</type>
         <name>SECONDS_SICK</name>
       </gpu:variable>
+      <gpu:variable>
+        <type>int</type>
+        <name>CLEANING_PERIOD_SECONDS</name>
+      </gpu:variable>
 <!-- Posición de la salida -->
       <gpu:variable>
         <type>int</type>
@@ -1415,6 +1419,10 @@
         <gpu:variable>
           <type>int</type>
           <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>tick</name>
         </gpu:variable>
         <gpu:variable>
           <type>int</type>

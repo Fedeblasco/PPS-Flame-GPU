@@ -291,6 +291,7 @@ unsigned int h_navmaps_static_variable_exit6_x_data_iteration;
 unsigned int h_navmaps_static_variable_exit6_y_data_iteration;
 unsigned int h_navmaps_static_variable_cant_generados_data_iteration;
 unsigned int h_chairs_defaultChair_variable_id_data_iteration;
+unsigned int h_chairs_defaultChair_variable_tick_data_iteration;
 unsigned int h_chairs_defaultChair_variable_x_data_iteration;
 unsigned int h_chairs_defaultChair_variable_y_data_iteration;
 unsigned int h_chairs_defaultChair_variable_state_data_iteration;
@@ -1022,6 +1023,7 @@ void initialise(char * inputfile){
     h_navmaps_static_variable_exit6_y_data_iteration = 0;
     h_navmaps_static_variable_cant_generados_data_iteration = 0;
     h_chairs_defaultChair_variable_id_data_iteration = 0;
+    h_chairs_defaultChair_variable_tick_data_iteration = 0;
     h_chairs_defaultChair_variable_x_data_iteration = 0;
     h_chairs_defaultChair_variable_y_data_iteration = 0;
     h_chairs_defaultChair_variable_state_data_iteration = 0;
@@ -3236,6 +3238,7 @@ float h_env_GOAL_WEIGHT;
 int h_env_SECONDS_PER_TICK;
 int h_env_SECONDS_INCUBATING;
 int h_env_SECONDS_SICK;
+int h_env_CLEANING_PERIOD_SECONDS;
 int h_env_EXIT_X;
 int h_env_EXIT_Y;
 float h_env_PROB_SNIFF;
@@ -3754,6 +3757,19 @@ void set_SECONDS_SICK(int* h_SECONDS_SICK){
 //constant getter
 const int* get_SECONDS_SICK(){
     return &h_env_SECONDS_SICK;
+}
+
+
+
+//constant setter
+void set_CLEANING_PERIOD_SECONDS(int* h_CLEANING_PERIOD_SECONDS){
+    gpuErrchk(cudaMemcpyToSymbol(CLEANING_PERIOD_SECONDS, h_CLEANING_PERIOD_SECONDS, sizeof(int)));
+    memcpy(&h_env_CLEANING_PERIOD_SECONDS, h_CLEANING_PERIOD_SECONDS,sizeof(int));
+}
+
+//constant getter
+const int* get_CLEANING_PERIOD_SECONDS(){
+    return &h_env_CLEANING_PERIOD_SECONDS;
 }
 
 
@@ -6470,6 +6486,44 @@ __host__ int get_chair_defaultChair_variable_id(unsigned int index){
     }
 }
 
+/** int get_chair_defaultChair_variable_tick(unsigned int index)
+ * Gets the value of the tick variable of an chair agent in the defaultChair state on the host. 
+ * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
+ * This has a potentially significant performance impact if used improperly.
+ * @param index the index of the agent within the list.
+ * @return value of agent variable tick
+ */
+__host__ int get_chair_defaultChair_variable_tick(unsigned int index){
+    unsigned int count = get_agent_chair_defaultChair_count();
+    unsigned int currentIteration = getIterationNumber();
+    
+    // If the index is within bounds - no need to check >= 0 due to unsigned.
+    if(count > 0 && index < count ){
+        // If necessary, copy agent data from the device to the host in the default stream
+        if(h_chairs_defaultChair_variable_tick_data_iteration != currentIteration){
+            gpuErrchk(
+                cudaMemcpy(
+                    h_chairs_defaultChair->tick,
+                    d_chairs_defaultChair->tick,
+                    count * sizeof(int),
+                    cudaMemcpyDeviceToHost
+                )
+            );
+            // Update some global value indicating what data is currently present in that host array.
+            h_chairs_defaultChair_variable_tick_data_iteration = currentIteration;
+        }
+
+        // Return the value of the index-th element of the relevant host array.
+        return h_chairs_defaultChair->tick[index];
+
+    } else {
+        fprintf(stderr, "Warning: Attempting to access tick for the %u th member of chair_defaultChair. count is %u at iteration %u\n", index, count, currentIteration);
+        // Otherwise we return a default value
+        return 0;
+
+    }
+}
+
 /** int get_chair_defaultChair_variable_x(unsigned int index)
  * Gets the value of the x variable of an chair agent in the defaultChair state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
@@ -8511,6 +8565,8 @@ void copy_single_xmachine_memory_chair_hostToDevice(xmachine_memory_chair_list *
  
 		gpuErrchk(cudaMemcpy(d_dst->id, &h_agent->id, sizeof(int), cudaMemcpyHostToDevice));
  
+		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(int), cudaMemcpyHostToDevice));
+ 
 		gpuErrchk(cudaMemcpy(d_dst->x, &h_agent->x, sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->y, &h_agent->y, sizeof(int), cudaMemcpyHostToDevice));
@@ -8533,6 +8589,8 @@ void copy_partial_xmachine_memory_chair_hostToDevice(xmachine_memory_chair_list 
     if (count > 0){
 	 
 		gpuErrchk(cudaMemcpy(d_dst->id, h_src->id, count * sizeof(int), cudaMemcpyHostToDevice));
+ 
+		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(int), cudaMemcpyHostToDevice));
  
 		gpuErrchk(cudaMemcpy(d_dst->x, h_src->x, count * sizeof(int), cudaMemcpyHostToDevice));
  
@@ -9268,6 +9326,8 @@ void h_unpack_agents_chair_AoS_to_SoA(xmachine_memory_chair_list * dst, xmachine
 			 
 			dst->id[i] = src[i]->id;
 			 
+			dst->tick[i] = src[i]->tick;
+			 
 			dst->x[i] = src[i]->x;
 			 
 			dst->y[i] = src[i]->y;
@@ -9305,6 +9365,7 @@ void h_add_agent_chair_defaultChair(xmachine_memory_chair* agent){
 
     // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
     h_chairs_defaultChair_variable_id_data_iteration = 0;
+    h_chairs_defaultChair_variable_tick_data_iteration = 0;
     h_chairs_defaultChair_variable_x_data_iteration = 0;
     h_chairs_defaultChair_variable_y_data_iteration = 0;
     h_chairs_defaultChair_variable_state_data_iteration = 0;
@@ -9340,6 +9401,7 @@ void h_add_agents_chair_defaultChair(xmachine_memory_chair** agents, unsigned in
 
         // Reset host variable status flags for the relevant agent state list as the device state list has been modified.
         h_chairs_defaultChair_variable_id_data_iteration = 0;
+        h_chairs_defaultChair_variable_tick_data_iteration = 0;
         h_chairs_defaultChair_variable_x_data_iteration = 0;
         h_chairs_defaultChair_variable_y_data_iteration = 0;
         h_chairs_defaultChair_variable_state_data_iteration = 0;
@@ -11436,6 +11498,27 @@ int min_chair_defaultChair_id_variable(){
 int max_chair_defaultChair_id_variable(){
     //max in default stream
     thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->id);
+    size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int reduce_chair_defaultChair_tick_variable(){
+    //reduce in default stream
+    return thrust::reduce(thrust::device_pointer_cast(d_chairs_defaultChair->tick),  thrust::device_pointer_cast(d_chairs_defaultChair->tick) + h_xmachine_memory_chair_defaultChair_count);
+}
+
+int count_chair_defaultChair_tick_variable(int count_value){
+    //count in default stream
+    return (int)thrust::count(thrust::device_pointer_cast(d_chairs_defaultChair->tick),  thrust::device_pointer_cast(d_chairs_defaultChair->tick) + h_xmachine_memory_chair_defaultChair_count, count_value);
+}
+int min_chair_defaultChair_tick_variable(){
+    //min in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->tick);
+    size_t result_offset = thrust::min_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
+    return *(thrust_ptr + result_offset);
+}
+int max_chair_defaultChair_tick_variable(){
+    //max in default stream
+    thrust::device_ptr<int> thrust_ptr = thrust::device_pointer_cast(d_chairs_defaultChair->tick);
     size_t result_offset = thrust::max_element(thrust_ptr, thrust_ptr + h_xmachine_memory_chair_defaultChair_count) - thrust_ptr;
     return *(thrust_ptr + result_offset);
 }
