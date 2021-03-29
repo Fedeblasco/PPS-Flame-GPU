@@ -337,7 +337,7 @@ unsigned int h_triages_defaultTriage_variable_front_data_iteration;
 unsigned int h_triages_defaultTriage_variable_rear_data_iteration;
 unsigned int h_triages_defaultTriage_variable_size_data_iteration;
 unsigned int h_triages_defaultTriage_variable_tick_data_iteration;
-unsigned int h_triages_defaultTriage_variable_boxArray_data_iteration;
+unsigned int h_triages_defaultTriage_variable_free_boxes_data_iteration;
 unsigned int h_triages_defaultTriage_variable_patientQueue_data_iteration;
 
 
@@ -523,6 +523,14 @@ xmachine_message_specialist_petition_list* d_specialist_petitions_swap;    /**< 
 int h_message_specialist_petition_count;         /**< message list counter*/
 int h_message_specialist_petition_output_type;   /**< message output type (single or optional)*/
 
+/* specialist_response Message variables */
+xmachine_message_specialist_response_list* h_specialist_responses;         /**< Pointer to message list on host*/
+xmachine_message_specialist_response_list* d_specialist_responses;         /**< Pointer to message list on device*/
+xmachine_message_specialist_response_list* d_specialist_responses_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
+/* Non partitioned and spatial partitioned message variables  */
+int h_message_specialist_response_count;         /**< message list counter*/
+int h_message_specialist_response_output_type;   /**< message output type (single or optional)*/
+
 /* doctor_reached Message variables */
 xmachine_message_doctor_reached_list* h_doctor_reacheds;         /**< Pointer to message list on host*/
 xmachine_message_doctor_reached_list* d_doctor_reacheds;         /**< Pointer to message list on device*/
@@ -562,14 +570,6 @@ xmachine_message_doctor_response_list* d_doctor_responses_swap;    /**< Pointer 
 /* Non partitioned and spatial partitioned message variables  */
 int h_message_doctor_response_count;         /**< message list counter*/
 int h_message_doctor_response_output_type;   /**< message output type (single or optional)*/
-
-/* specialist_response Message variables */
-xmachine_message_specialist_response_list* h_specialist_responses;         /**< Pointer to message list on host*/
-xmachine_message_specialist_response_list* d_specialist_responses;         /**< Pointer to message list on device*/
-xmachine_message_specialist_response_list* d_specialist_responses_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
-/* Non partitioned and spatial partitioned message variables  */
-int h_message_specialist_response_count;         /**< message list counter*/
-int h_message_specialist_response_output_type;   /**< message output type (single or optional)*/
 
 /* triage_petition Message variables */
 xmachine_message_triage_petition_list* h_triage_petitions;         /**< Pointer to message list on host*/
@@ -1060,7 +1060,7 @@ void initialise(char * inputfile){
     h_triages_defaultTriage_variable_rear_data_iteration = 0;
     h_triages_defaultTriage_variable_size_data_iteration = 0;
     h_triages_defaultTriage_variable_tick_data_iteration = 0;
-    h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
+    h_triages_defaultTriage_variable_free_boxes_data_iteration = 0;
     h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
     
 
@@ -1127,6 +1127,8 @@ void initialise(char * inputfile){
 	h_free_specialists = (xmachine_message_free_specialist_list*)malloc(message_free_specialist_SoA_size);
 	int message_specialist_petition_SoA_size = sizeof(xmachine_message_specialist_petition_list);
 	h_specialist_petitions = (xmachine_message_specialist_petition_list*)malloc(message_specialist_petition_SoA_size);
+	int message_specialist_response_SoA_size = sizeof(xmachine_message_specialist_response_list);
+	h_specialist_responses = (xmachine_message_specialist_response_list*)malloc(message_specialist_response_SoA_size);
 	int message_doctor_reached_SoA_size = sizeof(xmachine_message_doctor_reached_list);
 	h_doctor_reacheds = (xmachine_message_doctor_reached_list*)malloc(message_doctor_reached_SoA_size);
 	int message_free_doctor_SoA_size = sizeof(xmachine_message_free_doctor_list);
@@ -1137,8 +1139,6 @@ void initialise(char * inputfile){
 	h_doctor_petitions = (xmachine_message_doctor_petition_list*)malloc(message_doctor_petition_SoA_size);
 	int message_doctor_response_SoA_size = sizeof(xmachine_message_doctor_response_list);
 	h_doctor_responses = (xmachine_message_doctor_response_list*)malloc(message_doctor_response_SoA_size);
-	int message_specialist_response_SoA_size = sizeof(xmachine_message_specialist_response_list);
-	h_specialist_responses = (xmachine_message_specialist_response_list*)malloc(message_specialist_response_SoA_size);
 	int message_triage_petition_SoA_size = sizeof(xmachine_message_triage_petition_list);
 	h_triage_petitions = (xmachine_message_triage_petition_list*)malloc(message_triage_petition_SoA_size);
 	int message_triage_response_SoA_size = sizeof(xmachine_message_triage_response_list);
@@ -1453,6 +1453,11 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_specialist_petitions_swap, message_specialist_petition_SoA_size));
 	gpuErrchk( cudaMemcpy( d_specialist_petitions, h_specialist_petitions, message_specialist_petition_SoA_size, cudaMemcpyHostToDevice));
 	
+	/* specialist_response Message memory allocation (GPU) */
+	gpuErrchk( cudaMalloc( (void**) &d_specialist_responses, message_specialist_response_SoA_size));
+	gpuErrchk( cudaMalloc( (void**) &d_specialist_responses_swap, message_specialist_response_SoA_size));
+	gpuErrchk( cudaMemcpy( d_specialist_responses, h_specialist_responses, message_specialist_response_SoA_size, cudaMemcpyHostToDevice));
+	
 	/* doctor_reached Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_doctor_reacheds, message_doctor_reached_SoA_size));
 	gpuErrchk( cudaMalloc( (void**) &d_doctor_reacheds_swap, message_doctor_reached_SoA_size));
@@ -1477,11 +1482,6 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_doctor_responses, message_doctor_response_SoA_size));
 	gpuErrchk( cudaMalloc( (void**) &d_doctor_responses_swap, message_doctor_response_SoA_size));
 	gpuErrchk( cudaMemcpy( d_doctor_responses, h_doctor_responses, message_doctor_response_SoA_size, cudaMemcpyHostToDevice));
-	
-	/* specialist_response Message memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_specialist_responses, message_specialist_response_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_specialist_responses_swap, message_specialist_response_SoA_size));
-	gpuErrchk( cudaMemcpy( d_specialist_responses, h_specialist_responses, message_specialist_response_SoA_size, cudaMemcpyHostToDevice));
 	
 	/* triage_petition Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_triage_petitions, message_triage_petition_SoA_size));
@@ -2255,6 +2255,11 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_specialist_petitions));
 	gpuErrchk(cudaFree(d_specialist_petitions_swap));
 	
+	/* specialist_response Message variables */
+	free( h_specialist_responses);
+	gpuErrchk(cudaFree(d_specialist_responses));
+	gpuErrchk(cudaFree(d_specialist_responses_swap));
+	
 	/* doctor_reached Message variables */
 	free( h_doctor_reacheds);
 	gpuErrchk(cudaFree(d_doctor_reacheds));
@@ -2279,11 +2284,6 @@ void cleanup(){
 	free( h_doctor_responses);
 	gpuErrchk(cudaFree(d_doctor_responses));
 	gpuErrchk(cudaFree(d_doctor_responses_swap));
-	
-	/* specialist_response Message variables */
-	free( h_specialist_responses);
-	gpuErrchk(cudaFree(d_specialist_responses));
-	gpuErrchk(cudaFree(d_specialist_responses_swap));
 	
 	/* triage_petition Message variables */
 	free( h_triage_petitions);
@@ -2468,6 +2468,10 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_specialist_petition_count, &h_message_specialist_petition_count, sizeof(int)));
 	
+	h_message_specialist_response_count = 0;
+	//upload to device constant
+	gpuErrchk(cudaMemcpyToSymbol( d_message_specialist_response_count, &h_message_specialist_response_count, sizeof(int)));
+	
 	h_message_doctor_reached_count = 0;
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_doctor_reached_count, &h_message_doctor_reached_count, sizeof(int)));
@@ -2487,10 +2491,6 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	h_message_doctor_response_count = 0;
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_doctor_response_count, &h_message_doctor_response_count, sizeof(int)));
-	
-	h_message_specialist_response_count = 0;
-	//upload to device constant
-	gpuErrchk(cudaMemcpyToSymbol( d_message_specialist_response_count, &h_message_specialist_response_count, sizeof(int)));
 	
 	h_message_triage_petition_count = 0;
 	//upload to device constant
@@ -8259,15 +8259,15 @@ __host__ unsigned int get_triage_defaultTriage_variable_tick(unsigned int index)
     }
 }
 
-/** unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element)
- * Gets the element-th value of the boxArray variable array of an triage agent in the defaultTriage state on the host. 
+/** unsigned int get_triage_defaultTriage_variable_free_boxes(unsigned int index, unsigned int element)
+ * Gets the element-th value of the free_boxes variable array of an triage agent in the defaultTriage state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @param element the element index within the variable array
- * @return element-th value of agent variable boxArray
+ * @return element-th value of agent variable free_boxes
  */
-__host__ unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element){
+__host__ unsigned int get_triage_defaultTriage_variable_free_boxes(unsigned int index, unsigned int element){
     unsigned int count = get_agent_triage_defaultTriage_count();
     unsigned int numElements = 3;
     unsigned int currentIteration = getIterationNumber();
@@ -8275,27 +8275,27 @@ __host__ unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int in
     // If the index is within bounds - no need to check >= 0 due to unsigned.
     if(count > 0 && index < count && element < numElements ){
         // If necessary, copy agent data from the device to the host in the default stream
-        if(h_triages_defaultTriage_variable_boxArray_data_iteration != currentIteration){
+        if(h_triages_defaultTriage_variable_free_boxes_data_iteration != currentIteration){
             
             for(unsigned int e = 0; e < numElements; e++){
                 gpuErrchk(
                     cudaMemcpy(
-                        h_triages_defaultTriage->boxArray + (e * xmachine_memory_triage_MAX),
-                        d_triages_defaultTriage->boxArray + (e * xmachine_memory_triage_MAX), 
+                        h_triages_defaultTriage->free_boxes + (e * xmachine_memory_triage_MAX),
+                        d_triages_defaultTriage->free_boxes + (e * xmachine_memory_triage_MAX), 
                         count * sizeof(unsigned int), 
                         cudaMemcpyDeviceToHost
                     )
                 );
                 // Update some global value indicating what data is currently present in that host array.
-                h_triages_defaultTriage_variable_boxArray_data_iteration = currentIteration;
+                h_triages_defaultTriage_variable_free_boxes_data_iteration = currentIteration;
             }
         }
 
         // Return the value of the index-th element of the relevant host array.
-        return h_triages_defaultTriage->boxArray[index + (element * xmachine_memory_triage_MAX)];
+        return h_triages_defaultTriage->free_boxes[index + (element * xmachine_memory_triage_MAX)];
 
     } else {
-        fprintf(stderr, "Warning: Attempting to access the %u-th element of boxArray for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", element, index, count, currentIteration);
+        fprintf(stderr, "Warning: Attempting to access the %u-th element of free_boxes for the %u th member of triage_defaultTriage. count is %u at iteration %u\n", element, index, count, currentIteration);
         // Otherwise we return a default value
         return 0;
 
@@ -8965,7 +8965,7 @@ void copy_single_xmachine_memory_triage_hostToDevice(xmachine_memory_triage_list
 		gpuErrchk(cudaMemcpy(d_dst->tick, &h_agent->tick, sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 	for(unsigned int i = 0; i < 3; i++){
-		gpuErrchk(cudaMemcpy(d_dst->boxArray + (i * xmachine_memory_triage_MAX), h_agent->boxArray + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
+		gpuErrchk(cudaMemcpy(d_dst->free_boxes + (i * xmachine_memory_triage_MAX), h_agent->free_boxes + i, sizeof(unsigned int), cudaMemcpyHostToDevice));
     }
  
 	for(unsigned int i = 0; i < 35; i++){
@@ -8996,7 +8996,7 @@ void copy_partial_xmachine_memory_triage_hostToDevice(xmachine_memory_triage_lis
 		gpuErrchk(cudaMemcpy(d_dst->tick, h_src->tick, count * sizeof(unsigned int), cudaMemcpyHostToDevice));
  
 		for(unsigned int i = 0; i < 3; i++){
-			gpuErrchk(cudaMemcpy(d_dst->boxArray + (i * xmachine_memory_triage_MAX), h_src->boxArray + (i * xmachine_memory_triage_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
+			gpuErrchk(cudaMemcpy(d_dst->free_boxes + (i * xmachine_memory_triage_MAX), h_src->free_boxes + (i * xmachine_memory_triage_MAX), count * sizeof(unsigned int), cudaMemcpyHostToDevice));
         }
 
  
@@ -10396,10 +10396,10 @@ xmachine_memory_triage* h_allocate_agent_triage(){
 
     agent->tick = 0;
 	// Agent variable arrays must be allocated
-    agent->boxArray = (unsigned int*)malloc(3 * sizeof(unsigned int));
+    agent->free_boxes = (unsigned int*)malloc(3 * sizeof(unsigned int));
 	// If we have a default value, set each element correctly.
 	for(unsigned int index = 0; index < 3; index++){
-		agent->boxArray[index] = 0;
+		agent->free_boxes[index] = 0;
 	}	// Agent variable arrays must be allocated
     agent->patientQueue = (unsigned int*)malloc(35 * sizeof(unsigned int));
 	
@@ -10409,7 +10409,7 @@ xmachine_memory_triage* h_allocate_agent_triage(){
 }
 void h_free_agent_triage(xmachine_memory_triage** agent){
 
-    free((*agent)->boxArray);
+    free((*agent)->free_boxes);
 
     free((*agent)->patientQueue);
  
@@ -10444,7 +10444,7 @@ void h_unpack_agents_triage_AoS_to_SoA(xmachine_memory_triage_list * dst, xmachi
 			dst->tick[i] = src[i]->tick;
 			 
 			for(unsigned int j = 0; j < 3; j++){
-				dst->boxArray[(j * xmachine_memory_triage_MAX) + i] = src[i]->boxArray[j];
+				dst->free_boxes[(j * xmachine_memory_triage_MAX) + i] = src[i]->free_boxes[j];
 			}
 			 
 			for(unsigned int j = 0; j < 35; j++){
@@ -10485,7 +10485,7 @@ void h_add_agent_triage_defaultTriage(xmachine_memory_triage* agent){
     h_triages_defaultTriage_variable_rear_data_iteration = 0;
     h_triages_defaultTriage_variable_size_data_iteration = 0;
     h_triages_defaultTriage_variable_tick_data_iteration = 0;
-    h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
+    h_triages_defaultTriage_variable_free_boxes_data_iteration = 0;
     h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
     
 
@@ -10522,7 +10522,7 @@ void h_add_agents_triage_defaultTriage(xmachine_memory_triage** agents, unsigned
         h_triages_defaultTriage_variable_rear_data_iteration = 0;
         h_triages_defaultTriage_variable_size_data_iteration = 0;
         h_triages_defaultTriage_variable_tick_data_iteration = 0;
-        h_triages_defaultTriage_variable_boxArray_data_iteration = 0;
+        h_triages_defaultTriage_variable_free_boxes_data_iteration = 0;
         h_triages_defaultTriage_variable_patientQueue_data_iteration = 0;
         
 

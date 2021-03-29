@@ -131,8 +131,8 @@ typedef glm::dvec4 dvec4;
 #define xmachine_memory_receptionist_patientQueue_LENGTH 35 
 //Agent variable array length for xmachine_memory_chair_admin->chairArray
 #define xmachine_memory_chair_admin_chairArray_LENGTH 35 
-//Agent variable array length for xmachine_memory_triage->boxArray
-#define xmachine_memory_triage_boxArray_LENGTH 3 
+//Agent variable array length for xmachine_memory_triage->free_boxes
+#define xmachine_memory_triage_free_boxes_LENGTH 3 
 //Agent variable array length for xmachine_memory_triage->patientQueue
 #define xmachine_memory_triage_patientQueue_LENGTH 35
 
@@ -188,6 +188,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_specialist_petition
 #define xmachine_message_specialist_petition_MAX 65536
 
+//Maximum population size of xmachine_mmessage_specialist_response
+#define xmachine_message_specialist_response_MAX 65536
+
 //Maximum population size of xmachine_mmessage_doctor_reached
 #define xmachine_message_doctor_reached_MAX 65536
 
@@ -202,9 +205,6 @@ typedef glm::dvec4 dvec4;
 
 //Maximum population size of xmachine_mmessage_doctor_response
 #define xmachine_message_doctor_response_MAX 65536
-
-//Maximum population size of xmachine_mmessage_specialist_response
-#define xmachine_message_specialist_response_MAX 65536
 
 //Maximum population size of xmachine_mmessage_triage_petition
 #define xmachine_message_triage_petition_MAX 65536
@@ -231,12 +231,12 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_specialist_terminated_partitioningNone
 #define xmachine_message_free_specialist_partitioningNone
 #define xmachine_message_specialist_petition_partitioningNone
+#define xmachine_message_specialist_response_partitioningNone
 #define xmachine_message_doctor_reached_partitioningNone
 #define xmachine_message_free_doctor_partitioningNone
 #define xmachine_message_attention_terminated_partitioningNone
 #define xmachine_message_doctor_petition_partitioningNone
 #define xmachine_message_doctor_response_partitioningNone
-#define xmachine_message_specialist_response_partitioningNone
 #define xmachine_message_triage_petition_partitioningNone
 #define xmachine_message_triage_response_partitioningNone
 
@@ -469,7 +469,7 @@ struct __align__(16) xmachine_memory_triage
     unsigned int rear;    /**< X-machine memory variable rear of type unsigned int.*/
     unsigned int size;    /**< X-machine memory variable size of type unsigned int.*/
     unsigned int tick;    /**< X-machine memory variable tick of type unsigned int.*/
-    unsigned int *boxArray;    /**< X-machine memory variable boxArray of type unsigned int.*/
+    unsigned int *free_boxes;    /**< X-machine memory variable free_boxes of type unsigned int.*/
     unsigned int *patientQueue;    /**< X-machine memory variable patientQueue of type unsigned int.*/
 };
 
@@ -697,6 +697,19 @@ struct __align__(16) xmachine_message_specialist_petition
     unsigned int specialist_no;        /**< Message variable specialist_no of type unsigned int.*/
 };
 
+/** struct xmachine_message_specialist_response
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_specialist_response
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
+    unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    int specialist_ready;        /**< Message variable specialist_ready of type int.*/
+};
+
 /** struct xmachine_message_doctor_reached
  * Brute force: No Partitioning
  * Holds all message variables and is aligned to help with coalesced reads on the GPU
@@ -758,19 +771,6 @@ struct __align__(16) xmachine_message_doctor_response
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
     int doctor_no;        /**< Message variable doctor_no of type int.*/
-};
-
-/** struct xmachine_message_specialist_response
- * Brute force: No Partitioning
- * Holds all message variables and is aligned to help with coalesced reads on the GPU
- */
-struct __align__(16) xmachine_message_specialist_response
-{	
-    /* Brute force Partitioning Variables */
-    int _position;          /**< 1D position of message in linear message list */   
-      
-    unsigned int id;        /**< Message variable id of type unsigned int.*/  
-    int specialist_ready;        /**< Message variable specialist_ready of type int.*/
 };
 
 /** struct xmachine_message_triage_petition
@@ -1037,7 +1037,7 @@ struct xmachine_memory_triage_list
     unsigned int rear [xmachine_memory_triage_MAX];    /**< X-machine memory variable list rear of type unsigned int.*/
     unsigned int size [xmachine_memory_triage_MAX];    /**< X-machine memory variable list size of type unsigned int.*/
     unsigned int tick [xmachine_memory_triage_MAX];    /**< X-machine memory variable list tick of type unsigned int.*/
-    unsigned int boxArray [xmachine_memory_triage_MAX*3];    /**< X-machine memory variable list boxArray of type unsigned int.*/
+    unsigned int free_boxes [xmachine_memory_triage_MAX*3];    /**< X-machine memory variable list free_boxes of type unsigned int.*/
     unsigned int patientQueue [xmachine_memory_triage_MAX*35];    /**< X-machine memory variable list patientQueue of type unsigned int.*/
 };
 
@@ -1286,6 +1286,21 @@ struct xmachine_message_specialist_petition_list
     
 };
 
+/** struct xmachine_message_specialist_response_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_specialist_response_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_specialist_response_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_specialist_response_MAX];  /**< Used during parallel prefix sum */
+    
+    unsigned int id [xmachine_message_specialist_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
+    int specialist_ready [xmachine_message_specialist_response_MAX];    /**< Message memory variable list specialist_ready of type int.*/
+    
+};
+
 /** struct xmachine_message_doctor_reached_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -1356,21 +1371,6 @@ struct xmachine_message_doctor_response_list
     
     unsigned int id [xmachine_message_doctor_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
     int doctor_no [xmachine_message_doctor_response_MAX];    /**< Message memory variable list doctor_no of type int.*/
-    
-};
-
-/** struct xmachine_message_specialist_response_list
- * Brute force: No Partitioning
- * Structure of Array for memory coalescing 
- */
-struct xmachine_message_specialist_response_list
-{
-    /* Non discrete messages have temp variables used for reductions with optional message outputs */
-    int _position [xmachine_message_specialist_response_MAX];    /**< Holds agents position in the 1D agent list */
-    int _scan_input [xmachine_message_specialist_response_MAX];  /**< Used during parallel prefix sum */
-    
-    unsigned int id [xmachine_message_specialist_response_MAX];    /**< Message memory variable list id of type unsigned int.*/
-    int specialist_ready [xmachine_message_specialist_response_MAX];    /**< Message memory variable list specialist_ready of type int.*/
     
 };
 
@@ -2239,6 +2239,34 @@ __FLAME_GPU_FUNC__ xmachine_message_specialist_petition * get_first_specialist_p
 __FLAME_GPU_FUNC__ xmachine_message_specialist_petition * get_next_specialist_petition_message(xmachine_message_specialist_petition* current, xmachine_message_specialist_petition_list* specialist_petition_messages);
 
   
+/* Message Function Prototypes for Brute force (No Partitioning) specialist_response message implemented in FLAMEGPU_Kernels */
+
+/** add_specialist_response_message
+ * Function for all types of message partitioning
+ * Adds a new specialist_response agent to the xmachine_memory_specialist_response_list list using a linear mapping
+ * @param agents	xmachine_memory_specialist_response_list agent list
+ * @param id	message variable of type unsigned int
+ * @param specialist_ready	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_specialist_response_message(xmachine_message_specialist_response_list* specialist_response_messages, unsigned int id, int specialist_ready);
+ 
+/** get_first_specialist_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param specialist_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_response * get_first_specialist_response_message(xmachine_message_specialist_response_list* specialist_response_messages);
+
+/** get_next_specialist_response_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param specialist_response_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_specialist_response * get_next_specialist_response_message(xmachine_message_specialist_response* current, xmachine_message_specialist_response_list* specialist_response_messages);
+
+  
 /* Message Function Prototypes for Brute force (No Partitioning) doctor_reached message implemented in FLAMEGPU_Kernels */
 
 /** add_doctor_reached_message
@@ -2375,34 +2403,6 @@ __FLAME_GPU_FUNC__ xmachine_message_doctor_response * get_first_doctor_response_
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_doctor_response * get_next_doctor_response_message(xmachine_message_doctor_response* current, xmachine_message_doctor_response_list* doctor_response_messages);
-
-  
-/* Message Function Prototypes for Brute force (No Partitioning) specialist_response message implemented in FLAMEGPU_Kernels */
-
-/** add_specialist_response_message
- * Function for all types of message partitioning
- * Adds a new specialist_response agent to the xmachine_memory_specialist_response_list list using a linear mapping
- * @param agents	xmachine_memory_specialist_response_list agent list
- * @param id	message variable of type unsigned int
- * @param specialist_ready	message variable of type int
- */
- 
- __FLAME_GPU_FUNC__ void add_specialist_response_message(xmachine_message_specialist_response_list* specialist_response_messages, unsigned int id, int specialist_ready);
- 
-/** get_first_specialist_response_message
- * Get first message function for non partitioned (brute force) messages
- * @param specialist_response_messages message list
- * @return        returns the first message from the message list (offset depending on agent block)
- */
-__FLAME_GPU_FUNC__ xmachine_message_specialist_response * get_first_specialist_response_message(xmachine_message_specialist_response_list* specialist_response_messages);
-
-/** get_next_specialist_response_message
- * Get first message function for non partitioned (brute force) messages
- * @param current the current message struct
- * @param specialist_response_messages message list
- * @return        returns the first message from the message list (offset depending on agent block)
- */
-__FLAME_GPU_FUNC__ xmachine_message_specialist_response * get_next_specialist_response_message(xmachine_message_specialist_response* current, xmachine_message_specialist_response_list* specialist_response_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) triage_petition message implemented in FLAMEGPU_Kernels */
@@ -4128,15 +4128,15 @@ __host__ unsigned int get_triage_defaultTriage_variable_size(unsigned int index)
  */
 __host__ unsigned int get_triage_defaultTriage_variable_tick(unsigned int index);
 
-/** unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element)
- * Gets the element-th value of the boxArray variable array of an triage agent in the defaultTriage state on the host. 
+/** unsigned int get_triage_defaultTriage_variable_free_boxes(unsigned int index, unsigned int element)
+ * Gets the element-th value of the free_boxes variable array of an triage agent in the defaultTriage state on the host. 
  * If the data is not currently on the host, a memcpy of the data of all agents in that state list will be issued, via a global.
  * This has a potentially significant performance impact if used improperly.
  * @param index the index of the agent within the list.
  * @param element the element index within the variable array
- * @return element-th value of agent variable boxArray
+ * @return element-th value of agent variable free_boxes
  */
-__host__ unsigned int get_triage_defaultTriage_variable_boxArray(unsigned int index, unsigned int element);
+__host__ unsigned int get_triage_defaultTriage_variable_free_boxes(unsigned int index, unsigned int element);
 
 /** unsigned int get_triage_defaultTriage_variable_patientQueue(unsigned int index, unsigned int element)
  * Gets the element-th value of the patientQueue variable array of an triage agent in the defaultTriage state on the host. 

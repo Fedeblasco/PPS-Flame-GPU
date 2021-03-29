@@ -1154,13 +1154,13 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</tick>\n", file);
         
-		fputs("<boxArray>", file);
+		fputs("<free_boxes>", file);
         for (int j=0;j<3;j++){
-            fprintf(file, "%u", h_triages_defaultTriage->boxArray[(j*xmachine_memory_triage_MAX)+i]);
+            fprintf(file, "%u", h_triages_defaultTriage->free_boxes[(j*xmachine_memory_triage_MAX)+i]);
             if(j!=(3-1))
                 fprintf(file, ",");
         }
-		fputs("</boxArray>\n", file);
+		fputs("</free_boxes>\n", file);
         
 		fputs("<patientQueue>", file);
         for (int j=0;j<35;j++){
@@ -1295,7 +1295,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_triage_rear;
     int in_triage_size;
     int in_triage_tick;
-    int in_triage_boxArray;
+    int in_triage_free_boxes;
     int in_triage_patientQueue;
     
     /* tags for environment global variables */
@@ -1584,7 +1584,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int triage_rear;
 	unsigned int triage_size;
 	unsigned int triage_tick;
-    unsigned int triage_boxArray[3];
+    unsigned int triage_free_boxes[3];
     unsigned int triage_patientQueue[35];
 
     /* Variables for environment variables */
@@ -1786,7 +1786,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_triage_rear = 0;
 	in_triage_size = 0;
 	in_triage_tick = 0;
-	in_triage_boxArray = 0;
+	in_triage_free_boxes = 0;
 	in_triage_patientQueue = 0;
     in_env_EMMISION_RATE_EXIT1 = 0;
     in_env_EMMISION_RATE_EXIT2 = 0;
@@ -2066,7 +2066,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_triages->size[k] = 0;
 		h_triages->tick[k] = 0;
         for (i=0;i<3;i++){
-            h_triages->boxArray[(i*xmachine_memory_triage_MAX)+k] = 0;
+            h_triages->free_boxes[(i*xmachine_memory_triage_MAX)+k] = 0;
         }
         for (i=0;i<35;i++){
             h_triages->patientQueue[(i*xmachine_memory_triage_MAX)+k] = 0;
@@ -2195,7 +2195,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     triage_size = 0;
     triage_tick = 0;
     for (i=0;i<3;i++){
-        triage_boxArray[i] = 0;
+        triage_free_boxes[i] = 0;
     }
     for (i=0;i<35;i++){
         triage_patientQueue[i] = 0;
@@ -2665,7 +2665,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_triages->size[*h_xmachine_memory_triage_count] = triage_size;
 					h_triages->tick[*h_xmachine_memory_triage_count] = triage_tick;
                     for (int k=0;k<3;k++){
-                        h_triages->boxArray[(k*xmachine_memory_triage_MAX)+(*h_xmachine_memory_triage_count)] = triage_boxArray[k];
+                        h_triages->free_boxes[(k*xmachine_memory_triage_MAX)+(*h_xmachine_memory_triage_count)] = triage_free_boxes[k];
                     }
                     for (int k=0;k<35;k++){
                         h_triages->patientQueue[(k*xmachine_memory_triage_MAX)+(*h_xmachine_memory_triage_count)] = triage_patientQueue[k];
@@ -2800,7 +2800,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 triage_size = 0;
                 triage_tick = 0;
                 for (i=0;i<3;i++){
-                    triage_boxArray[i] = 0;
+                    triage_free_boxes[i] = 0;
                 }
                 for (i=0;i<35;i++){
                     triage_patientQueue[i] = 0;
@@ -2994,8 +2994,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/size") == 0) in_triage_size = 0;
 			if(strcmp(buffer, "tick") == 0) in_triage_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_triage_tick = 0;
-			if(strcmp(buffer, "boxArray") == 0) in_triage_boxArray = 1;
-			if(strcmp(buffer, "/boxArray") == 0) in_triage_boxArray = 0;
+			if(strcmp(buffer, "free_boxes") == 0) in_triage_free_boxes = 1;
+			if(strcmp(buffer, "/free_boxes") == 0) in_triage_free_boxes = 0;
 			if(strcmp(buffer, "patientQueue") == 0) in_triage_patientQueue = 1;
 			if(strcmp(buffer, "/patientQueue") == 0) in_triage_patientQueue = 0;
 			
@@ -3473,8 +3473,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_triage_tick){
                     triage_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
-				if(in_triage_boxArray){
-                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, triage_boxArray, 3);    
+				if(in_triage_free_boxes){
+                    readArrayInput<unsigned int>(&fpgu_strtoul, buffer, triage_free_boxes, 3);    
                 }
 				if(in_triage_patientQueue){
                     readArrayInput<unsigned int>(&fpgu_strtoul, buffer, triage_patientQueue, 35);    

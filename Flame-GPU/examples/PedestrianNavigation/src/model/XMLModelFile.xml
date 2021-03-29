@@ -1551,7 +1551,7 @@
     <gpu:xagent>
       <name>specialist_manager</name>
       <memory>
-        <gpu:variable>
+        <gpu:variable><!-- Agregada para que no falle la compilación -->  
           <type>unsigned int</type>
           <name>id</name>
         </gpu:variable>
@@ -2124,7 +2124,7 @@
         </gpu:variable>
         <gpu:variable>
           <type>unsigned int</type>
-          <name>boxArray</name>
+          <name>free_boxes</name>
           <description>Arreglo que maneja si cada box está disponible o no</description>
           <arrayLength>3</arrayLength>
           <defaultValue>0</defaultValue>
@@ -2466,6 +2466,22 @@
       <gpu:partitioningNone/>
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
+
+    <gpu:message> 
+      <name>specialist_response</name>
+      <variables>
+        <gpu:variable>
+          <type>unsigned int</type>
+          <name>id</name>
+        </gpu:variable>
+        <gpu:variable>
+          <type>int</type>
+          <name>specialist_ready</name>
+        </gpu:variable>
+      </variables>
+      <gpu:partitioningNone/>
+      <gpu:bufferSize>65536</gpu:bufferSize>
+    </gpu:message>
   <!-- Mensajes del doctor -->
     <gpu:message> 
       <name>doctor_reached</name>
@@ -2539,21 +2555,6 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
-    <gpu:message> 
-      <name>specialist_response</name>
-      <variables>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>id</name>
-        </gpu:variable>
-        <gpu:variable>
-          <type>int</type>
-          <name>specialist_ready</name>
-        </gpu:variable>
-      </variables>
-      <gpu:partitioningNone/>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:message>
   <!-- Mensajes del triage -->
     <gpu:message> 
         <name>triage_petition</name>
