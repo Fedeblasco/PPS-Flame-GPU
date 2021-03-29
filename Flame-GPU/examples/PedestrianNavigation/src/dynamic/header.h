@@ -212,6 +212,9 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_triage_response
 #define xmachine_message_triage_response_MAX 65536
 
+//Maximum population size of xmachine_mmessage_free_box
+#define xmachine_message_free_box_MAX 65536
+
 
 /* Define preprocessor symbols for each message to specify the type, to simplify / improve portability */
 
@@ -239,6 +242,7 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_doctor_response_partitioningNone
 #define xmachine_message_triage_petition_partitioningNone
 #define xmachine_message_triage_response_partitioningNone
+#define xmachine_message_free_box_partitioningNone
 
 /* Spatial partitioning grid size definitions */
 //xmachine_message_pedestrian_location partition grid size (gridDim.X*gridDim.Y*gridDim.Z)
@@ -795,6 +799,18 @@ struct __align__(16) xmachine_message_triage_response
     int _position;          /**< 1D position of message in linear message list */   
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
+    int box_no;        /**< Message variable box_no of type int.*/
+};
+
+/** struct xmachine_message_free_box
+ * Brute force: No Partitioning
+ * Holds all message variables and is aligned to help with coalesced reads on the GPU
+ */
+struct __align__(16) xmachine_message_free_box
+{	
+    /* Brute force Partitioning Variables */
+    int _position;          /**< 1D position of message in linear message list */   
+      
     int box_no;        /**< Message variable box_no of type int.*/
 };
 
@@ -1403,6 +1419,20 @@ struct xmachine_message_triage_response_list
     
 };
 
+/** struct xmachine_message_free_box_list
+ * Brute force: No Partitioning
+ * Structure of Array for memory coalescing 
+ */
+struct xmachine_message_free_box_list
+{
+    /* Non discrete messages have temp variables used for reductions with optional message outputs */
+    int _position [xmachine_message_free_box_MAX];    /**< Holds agents position in the 1D agent list */
+    int _scan_input [xmachine_message_free_box_MAX];  /**< Used during parallel prefix sum */
+    
+    int box_no [xmachine_message_free_box_MAX];    /**< Message memory variable list box_no of type int.*/
+    
+};
+
 
 
 /* Spatially Partitioned Message boundary Matrices */
@@ -1559,9 +1589,9 @@ __FLAME_GPU_FUNC__ int output_box_petition(xmachine_memory_agent* agent, xmachin
 /**
  * receive_box_response FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param box_response_messages  box_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_box_response_message and get_next_box_response_message functions.
+ * @param box_response_messages  box_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_box_response_message and get_next_box_response_message functions.* @param free_box_messages Pointer to output message list of type xmachine_message_free_box_list. Must be passed as an argument to the add_free_box_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachine_message_box_response_list* box_response_messages);
+__FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachine_message_box_response_list* box_response_messages, xmachine_message_free_box_list* free_box_messages);
 
 /**
  * output_doctor_petition FLAMEGPU Agent Function
@@ -1772,6 +1802,13 @@ __FLAME_GPU_FUNC__ int doctor_server(xmachine_memory_doctor* agent, xmachine_mes
  * @param triage_petition_messages  triage_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_triage_petition_message and get_next_triage_petition_message functions.* @param triage_response_messages Pointer to output message list of type xmachine_message_triage_response_list. Must be passed as an argument to the add_triage_response_message function ??.
  */
 __FLAME_GPU_FUNC__ int receive_triage_petitions(xmachine_memory_triage* agent, xmachine_message_triage_petition_list* triage_petition_messages, xmachine_message_triage_response_list* triage_response_messages);
+
+/**
+ * receive_free_box FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_triage. This represents a single agent instance and can be modified directly.
+ * @param free_box_messages  free_box_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_free_box_message and get_next_free_box_message functions.
+ */
+__FLAME_GPU_FUNC__ int receive_free_box(xmachine_memory_triage* agent, xmachine_message_free_box_list* free_box_messages);
 
   
 /* Message Function Prototypes for Spatially Partitioned pedestrian_location message implemented in FLAMEGPU_Kernels */
@@ -2458,6 +2495,33 @@ __FLAME_GPU_FUNC__ xmachine_message_triage_response * get_first_triage_response_
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_triage_response * get_next_triage_response_message(xmachine_message_triage_response* current, xmachine_message_triage_response_list* triage_response_messages);
+
+  
+/* Message Function Prototypes for Brute force (No Partitioning) free_box message implemented in FLAMEGPU_Kernels */
+
+/** add_free_box_message
+ * Function for all types of message partitioning
+ * Adds a new free_box agent to the xmachine_memory_free_box_list list using a linear mapping
+ * @param agents	xmachine_memory_free_box_list agent list
+ * @param box_no	message variable of type int
+ */
+ 
+ __FLAME_GPU_FUNC__ void add_free_box_message(xmachine_message_free_box_list* free_box_messages, int box_no);
+ 
+/** get_first_free_box_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param free_box_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_box * get_first_free_box_message(xmachine_message_free_box_list* free_box_messages);
+
+/** get_next_free_box_message
+ * Get first message function for non partitioned (brute force) messages
+ * @param current the current message struct
+ * @param free_box_messages message list
+ * @return        returns the first message from the message list (offset depending on agent block)
+ */
+__FLAME_GPU_FUNC__ xmachine_message_free_box * get_next_free_box_message(xmachine_message_free_box* current, xmachine_message_free_box_list* free_box_messages);
 
   
 /* Agent Function Prototypes implemented in FLAMEGPU_Kernels */

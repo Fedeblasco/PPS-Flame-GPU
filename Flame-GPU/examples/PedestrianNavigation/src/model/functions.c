@@ -854,14 +854,15 @@ __FLAME_GPU_FUNC__ int receive_specialist_terminated(xmachine_memory_agent* agen
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachine_message_box_response_list* boxResponseMessages){
+__FLAME_GPU_FUNC__ int receive_box_response(xmachine_memory_agent* agent, xmachine_message_box_response_list* boxResponseMessages, xmachine_message_free_box_list* freeBoxMessages){
 	
 	xmachine_message_box_response* current_message = get_first_box_response_message(boxResponseMessages);
 	while(current_message){
 		if(agent->id == current_message->id){
-			agent->estado_movimiento++;
+			agent->estado_movimiento += 2;
 			agent->priority = current_message->priority;
 			agent->specialist_no = current_message->doctor_no;
+			add_free_box_message(freeBoxMessages, agent->box_no);
 			//printf("Mi prioridad es %d, tengo que ir a %d, soy %d\n",current_message->priority,agent->specialist_no,agent->id);
 		}
 		current_message = get_next_box_response_message(current_message, boxResponseMessages);

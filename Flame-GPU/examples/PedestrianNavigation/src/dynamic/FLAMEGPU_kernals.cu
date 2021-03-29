@@ -208,6 +208,11 @@ __constant__ int d_message_triage_petition_output_type;   /**< message output ty
 __constant__ int d_message_triage_response_count;         /**< message list counter*/
 __constant__ int d_message_triage_response_output_type;   /**< message output type (single or optional)*/
 
+/* free_box Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_free_box_count;         /**< message list counter*/
+__constant__ int d_message_free_box_output_type;   /**< message output type (single or optional)*/
+
 	
 
 /* Graph Constants */
@@ -253,6 +258,7 @@ __constant__ int d_tex_xmachine_message_navmap_cell_exit_no_offset;texture<float
 __constant__ int d_tex_xmachine_message_navmap_cell_height_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_x;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_y;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_y_offset;
+
 
 
 
@@ -1113,7 +1119,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 	if (index < d_xmachine_memory_agent_count){
 	
 		//apply the filter
-		if ((currentState->estado_movimiento[index]==14)||(currentState->estado_movimiento[index]==21))
+		if (currentState->estado_movimiento[index]==14)
 		{	//copy agent data to newstate list
 			nextState->id[index] = currentState->id[index];
 			nextState->x[index] = currentState->x[index];
@@ -7462,6 +7468,152 @@ __device__ xmachine_message_triage_response* get_next_triage_response_message(xm
 	return ((xmachine_message_triage_response*)&message_share[message_index]);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created free_box message functions */
+
+
+/** add_free_box_message
+ * Add non partitioned or spatially partitioned free_box message
+ * @param messages xmachine_message_free_box_list message list to add too
+ * @param box_no agent variable of type int
+ */
+__device__ void add_free_box_message(xmachine_message_free_box_list* messages, int box_no){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_free_box_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_free_box_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_free_box_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_free_box Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->box_no[index] = box_no;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned free_box message (for optional messages)
+ * @param messages scatter_optional_free_box_messages Sparse xmachine_message_free_box_list message list
+ * @param message_swap temp xmachine_message_free_box_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_free_box_messages(xmachine_message_free_box_list* messages, xmachine_message_free_box_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_free_box_count;
+
+		//AoS - xmachine_message_free_box Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->box_no[output_index] = messages_swap->box_no[index];				
+	}
+}
+
+/** reset_free_box_swaps
+ * Reset non partitioned or spatially partitioned free_box message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_free_box_swaps(xmachine_message_free_box_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_free_box* get_first_free_box_message(xmachine_message_free_box_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_free_box_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_free_box Coalesced memory read
+	xmachine_message_free_box temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.box_no = messages->box_no[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_box));
+	xmachine_message_free_box* sm_message = ((xmachine_message_free_box*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_free_box*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_free_box* get_next_free_box_message(xmachine_message_free_box* message, xmachine_message_free_box_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_free_box_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_free_box_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_free_box Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_free_box temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.box_no = messages->box_no[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_box));
+		xmachine_message_free_box* sm_message = ((xmachine_message_free_box*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_free_box));
+	return ((xmachine_message_free_box*)&message_share[message_index]);
+}
+
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created GPU kernels  */
@@ -8512,7 +8664,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 /**
  *
  */
-__global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents, xmachine_message_box_response_list* box_response_messages){
+__global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents, xmachine_message_box_response_list* box_response_messages, xmachine_message_free_box_list* free_box_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -8581,7 +8733,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	}
 
 	//FLAME function call
-	int dead = !receive_box_response(&agent, box_response_messages);
+	int dead = !receive_box_response(&agent, box_response_messages, free_box_messages	);
 	
 
 	
@@ -10508,6 +10660,57 @@ __global__ void GPUFLAME_receive_triage_petitions(xmachine_memory_triage_list* a
 	agents->_scan_input[index]  = dead; 
 
 	//AoS to SoA - xmachine_memory_receive_triage_petitions Coalesced memory write (ignore arrays)
+	agents->front[index] = agent.front;
+	agents->rear[index] = agent.rear;
+	agents->size[index] = agent.size;
+	agents->tick[index] = agent.tick;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_free_box(xmachine_memory_triage_list* agents, xmachine_message_free_box_list* free_box_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_free_box Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_triage agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_triage_count){
+    
+	agent.front = agents->front[index];
+	agent.rear = agents->rear[index];
+	agent.size = agents->size[index];
+	agent.tick = agents->tick[index];
+    agent.free_boxes = &(agents->free_boxes[index]);
+    agent.patientQueue = &(agents->patientQueue[index]);
+	} else {
+	
+	agent.front = 0;
+	agent.rear = 0;
+	agent.size = 0;
+	agent.tick = 0;
+    agent.free_boxes = nullptr;
+    agent.patientQueue = nullptr;
+	}
+
+	//FLAME function call
+	int dead = !receive_free_box(&agent, free_box_messages);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_triage_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_free_box Coalesced memory write (ignore arrays)
 	agents->front[index] = agent.front;
 	agents->rear[index] = agent.rear;
 	agents->size[index] = agent.size;
