@@ -9,8 +9,8 @@ __FLAME_GPU_FUNC__ int output_chair_state(xmachine_memory_chair* agent, xmachine
                     agent->state = 1;
                 }
             }
+            add_chair_state_message(chairStateMessages,current_message->id,agent->state);
 		}
-        add_chair_state_message(chairStateMessages,current_message->id,agent->state);
 		current_message = get_next_chair_contact_message(current_message, chairContactMessages);
 	}
 

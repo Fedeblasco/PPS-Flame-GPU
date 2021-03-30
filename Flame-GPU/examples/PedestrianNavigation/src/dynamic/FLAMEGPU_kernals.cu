@@ -31,6 +31,8 @@ __constant__ int d_xmachine_memory_navmap_count;
 
 __constant__ int d_xmachine_memory_chair_count;
 
+__constant__ int d_xmachine_memory_bed_count;
+
 __constant__ int d_xmachine_memory_doctor_manager_count;
 
 __constant__ int d_xmachine_memory_specialist_manager_count;
@@ -42,6 +44,8 @@ __constant__ int d_xmachine_memory_receptionist_count;
 __constant__ int d_xmachine_memory_agent_generator_count;
 
 __constant__ int d_xmachine_memory_chair_admin_count;
+
+__constant__ int d_xmachine_memory_uci_count;
 
 __constant__ int d_xmachine_memory_box_count;
 
@@ -57,6 +61,8 @@ __constant__ int d_xmachine_memory_navmap_static_count;
 
 __constant__ int d_xmachine_memory_chair_defaultChair_count;
 
+__constant__ int d_xmachine_memory_bed_defaultBed_count;
+
 __constant__ int d_xmachine_memory_doctor_manager_defaultDoctorManager_count;
 
 __constant__ int d_xmachine_memory_specialist_manager_defaultSpecialistManager_count;
@@ -68,6 +74,8 @@ __constant__ int d_xmachine_memory_receptionist_defaultReceptionist_count;
 __constant__ int d_xmachine_memory_agent_generator_defaultGenerator_count;
 
 __constant__ int d_xmachine_memory_chair_admin_defaultAdmin_count;
+
+__constant__ int d_xmachine_memory_uci_defaultUci_count;
 
 __constant__ int d_xmachine_memory_box_defaultBox_count;
 
@@ -123,20 +131,30 @@ __constant__ int d_message_chair_petition_output_type;   /**< message output typ
 __constant__ int d_message_chair_response_count;         /**< message list counter*/
 __constant__ int d_message_chair_response_output_type;   /**< message output type (single or optional)*/
 
-/* chair_state Message variables */
-/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
-__constant__ int d_message_chair_state_count;         /**< message list counter*/
-__constant__ int d_message_chair_state_output_type;   /**< message output type (single or optional)*/
-
 /* free_chair Message variables */
 /* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
 __constant__ int d_message_free_chair_count;         /**< message list counter*/
 __constant__ int d_message_free_chair_output_type;   /**< message output type (single or optional)*/
 
+/* chair_state Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_chair_state_count;         /**< message list counter*/
+__constant__ int d_message_chair_state_output_type;   /**< message output type (single or optional)*/
+
 /* chair_contact Message variables */
 /* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
 __constant__ int d_message_chair_contact_count;         /**< message list counter*/
 __constant__ int d_message_chair_contact_output_type;   /**< message output type (single or optional)*/
+
+/* bed_state Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_bed_state_count;         /**< message list counter*/
+__constant__ int d_message_bed_state_output_type;   /**< message output type (single or optional)*/
+
+/* bed_contact Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_bed_contact_count;         /**< message list counter*/
+__constant__ int d_message_bed_contact_output_type;   /**< message output type (single or optional)*/
 
 /* box_petition Message variables */
 /* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
@@ -198,6 +216,21 @@ __constant__ int d_message_doctor_petition_output_type;   /**< message output ty
 __constant__ int d_message_doctor_response_count;         /**< message list counter*/
 __constant__ int d_message_doctor_response_output_type;   /**< message output type (single or optional)*/
 
+/* bed_petition Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_bed_petition_count;         /**< message list counter*/
+__constant__ int d_message_bed_petition_output_type;   /**< message output type (single or optional)*/
+
+/* bed_response Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_bed_response_count;         /**< message list counter*/
+__constant__ int d_message_bed_response_output_type;   /**< message output type (single or optional)*/
+
+/* free_bed Message variables */
+/* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
+__constant__ int d_message_free_bed_count;         /**< message list counter*/
+__constant__ int d_message_free_bed_output_type;   /**< message output type (single or optional)*/
+
 /* triage_petition Message variables */
 /* Non partitioned, spatial partitioned and on-graph partitioned message variables  */
 __constant__ int d_message_triage_petition_count;         /**< message list counter*/
@@ -258,6 +291,11 @@ __constant__ int d_tex_xmachine_message_navmap_cell_exit_no_offset;texture<float
 __constant__ int d_tex_xmachine_message_navmap_cell_height_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_x;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_x_offset;texture<float, 1, cudaReadModeElementType> tex_xmachine_message_navmap_cell_collision_y;
 __constant__ int d_tex_xmachine_message_navmap_cell_collision_y_offset;
+
+
+
+
+
 
 
 
@@ -363,6 +401,60 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 }
 
 
+/** infect_pedestrians_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void infect_pedestrians_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if (currentState->estado_movimiento[index]!=35)
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
 /** output_chair_contact_function_filter
  *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
  * @param currentState xmachine_memory_agent_list representing agent i the current state
@@ -402,6 +494,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -455,6 +548,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -508,6 +602,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -561,6 +656,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -614,6 +710,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -667,6 +764,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -720,6 +818,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -773,6 +872,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -826,6 +926,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -879,6 +980,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -932,6 +1034,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -985,6 +1088,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -1038,6 +1142,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -1091,6 +1196,169 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** output_bed_petition_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void output_bed_petition_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if (currentState->estado_movimiento[index]==33)
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** receive_bed_response_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void receive_bed_response_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if ((currentState->estado_movimiento[index]==34)||(currentState->estado_movimiento[index]==35))
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
+			nextState->priority[index] = currentState->priority[index];
+			nextState->vaccine[index] = currentState->vaccine[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** output_bed_contact_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_list representing agent i the next state
+ */
+ __global__ void output_bed_contact_function_filter(xmachine_memory_agent_list* currentState, xmachine_memory_agent_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_count){
+	
+		//apply the filter
+		if (currentState->estado_movimiento[index]==35)
+		{	//copy agent data to newstate list
+			nextState->id[index] = currentState->id[index];
+			nextState->x[index] = currentState->x[index];
+			nextState->y[index] = currentState->y[index];
+			nextState->velx[index] = currentState->velx[index];
+			nextState->vely[index] = currentState->vely[index];
+			nextState->steer_x[index] = currentState->steer_x[index];
+			nextState->steer_y[index] = currentState->steer_y[index];
+			nextState->height[index] = currentState->height[index];
+			nextState->exit_no[index] = currentState->exit_no[index];
+			nextState->speed[index] = currentState->speed[index];
+			nextState->lod[index] = currentState->lod[index];
+			nextState->animate[index] = currentState->animate[index];
+			nextState->animate_dir[index] = currentState->animate_dir[index];
+			nextState->estado[index] = currentState->estado[index];
+			nextState->tick[index] = currentState->tick[index];
+			nextState->estado_movimiento[index] = currentState->estado_movimiento[index];
+			nextState->go_to_x[index] = currentState->go_to_x[index];
+			nextState->go_to_y[index] = currentState->go_to_y[index];
+			nextState->checkpoint[index] = currentState->checkpoint[index];
+			nextState->chair_no[index] = currentState->chair_no[index];
+			nextState->box_no[index] = currentState->box_no[index];
+			nextState->doctor_no[index] = currentState->doctor_no[index];
+			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -1144,6 +1412,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -1197,6 +1466,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 			nextState->box_no[index] = currentState->box_no[index];
 			nextState->doctor_no[index] = currentState->doctor_no[index];
 			nextState->specialist_no[index] = currentState->specialist_no[index];
+			nextState->bed_no[index] = currentState->bed_no[index];
 			nextState->priority[index] = currentState->priority[index];
 			nextState->vaccine[index] = currentState->vaccine[index];
 			//set scan input flag to 1
@@ -1228,6 +1498,41 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 		if (currentState->chairs_generated[index]<35)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->beds_generated[index] = currentState->beds_generated[index];
+			nextState->boxes_generated[index] = currentState->boxes_generated[index];
+			nextState->doctors_generated[index] = currentState->doctors_generated[index];
+			nextState->specialists_generated[index] = currentState->specialists_generated[index];
+			nextState->personal_generated[index] = currentState->personal_generated[index];
+			//set scan input flag to 1
+			nextState->_scan_input[index] = 1;
+		}
+		else
+		{
+			//set scan input flag of current state to 1 (keep agent)
+			currentState->_scan_input[index] = 1;
+		}
+	
+	}
+ }
+
+/** generate_beds_function_filter
+ *	Standard agent condition function. Filters agents from one state list to the next depending on the condition
+ * @param currentState xmachine_memory_agent_generator_list representing agent i the current state
+ * @param nextState xmachine_memory_agent_generator_list representing agent i the next state
+ */
+ __global__ void generate_beds_function_filter(xmachine_memory_agent_generator_list* currentState, xmachine_memory_agent_generator_list* nextState)
+ {
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+	
+	//check thread max
+	if (index < d_xmachine_memory_agent_generator_count){
+	
+		//apply the filter
+		if (currentState->beds_generated[index]<NUMBER_OF_BEDS)
+		{	//copy agent data to newstate list
+			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->beds_generated[index] = currentState->beds_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
@@ -1261,6 +1566,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 		if (currentState->boxes_generated[index]<3)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->beds_generated[index] = currentState->beds_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
@@ -1294,6 +1600,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 		if (currentState->doctors_generated[index]<4)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->beds_generated[index] = currentState->beds_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
@@ -1327,6 +1634,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 		if (currentState->specialists_generated[index]<5)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->beds_generated[index] = currentState->beds_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
@@ -1360,6 +1668,7 @@ __device__ bool next_cell2D(glm::ivec3* relative_cell)
 		if (currentState->personal_generated[index]<11)
 		{	//copy agent data to newstate list
 			nextState->chairs_generated[index] = currentState->chairs_generated[index];
+			nextState->beds_generated[index] = currentState->beds_generated[index];
 			nextState->boxes_generated[index] = currentState->boxes_generated[index];
 			nextState->doctors_generated[index] = currentState->doctors_generated[index];
 			nextState->specialists_generated[index] = currentState->specialists_generated[index];
@@ -1436,6 +1745,7 @@ __global__ void scatter_agent_Agents(xmachine_memory_agent_list* agents_dst, xma
 		agents_dst->box_no[output_index] = agents_src->box_no[index];        
 		agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];        
 		agents_dst->specialist_no[output_index] = agents_src->specialist_no[index];        
+		agents_dst->bed_no[output_index] = agents_src->bed_no[index];        
 		agents_dst->priority[output_index] = agents_src->priority[index];        
 		agents_dst->vaccine[output_index] = agents_src->vaccine[index];
 	}
@@ -1480,6 +1790,7 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
 	    agents_dst->box_no[output_index] = agents_src->box_no[index];
 	    agents_dst->doctor_no[output_index] = agents_src->doctor_no[index];
 	    agents_dst->specialist_no[output_index] = agents_src->specialist_no[index];
+	    agents_dst->bed_no[output_index] = agents_src->bed_no[index];
 	    agents_dst->priority[output_index] = agents_src->priority[index];
 	    agents_dst->vaccine[output_index] = agents_src->vaccine[index];
     }
@@ -1511,11 +1822,12 @@ __global__ void append_agent_Agents(xmachine_memory_agent_list* agents_dst, xmac
  * @param box_no agent variable of type unsigned int
  * @param doctor_no agent variable of type unsigned int
  * @param specialist_no agent variable of type unsigned int
+ * @param bed_no agent variable of type unsigned int
  * @param priority agent variable of type unsigned int
  * @param vaccine agent variable of type unsigned int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority, unsigned int vaccine){
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int bed_no, unsigned int priority, unsigned int vaccine){
 	
 	int index;
     
@@ -1557,14 +1869,15 @@ __device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, floa
 	agents->box_no[index] = box_no;
 	agents->doctor_no[index] = doctor_no;
 	agents->specialist_no[index] = specialist_no;
+	agents->bed_no[index] = bed_no;
 	agents->priority[index] = priority;
 	agents->vaccine[index] = vaccine;
 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int priority, unsigned int vaccine){
-    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, specialist_no, priority, vaccine);
+__device__ void add_agent_agent(xmachine_memory_agent_list* agents, int id, float x, float y, float velx, float vely, float steer_x, float steer_y, float height, int exit_no, float speed, int lod, float animate, int animate_dir, int estado, int tick, unsigned int estado_movimiento, unsigned int go_to_x, unsigned int go_to_y, unsigned int checkpoint, int chair_no, unsigned int box_no, unsigned int doctor_no, unsigned int specialist_no, unsigned int bed_no, unsigned int priority, unsigned int vaccine){
+    add_agent_agent<DISCRETE_2D>(agents, id, x, y, velx, vely, steer_x, steer_y, height, exit_no, speed, lod, animate, animate_dir, estado, tick, estado_movimiento, go_to_x, go_to_y, checkpoint, chair_no, box_no, doctor_no, specialist_no, bed_no, priority, vaccine);
 }
 
 /** reorder_agent_agents
@@ -1603,6 +1916,7 @@ __global__ void reorder_agent_agents(unsigned int* values, xmachine_memory_agent
 	ordered_agents->box_no[index] = unordered_agents->box_no[old_pos];
 	ordered_agents->doctor_no[index] = unordered_agents->doctor_no[old_pos];
 	ordered_agents->specialist_no[index] = unordered_agents->specialist_no[old_pos];
+	ordered_agents->bed_no[index] = unordered_agents->bed_no[old_pos];
 	ordered_agents->priority[index] = unordered_agents->priority[old_pos];
 	ordered_agents->vaccine[index] = unordered_agents->vaccine[old_pos];
 }
@@ -1752,6 +2066,127 @@ __global__ void reorder_chair_agents(unsigned int* values, xmachine_memory_chair
 	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 	ordered_agents->x[index] = unordered_agents->x[old_pos];
 	ordered_agents->y[index] = unordered_agents->y[old_pos];
+	ordered_agents->state[index] = unordered_agents->state[old_pos];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created bed agent functions */
+
+/** reset_bed_scan_input
+ * bed agent reset scan input function
+ * @param agents The xmachine_memory_bed_list agent list
+ */
+__global__ void reset_bed_scan_input(xmachine_memory_bed_list* agents){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 0;
+}
+
+
+
+/** scatter_bed_Agents
+ * bed scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_bed_list agent list destination
+ * @param agents_src xmachine_memory_bed_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void scatter_bed_Agents(xmachine_memory_bed_list* agents_dst, xmachine_memory_bed_list* agents_src, int dst_agent_count, int number_to_scatter){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = agents_src->_scan_input[index];
+
+	//if optional message is to be written. 
+	//must check agent is within number to scatter as unused threads may have scan input = 1
+	if ((_scan_input == 1)&&(index < number_to_scatter)){
+		int output_index = agents_src->_position[index] + dst_agent_count;
+
+		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
+        agents_dst->_position[output_index] = output_index;        
+		agents_dst->id[output_index] = agents_src->id[index];        
+		agents_dst->tick[output_index] = agents_src->tick[index];        
+		agents_dst->state[output_index] = agents_src->state[index];
+	}
+}
+
+/** append_bed_Agents
+ * bed scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_bed_list agent list destination
+ * @param agents_src xmachine_memory_bed_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void append_bed_Agents(xmachine_memory_bed_list* agents_dst, xmachine_memory_bed_list* agents_src, int dst_agent_count, int number_to_append){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//must check agent is within number to append as unused threads may have scan input = 1
+    if (index < number_to_append){
+	    int output_index = index + dst_agent_count;
+
+	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
+	    agents_dst->_position[output_index] = output_index;
+	    agents_dst->id[output_index] = agents_src->id[index];
+	    agents_dst->tick[output_index] = agents_src->tick[index];
+	    agents_dst->state[output_index] = agents_src->state[index];
+    }
+}
+
+/** add_bed_agent
+ * Continuous bed agent add agent function writes agent data to agent swap
+ * @param agents xmachine_memory_bed_list to add agents to 
+ * @param id agent variable of type int
+ * @param tick agent variable of type int
+ * @param state agent variable of type int
+ */
+template <int AGENT_TYPE>
+__device__ void add_bed_agent(xmachine_memory_bed_list* agents, int id, int tick, int state){
+	
+	int index;
+    
+    //calculate the agents index in global agent list (depends on agent type)
+	if (AGENT_TYPE == DISCRETE_2D){
+		int width = (blockDim.x* gridDim.x);
+		glm::ivec2 global_position;
+		global_position.x = (blockIdx.x*blockDim.x) + threadIdx.x;
+		global_position.y = (blockIdx.y*blockDim.y) + threadIdx.y;
+		index = global_position.x + (global_position.y* width);
+	}else//AGENT_TYPE == CONTINOUS
+		index = threadIdx.x + blockIdx.x*blockDim.x;
+
+	//for prefix sum
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 1;
+
+	//write data to new buffer
+	agents->id[index] = id;
+	agents->tick[index] = tick;
+	agents->state[index] = state;
+
+}
+
+//non templated version assumes DISCRETE_2D but works also for CONTINUOUS
+__device__ void add_bed_agent(xmachine_memory_bed_list* agents, int id, int tick, int state){
+    add_bed_agent<DISCRETE_2D>(agents, id, tick, state);
+}
+
+/** reorder_bed_agents
+ * Continuous bed agent areorder function used after key value pairs have been sorted
+ * @param values sorted index values
+ * @param unordered_agents list of unordered agents
+ * @ param ordered_agents list used to output ordered agents
+ */
+__global__ void reorder_bed_agents(unsigned int* values, xmachine_memory_bed_list* unordered_agents, xmachine_memory_bed_list* ordered_agents)
+{
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	uint old_pos = values[index];
+
+	//reorder agent data
+	ordered_agents->id[index] = unordered_agents->id[old_pos];
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
 	ordered_agents->state[index] = unordered_agents->state[old_pos];
 }
 
@@ -2500,6 +2935,7 @@ __global__ void scatter_agent_generator_Agents(xmachine_memory_agent_generator_l
 		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
         agents_dst->_position[output_index] = output_index;        
 		agents_dst->chairs_generated[output_index] = agents_src->chairs_generated[index];        
+		agents_dst->beds_generated[output_index] = agents_src->beds_generated[index];        
 		agents_dst->boxes_generated[output_index] = agents_src->boxes_generated[index];        
 		agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];        
 		agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];        
@@ -2524,6 +2960,7 @@ __global__ void append_agent_generator_Agents(xmachine_memory_agent_generator_li
 	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
 	    agents_dst->_position[output_index] = output_index;
 	    agents_dst->chairs_generated[output_index] = agents_src->chairs_generated[index];
+	    agents_dst->beds_generated[output_index] = agents_src->beds_generated[index];
 	    agents_dst->boxes_generated[output_index] = agents_src->boxes_generated[index];
 	    agents_dst->doctors_generated[output_index] = agents_src->doctors_generated[index];
 	    agents_dst->specialists_generated[output_index] = agents_src->specialists_generated[index];
@@ -2535,13 +2972,14 @@ __global__ void append_agent_generator_Agents(xmachine_memory_agent_generator_li
  * Continuous agent_generator agent add agent function writes agent data to agent swap
  * @param agents xmachine_memory_agent_generator_list to add agents to 
  * @param chairs_generated agent variable of type int
+ * @param beds_generated agent variable of type int
  * @param boxes_generated agent variable of type int
  * @param doctors_generated agent variable of type int
  * @param specialists_generated agent variable of type int
  * @param personal_generated agent variable of type int
  */
 template <int AGENT_TYPE>
-__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated, int personal_generated){
+__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int beds_generated, int boxes_generated, int doctors_generated, int specialists_generated, int personal_generated){
 	
 	int index;
     
@@ -2561,6 +2999,7 @@ __device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* 
 
 	//write data to new buffer
 	agents->chairs_generated[index] = chairs_generated;
+	agents->beds_generated[index] = beds_generated;
 	agents->boxes_generated[index] = boxes_generated;
 	agents->doctors_generated[index] = doctors_generated;
 	agents->specialists_generated[index] = specialists_generated;
@@ -2569,8 +3008,8 @@ __device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* 
 }
 
 //non templated version assumes DISCRETE_2D but works also for CONTINUOUS
-__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int boxes_generated, int doctors_generated, int specialists_generated, int personal_generated){
-    add_agent_generator_agent<DISCRETE_2D>(agents, chairs_generated, boxes_generated, doctors_generated, specialists_generated, personal_generated);
+__device__ void add_agent_generator_agent(xmachine_memory_agent_generator_list* agents, int chairs_generated, int beds_generated, int boxes_generated, int doctors_generated, int specialists_generated, int personal_generated){
+    add_agent_generator_agent<DISCRETE_2D>(agents, chairs_generated, beds_generated, boxes_generated, doctors_generated, specialists_generated, personal_generated);
 }
 
 /** reorder_agent_generator_agents
@@ -2587,6 +3026,7 @@ __global__ void reorder_agent_generator_agents(unsigned int* values, xmachine_me
 
 	//reorder agent data
 	ordered_agents->chairs_generated[index] = unordered_agents->chairs_generated[old_pos];
+	ordered_agents->beds_generated[index] = unordered_agents->beds_generated[old_pos];
 	ordered_agents->boxes_generated[index] = unordered_agents->boxes_generated[old_pos];
 	ordered_agents->doctors_generated[index] = unordered_agents->doctors_generated[old_pos];
 	ordered_agents->specialists_generated[index] = unordered_agents->specialists_generated[old_pos];
@@ -2742,6 +3182,158 @@ __FLAME_GPU_FUNC__ void set_chair_admin_agent_array_value(T *array, uint index, 
 	// Null check for out of bounds agents (brute force communication. )
 	if(array != nullptr){
 	    array[index*xmachine_memory_chair_admin_MAX] = value;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created uci agent functions */
+
+/** reset_uci_scan_input
+ * uci agent reset scan input function
+ * @param agents The xmachine_memory_uci_list agent list
+ */
+__global__ void reset_uci_scan_input(xmachine_memory_uci_list* agents){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 0;
+}
+
+
+
+/** scatter_uci_Agents
+ * uci scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_uci_list agent list destination
+ * @param agents_src xmachine_memory_uci_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void scatter_uci_Agents(xmachine_memory_uci_list* agents_dst, xmachine_memory_uci_list* agents_src, int dst_agent_count, int number_to_scatter){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = agents_src->_scan_input[index];
+
+	//if optional message is to be written. 
+	//must check agent is within number to scatter as unused threads may have scan input = 1
+	if ((_scan_input == 1)&&(index < number_to_scatter)){
+		int output_index = agents_src->_position[index] + dst_agent_count;
+
+		//AoS - xmachine_message_location Un-Coalesced scattered memory write     
+        agents_dst->_position[output_index] = output_index;        
+		agents_dst->tick[output_index] = agents_src->tick[index];
+	    for (int i=0; i<100; i++){
+	      agents_dst->bedArray[(i*xmachine_memory_uci_MAX)+output_index] = agents_src->bedArray[(i*xmachine_memory_uci_MAX)+index];
+	    }
+	}
+}
+
+/** append_uci_Agents
+ * uci scatter agents function (used after agent birth/death)
+ * @param agents_dst xmachine_memory_uci_list agent list destination
+ * @param agents_src xmachine_memory_uci_list agent list source
+ * @param dst_agent_count index to start scattering agents from
+ */
+__global__ void append_uci_Agents(xmachine_memory_uci_list* agents_dst, xmachine_memory_uci_list* agents_src, int dst_agent_count, int number_to_append){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//must check agent is within number to append as unused threads may have scan input = 1
+    if (index < number_to_append){
+	    int output_index = index + dst_agent_count;
+
+	    //AoS - xmachine_message_location Un-Coalesced scattered memory write
+	    agents_dst->_position[output_index] = output_index;
+	    agents_dst->tick[output_index] = agents_src->tick[index];
+	    for (int i=0; i<100; i++){
+	      agents_dst->bedArray[(i*xmachine_memory_uci_MAX)+output_index] = agents_src->bedArray[(i*xmachine_memory_uci_MAX)+index];
+	    }
+    }
+}
+
+/** add_uci_agent
+ * Continuous uci agent add agent function writes agent data to agent swap
+ * @param agents xmachine_memory_uci_list to add agents to 
+ * @param tick agent variable of type unsigned int
+ * @param bedArray agent variable of type ivec2
+ */
+template <int AGENT_TYPE>
+__device__ void add_uci_agent(xmachine_memory_uci_list* agents, unsigned int tick){
+	
+	int index;
+    
+    //calculate the agents index in global agent list (depends on agent type)
+	if (AGENT_TYPE == DISCRETE_2D){
+		int width = (blockDim.x* gridDim.x);
+		glm::ivec2 global_position;
+		global_position.x = (blockIdx.x*blockDim.x) + threadIdx.x;
+		global_position.y = (blockIdx.y*blockDim.y) + threadIdx.y;
+		index = global_position.x + (global_position.y* width);
+	}else//AGENT_TYPE == CONTINOUS
+		index = threadIdx.x + blockIdx.x*blockDim.x;
+
+	//for prefix sum
+	agents->_position[index] = 0;
+	agents->_scan_input[index] = 1;
+
+	//write data to new buffer
+	agents->tick[index] = tick;
+
+}
+
+//non templated version assumes DISCRETE_2D but works also for CONTINUOUS
+__device__ void add_uci_agent(xmachine_memory_uci_list* agents, unsigned int tick){
+    add_uci_agent<DISCRETE_2D>(agents, tick);
+}
+
+/** reorder_uci_agents
+ * Continuous uci agent areorder function used after key value pairs have been sorted
+ * @param values sorted index values
+ * @param unordered_agents list of unordered agents
+ * @ param ordered_agents list used to output ordered agents
+ */
+__global__ void reorder_uci_agents(unsigned int* values, xmachine_memory_uci_list* unordered_agents, xmachine_memory_uci_list* ordered_agents)
+{
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	uint old_pos = values[index];
+
+	//reorder agent data
+	ordered_agents->tick[index] = unordered_agents->tick[old_pos];
+	for (int i=0; i<100; i++){
+	  ordered_agents->bedArray[(i*xmachine_memory_uci_MAX)+index] = unordered_agents->bedArray[(i*xmachine_memory_uci_MAX)+old_pos];
+	}
+}
+
+/** get_uci_agent_array_value
+ *  Template function for accessing uci agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @return return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ T get_uci_agent_array_value(T *array, uint index){
+	// Null check for out of bounds agents (brute force communication. )
+	if(array != nullptr){
+	    return array[index*xmachine_memory_uci_MAX];
+    } else {
+    	// Return the default value for this data type 
+	    return 0;
+    }
+}
+
+/** set_uci_agent_array_value
+ *  Template function for setting uci agent array memory variables. Assumes array points to the first element of the agents array values (offset by agent index)
+ *  @param array Agent memory array
+ *  @param index to lookup
+ *  @param return value
+ */
+template<typename T>
+__FLAME_GPU_FUNC__ void set_uci_agent_array_value(T *array, uint index, T value){
+	// Null check for out of bounds agents (brute force communication. )
+	if(array != nullptr){
+	    array[index*xmachine_memory_uci_MAX] = value;
     }
 }
 
@@ -4860,6 +5452,152 @@ __device__ xmachine_message_chair_response* get_next_chair_response_message(xmac
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created free_chair message functions */
+
+
+/** add_free_chair_message
+ * Add non partitioned or spatially partitioned free_chair message
+ * @param messages xmachine_message_free_chair_list message list to add too
+ * @param chair_no agent variable of type unsigned int
+ */
+__device__ void add_free_chair_message(xmachine_message_free_chair_list* messages, unsigned int chair_no){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_free_chair_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_free_chair_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_free_chair_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_free_chair Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->chair_no[index] = chair_no;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned free_chair message (for optional messages)
+ * @param messages scatter_optional_free_chair_messages Sparse xmachine_message_free_chair_list message list
+ * @param message_swap temp xmachine_message_free_chair_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_free_chair_messages(xmachine_message_free_chair_list* messages, xmachine_message_free_chair_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_free_chair_count;
+
+		//AoS - xmachine_message_free_chair Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->chair_no[output_index] = messages_swap->chair_no[index];				
+	}
+}
+
+/** reset_free_chair_swaps
+ * Reset non partitioned or spatially partitioned free_chair message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_free_chair_swaps(xmachine_message_free_chair_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_free_chair* get_first_free_chair_message(xmachine_message_free_chair_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_free_chair_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_free_chair Coalesced memory read
+	xmachine_message_free_chair temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.chair_no = messages->chair_no[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_chair));
+	xmachine_message_free_chair* sm_message = ((xmachine_message_free_chair*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_free_chair*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_free_chair* get_next_free_chair_message(xmachine_message_free_chair* message, xmachine_message_free_chair_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_free_chair_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_free_chair_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_free_chair Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_free_chair temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.chair_no = messages->chair_no[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_chair));
+		xmachine_message_free_chair* sm_message = ((xmachine_message_free_chair*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_free_chair));
+	return ((xmachine_message_free_chair*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created chair_state message functions */
 
 
@@ -5008,152 +5746,6 @@ __device__ xmachine_message_chair_state* get_next_chair_state_message(xmachine_m
 
 	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_chair_state));
 	return ((xmachine_message_chair_state*)&message_share[message_index]);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* Dynamically created free_chair message functions */
-
-
-/** add_free_chair_message
- * Add non partitioned or spatially partitioned free_chair message
- * @param messages xmachine_message_free_chair_list message list to add too
- * @param chair_no agent variable of type unsigned int
- */
-__device__ void add_free_chair_message(xmachine_message_free_chair_list* messages, unsigned int chair_no){
-
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_free_chair_count;
-
-	int _position;
-	int _scan_input;
-
-	//decide output position
-	if(d_message_free_chair_output_type == single_message){
-		_position = index; //same as agent position
-		_scan_input = 0;
-	}else if (d_message_free_chair_output_type == optional_message){
-		_position = 0;	   //to be calculated using Prefix sum
-		_scan_input = 1;
-	}
-
-	//AoS - xmachine_message_free_chair Coalesced memory write
-	messages->_scan_input[index] = _scan_input;	
-	messages->_position[index] = _position;
-	messages->chair_no[index] = chair_no;
-
-}
-
-/**
- * Scatter non partitioned or spatially partitioned free_chair message (for optional messages)
- * @param messages scatter_optional_free_chair_messages Sparse xmachine_message_free_chair_list message list
- * @param message_swap temp xmachine_message_free_chair_list message list to scatter sparse messages to
- */
-__global__ void scatter_optional_free_chair_messages(xmachine_message_free_chair_list* messages, xmachine_message_free_chair_list* messages_swap){
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
-
-	int _scan_input = messages_swap->_scan_input[index];
-
-	//if optional message is to be written
-	if (_scan_input == 1){
-		int output_index = messages_swap->_position[index] + d_message_free_chair_count;
-
-		//AoS - xmachine_message_free_chair Un-Coalesced scattered memory write
-		messages->_position[output_index] = output_index;
-		messages->chair_no[output_index] = messages_swap->chair_no[index];				
-	}
-}
-
-/** reset_free_chair_swaps
- * Reset non partitioned or spatially partitioned free_chair message swaps (for scattering optional messages)
- * @param message_swap message list to reset _position and _scan_input values back to 0
- */
-__global__ void reset_free_chair_swaps(xmachine_message_free_chair_list* messages_swap){
-
-	//global thread index
-	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
-
-	messages_swap->_position[index] = 0;
-	messages_swap->_scan_input[index] = 0;
-}
-
-/* Message functions */
-
-__device__ xmachine_message_free_chair* get_first_free_chair_message(xmachine_message_free_chair_list* messages){
-
-	extern __shared__ int sm_data [];
-	char* message_share = (char*)&sm_data[0];
-	
-	//wrap size is the number of tiles required to load all messages
-	int wrap_size = (ceil((float)d_message_free_chair_count/ blockDim.x)* blockDim.x);
-
-	//if no messages then return a null pointer (false)
-	if (wrap_size == 0)
-		return nullptr;
-
-	//global thread index
-	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
-
-	//global thread index
-	int index = WRAP(global_index, wrap_size);
-
-	//SoA to AoS - xmachine_message_free_chair Coalesced memory read
-	xmachine_message_free_chair temp_message;
-	temp_message._position = messages->_position[index];
-	temp_message.chair_no = messages->chair_no[index];
-
-	//AoS to shared memory
-	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_chair));
-	xmachine_message_free_chair* sm_message = ((xmachine_message_free_chair*)&message_share[message_index]);
-	sm_message[0] = temp_message;
-
-	__syncthreads();
-
-  //HACK FOR 64 bit addressing issue in sm
-	return ((xmachine_message_free_chair*)&message_share[d_SM_START]);
-}
-
-__device__ xmachine_message_free_chair* get_next_free_chair_message(xmachine_message_free_chair* message, xmachine_message_free_chair_list* messages){
-
-	extern __shared__ int sm_data [];
-	char* message_share = (char*)&sm_data[0];
-	
-	//wrap size is the number of tiles required to load all messages
-	int wrap_size = ceil((float)d_message_free_chair_count/ blockDim.x)*blockDim.x;
-
-	int i = WRAP((message->_position + 1),wrap_size);
-
-	//If end of messages (last message not multiple of gridsize) go to 0 index
-	if (i >= d_message_free_chair_count)
-		i = 0;
-
-	//Check if back to start position of first message
-	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
-		return nullptr;
-
-	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
-	i = i % blockDim.x;						 //mod i for shared memory index
-
-	//if count == Block Size load next tile int shared memory values
-	if (i == 0){
-		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
-		
-		//SoA to AoS - xmachine_message_free_chair Coalesced memory read
-		int index = (tile* blockDim.x) + threadIdx.x;
-		xmachine_message_free_chair temp_message;
-		temp_message._position = messages->_position[index];
-		temp_message.chair_no = messages->chair_no[index];
-
-		//AoS to shared memory
-		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_chair));
-		xmachine_message_free_chair* sm_message = ((xmachine_message_free_chair*)&message_share[message_index]);
-		sm_message[0] = temp_message;
-
-		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
-	}
-
-	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_free_chair));
-	return ((xmachine_message_free_chair*)&message_share[message_index]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5310,6 +5902,313 @@ __device__ xmachine_message_chair_contact* get_next_chair_contact_message(xmachi
 
 	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_chair_contact));
 	return ((xmachine_message_chair_contact*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created bed_state message functions */
+
+
+/** add_bed_state_message
+ * Add non partitioned or spatially partitioned bed_state message
+ * @param messages xmachine_message_bed_state_list message list to add too
+ * @param id agent variable of type unsigned int
+ * @param state agent variable of type int
+ */
+__device__ void add_bed_state_message(xmachine_message_bed_state_list* messages, unsigned int id, int state){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_bed_state_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_bed_state_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_bed_state_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_bed_state Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+	messages->state[index] = state;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned bed_state message (for optional messages)
+ * @param messages scatter_optional_bed_state_messages Sparse xmachine_message_bed_state_list message list
+ * @param message_swap temp xmachine_message_bed_state_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_bed_state_messages(xmachine_message_bed_state_list* messages, xmachine_message_bed_state_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_bed_state_count;
+
+		//AoS - xmachine_message_bed_state Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];
+		messages->state[output_index] = messages_swap->state[index];				
+	}
+}
+
+/** reset_bed_state_swaps
+ * Reset non partitioned or spatially partitioned bed_state message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_bed_state_swaps(xmachine_message_bed_state_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_bed_state* get_first_bed_state_message(xmachine_message_bed_state_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_bed_state_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_bed_state Coalesced memory read
+	xmachine_message_bed_state temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+	temp_message.state = messages->state[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_state));
+	xmachine_message_bed_state* sm_message = ((xmachine_message_bed_state*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_bed_state*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_bed_state* get_next_bed_state_message(xmachine_message_bed_state* message, xmachine_message_bed_state_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_bed_state_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_bed_state_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_bed_state Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_bed_state temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+		temp_message.state = messages->state[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_state));
+		xmachine_message_bed_state* sm_message = ((xmachine_message_bed_state*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_bed_state));
+	return ((xmachine_message_bed_state*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created bed_contact message functions */
+
+
+/** add_bed_contact_message
+ * Add non partitioned or spatially partitioned bed_contact message
+ * @param messages xmachine_message_bed_contact_list message list to add too
+ * @param id agent variable of type unsigned int
+ * @param bed_no agent variable of type unsigned int
+ * @param state agent variable of type int
+ */
+__device__ void add_bed_contact_message(xmachine_message_bed_contact_list* messages, unsigned int id, unsigned int bed_no, int state){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_bed_contact_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_bed_contact_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_bed_contact_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_bed_contact Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+	messages->bed_no[index] = bed_no;
+	messages->state[index] = state;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned bed_contact message (for optional messages)
+ * @param messages scatter_optional_bed_contact_messages Sparse xmachine_message_bed_contact_list message list
+ * @param message_swap temp xmachine_message_bed_contact_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_bed_contact_messages(xmachine_message_bed_contact_list* messages, xmachine_message_bed_contact_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_bed_contact_count;
+
+		//AoS - xmachine_message_bed_contact Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];
+		messages->bed_no[output_index] = messages_swap->bed_no[index];
+		messages->state[output_index] = messages_swap->state[index];				
+	}
+}
+
+/** reset_bed_contact_swaps
+ * Reset non partitioned or spatially partitioned bed_contact message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_bed_contact_swaps(xmachine_message_bed_contact_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_bed_contact* get_first_bed_contact_message(xmachine_message_bed_contact_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_bed_contact_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_bed_contact Coalesced memory read
+	xmachine_message_bed_contact temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+	temp_message.bed_no = messages->bed_no[index];
+	temp_message.state = messages->state[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_contact));
+	xmachine_message_bed_contact* sm_message = ((xmachine_message_bed_contact*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_bed_contact*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_bed_contact* get_next_bed_contact_message(xmachine_message_bed_contact* message, xmachine_message_bed_contact_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_bed_contact_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_bed_contact_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_bed_contact Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_bed_contact temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+		temp_message.bed_no = messages->bed_no[index];
+		temp_message.state = messages->state[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_contact));
+		xmachine_message_bed_contact* sm_message = ((xmachine_message_bed_contact*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_bed_contact));
+	return ((xmachine_message_bed_contact*)&message_share[message_index]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7115,6 +8014,449 @@ __device__ xmachine_message_doctor_response* get_next_doctor_response_message(xm
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created bed_petition message functions */
+
+
+/** add_bed_petition_message
+ * Add non partitioned or spatially partitioned bed_petition message
+ * @param messages xmachine_message_bed_petition_list message list to add too
+ * @param id agent variable of type unsigned int
+ */
+__device__ void add_bed_petition_message(xmachine_message_bed_petition_list* messages, unsigned int id){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_bed_petition_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_bed_petition_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_bed_petition_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_bed_petition Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned bed_petition message (for optional messages)
+ * @param messages scatter_optional_bed_petition_messages Sparse xmachine_message_bed_petition_list message list
+ * @param message_swap temp xmachine_message_bed_petition_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_bed_petition_messages(xmachine_message_bed_petition_list* messages, xmachine_message_bed_petition_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_bed_petition_count;
+
+		//AoS - xmachine_message_bed_petition Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];				
+	}
+}
+
+/** reset_bed_petition_swaps
+ * Reset non partitioned or spatially partitioned bed_petition message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_bed_petition_swaps(xmachine_message_bed_petition_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_bed_petition* get_first_bed_petition_message(xmachine_message_bed_petition_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_bed_petition_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_bed_petition Coalesced memory read
+	xmachine_message_bed_petition temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_petition));
+	xmachine_message_bed_petition* sm_message = ((xmachine_message_bed_petition*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_bed_petition*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_bed_petition* get_next_bed_petition_message(xmachine_message_bed_petition* message, xmachine_message_bed_petition_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_bed_petition_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_bed_petition_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_bed_petition Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_bed_petition temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_petition));
+		xmachine_message_bed_petition* sm_message = ((xmachine_message_bed_petition*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_bed_petition));
+	return ((xmachine_message_bed_petition*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created bed_response message functions */
+
+
+/** add_bed_response_message
+ * Add non partitioned or spatially partitioned bed_response message
+ * @param messages xmachine_message_bed_response_list message list to add too
+ * @param id agent variable of type unsigned int
+ * @param bed_no agent variable of type int
+ */
+__device__ void add_bed_response_message(xmachine_message_bed_response_list* messages, unsigned int id, int bed_no){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_bed_response_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_bed_response_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_bed_response_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_bed_response Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->id[index] = id;
+	messages->bed_no[index] = bed_no;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned bed_response message (for optional messages)
+ * @param messages scatter_optional_bed_response_messages Sparse xmachine_message_bed_response_list message list
+ * @param message_swap temp xmachine_message_bed_response_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_bed_response_messages(xmachine_message_bed_response_list* messages, xmachine_message_bed_response_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_bed_response_count;
+
+		//AoS - xmachine_message_bed_response Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->id[output_index] = messages_swap->id[index];
+		messages->bed_no[output_index] = messages_swap->bed_no[index];				
+	}
+}
+
+/** reset_bed_response_swaps
+ * Reset non partitioned or spatially partitioned bed_response message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_bed_response_swaps(xmachine_message_bed_response_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_bed_response* get_first_bed_response_message(xmachine_message_bed_response_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_bed_response_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_bed_response Coalesced memory read
+	xmachine_message_bed_response temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.id = messages->id[index];
+	temp_message.bed_no = messages->bed_no[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_response));
+	xmachine_message_bed_response* sm_message = ((xmachine_message_bed_response*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_bed_response*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_bed_response* get_next_bed_response_message(xmachine_message_bed_response* message, xmachine_message_bed_response_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_bed_response_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_bed_response_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_bed_response Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_bed_response temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.id = messages->id[index];
+		temp_message.bed_no = messages->bed_no[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_bed_response));
+		xmachine_message_bed_response* sm_message = ((xmachine_message_bed_response*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_bed_response));
+	return ((xmachine_message_bed_response*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Dynamically created free_bed message functions */
+
+
+/** add_free_bed_message
+ * Add non partitioned or spatially partitioned free_bed message
+ * @param messages xmachine_message_free_bed_list message list to add too
+ * @param bed_no agent variable of type unsigned int
+ */
+__device__ void add_free_bed_message(xmachine_message_free_bed_list* messages, unsigned int bed_no){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x + d_message_free_bed_count;
+
+	int _position;
+	int _scan_input;
+
+	//decide output position
+	if(d_message_free_bed_output_type == single_message){
+		_position = index; //same as agent position
+		_scan_input = 0;
+	}else if (d_message_free_bed_output_type == optional_message){
+		_position = 0;	   //to be calculated using Prefix sum
+		_scan_input = 1;
+	}
+
+	//AoS - xmachine_message_free_bed Coalesced memory write
+	messages->_scan_input[index] = _scan_input;	
+	messages->_position[index] = _position;
+	messages->bed_no[index] = bed_no;
+
+}
+
+/**
+ * Scatter non partitioned or spatially partitioned free_bed message (for optional messages)
+ * @param messages scatter_optional_free_bed_messages Sparse xmachine_message_free_bed_list message list
+ * @param message_swap temp xmachine_message_free_bed_list message list to scatter sparse messages to
+ */
+__global__ void scatter_optional_free_bed_messages(xmachine_message_free_bed_list* messages, xmachine_message_free_bed_list* messages_swap){
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	int _scan_input = messages_swap->_scan_input[index];
+
+	//if optional message is to be written
+	if (_scan_input == 1){
+		int output_index = messages_swap->_position[index] + d_message_free_bed_count;
+
+		//AoS - xmachine_message_free_bed Un-Coalesced scattered memory write
+		messages->_position[output_index] = output_index;
+		messages->bed_no[output_index] = messages_swap->bed_no[index];				
+	}
+}
+
+/** reset_free_bed_swaps
+ * Reset non partitioned or spatially partitioned free_bed message swaps (for scattering optional messages)
+ * @param message_swap message list to reset _position and _scan_input values back to 0
+ */
+__global__ void reset_free_bed_swaps(xmachine_message_free_bed_list* messages_swap){
+
+	//global thread index
+	int index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	messages_swap->_position[index] = 0;
+	messages_swap->_scan_input[index] = 0;
+}
+
+/* Message functions */
+
+__device__ xmachine_message_free_bed* get_first_free_bed_message(xmachine_message_free_bed_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = (ceil((float)d_message_free_bed_count/ blockDim.x)* blockDim.x);
+
+	//if no messages then return a null pointer (false)
+	if (wrap_size == 0)
+		return nullptr;
+
+	//global thread index
+	int global_index = (blockIdx.x*blockDim.x) + threadIdx.x;
+
+	//global thread index
+	int index = WRAP(global_index, wrap_size);
+
+	//SoA to AoS - xmachine_message_free_bed Coalesced memory read
+	xmachine_message_free_bed temp_message;
+	temp_message._position = messages->_position[index];
+	temp_message.bed_no = messages->bed_no[index];
+
+	//AoS to shared memory
+	int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_bed));
+	xmachine_message_free_bed* sm_message = ((xmachine_message_free_bed*)&message_share[message_index]);
+	sm_message[0] = temp_message;
+
+	__syncthreads();
+
+  //HACK FOR 64 bit addressing issue in sm
+	return ((xmachine_message_free_bed*)&message_share[d_SM_START]);
+}
+
+__device__ xmachine_message_free_bed* get_next_free_bed_message(xmachine_message_free_bed* message, xmachine_message_free_bed_list* messages){
+
+	extern __shared__ int sm_data [];
+	char* message_share = (char*)&sm_data[0];
+	
+	//wrap size is the number of tiles required to load all messages
+	int wrap_size = ceil((float)d_message_free_bed_count/ blockDim.x)*blockDim.x;
+
+	int i = WRAP((message->_position + 1),wrap_size);
+
+	//If end of messages (last message not multiple of gridsize) go to 0 index
+	if (i >= d_message_free_bed_count)
+		i = 0;
+
+	//Check if back to start position of first message
+	if (i == WRAP((blockDim.x* blockIdx.x), wrap_size))
+		return nullptr;
+
+	int tile = floor((float)i/(blockDim.x)); //tile is round down position over blockDim
+	i = i % blockDim.x;						 //mod i for shared memory index
+
+	//if count == Block Size load next tile int shared memory values
+	if (i == 0){
+		__syncthreads();					//make sure we don't change shared memory until all threads are here (important for emu-debug mode)
+		
+		//SoA to AoS - xmachine_message_free_bed Coalesced memory read
+		int index = (tile* blockDim.x) + threadIdx.x;
+		xmachine_message_free_bed temp_message;
+		temp_message._position = messages->_position[index];
+		temp_message.bed_no = messages->bed_no[index];
+
+		//AoS to shared memory
+		int message_index = SHARE_INDEX(threadIdx.y*blockDim.x+threadIdx.x, sizeof(xmachine_message_free_bed));
+		xmachine_message_free_bed* sm_message = ((xmachine_message_free_bed*)&message_share[message_index]);
+		sm_message[0] = temp_message;
+
+		__syncthreads();					//make sure we don't start returning messages until all threads have updated shared memory
+	}
+
+	int message_index = SHARE_INDEX(i, sizeof(xmachine_message_free_bed));
+	return ((xmachine_message_free_bed*)&message_share[message_index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Dynamically created triage_petition message functions */
 
 
@@ -7604,6 +8946,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -7638,6 +8981,7 @@ __global__ void GPUFLAME_output_pedestrian_location(xmachine_memory_agent_list* 
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -7683,6 +9027,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -7717,6 +9062,7 @@ __global__ void GPUFLAME_avoid_pedestrians(xmachine_memory_agent_list* agents, x
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -7762,6 +9108,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -7796,6 +9143,7 @@ __global__ void GPUFLAME_output_pedestrian_state(xmachine_memory_agent_list* age
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -7841,6 +9189,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -7875,6 +9224,7 @@ __global__ void GPUFLAME_infect_pedestrians(xmachine_memory_agent_list* agents, 
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -7920,6 +9270,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -7954,6 +9305,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -7998,6 +9350,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -8025,6 +9378,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -8063,6 +9417,7 @@ __global__ void GPUFLAME_receive_chair_state(xmachine_memory_agent_list* agents,
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -8109,6 +9464,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -8143,6 +9499,7 @@ __global__ void GPUFLAME_output_chair_contact(xmachine_memory_agent_list* agents
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -8188,6 +9545,7 @@ __global__ void GPUFLAME_output_free_chair(xmachine_memory_agent_list* agents, x
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -8222,6 +9580,7 @@ __global__ void GPUFLAME_output_free_chair(xmachine_memory_agent_list* agents, x
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -8267,6 +9626,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -8301,6 +9661,7 @@ __global__ void GPUFLAME_output_chair_petition(xmachine_memory_agent_list* agent
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -8345,6 +9706,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -8372,6 +9734,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -8410,6 +9773,7 @@ __global__ void GPUFLAME_receive_chair_response(xmachine_memory_agent_list* agen
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -8455,6 +9819,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -8482,6 +9847,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -8520,6 +9886,7 @@ __global__ void GPUFLAME_receive_check_in_response(xmachine_memory_agent_list* a
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -8566,6 +9933,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -8600,6 +9968,7 @@ __global__ void GPUFLAME_output_box_petition(xmachine_memory_agent_list* agents,
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -8644,6 +10013,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -8671,6 +10041,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -8709,6 +10080,7 @@ __global__ void GPUFLAME_receive_box_response(xmachine_memory_agent_list* agents
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -8755,6 +10127,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -8789,6 +10162,7 @@ __global__ void GPUFLAME_output_doctor_petition(xmachine_memory_agent_list* agen
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -8833,6 +10207,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -8860,6 +10235,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -8898,6 +10274,7 @@ __global__ void GPUFLAME_receive_doctor_response(xmachine_memory_agent_list* age
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -8943,6 +10320,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -8970,6 +10348,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -9008,6 +10387,7 @@ __global__ void GPUFLAME_receive_attention_terminated(xmachine_memory_agent_list
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -9053,6 +10433,7 @@ __global__ void GPUFLAME_receive_specialist_terminated(xmachine_memory_agent_lis
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -9080,6 +10461,7 @@ __global__ void GPUFLAME_receive_specialist_terminated(xmachine_memory_agent_lis
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -9118,6 +10500,7 @@ __global__ void GPUFLAME_receive_specialist_terminated(xmachine_memory_agent_lis
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -9164,6 +10547,7 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -9198,6 +10582,7 @@ __global__ void GPUFLAME_output_doctor_reached(xmachine_memory_agent_list* agent
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -9242,6 +10627,7 @@ __global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list*
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -9269,6 +10655,7 @@ __global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list*
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -9307,6 +10694,7 @@ __global__ void GPUFLAME_receive_specialist_response(xmachine_memory_agent_list*
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -9353,6 +10741,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -9387,6 +10776,7 @@ __global__ void GPUFLAME_output_specialist_petition(xmachine_memory_agent_list* 
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -9432,6 +10822,7 @@ __global__ void GPUFLAME_output_specialist_reached(xmachine_memory_agent_list* a
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -9466,6 +10857,395 @@ __global__ void GPUFLAME_output_specialist_reached(xmachine_memory_agent_list* a
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
+	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_output_bed_petition(xmachine_memory_agent_list* agents, xmachine_message_bed_petition_list* bed_petition_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_output_bed_petition Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
+	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
+
+	//FLAME function call
+	int dead = !output_bed_petition(&agent, bed_petition_messages	);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_output_bed_petition Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
+	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_bed_state(xmachine_memory_agent_list* agents, xmachine_message_bed_state_list* bed_state_messages, RNG_rand48* rand48){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_bed_state Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
+	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
+	} else {
+	
+	agent.id = 0;
+	agent.x = 0;
+	agent.y = 0;
+	agent.velx = 0;
+	agent.vely = 0;
+	agent.steer_x = 0;
+	agent.steer_y = 0;
+	agent.height = 0;
+	agent.exit_no = 0;
+	agent.speed = 0;
+	agent.lod = 0;
+	agent.animate = 0;
+	agent.animate_dir = 0;
+	agent.estado = 0;
+	agent.tick = 0;
+	agent.estado_movimiento = 0;
+	agent.go_to_x = 0;
+	agent.go_to_y = 0;
+	agent.checkpoint = 0;
+	agent.chair_no = 0;
+	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.specialist_no = 0;
+	agent.bed_no = 0;
+	agent.priority = 0;
+	agent.vaccine = 0;
+	}
+
+	//FLAME function call
+	int dead = !receive_bed_state(&agent, bed_state_messages, rand48);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_bed_state Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
+	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_bed_response(xmachine_memory_agent_list* agents, xmachine_message_bed_response_list* bed_response_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_bed_response Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
+	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
+	} else {
+	
+	agent.id = 0;
+	agent.x = 0;
+	agent.y = 0;
+	agent.velx = 0;
+	agent.vely = 0;
+	agent.steer_x = 0;
+	agent.steer_y = 0;
+	agent.height = 0;
+	agent.exit_no = 0;
+	agent.speed = 0;
+	agent.lod = 0;
+	agent.animate = 0;
+	agent.animate_dir = 0;
+	agent.estado = 0;
+	agent.tick = 0;
+	agent.estado_movimiento = 0;
+	agent.go_to_x = 0;
+	agent.go_to_y = 0;
+	agent.checkpoint = 0;
+	agent.chair_no = 0;
+	agent.box_no = 0;
+	agent.doctor_no = 0;
+	agent.specialist_no = 0;
+	agent.bed_no = 0;
+	agent.priority = 0;
+	agent.vaccine = 0;
+	}
+
+	//FLAME function call
+	int dead = !receive_bed_response(&agent, bed_response_messages);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_agent_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_bed_response Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
+	agents->priority[index] = agent.priority;
+	agents->vaccine[index] = agent.vaccine;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_output_bed_contact(xmachine_memory_agent_list* agents, xmachine_message_bed_contact_list* bed_contact_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_output_bed_contact Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.id = agents->id[index];
+	agent.x = agents->x[index];
+	agent.y = agents->y[index];
+	agent.velx = agents->velx[index];
+	agent.vely = agents->vely[index];
+	agent.steer_x = agents->steer_x[index];
+	agent.steer_y = agents->steer_y[index];
+	agent.height = agents->height[index];
+	agent.exit_no = agents->exit_no[index];
+	agent.speed = agents->speed[index];
+	agent.lod = agents->lod[index];
+	agent.animate = agents->animate[index];
+	agent.animate_dir = agents->animate_dir[index];
+	agent.estado = agents->estado[index];
+	agent.tick = agents->tick[index];
+	agent.estado_movimiento = agents->estado_movimiento[index];
+	agent.go_to_x = agents->go_to_x[index];
+	agent.go_to_y = agents->go_to_y[index];
+	agent.checkpoint = agents->checkpoint[index];
+	agent.chair_no = agents->chair_no[index];
+	agent.box_no = agents->box_no[index];
+	agent.doctor_no = agents->doctor_no[index];
+	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
+	agent.priority = agents->priority[index];
+	agent.vaccine = agents->vaccine[index];
+
+	//FLAME function call
+	int dead = !output_bed_contact(&agent, bed_contact_messages	);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_output_bed_contact Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->x[index] = agent.x;
+	agents->y[index] = agent.y;
+	agents->velx[index] = agent.velx;
+	agents->vely[index] = agent.vely;
+	agents->steer_x[index] = agent.steer_x;
+	agents->steer_y[index] = agent.steer_y;
+	agents->height[index] = agent.height;
+	agents->exit_no[index] = agent.exit_no;
+	agents->speed[index] = agent.speed;
+	agents->lod[index] = agent.lod;
+	agents->animate[index] = agent.animate;
+	agents->animate_dir[index] = agent.animate_dir;
+	agents->estado[index] = agent.estado;
+	agents->tick[index] = agent.tick;
+	agents->estado_movimiento[index] = agent.estado_movimiento;
+	agents->go_to_x[index] = agent.go_to_x;
+	agents->go_to_y[index] = agent.go_to_y;
+	agents->checkpoint[index] = agent.checkpoint;
+	agents->chair_no[index] = agent.chair_no;
+	agents->box_no[index] = agent.box_no;
+	agents->doctor_no[index] = agent.doctor_no;
+	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -9511,6 +11291,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 
@@ -9545,6 +11326,7 @@ __global__ void GPUFLAME_output_triage_petition(xmachine_memory_agent_list* agen
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 }
@@ -9589,6 +11371,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.box_no = agents->box_no[index];
 	agent.doctor_no = agents->doctor_no[index];
 	agent.specialist_no = agents->specialist_no[index];
+	agent.bed_no = agents->bed_no[index];
 	agent.priority = agents->priority[index];
 	agent.vaccine = agents->vaccine[index];
 	} else {
@@ -9616,6 +11399,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agent.box_no = 0;
 	agent.doctor_no = 0;
 	agent.specialist_no = 0;
+	agent.bed_no = 0;
 	agent.priority = 0;
 	agent.vaccine = 0;
 	}
@@ -9654,6 +11438,7 @@ __global__ void GPUFLAME_receive_triage_response(xmachine_memory_agent_list* age
 	agents->box_no[index] = agent.box_no;
 	agents->doctor_no[index] = agent.doctor_no;
 	agents->specialist_no[index] = agent.specialist_no;
+	agents->bed_no[index] = agent.bed_no;
 	agents->priority[index] = agent.priority;
 	agents->vaccine[index] = agent.vaccine;
 	}
@@ -9847,6 +11632,50 @@ __global__ void GPUFLAME_output_chair_state(xmachine_memory_chair_list* agents, 
 	agents->tick[index] = agent.tick;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
+	agents->state[index] = agent.state;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_output_bed_state(xmachine_memory_bed_list* agents, xmachine_message_bed_contact_list* bed_contact_messages, xmachine_message_bed_state_list* bed_state_messages, RNG_rand48* rand48){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_output_bed_state Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_bed agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_bed_count){
+    
+	agent.id = agents->id[index];
+	agent.tick = agents->tick[index];
+	agent.state = agents->state[index];
+	} else {
+	
+	agent.id = 0;
+	agent.tick = 0;
+	agent.state = 0;
+	}
+
+	//FLAME function call
+	int dead = !output_bed_state(&agent, bed_contact_messages, bed_state_messages	, rand48);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_bed_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_output_bed_state Coalesced memory write (ignore arrays)
+	agents->id[index] = agent.id;
+	agents->tick[index] = agent.tick;
 	agents->state[index] = agent.state;
 	}
 }
@@ -10183,6 +12012,7 @@ __global__ void GPUFLAME_generate_chairs(xmachine_memory_agent_generator_list* a
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
 	agent.chairs_generated = agents->chairs_generated[index];
+	agent.beds_generated = agents->beds_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
@@ -10197,6 +12027,48 @@ __global__ void GPUFLAME_generate_chairs(xmachine_memory_agent_generator_list* a
 
 	//AoS to SoA - xmachine_memory_generate_chairs Coalesced memory write (ignore arrays)
 	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->beds_generated[index] = agent.beds_generated;
+	agents->boxes_generated[index] = agent.boxes_generated;
+	agents->doctors_generated[index] = agent.doctors_generated;
+	agents->specialists_generated[index] = agent.specialists_generated;
+	agents->personal_generated[index] = agent.personal_generated;
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_generate_beds(xmachine_memory_agent_generator_list* agents, xmachine_memory_bed_list* bed_agents){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    //For agents not using non partitioned message input check the agent bounds
+    if (index >= d_xmachine_memory_agent_generator_count)
+        return;
+    
+
+	//SoA to AoS - xmachine_memory_generate_beds Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_agent_generator agent;
+    
+    // Thread bounds already checked, but the agent function will still execute. load default values?
+	
+	agent.chairs_generated = agents->chairs_generated[index];
+	agent.beds_generated = agents->beds_generated[index];
+	agent.boxes_generated = agents->boxes_generated[index];
+	agent.doctors_generated = agents->doctors_generated[index];
+	agent.specialists_generated = agents->specialists_generated[index];
+	agent.personal_generated = agents->personal_generated[index];
+
+	//FLAME function call
+	int dead = !generate_beds(&agent, bed_agents);
+	
+
+	//continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_generate_beds Coalesced memory write (ignore arrays)
+	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->beds_generated[index] = agent.beds_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
@@ -10222,6 +12094,7 @@ __global__ void GPUFLAME_generate_boxes(xmachine_memory_agent_generator_list* ag
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
 	agent.chairs_generated = agents->chairs_generated[index];
+	agent.beds_generated = agents->beds_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
@@ -10236,6 +12109,7 @@ __global__ void GPUFLAME_generate_boxes(xmachine_memory_agent_generator_list* ag
 
 	//AoS to SoA - xmachine_memory_generate_boxes Coalesced memory write (ignore arrays)
 	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->beds_generated[index] = agent.beds_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
@@ -10261,6 +12135,7 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
 	agent.chairs_generated = agents->chairs_generated[index];
+	agent.beds_generated = agents->beds_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
@@ -10275,6 +12150,7 @@ __global__ void GPUFLAME_generate_doctors(xmachine_memory_agent_generator_list* 
 
 	//AoS to SoA - xmachine_memory_generate_doctors Coalesced memory write (ignore arrays)
 	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->beds_generated[index] = agent.beds_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
@@ -10300,6 +12176,7 @@ __global__ void GPUFLAME_generate_specialists(xmachine_memory_agent_generator_li
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
 	agent.chairs_generated = agents->chairs_generated[index];
+	agent.beds_generated = agents->beds_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
@@ -10314,6 +12191,7 @@ __global__ void GPUFLAME_generate_specialists(xmachine_memory_agent_generator_li
 
 	//AoS to SoA - xmachine_memory_generate_specialists Coalesced memory write (ignore arrays)
 	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->beds_generated[index] = agent.beds_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
@@ -10339,6 +12217,7 @@ __global__ void GPUFLAME_generate_personal(xmachine_memory_agent_generator_list*
     // Thread bounds already checked, but the agent function will still execute. load default values?
 	
 	agent.chairs_generated = agents->chairs_generated[index];
+	agent.beds_generated = agents->beds_generated[index];
 	agent.boxes_generated = agents->boxes_generated[index];
 	agent.doctors_generated = agents->doctors_generated[index];
 	agent.specialists_generated = agents->specialists_generated[index];
@@ -10353,6 +12232,7 @@ __global__ void GPUFLAME_generate_personal(xmachine_memory_agent_generator_list*
 
 	//AoS to SoA - xmachine_memory_generate_personal Coalesced memory write (ignore arrays)
 	agents->chairs_generated[index] = agent.chairs_generated;
+	agents->beds_generated[index] = agent.beds_generated;
 	agents->boxes_generated[index] = agent.boxes_generated;
 	agents->doctors_generated[index] = agent.doctors_generated;
 	agents->specialists_generated[index] = agent.specialists_generated;
@@ -10436,6 +12316,86 @@ __global__ void GPUFLAME_receive_free_chair(xmachine_memory_chair_admin_list* ag
 
 	//AoS to SoA - xmachine_memory_receive_free_chair Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_attend_bed_petitions(xmachine_memory_uci_list* agents, xmachine_message_bed_petition_list* bed_petition_messages, xmachine_message_bed_response_list* bed_response_messages, RNG_rand48* rand48){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_attend_bed_petitions Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_uci agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_uci_count){
+    
+	agent.tick = agents->tick[index];
+    agent.bedArray = &(agents->bedArray[index]);
+	} else {
+	
+	agent.tick = 0;
+    agent.bedArray = nullptr;
+	}
+
+	//FLAME function call
+	int dead = !attend_bed_petitions(&agent, bed_petition_messages, bed_response_messages	, rand48);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_uci_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_attend_bed_petitions Coalesced memory write (ignore arrays)
+	agents->tick[index] = agent.tick;
+	}
+}
+
+/**
+ *
+ */
+__global__ void GPUFLAME_receive_free_bed(xmachine_memory_uci_list* agents, xmachine_message_free_bed_list* free_bed_messages){
+	
+	//continuous agent: index is agent position in 1D agent list
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+  
+    
+    //No partitioned input requires threads to be launched beyond the agent count to ensure full block sizes
+    
+
+	//SoA to AoS - xmachine_memory_receive_free_bed Coalesced memory read (arrays point to first item for agent index)
+	xmachine_memory_uci agent;
+    //No partitioned input may launch more threads than required - only load agent data within bounds. 
+    if (index < d_xmachine_memory_uci_count){
+    
+	agent.tick = agents->tick[index];
+    agent.bedArray = &(agents->bedArray[index]);
+	} else {
+	
+	agent.tick = 0;
+    agent.bedArray = nullptr;
+	}
+
+	//FLAME function call
+	int dead = !receive_free_bed(&agent, free_bed_messages);
+	
+
+	
+    //No partitioned input may launch more threads than required - only write agent data within bounds. 
+    if (index < d_xmachine_memory_uci_count){
+    //continuous agent: set reallocation flag
+	agents->_scan_input[index]  = dead; 
+
+	//AoS to SoA - xmachine_memory_receive_free_bed Coalesced memory write (ignore arrays)
+	agents->tick[index] = agent.tick;
 	}
 }
 

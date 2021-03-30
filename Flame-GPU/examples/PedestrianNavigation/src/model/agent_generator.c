@@ -23,6 +23,16 @@ __FLAME_GPU_FUNC__ int generate_boxes(xmachine_memory_agent_generator* agent, xm
     return 0;
 }
 
+__FLAME_GPU_FUNC__ int generate_beds(xmachine_memory_agent_generator* agent, xmachine_memory_bed_list* bed_agents){
+    
+    printf("Cama generada\n"); 
+    
+    add_bed_agent(bed_agents, agent->beds_generated,0,0);
+
+    agent->beds_generated++;
+    return 0;
+}
+
 __FLAME_GPU_FUNC__ int generate_doctors(xmachine_memory_agent_generator* agent, xmachine_memory_doctor_list* doctor_agents){
     
     printf("Doctor generado\n"); 
@@ -75,7 +85,7 @@ __FLAME_GPU_FUNC__ int generate_personal(xmachine_memory_agent_generator* agent,
     if(random <= PROB_VACCINE_STAFF){
         vaccine = 1;
     }
-    add_agent_agent(agent_agents, -(agent->personal_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, vaccine);
+    add_agent_agent(agent_agents, -(agent->personal_generated+1), x, y, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0/*exit*/, 0, 1, 0, 1, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, vaccine);
 
     agent->personal_generated++;
     return 0;

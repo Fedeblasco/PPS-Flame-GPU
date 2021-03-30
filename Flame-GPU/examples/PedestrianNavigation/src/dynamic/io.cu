@@ -117,7 +117,7 @@ void readArrayInputVectorType( BASE_T (*parseFunc)(const char*), char* buffer, T
     }
 }
 
-void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_doctor_manager_list* h_doctor_managers_defaultDoctorManager, xmachine_memory_doctor_manager_list* d_doctor_managers_defaultDoctorManager, int h_xmachine_memory_doctor_manager_defaultDoctorManager_count,xmachine_memory_specialist_manager_list* h_specialist_managers_defaultSpecialistManager, xmachine_memory_specialist_manager_list* d_specialist_managers_defaultSpecialistManager, int h_xmachine_memory_specialist_manager_defaultSpecialistManager_count,xmachine_memory_specialist_list* h_specialists_defaultSpecialist, xmachine_memory_specialist_list* d_specialists_defaultSpecialist, int h_xmachine_memory_specialist_defaultSpecialist_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_doctor_list* h_doctors_defaultDoctor, xmachine_memory_doctor_list* d_doctors_defaultDoctor, int h_xmachine_memory_doctor_defaultDoctor_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count)
+void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_agent_list* h_agents_default, xmachine_memory_agent_list* d_agents_default, int h_xmachine_memory_agent_default_count,xmachine_memory_navmap_list* h_navmaps_static, xmachine_memory_navmap_list* d_navmaps_static, int h_xmachine_memory_navmap_static_count,xmachine_memory_chair_list* h_chairs_defaultChair, xmachine_memory_chair_list* d_chairs_defaultChair, int h_xmachine_memory_chair_defaultChair_count,xmachine_memory_bed_list* h_beds_defaultBed, xmachine_memory_bed_list* d_beds_defaultBed, int h_xmachine_memory_bed_defaultBed_count,xmachine_memory_doctor_manager_list* h_doctor_managers_defaultDoctorManager, xmachine_memory_doctor_manager_list* d_doctor_managers_defaultDoctorManager, int h_xmachine_memory_doctor_manager_defaultDoctorManager_count,xmachine_memory_specialist_manager_list* h_specialist_managers_defaultSpecialistManager, xmachine_memory_specialist_manager_list* d_specialist_managers_defaultSpecialistManager, int h_xmachine_memory_specialist_manager_defaultSpecialistManager_count,xmachine_memory_specialist_list* h_specialists_defaultSpecialist, xmachine_memory_specialist_list* d_specialists_defaultSpecialist, int h_xmachine_memory_specialist_defaultSpecialist_count,xmachine_memory_receptionist_list* h_receptionists_defaultReceptionist, xmachine_memory_receptionist_list* d_receptionists_defaultReceptionist, int h_xmachine_memory_receptionist_defaultReceptionist_count,xmachine_memory_agent_generator_list* h_agent_generators_defaultGenerator, xmachine_memory_agent_generator_list* d_agent_generators_defaultGenerator, int h_xmachine_memory_agent_generator_defaultGenerator_count,xmachine_memory_chair_admin_list* h_chair_admins_defaultAdmin, xmachine_memory_chair_admin_list* d_chair_admins_defaultAdmin, int h_xmachine_memory_chair_admin_defaultAdmin_count,xmachine_memory_uci_list* h_ucis_defaultUci, xmachine_memory_uci_list* d_ucis_defaultUci, int h_xmachine_memory_uci_defaultUci_count,xmachine_memory_box_list* h_boxs_defaultBox, xmachine_memory_box_list* d_boxs_defaultBox, int h_xmachine_memory_box_defaultBox_count,xmachine_memory_doctor_list* h_doctors_defaultDoctor, xmachine_memory_doctor_list* d_doctors_defaultDoctor, int h_xmachine_memory_doctor_defaultDoctor_count,xmachine_memory_triage_list* h_triages_defaultTriage, xmachine_memory_triage_list* d_triages_defaultTriage, int h_xmachine_memory_triage_defaultTriage_count)
 {
     PROFILE_SCOPED_RANGE("saveIterationData");
 	cudaError_t cudaStatus;
@@ -140,6 +140,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying chair Agent defaultChair State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_beds_defaultBed, d_beds_defaultBed, sizeof(xmachine_memory_bed_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying bed Agent defaultBed State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_doctor_managers_defaultDoctorManager, d_doctor_managers_defaultDoctorManager, sizeof(xmachine_memory_doctor_manager_list), cudaMemcpyDeviceToHost);
@@ -176,6 +182,12 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr,"Error Copying chair_admin Agent defaultAdmin State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
+		exit(cudaStatus);
+	}
+	cudaStatus = cudaMemcpy( h_ucis_defaultUci, d_ucis_defaultUci, sizeof(xmachine_memory_uci_list), cudaMemcpyDeviceToHost);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr,"Error Copying uci Agent defaultUci State Memory from GPU: %s\n", cudaGetErrorString(cudaStatus));
 		exit(cudaStatus);
 	}
 	cudaStatus = cudaMemcpy( h_boxs_defaultBox, d_boxs_defaultBox, sizeof(xmachine_memory_box_list), cudaMemcpyDeviceToHost);
@@ -390,6 +402,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%f", (*get_PROB_INFECT_CHAIR()));
     fputs(data, file);
     fputs("</PROB_INFECT_CHAIR>\n", file);
+    fputs("\t<PROB_INFECT_BED>", file);
+    sprintf(data, "%f", (*get_PROB_INFECT_BED()));
+    fputs(data, file);
+    fputs("</PROB_INFECT_BED>\n", file);
     fputs("\t<PROB_VACCINE>", file);
     sprintf(data, "%f", (*get_PROB_VACCINE()));
     fputs(data, file);
@@ -446,6 +462,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_UCI_Y()));
     fputs(data, file);
     fputs("</UCI_Y>\n", file);
+    fputs("\t<NUMBER_OF_BEDS>", file);
+    sprintf(data, "%d", (*get_NUMBER_OF_BEDS()));
+    fputs(data, file);
+    fputs("</NUMBER_OF_BEDS>\n", file);
     fputs("\t<CHECKPOINT_1_X>", file);
     sprintf(data, "%d", (*get_CHECKPOINT_1_X()));
     fputs(data, file);
@@ -692,6 +712,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</specialist_no>\n", file);
         
+		fputs("<bed_no>", file);
+        sprintf(data, "%u", h_agents_default->bed_no[i]);
+		fputs(data, file);
+		fputs("</bed_no>\n", file);
+        
 		fputs("<priority>", file);
         sprintf(data, "%u", h_agents_default->priority[i]);
 		fputs(data, file);
@@ -843,6 +868,28 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
         
 		fputs("<state>", file);
         sprintf(data, "%d", h_chairs_defaultChair->state[i]);
+		fputs(data, file);
+		fputs("</state>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each bed agent to xml
+	for (int i=0; i<h_xmachine_memory_bed_defaultBed_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>bed</name>\n", file);
+        
+		fputs("<id>", file);
+        sprintf(data, "%d", h_beds_defaultBed->id[i]);
+		fputs(data, file);
+		fputs("</id>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%d", h_beds_defaultBed->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
+		fputs("<state>", file);
+        sprintf(data, "%d", h_beds_defaultBed->state[i]);
 		fputs(data, file);
 		fputs("</state>\n", file);
         
@@ -1052,6 +1099,11 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 		fputs(data, file);
 		fputs("</chairs_generated>\n", file);
         
+		fputs("<beds_generated>", file);
+        sprintf(data, "%d", h_agent_generators_defaultGenerator->beds_generated[i]);
+		fputs(data, file);
+		fputs("</beds_generated>\n", file);
+        
 		fputs("<boxes_generated>", file);
         sprintf(data, "%d", h_agent_generators_defaultGenerator->boxes_generated[i]);
 		fputs(data, file);
@@ -1091,6 +1143,26 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
                 fprintf(file, ",");
         }
 		fputs("</chairArray>\n", file);
+        
+		fputs("</xagent>\n", file);
+	}
+	//Write each uci agent to xml
+	for (int i=0; i<h_xmachine_memory_uci_defaultUci_count; i++){
+		fputs("<xagent>\n" , file);
+		fputs("<name>uci</name>\n", file);
+        
+		fputs("<tick>", file);
+        sprintf(data, "%u", h_ucis_defaultUci->tick[i]);
+		fputs(data, file);
+		fputs("</tick>\n", file);
+        
+		fputs("<bedArray>", file);
+        for (int j=0;j<100;j++){
+            fprintf(file, "%d, %d", h_ucis_defaultUci->bedArray[(j*xmachine_memory_uci_MAX)+i].x, h_ucis_defaultUci->bedArray[(j*xmachine_memory_uci_MAX)+i].y);
+            if(j!=(100-1))
+                fprintf(file, "|");
+        }
+		fputs("</bedArray>\n", file);
         
 		fputs("</xagent>\n", file);
 	}
@@ -1191,7 +1263,7 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
 
 }
 
-void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_doctor_manager_list* h_doctor_managers, int* h_xmachine_memory_doctor_manager_count,xmachine_memory_specialist_manager_list* h_specialist_managers, int* h_xmachine_memory_specialist_manager_count,xmachine_memory_specialist_list* h_specialists, int* h_xmachine_memory_specialist_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_doctor_list* h_doctors, int* h_xmachine_memory_doctor_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count)
+void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, int* h_xmachine_memory_agent_count,xmachine_memory_navmap_list* h_navmaps, int* h_xmachine_memory_navmap_count,xmachine_memory_chair_list* h_chairs, int* h_xmachine_memory_chair_count,xmachine_memory_bed_list* h_beds, int* h_xmachine_memory_bed_count,xmachine_memory_doctor_manager_list* h_doctor_managers, int* h_xmachine_memory_doctor_manager_count,xmachine_memory_specialist_manager_list* h_specialist_managers, int* h_xmachine_memory_specialist_manager_count,xmachine_memory_specialist_list* h_specialists, int* h_xmachine_memory_specialist_count,xmachine_memory_receptionist_list* h_receptionists, int* h_xmachine_memory_receptionist_count,xmachine_memory_agent_generator_list* h_agent_generators, int* h_xmachine_memory_agent_generator_count,xmachine_memory_chair_admin_list* h_chair_admins, int* h_xmachine_memory_chair_admin_count,xmachine_memory_uci_list* h_ucis, int* h_xmachine_memory_uci_count,xmachine_memory_box_list* h_boxs, int* h_xmachine_memory_box_count,xmachine_memory_doctor_list* h_doctors, int* h_xmachine_memory_doctor_count,xmachine_memory_triage_list* h_triages, int* h_xmachine_memory_triage_count)
 {
     PROFILE_SCOPED_RANGE("readInitialStates");
 
@@ -1234,6 +1306,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_agent_box_no;
     int in_agent_doctor_no;
     int in_agent_specialist_no;
+    int in_agent_bed_no;
     int in_agent_priority;
     int in_agent_vaccine;
     int in_navmap_x;
@@ -1262,6 +1335,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_chair_x;
     int in_chair_y;
     int in_chair_state;
+    int in_bed_id;
+    int in_bed_tick;
+    int in_bed_state;
     int in_doctor_manager_tick;
     int in_doctor_manager_rear;
     int in_doctor_manager_size;
@@ -1289,12 +1365,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_receptionist_current_patient;
     int in_receptionist_attend_patient;
     int in_agent_generator_chairs_generated;
+    int in_agent_generator_beds_generated;
     int in_agent_generator_boxes_generated;
     int in_agent_generator_doctors_generated;
     int in_agent_generator_specialists_generated;
     int in_agent_generator_personal_generated;
     int in_chair_admin_id;
     int in_chair_admin_chairArray;
+    int in_uci_tick;
+    int in_uci_bedArray;
     int in_box_id;
     int in_box_current_patient;
     int in_box_tick;
@@ -1398,6 +1477,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_PROB_INFECT_CHAIR;
     
+    int in_env_PROB_INFECT_BED;
+    
     int in_env_PROB_VACCINE;
     
     int in_env_PROB_VACCINE_STAFF;
@@ -1425,6 +1506,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int in_env_UCI_X;
     
     int in_env_UCI_Y;
+    
+    int in_env_NUMBER_OF_BEDS;
     
     int in_env_CHECKPOINT_1_X;
     
@@ -1492,12 +1575,14 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	*h_xmachine_memory_agent_count = 0;
 	*h_xmachine_memory_navmap_count = 0;
 	*h_xmachine_memory_chair_count = 0;
+	*h_xmachine_memory_bed_count = 0;
 	*h_xmachine_memory_doctor_manager_count = 0;
 	*h_xmachine_memory_specialist_manager_count = 0;
 	*h_xmachine_memory_specialist_count = 0;
 	*h_xmachine_memory_receptionist_count = 0;
 	*h_xmachine_memory_agent_generator_count = 0;
 	*h_xmachine_memory_chair_admin_count = 0;
+	*h_xmachine_memory_uci_count = 0;
 	*h_xmachine_memory_box_count = 0;
 	*h_xmachine_memory_doctor_count = 0;
 	*h_xmachine_memory_triage_count = 0;
@@ -1526,6 +1611,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	unsigned int agent_box_no;
 	unsigned int agent_doctor_no;
 	unsigned int agent_specialist_no;
+	unsigned int agent_bed_no;
 	unsigned int agent_priority;
 	unsigned int agent_vaccine;
 	int navmap_x;
@@ -1554,6 +1640,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int chair_x;
 	int chair_y;
 	int chair_state;
+	int bed_id;
+	int bed_tick;
+	int bed_state;
 	unsigned int doctor_manager_tick;
 	unsigned int doctor_manager_rear;
 	unsigned int doctor_manager_size;
@@ -1581,12 +1670,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	int receptionist_current_patient;
 	int receptionist_attend_patient;
 	int agent_generator_chairs_generated;
+	int agent_generator_beds_generated;
 	int agent_generator_boxes_generated;
 	int agent_generator_doctors_generated;
 	int agent_generator_specialists_generated;
 	int agent_generator_personal_generated;
 	unsigned int chair_admin_id;
     unsigned int chair_admin_chairArray[35];
+	unsigned int uci_tick;
+    ivec2 uci_bedArray[100];
 	unsigned int box_id;
 	unsigned int box_current_patient;
 	unsigned int box_tick;
@@ -1645,6 +1737,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     float env_PROB_SPAWN_SICK;
     float env_PROB_INFECT_PERSONAL;
     float env_PROB_INFECT_CHAIR;
+    float env_PROB_INFECT_BED;
     float env_PROB_VACCINE;
     float env_PROB_VACCINE_STAFF;
     int env_FIRSTCHAIR_X;
@@ -1659,6 +1752,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int env_TRIAGE_Y;
     int env_UCI_X;
     int env_UCI_Y;
+    int env_NUMBER_OF_BEDS;
     int env_CHECKPOINT_1_X;
     int env_CHECKPOINT_1_Y;
     int env_CHECKPOINT_2_X;
@@ -1730,6 +1824,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_agent_box_no = 0;
 	in_agent_doctor_no = 0;
 	in_agent_specialist_no = 0;
+	in_agent_bed_no = 0;
 	in_agent_priority = 0;
 	in_agent_vaccine = 0;
 	in_navmap_x = 0;
@@ -1758,6 +1853,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_chair_x = 0;
 	in_chair_y = 0;
 	in_chair_state = 0;
+	in_bed_id = 0;
+	in_bed_tick = 0;
+	in_bed_state = 0;
 	in_doctor_manager_tick = 0;
 	in_doctor_manager_rear = 0;
 	in_doctor_manager_size = 0;
@@ -1785,12 +1883,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	in_receptionist_current_patient = 0;
 	in_receptionist_attend_patient = 0;
 	in_agent_generator_chairs_generated = 0;
+	in_agent_generator_beds_generated = 0;
 	in_agent_generator_boxes_generated = 0;
 	in_agent_generator_doctors_generated = 0;
 	in_agent_generator_specialists_generated = 0;
 	in_agent_generator_personal_generated = 0;
 	in_chair_admin_id = 0;
 	in_chair_admin_chairArray = 0;
+	in_uci_tick = 0;
+	in_uci_bedArray = 0;
 	in_box_id = 0;
 	in_box_current_patient = 0;
 	in_box_tick = 0;
@@ -1847,6 +1948,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_PROB_SPAWN_SICK = 0;
     in_env_PROB_INFECT_PERSONAL = 0;
     in_env_PROB_INFECT_CHAIR = 0;
+    in_env_PROB_INFECT_BED = 0;
     in_env_PROB_VACCINE = 0;
     in_env_PROB_VACCINE_STAFF = 0;
     in_env_FIRSTCHAIR_X = 0;
@@ -1861,6 +1963,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_TRIAGE_Y = 0;
     in_env_UCI_X = 0;
     in_env_UCI_Y = 0;
+    in_env_NUMBER_OF_BEDS = 0;
     in_env_CHECKPOINT_1_X = 0;
     in_env_CHECKPOINT_1_Y = 0;
     in_env_CHECKPOINT_2_X = 0;
@@ -1919,6 +2022,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_agents->box_no[k] = 0;
 		h_agents->doctor_no[k] = 0;
 		h_agents->specialist_no[k] = 0;
+		h_agents->bed_no[k] = 0;
 		h_agents->priority[k] = 0;
 		h_agents->vaccine[k] = 0;
 	}
@@ -1959,6 +2063,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_chairs->x[k] = 0;
 		h_chairs->y[k] = 0;
 		h_chairs->state[k] = 0;
+	}
+	
+	//set all bed values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_bed_MAX; k++)
+	{	
+		h_beds->id[k] = 0;
+		h_beds->tick[k] = 0;
+		h_beds->state[k] = 0;
 	}
 	
 	//set all doctor_manager values to 0
@@ -2040,6 +2153,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 	for (int k=0; k<xmachine_memory_agent_generator_MAX; k++)
 	{	
 		h_agent_generators->chairs_generated[k] = 0;
+		h_agent_generators->beds_generated[k] = 0;
 		h_agent_generators->boxes_generated[k] = 0;
 		h_agent_generators->doctors_generated[k] = 0;
 		h_agent_generators->specialists_generated[k] = 0;
@@ -2053,6 +2167,16 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 		h_chair_admins->id[k] = 0;
         for (i=0;i<35;i++){
             h_chair_admins->chairArray[(i*xmachine_memory_chair_admin_MAX)+k] = 0;
+        }
+	}
+	
+	//set all uci values to 0
+	//If this is not done then it will cause errors in emu mode where undefined memory is not 0
+	for (int k=0; k<xmachine_memory_uci_MAX; k++)
+	{	
+		h_ucis->tick[k] = 0;
+        for (i=0;i<100;i++){
+            h_ucis->bedArray[(i*xmachine_memory_uci_MAX)+k] = {0,0};
         }
 	}
 	
@@ -2115,6 +2239,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     agent_box_no = 0;
     agent_doctor_no = 0;
     agent_specialist_no = 0;
+    agent_bed_no = 0;
     agent_priority = 0;
     agent_vaccine = 0;
     navmap_x = 0;
@@ -2143,6 +2268,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     chair_x = 0;
     chair_y = 0;
     chair_state = 0;
+    bed_id = 0;
+    bed_tick = 0;
+    bed_state = 0;
     doctor_manager_tick = 0;
     doctor_manager_rear = 0;
     doctor_manager_size = 0;
@@ -2194,6 +2322,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     receptionist_current_patient = -1;
     receptionist_attend_patient = 0;
     agent_generator_chairs_generated = 0;
+    agent_generator_beds_generated = 0;
     agent_generator_boxes_generated = 0;
     agent_generator_doctors_generated = 0;
     agent_generator_specialists_generated = 0;
@@ -2201,6 +2330,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     chair_admin_id = 0;
     for (i=0;i<35;i++){
         chair_admin_chairArray[i] = 0;
+    }
+    uci_tick = 0;
+    for (i=0;i<100;i++){
+        uci_bedArray[i] = {0,0};
     }
     box_id = 0;
     box_current_patient = 0;
@@ -2264,6 +2397,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_PROB_SPAWN_SICK = 0;
     env_PROB_INFECT_PERSONAL = 0;
     env_PROB_INFECT_CHAIR = 0;
+    env_PROB_INFECT_BED = 0;
     env_PROB_VACCINE = 0;
     env_PROB_VACCINE_STAFF = 0;
     env_FIRSTCHAIR_X = 0;
@@ -2278,6 +2412,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_TRIAGE_Y = 0;
     env_UCI_X = 0;
     env_UCI_Y = 0;
+    env_NUMBER_OF_BEDS = 0;
     env_CHECKPOINT_1_X = 0;
     env_CHECKPOINT_1_Y = 0;
     env_CHECKPOINT_2_X = 0;
@@ -2442,6 +2577,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					h_agents->box_no[*h_xmachine_memory_agent_count] = agent_box_no;
 					h_agents->doctor_no[*h_xmachine_memory_agent_count] = agent_doctor_no;
 					h_agents->specialist_no[*h_xmachine_memory_agent_count] = agent_specialist_no;
+					h_agents->bed_no[*h_xmachine_memory_agent_count] = agent_bed_no;
 					h_agents->priority[*h_xmachine_memory_agent_count] = agent_priority;
 					h_agents->vaccine[*h_xmachine_memory_agent_count] = agent_vaccine;
 					(*h_xmachine_memory_agent_count) ++;	
@@ -2517,6 +2653,20 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     
 					h_chairs->state[*h_xmachine_memory_chair_count] = chair_state;
 					(*h_xmachine_memory_chair_count) ++;	
+				}
+				else if(strcmp(agentname, "bed") == 0)
+				{
+					if (*h_xmachine_memory_bed_count > xmachine_memory_bed_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent bed exceeded whilst reading data\n", xmachine_memory_bed_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_beds->id[*h_xmachine_memory_bed_count] = bed_id;
+					h_beds->tick[*h_xmachine_memory_bed_count] = bed_tick;
+					h_beds->state[*h_xmachine_memory_bed_count] = bed_state;
+					(*h_xmachine_memory_bed_count) ++;	
 				}
 				else if(strcmp(agentname, "doctor_manager") == 0)
 				{
@@ -2622,6 +2772,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 					}
                     
 					h_agent_generators->chairs_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_chairs_generated;
+					h_agent_generators->beds_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_beds_generated;
 					h_agent_generators->boxes_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_boxes_generated;
 					h_agent_generators->doctors_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_doctors_generated;
 					h_agent_generators->specialists_generated[*h_xmachine_memory_agent_generator_count] = agent_generator_specialists_generated;
@@ -2642,6 +2793,21 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                         h_chair_admins->chairArray[(k*xmachine_memory_chair_admin_MAX)+(*h_xmachine_memory_chair_admin_count)] = chair_admin_chairArray[k];
                     }
 					(*h_xmachine_memory_chair_admin_count) ++;	
+				}
+				else if(strcmp(agentname, "uci") == 0)
+				{
+					if (*h_xmachine_memory_uci_count > xmachine_memory_uci_MAX){
+						printf("ERROR: MAX Buffer size (%i) for agent uci exceeded whilst reading data\n", xmachine_memory_uci_MAX);
+						// Close the file and stop reading
+						fclose(file);
+						exit(EXIT_FAILURE);
+					}
+                    
+					h_ucis->tick[*h_xmachine_memory_uci_count] = uci_tick;
+                    for (int k=0;k<100;k++){
+                        h_ucis->bedArray[(k*xmachine_memory_uci_MAX)+(*h_xmachine_memory_uci_count)] = uci_bedArray[k];
+                    }
+					(*h_xmachine_memory_uci_count) ++;	
 				}
 				else if(strcmp(agentname, "box") == 0)
 				{
@@ -2723,6 +2889,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 agent_box_no = 0;
                 agent_doctor_no = 0;
                 agent_specialist_no = 0;
+                agent_bed_no = 0;
                 agent_priority = 0;
                 agent_vaccine = 0;
                 navmap_x = 0;
@@ -2751,6 +2918,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 chair_x = 0;
                 chair_y = 0;
                 chair_state = 0;
+                bed_id = 0;
+                bed_tick = 0;
+                bed_state = 0;
                 doctor_manager_tick = 0;
                 doctor_manager_rear = 0;
                 doctor_manager_size = 0;
@@ -2802,6 +2972,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 receptionist_current_patient = -1;
                 receptionist_attend_patient = 0;
                 agent_generator_chairs_generated = 0;
+                agent_generator_beds_generated = 0;
                 agent_generator_boxes_generated = 0;
                 agent_generator_doctors_generated = 0;
                 agent_generator_specialists_generated = 0;
@@ -2809,6 +2980,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 chair_admin_id = 0;
                 for (i=0;i<35;i++){
                     chair_admin_chairArray[i] = 0;
+                }
+                uci_tick = 0;
+                for (i=0;i<100;i++){
+                    uci_bedArray[i] = {0,0};
                 }
                 box_id = 0;
                 box_current_patient = 0;
@@ -2875,6 +3050,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/doctor_no") == 0) in_agent_doctor_no = 0;
 			if(strcmp(buffer, "specialist_no") == 0) in_agent_specialist_no = 1;
 			if(strcmp(buffer, "/specialist_no") == 0) in_agent_specialist_no = 0;
+			if(strcmp(buffer, "bed_no") == 0) in_agent_bed_no = 1;
+			if(strcmp(buffer, "/bed_no") == 0) in_agent_bed_no = 0;
 			if(strcmp(buffer, "priority") == 0) in_agent_priority = 1;
 			if(strcmp(buffer, "/priority") == 0) in_agent_priority = 0;
 			if(strcmp(buffer, "vaccine") == 0) in_agent_vaccine = 1;
@@ -2931,6 +3108,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/y") == 0) in_chair_y = 0;
 			if(strcmp(buffer, "state") == 0) in_chair_state = 1;
 			if(strcmp(buffer, "/state") == 0) in_chair_state = 0;
+			if(strcmp(buffer, "id") == 0) in_bed_id = 1;
+			if(strcmp(buffer, "/id") == 0) in_bed_id = 0;
+			if(strcmp(buffer, "tick") == 0) in_bed_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_bed_tick = 0;
+			if(strcmp(buffer, "state") == 0) in_bed_state = 1;
+			if(strcmp(buffer, "/state") == 0) in_bed_state = 0;
 			if(strcmp(buffer, "tick") == 0) in_doctor_manager_tick = 1;
 			if(strcmp(buffer, "/tick") == 0) in_doctor_manager_tick = 0;
 			if(strcmp(buffer, "rear") == 0) in_doctor_manager_rear = 1;
@@ -2985,6 +3168,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/attend_patient") == 0) in_receptionist_attend_patient = 0;
 			if(strcmp(buffer, "chairs_generated") == 0) in_agent_generator_chairs_generated = 1;
 			if(strcmp(buffer, "/chairs_generated") == 0) in_agent_generator_chairs_generated = 0;
+			if(strcmp(buffer, "beds_generated") == 0) in_agent_generator_beds_generated = 1;
+			if(strcmp(buffer, "/beds_generated") == 0) in_agent_generator_beds_generated = 0;
 			if(strcmp(buffer, "boxes_generated") == 0) in_agent_generator_boxes_generated = 1;
 			if(strcmp(buffer, "/boxes_generated") == 0) in_agent_generator_boxes_generated = 0;
 			if(strcmp(buffer, "doctors_generated") == 0) in_agent_generator_doctors_generated = 1;
@@ -2997,6 +3182,10 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 			if(strcmp(buffer, "/id") == 0) in_chair_admin_id = 0;
 			if(strcmp(buffer, "chairArray") == 0) in_chair_admin_chairArray = 1;
 			if(strcmp(buffer, "/chairArray") == 0) in_chair_admin_chairArray = 0;
+			if(strcmp(buffer, "tick") == 0) in_uci_tick = 1;
+			if(strcmp(buffer, "/tick") == 0) in_uci_tick = 0;
+			if(strcmp(buffer, "bedArray") == 0) in_uci_bedArray = 1;
+			if(strcmp(buffer, "/bedArray") == 0) in_uci_bedArray = 0;
 			if(strcmp(buffer, "id") == 0) in_box_id = 1;
 			if(strcmp(buffer, "/id") == 0) in_box_id = 0;
 			if(strcmp(buffer, "current_patient") == 0) in_box_current_patient = 1;
@@ -3111,6 +3300,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/PROB_INFECT_PERSONAL") == 0) in_env_PROB_INFECT_PERSONAL = 0;
 			if(strcmp(buffer, "PROB_INFECT_CHAIR") == 0) in_env_PROB_INFECT_CHAIR = 1;
             if(strcmp(buffer, "/PROB_INFECT_CHAIR") == 0) in_env_PROB_INFECT_CHAIR = 0;
+			if(strcmp(buffer, "PROB_INFECT_BED") == 0) in_env_PROB_INFECT_BED = 1;
+            if(strcmp(buffer, "/PROB_INFECT_BED") == 0) in_env_PROB_INFECT_BED = 0;
 			if(strcmp(buffer, "PROB_VACCINE") == 0) in_env_PROB_VACCINE = 1;
             if(strcmp(buffer, "/PROB_VACCINE") == 0) in_env_PROB_VACCINE = 0;
 			if(strcmp(buffer, "PROB_VACCINE_STAFF") == 0) in_env_PROB_VACCINE_STAFF = 1;
@@ -3139,6 +3330,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/UCI_X") == 0) in_env_UCI_X = 0;
 			if(strcmp(buffer, "UCI_Y") == 0) in_env_UCI_Y = 1;
             if(strcmp(buffer, "/UCI_Y") == 0) in_env_UCI_Y = 0;
+			if(strcmp(buffer, "NUMBER_OF_BEDS") == 0) in_env_NUMBER_OF_BEDS = 1;
+            if(strcmp(buffer, "/NUMBER_OF_BEDS") == 0) in_env_NUMBER_OF_BEDS = 0;
 			if(strcmp(buffer, "CHECKPOINT_1_X") == 0) in_env_CHECKPOINT_1_X = 1;
             if(strcmp(buffer, "/CHECKPOINT_1_X") == 0) in_env_CHECKPOINT_1_X = 0;
 			if(strcmp(buffer, "CHECKPOINT_1_Y") == 0) in_env_CHECKPOINT_1_Y = 1;
@@ -3288,6 +3481,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_agent_specialist_no){
                     agent_specialist_no = (unsigned int) fpgu_strtoul(buffer); 
                 }
+				if(in_agent_bed_no){
+                    agent_bed_no = (unsigned int) fpgu_strtoul(buffer); 
+                }
 				if(in_agent_priority){
                     agent_priority = (unsigned int) fpgu_strtoul(buffer); 
                 }
@@ -3372,6 +3568,15 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_chair_state){
                     chair_state = (int) fpgu_strtol(buffer); 
                 }
+				if(in_bed_id){
+                    bed_id = (int) fpgu_strtol(buffer); 
+                }
+				if(in_bed_tick){
+                    bed_tick = (int) fpgu_strtol(buffer); 
+                }
+				if(in_bed_state){
+                    bed_state = (int) fpgu_strtol(buffer); 
+                }
 				if(in_doctor_manager_tick){
                     doctor_manager_tick = (unsigned int) fpgu_strtoul(buffer); 
                 }
@@ -3453,6 +3658,9 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
 				if(in_agent_generator_chairs_generated){
                     agent_generator_chairs_generated = (int) fpgu_strtol(buffer); 
                 }
+				if(in_agent_generator_beds_generated){
+                    agent_generator_beds_generated = (int) fpgu_strtol(buffer); 
+                }
 				if(in_agent_generator_boxes_generated){
                     agent_generator_boxes_generated = (int) fpgu_strtol(buffer); 
                 }
@@ -3470,6 +3678,12 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                 }
 				if(in_chair_admin_chairArray){
                     readArrayInput<unsigned int>(&fpgu_strtoul, buffer, chair_admin_chairArray, 35);    
+                }
+				if(in_uci_tick){
+                    uci_tick = (unsigned int) fpgu_strtoul(buffer); 
+                }
+				if(in_uci_bedArray){
+                    readArrayInputVectorType<ivec2, int, 2>(&fpgu_strtol, buffer, uci_bedArray, 100);    
                 }
 				if(in_box_id){
                     box_id = (unsigned int) fpgu_strtoul(buffer); 
@@ -3818,6 +4032,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     set_PROB_INFECT_CHAIR(&env_PROB_INFECT_CHAIR);
                   
               }
+            if(in_env_PROB_INFECT_BED){
+              
+                    env_PROB_INFECT_BED = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_INFECT_BED(&env_PROB_INFECT_BED);
+                  
+              }
             if(in_env_PROB_VACCINE){
               
                     env_PROB_VACCINE = (float) fgpu_atof(buffer);
@@ -3914,6 +4135,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_UCI_Y = (int) fpgu_strtol(buffer);
                     
                     set_UCI_Y(&env_UCI_Y);
+                  
+              }
+            if(in_env_NUMBER_OF_BEDS){
+              
+                    env_NUMBER_OF_BEDS = (int) fpgu_strtol(buffer);
+                    
+                    set_NUMBER_OF_BEDS(&env_NUMBER_OF_BEDS);
                   
               }
             if(in_env_CHECKPOINT_1_X){

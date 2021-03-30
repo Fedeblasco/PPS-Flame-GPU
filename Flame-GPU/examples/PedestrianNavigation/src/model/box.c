@@ -16,9 +16,10 @@ __FLAME_GPU_FUNC__ int determine_priority(RNG_rand48* rand48){
 __FLAME_GPU_FUNC__ int determine_room(RNG_rand48* rand48){
 	float random = rnd<CONTINUOUS>(rand48);
 	float acc = 0;
+	float acctemp = 0;
 	float prob_esp[] = {PROB_MEDICAL,PROB_SURGICAL,PROB_PEDIATRICS,PROB_GYNECOLOGIST,PROB_GERIATRICS,PROB_PSYCHIATRY,PROB_UCI};
 	for(int i = 0; i<7; i++){
-		float acctemp = acc+prob_esp[i];
+		acctemp = acc+prob_esp[i];
 		if((acc < random) && (random <= acctemp)){
 			return i;
 		}
