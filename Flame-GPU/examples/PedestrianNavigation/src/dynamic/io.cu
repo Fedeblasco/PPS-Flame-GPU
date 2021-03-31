@@ -414,6 +414,10 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%f", (*get_PROB_VACCINE_STAFF()));
     fputs(data, file);
     fputs("</PROB_VACCINE_STAFF>\n", file);
+    fputs("\t<UCI_INFECTION_CHANCE>", file);
+    sprintf(data, "%f", (*get_UCI_INFECTION_CHANCE()));
+    fputs(data, file);
+    fputs("</UCI_INFECTION_CHANCE>\n", file);
     fputs("\t<FIRSTCHAIR_X>", file);
     sprintf(data, "%d", (*get_FIRSTCHAIR_X()));
     fputs(data, file);
@@ -1483,6 +1487,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_PROB_VACCINE_STAFF;
     
+    int in_env_UCI_INFECTION_CHANCE;
+    
     int in_env_FIRSTCHAIR_X;
     
     int in_env_FIRSTCHAIR_Y;
@@ -1740,6 +1746,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     float env_PROB_INFECT_BED;
     float env_PROB_VACCINE;
     float env_PROB_VACCINE_STAFF;
+    float env_UCI_INFECTION_CHANCE;
     int env_FIRSTCHAIR_X;
     int env_FIRSTCHAIR_Y;
     int env_SPACE_BETWEEN;
@@ -1951,6 +1958,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_PROB_INFECT_BED = 0;
     in_env_PROB_VACCINE = 0;
     in_env_PROB_VACCINE_STAFF = 0;
+    in_env_UCI_INFECTION_CHANCE = 0;
     in_env_FIRSTCHAIR_X = 0;
     in_env_FIRSTCHAIR_Y = 0;
     in_env_SPACE_BETWEEN = 0;
@@ -2400,6 +2408,7 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_PROB_INFECT_BED = 0;
     env_PROB_VACCINE = 0;
     env_PROB_VACCINE_STAFF = 0;
+    env_UCI_INFECTION_CHANCE = 0;
     env_FIRSTCHAIR_X = 0;
     env_FIRSTCHAIR_Y = 0;
     env_SPACE_BETWEEN = 0;
@@ -3306,6 +3315,8 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/PROB_VACCINE") == 0) in_env_PROB_VACCINE = 0;
 			if(strcmp(buffer, "PROB_VACCINE_STAFF") == 0) in_env_PROB_VACCINE_STAFF = 1;
             if(strcmp(buffer, "/PROB_VACCINE_STAFF") == 0) in_env_PROB_VACCINE_STAFF = 0;
+			if(strcmp(buffer, "UCI_INFECTION_CHANCE") == 0) in_env_UCI_INFECTION_CHANCE = 1;
+            if(strcmp(buffer, "/UCI_INFECTION_CHANCE") == 0) in_env_UCI_INFECTION_CHANCE = 0;
 			if(strcmp(buffer, "FIRSTCHAIR_X") == 0) in_env_FIRSTCHAIR_X = 1;
             if(strcmp(buffer, "/FIRSTCHAIR_X") == 0) in_env_FIRSTCHAIR_X = 0;
 			if(strcmp(buffer, "FIRSTCHAIR_Y") == 0) in_env_FIRSTCHAIR_Y = 1;
@@ -4051,6 +4062,13 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_PROB_VACCINE_STAFF = (float) fgpu_atof(buffer);
                     
                     set_PROB_VACCINE_STAFF(&env_PROB_VACCINE_STAFF);
+                  
+              }
+            if(in_env_UCI_INFECTION_CHANCE){
+              
+                    env_UCI_INFECTION_CHANCE = (float) fgpu_atof(buffer);
+                    
+                    set_UCI_INFECTION_CHANCE(&env_UCI_INFECTION_CHANCE);
                   
               }
             if(in_env_FIRSTCHAIR_X){

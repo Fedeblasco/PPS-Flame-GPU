@@ -267,8 +267,8 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 			//Si estoy sano, y me cruce con un paciente que esta enfermo o es portador, cambio mi estado a portador
 			if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
-					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-					if(temp<PROB_SNIFF*PROB_INFECT){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
+					float rand = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
+					if(rand<PROB_SNIFF*PROB_INFECT){//Si el random es mas chico que la probabilidad de contagiarme, me contagio
 						agent->estado = 1;
 						int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
@@ -289,7 +289,7 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
     return 0;
 }
 
-__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
+__FLAME_GPU_FUNC__ int infect_patients(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
 
     xmachine_message_pedestrian_state* current_message = get_first_pedestrian_state_message(pedestrian_state_messages, partition_matrix, agent->x, agent->y, 0.0);
 	
@@ -306,8 +306,8 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 			//Si estoy sano, y me cruce con un paciente que esta enfermo o es portador, cambio mi estado a portador
 			if(agent->estado==0){
 				if(current_message->estado==1 || current_message->estado==2){
-					float temp = rnd<DISCRETE_2D>(rand48);//Valor de 0 a 1
-					if((temp<PROB_SNIFF*PROB_INFECT) && (!agent->vaccine)){//Si el random es mas chico que la probabilidad de contagiarme y no tengo la vacuna, me contagio
+					float rand = rnd<CONTINUOUS>(rand48);//Valor de 0 a 1
+					if((rand<PROB_SNIFF*PROB_INFECT) && (!agent->vaccine)){//Si el random es mas chico que la probabilidad de contagiarme y no tengo la vacuna, me contagio
 						agent->estado = 1;
 						//int prueba1 = floor(((current_message->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 						//int prueba2 = floor(((current_message->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
@@ -319,6 +319,38 @@ __FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine
 		current_message = get_next_pedestrian_state_message(current_message, pedestrian_state_messages, partition_matrix);
 	}
 
+	return 0;
+}
+
+__FLAME_GPU_FUNC__ int infect_patients_UCI(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48){
+
+	//Para contabilizar la cantidad de pacientes enfermos en la UCI
+	int qty = 0;
+	
+	xmachine_message_pedestrian_state* current_message = get_first_pedestrian_state_message(pedestrian_state_messages, partition_matrix, agent->x, agent->y, 0.0);
+	
+	glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
+	
+	while (current_message)
+	{	
+		glm::vec2 agent_pos = glm::vec2(agent->x, agent->y);
+		glm::vec2 message_pos = glm::vec2(current_message->x, current_message->y);
+		float separation = length(agent_pos - message_pos);
+		//Si la distancia entre uno y el otro es mayor a la distancia minima y menor al radio definido
+		if ((separation < MESSAGE_RADIUS)&&(separation>MIN_DISTANCE)){
+			if(current_message->estado==1 || current_message->estado==2){
+				qty++;
+			}			
+		}
+		current_message = get_next_pedestrian_state_message(current_message, pedestrian_state_messages, partition_matrix);
+	}
+
+	float rand = rnd<CONTINUOUS>(rand48);//Valor de 0 a 1
+	float P = qty * UCI_INFECTION_CHANCE;// Probabilidad de contagio en la UCI
+	if(rand <= P){
+		agent->estado = 1;
+	}
+	
 	return 0;
 }
 
@@ -725,14 +757,14 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 
 /*-------------------------------------------------------------Recepción de mensajes-------------------------------------------------------------*/
 
-__FLAME_GPU_FUNC__ int receive_check_in_response(xmachine_memory_agent* agent, xmachine_message_check_in_response_list* avisarPacienteMessages, xmachine_message_chair_petition_list* chairPetitionMessages){
+__FLAME_GPU_FUNC__ int receive_check_in_response(xmachine_memory_agent* agent, xmachine_message_check_in_response_list* avisarPacienteMessages, xmachine_message_free_chair_list* freeChairMessages){
 
 	xmachine_message_check_in_response* current_message = get_first_check_in_response_message(avisarPacienteMessages);
 	while(current_message){
 		if(current_message->id == agent->id){
 			//printf("Soy %d y recibi este mensaje %d\n",agent->id,current_message->id);
 			if(agent->chair_no != -1){
-				add_chair_petition_message(chairPetitionMessages, agent->id);
+				add_free_chair_message(freeChairMessages, agent->chair_no);
 				agent->chair_no = -1;
 			}
 			agent->estado_movimiento++;
@@ -745,6 +777,7 @@ __FLAME_GPU_FUNC__ int receive_check_in_response(xmachine_memory_agent* agent, x
 
 __FLAME_GPU_FUNC__ int receive_chair_response(xmachine_memory_agent* agent, xmachine_message_chair_response_list* chairResponseMessages){
 
+	//printf("Soy %d y me trabé en el estado 25, tengo que ir a %d\n", agent->id, agent->specialist_no);
 	xmachine_message_chair_response* current_message = get_first_chair_response_message(chairResponseMessages);
 	while(current_message){
 		if(current_message->id == agent->id){
@@ -798,14 +831,14 @@ __FLAME_GPU_FUNC__ int receive_bed_state(xmachine_memory_agent* agent, xmachine_
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xmachine_message_triage_response_list* triageResponseMessages, xmachine_message_chair_petition_list* chairPetitionMessages){
+__FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xmachine_message_triage_response_list* triageResponseMessages, xmachine_message_free_chair_list* freeChairMessages){
 	
 	xmachine_message_triage_response* current_message = get_first_triage_response_message(triageResponseMessages);
 	while(current_message){
 		if(agent->id == current_message->id){
 			agent->estado_movimiento++;
 			agent->box_no = current_message->box_no;
-			add_chair_petition_message(chairPetitionMessages, agent->id);
+			add_free_chair_message(freeChairMessages, agent->chair_no);
 			agent->chair_no = -1;
 			//printf("Tengo que ir al box %d, soy %d\n",current_message->box_no,agent->id);
 		}
@@ -925,7 +958,7 @@ __FLAME_GPU_FUNC__ int receive_bed_response(xmachine_memory_agent* agent, xmachi
 			if(current_message->bed_no != -1){
 				agent->estado_movimiento++;
 				agent->bed_no = current_message->bed_no;
-				printf("Soy %d y me voy a acostar en la cama %d por %d minutos\n",agent->id,current_message->bed_no);
+				//printf("Soy %d y me voy a acostar en la cama %d por %d minutos\n",agent->id,current_message->bed_no);
 			}else{
 				//printf("Me muero\n");
 				agent->estado_movimiento = 40;

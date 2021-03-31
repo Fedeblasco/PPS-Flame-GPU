@@ -196,6 +196,10 @@
         <type>float</type>
         <name>PROB_VACCINE_STAFF</name>
       </gpu:variable>
+      <gpu:variable>
+        <type>float</type>
+        <name>UCI_INFECTION_CHANCE</name>
+      </gpu:variable>
 <!-- Manejo de las sillas -->
       <gpu:variable>
         <type>int</type>
@@ -553,7 +557,7 @@
         </gpu:function>
 
         <gpu:function>
-          <name>infect_pedestrians</name>
+          <name>infect_patients</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <inputs>
@@ -563,11 +567,65 @@
           </inputs>
           <condition>
             <lhs>
-              <agentVariable>estado_movimiento</agentVariable>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>!=</operator>
+                <rhs>
+                    <value>35</value>
+                </rhs>
+              </condition>
             </lhs>
-            <operator>!=</operator>
+            <operator>and</operator>
             <rhs>
-                <value>35</value>
+              <condition>
+                <lhs>
+                  <agentVariable>estado</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>0</value>
+                </rhs>
+              </condition>
+            </rhs>
+          </condition>
+          <gpu:reallocate>false</gpu:reallocate>
+          <gpu:RNG>true</gpu:RNG>
+        </gpu:function>
+
+        <gpu:function>
+          <name>infect_patients_UCI</name>
+          <currentState>default</currentState>
+          <nextState>default</nextState>
+          <inputs>
+            <gpu:input>
+              <messageName>pedestrian_state</messageName>
+            </gpu:input>
+          </inputs>
+          <condition>
+            <lhs>
+              <condition>
+                <lhs>
+                  <agentVariable>estado_movimiento</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>35</value>
+                </rhs>
+              </condition>
+            </lhs>
+            <operator>and</operator>
+            <rhs>
+              <condition>
+                <lhs>
+                  <agentVariable>estado</agentVariable>
+                </lhs>
+                <operator>==</operator>
+                <rhs>
+                    <value>0</value>
+                </rhs>
+              </condition>
             </rhs>
           </condition>
           <gpu:reallocate>false</gpu:reallocate>
@@ -786,7 +844,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>chair_petition</messageName>
+              <messageName>free_chair</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -1376,7 +1434,7 @@
           </inputs>
           <outputs>
             <gpu:output>
-              <messageName>chair_petition</messageName>
+              <messageName>free_chair</messageName>
               <gpu:type>optional_message</gpu:type>
             </gpu:output>
           </outputs>
@@ -2213,18 +2271,6 @@
           <gpu:RNG>true</gpu:RNG>
         </gpu:function>
 
-        <gpu:function>
-          <name>receive_free_bed</name>
-          <currentState>defaultUci</currentState>
-          <nextState>defaultUci</nextState>
-          <inputs>
-            <gpu:input>
-              <messageName>free_bed</messageName>
-            </gpu:input>
-          </inputs>
-          <gpu:reallocate>false</gpu:reallocate>
-          <gpu:RNG>false</gpu:RNG>
-        </gpu:function>
       </functions>
       <states>
         <gpu:state>
@@ -2856,18 +2902,6 @@
       <gpu:bufferSize>65536</gpu:bufferSize>
     </gpu:message>
 
-    <gpu:message> 
-      <name>free_bed</name>
-      <variables>
-        <gpu:variable>
-          <type>unsigned int</type>
-          <name>bed_no</name>
-        </gpu:variable>
-      </variables>
-      <gpu:partitioningNone/>
-      <gpu:bufferSize>65536</gpu:bufferSize>
-    </gpu:message>
-
   <!-- Mensajes del triage -->
     <gpu:message> 
         <name>triage_petition</name>
@@ -3004,7 +3038,10 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>infect_pedestrians</name>
+        <name>infect_patients</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>infect_patients_UCI</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_chair_state</name>
@@ -3017,12 +3054,6 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_doctor_petitions</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>receive_free_chair</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
-        <name>receive_free_bed</name>
       </gpu:layerFunction>
     </layer>
     <layer>
@@ -3067,9 +3098,6 @@
     </layer>
     <layer>
       <gpu:layerFunction>
-        <name>receive_chair_response</name>
-      </gpu:layerFunction>
-      <gpu:layerFunction>
         <name>receive_bed_response</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
@@ -3080,6 +3108,14 @@
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_free_box</name>
+      </gpu:layerFunction>
+      <gpu:layerFunction>
+        <name>receive_free_chair</name>
+      </gpu:layerFunction>
+    </layer>
+    <layer>
+      <gpu:layerFunction>
+        <name>receive_chair_response</name>
       </gpu:layerFunction>
     </layer>
   </layers>

@@ -226,9 +226,6 @@ typedef glm::dvec4 dvec4;
 //Maximum population size of xmachine_mmessage_bed_response
 #define xmachine_message_bed_response_MAX 65536
 
-//Maximum population size of xmachine_mmessage_free_bed
-#define xmachine_message_free_bed_MAX 65536
-
 //Maximum population size of xmachine_mmessage_triage_petition
 #define xmachine_message_triage_petition_MAX 65536
 
@@ -267,7 +264,6 @@ typedef glm::dvec4 dvec4;
 #define xmachine_message_doctor_response_partitioningNone
 #define xmachine_message_bed_petition_partitioningNone
 #define xmachine_message_bed_response_partitioningNone
-#define xmachine_message_free_bed_partitioningNone
 #define xmachine_message_triage_petition_partitioningNone
 #define xmachine_message_triage_response_partitioningNone
 #define xmachine_message_free_box_partitioningNone
@@ -879,18 +875,6 @@ struct __align__(16) xmachine_message_bed_response
       
     unsigned int id;        /**< Message variable id of type unsigned int.*/  
     int bed_no;        /**< Message variable bed_no of type int.*/
-};
-
-/** struct xmachine_message_free_bed
- * Brute force: No Partitioning
- * Holds all message variables and is aligned to help with coalesced reads on the GPU
- */
-struct __align__(16) xmachine_message_free_bed
-{	
-    /* Brute force Partitioning Variables */
-    int _position;          /**< 1D position of message in linear message list */   
-      
-    unsigned int bed_no;        /**< Message variable bed_no of type unsigned int.*/
 };
 
 /** struct xmachine_message_triage_petition
@@ -1598,20 +1582,6 @@ struct xmachine_message_bed_response_list
     
 };
 
-/** struct xmachine_message_free_bed_list
- * Brute force: No Partitioning
- * Structure of Array for memory coalescing 
- */
-struct xmachine_message_free_bed_list
-{
-    /* Non discrete messages have temp variables used for reductions with optional message outputs */
-    int _position [xmachine_message_free_bed_MAX];    /**< Holds agents position in the 1D agent list */
-    int _scan_input [xmachine_message_free_bed_MAX];  /**< Used during parallel prefix sum */
-    
-    unsigned int bed_no [xmachine_message_free_bed_MAX];    /**< Message memory variable list bed_no of type unsigned int.*/
-    
-};
-
 /** struct xmachine_message_triage_petition_list
  * Brute force: No Partitioning
  * Structure of Array for memory coalescing 
@@ -1746,11 +1716,18 @@ __FLAME_GPU_FUNC__ int avoid_pedestrians(xmachine_memory_agent* agent, xmachine_
 __FLAME_GPU_FUNC__ int output_pedestrian_state(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages);
 
 /**
- * infect_pedestrians FLAMEGPU Agent Function
+ * infect_patients FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param pedestrian_state_messages  pedestrian_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_state_message and get_next_pedestrian_state_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_state_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
-__FLAME_GPU_FUNC__ int infect_pedestrians(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
+__FLAME_GPU_FUNC__ int infect_patients(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
+
+/**
+ * infect_patients_UCI FLAMEGPU Agent Function
+ * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
+ * @param pedestrian_state_messages  pedestrian_state_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_pedestrian_state_message and get_next_pedestrian_state_message functions.* @param partition_matrix Pointer to the partition matrix of type xmachine_message_pedestrian_state_PBM. Used within the get_first__message and get_next__message functions for spatially partitioned message access.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
+ */
+__FLAME_GPU_FUNC__ int infect_patients_UCI(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
 
 /**
  * move FLAMEGPU Agent Function
@@ -1797,9 +1774,9 @@ __FLAME_GPU_FUNC__ int receive_chair_response(xmachine_memory_agent* agent, xmac
 /**
  * receive_check_in_response FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param check_in_response_messages  check_in_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_response_message and get_next_check_in_response_message functions.* @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
+ * @param check_in_response_messages  check_in_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_check_in_response_message and get_next_check_in_response_message functions.* @param free_chair_messages Pointer to output message list of type xmachine_message_free_chair_list. Must be passed as an argument to the add_free_chair_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_check_in_response(xmachine_memory_agent* agent, xmachine_message_check_in_response_list* check_in_response_messages, xmachine_message_chair_petition_list* chair_petition_messages);
+__FLAME_GPU_FUNC__ int receive_check_in_response(xmachine_memory_agent* agent, xmachine_message_check_in_response_list* check_in_response_messages, xmachine_message_free_chair_list* free_chair_messages);
 
 /**
  * output_box_petition FLAMEGPU Agent Function
@@ -1909,9 +1886,9 @@ __FLAME_GPU_FUNC__ int output_triage_petition(xmachine_memory_agent* agent, xmac
 /**
  * receive_triage_response FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
- * @param triage_response_messages  triage_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_triage_response_message and get_next_triage_response_message functions.* @param chair_petition_messages Pointer to output message list of type xmachine_message_chair_petition_list. Must be passed as an argument to the add_chair_petition_message function ??.
+ * @param triage_response_messages  triage_response_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_triage_response_message and get_next_triage_response_message functions.* @param free_chair_messages Pointer to output message list of type xmachine_message_free_chair_list. Must be passed as an argument to the add_free_chair_message function ??.
  */
-__FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xmachine_message_triage_response_list* triage_response_messages, xmachine_message_chair_petition_list* chair_petition_messages);
+__FLAME_GPU_FUNC__ int receive_triage_response(xmachine_memory_agent* agent, xmachine_message_triage_response_list* triage_response_messages, xmachine_message_free_chair_list* free_chair_messages);
 
 /**
  * output_navmap_cells FLAMEGPU Agent Function
@@ -2045,13 +2022,6 @@ __FLAME_GPU_FUNC__ int receive_free_chair(xmachine_memory_chair_admin* agent, xm
  * @param bed_petition_messages  bed_petition_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_bed_petition_message and get_next_bed_petition_message functions.* @param bed_response_messages Pointer to output message list of type xmachine_message_bed_response_list. Must be passed as an argument to the add_bed_response_message function ??.* @param rand48 Pointer to the seed list of type RNG_rand48. Must be passed as an argument to the rand48 function for generating random numbers on the GPU.
  */
 __FLAME_GPU_FUNC__ int attend_bed_petitions(xmachine_memory_uci* agent, xmachine_message_bed_petition_list* bed_petition_messages, xmachine_message_bed_response_list* bed_response_messages, RNG_rand48* rand48);
-
-/**
- * receive_free_bed FLAMEGPU Agent Function
- * @param agent Pointer to an agent structure of type xmachine_memory_uci. This represents a single agent instance and can be modified directly.
- * @param free_bed_messages  free_bed_messages Pointer to input message list of type xmachine_message__list. Must be passed as an argument to the get_first_free_bed_message and get_next_free_bed_message functions.
- */
-__FLAME_GPU_FUNC__ int receive_free_bed(xmachine_memory_uci* agent, xmachine_message_free_bed_list* free_bed_messages);
 
 /**
  * box_server FLAMEGPU Agent Function
@@ -2823,33 +2793,6 @@ __FLAME_GPU_FUNC__ xmachine_message_bed_response * get_first_bed_response_messag
  * @return        returns the first message from the message list (offset depending on agent block)
  */
 __FLAME_GPU_FUNC__ xmachine_message_bed_response * get_next_bed_response_message(xmachine_message_bed_response* current, xmachine_message_bed_response_list* bed_response_messages);
-
-  
-/* Message Function Prototypes for Brute force (No Partitioning) free_bed message implemented in FLAMEGPU_Kernels */
-
-/** add_free_bed_message
- * Function for all types of message partitioning
- * Adds a new free_bed agent to the xmachine_memory_free_bed_list list using a linear mapping
- * @param agents	xmachine_memory_free_bed_list agent list
- * @param bed_no	message variable of type unsigned int
- */
- 
- __FLAME_GPU_FUNC__ void add_free_bed_message(xmachine_message_free_bed_list* free_bed_messages, unsigned int bed_no);
- 
-/** get_first_free_bed_message
- * Get first message function for non partitioned (brute force) messages
- * @param free_bed_messages message list
- * @return        returns the first message from the message list (offset depending on agent block)
- */
-__FLAME_GPU_FUNC__ xmachine_message_free_bed * get_first_free_bed_message(xmachine_message_free_bed_list* free_bed_messages);
-
-/** get_next_free_bed_message
- * Get first message function for non partitioned (brute force) messages
- * @param current the current message struct
- * @param free_bed_messages message list
- * @return        returns the first message from the message list (offset depending on agent block)
- */
-__FLAME_GPU_FUNC__ xmachine_message_free_bed * get_next_free_bed_message(xmachine_message_free_bed* current, xmachine_message_free_bed_list* free_bed_messages);
 
   
 /* Message Function Prototypes for Brute force (No Partitioning) triage_petition message implemented in FLAMEGPU_Kernels */
@@ -7592,6 +7535,8 @@ __constant__ float PROB_VACCINE;
 
 __constant__ float PROB_VACCINE_STAFF;
 
+__constant__ float UCI_INFECTION_CHANCE;
+
 __constant__ int FIRSTCHAIR_X;
 
 __constant__ int FIRSTCHAIR_Y;
@@ -8196,6 +8141,17 @@ extern const float* get_PROB_VACCINE_STAFF();
 
 
 extern float h_env_PROB_VACCINE_STAFF;
+
+/** set_UCI_INFECTION_CHANCE
+ * Sets the constant variable UCI_INFECTION_CHANCE on the device which can then be used in the agent functions.
+ * @param h_UCI_INFECTION_CHANCE value to set the variable
+ */
+extern void set_UCI_INFECTION_CHANCE(float* h_UCI_INFECTION_CHANCE);
+
+extern const float* get_UCI_INFECTION_CHANCE();
+
+
+extern float h_env_UCI_INFECTION_CHANCE;
 
 /** set_FIRSTCHAIR_X
  * Sets the constant variable FIRSTCHAIR_X on the device which can then be used in the agent functions.

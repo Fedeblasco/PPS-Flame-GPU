@@ -43,12 +43,10 @@ __FLAME_GPU_FUNC__ int attend_bed_petitions(xmachine_memory_uci* agent, xmachine
             agent->bedArray[index].x = current_message->id;//Marco que esta ocupada
             agent->bedArray[index].y = determine_stay_time(rand48);
             add_bed_response_message(bedResponseMessages, current_message->id, index);
-            //printf("Sentate en la posición random %d\n",index);
         }else{
             if(index2 != -1){
                 agent->bedArray[index2].x = current_message->id;//Marco que esta ocupada
                 agent->bedArray[index2].y = determine_stay_time(rand48);
-                //printf("Sentate en la posición lineal %d\n",index2);
             }
             add_bed_response_message(bedResponseMessages, current_message->id, index2);
         }
@@ -66,7 +64,7 @@ __FLAME_GPU_FUNC__ int attend_bed_petitions(xmachine_memory_uci* agent, xmachine
                 agent->bedArray[i].y--;
                 //Si se le acabo el tiempo al paciente, le envío un mensaje para que se retire
                 if(agent->bedArray[i].y <= 0){
-                    printf("Enviandole a %d que se retire\n",agent->bedArray[i].x);
+                    //printf("Enviandole a %d que se retire\n",agent->bedArray[i].x);
                     add_bed_response_message(bedResponseMessages, agent->bedArray[i].x, -1);
                     agent->bedArray[i].x = 0;
                 }
@@ -75,16 +73,5 @@ __FLAME_GPU_FUNC__ int attend_bed_petitions(xmachine_memory_uci* agent, xmachine
         agent->tick = 0;
     }
 
-	return 0;
-}
-
-__FLAME_GPU_FUNC__ int receive_free_bed(xmachine_memory_uci* agent, xmachine_message_free_bed_list* freeChairMessages){
-	
-	/*xmachine_message_free_bed* current_message = get_first_free_bed_message(freeChairMessages);
-	while(current_message){
-		agent->bedArray[current_message->bed_no] = 0;
-		//printf("Libere la silla número %d\n",current_message->bed_no);
-		current_message = get_next_free_bed_message(current_message, freeChairMessages);
-	}*/
 	return 0;
 }

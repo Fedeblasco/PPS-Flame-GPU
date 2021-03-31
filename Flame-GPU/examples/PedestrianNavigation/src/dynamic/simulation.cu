@@ -637,14 +637,6 @@ xmachine_message_bed_response_list* d_bed_responses_swap;    /**< Pointer to mes
 int h_message_bed_response_count;         /**< message list counter*/
 int h_message_bed_response_output_type;   /**< message output type (single or optional)*/
 
-/* free_bed Message variables */
-xmachine_message_free_bed_list* h_free_beds;         /**< Pointer to message list on host*/
-xmachine_message_free_bed_list* d_free_beds;         /**< Pointer to message list on device*/
-xmachine_message_free_bed_list* d_free_beds_swap;    /**< Pointer to message swap list on device (used for holding optional messages)*/
-/* Non partitioned and spatial partitioned message variables  */
-int h_message_free_bed_count;         /**< message list counter*/
-int h_message_free_bed_output_type;   /**< message output type (single or optional)*/
-
 /* triage_petition Message variables */
 xmachine_message_triage_petition_list* h_triage_petitions;         /**< Pointer to message list on host*/
 xmachine_message_triage_petition_list* d_triage_petitions;         /**< Pointer to message list on device*/
@@ -763,10 +755,15 @@ void agent_avoid_pedestrians(cudaStream_t &stream);
  */
 void agent_output_pedestrian_state(cudaStream_t &stream);
 
-/** agent_infect_pedestrians
- * Agent function prototype for infect_pedestrians function of agent agent
+/** agent_infect_patients
+ * Agent function prototype for infect_patients function of agent agent
  */
-void agent_infect_pedestrians(cudaStream_t &stream);
+void agent_infect_patients(cudaStream_t &stream);
+
+/** agent_infect_patients_UCI
+ * Agent function prototype for infect_patients_UCI function of agent agent
+ */
+void agent_infect_patients_UCI(cudaStream_t &stream);
 
 /** agent_move
  * Agent function prototype for move function of agent agent
@@ -977,11 +974,6 @@ void chair_admin_receive_free_chair(cudaStream_t &stream);
  * Agent function prototype for attend_bed_petitions function of uci agent
  */
 void uci_attend_bed_petitions(cudaStream_t &stream);
-
-/** uci_receive_free_bed
- * Agent function prototype for receive_free_bed function of uci agent
- */
-void uci_receive_free_bed(cudaStream_t &stream);
 
 /** box_box_server
  * Agent function prototype for box_server function of box agent
@@ -1287,8 +1279,6 @@ void initialise(char * inputfile){
 	h_bed_petitions = (xmachine_message_bed_petition_list*)malloc(message_bed_petition_SoA_size);
 	int message_bed_response_SoA_size = sizeof(xmachine_message_bed_response_list);
 	h_bed_responses = (xmachine_message_bed_response_list*)malloc(message_bed_response_SoA_size);
-	int message_free_bed_SoA_size = sizeof(xmachine_message_free_bed_list);
-	h_free_beds = (xmachine_message_free_bed_list*)malloc(message_free_bed_SoA_size);
 	int message_triage_petition_SoA_size = sizeof(xmachine_message_triage_petition_list);
 	h_triage_petitions = (xmachine_message_triage_petition_list*)malloc(message_triage_petition_SoA_size);
 	int message_triage_response_SoA_size = sizeof(xmachine_message_triage_response_list);
@@ -1676,11 +1666,6 @@ void initialise(char * inputfile){
 	gpuErrchk( cudaMalloc( (void**) &d_bed_responses, message_bed_response_SoA_size));
 	gpuErrchk( cudaMalloc( (void**) &d_bed_responses_swap, message_bed_response_SoA_size));
 	gpuErrchk( cudaMemcpy( d_bed_responses, h_bed_responses, message_bed_response_SoA_size, cudaMemcpyHostToDevice));
-	
-	/* free_bed Message memory allocation (GPU) */
-	gpuErrchk( cudaMalloc( (void**) &d_free_beds, message_free_bed_SoA_size));
-	gpuErrchk( cudaMalloc( (void**) &d_free_beds_swap, message_free_bed_SoA_size));
-	gpuErrchk( cudaMemcpy( d_free_beds, h_free_beds, message_free_bed_SoA_size, cudaMemcpyHostToDevice));
 	
 	/* triage_petition Message memory allocation (GPU) */
 	gpuErrchk( cudaMalloc( (void**) &d_triage_petitions, message_triage_petition_SoA_size));
@@ -2607,11 +2592,6 @@ void cleanup(){
 	gpuErrchk(cudaFree(d_bed_responses));
 	gpuErrchk(cudaFree(d_bed_responses_swap));
 	
-	/* free_bed Message variables */
-	free( h_free_beds);
-	gpuErrchk(cudaFree(d_free_beds));
-	gpuErrchk(cudaFree(d_free_beds_swap));
-	
 	/* triage_petition Message variables */
 	free( h_triage_petitions);
 	gpuErrchk(cudaFree(d_triage_petitions));
@@ -2851,10 +2831,6 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	h_message_bed_response_count = 0;
 	//upload to device constant
 	gpuErrchk(cudaMemcpyToSymbol( d_message_bed_response_count, &h_message_bed_response_count, sizeof(int)));
-	
-	h_message_free_bed_count = 0;
-	//upload to device constant
-	gpuErrchk(cudaMemcpyToSymbol( d_message_free_bed_count, &h_message_free_bed_count, sizeof(int)));
 	
 	h_message_triage_petition_count = 0;
 	//upload to device constant
@@ -3270,14 +3246,28 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_infect_pedestrians");
-	agent_infect_pedestrians(stream1);
+    PROFILE_PUSH_RANGE("agent_infect_patients");
+	agent_infect_patients(stream1);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_infect_pedestrians = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: agent_infect_patients = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_infect_patients_UCI");
+	agent_infect_patients_UCI(stream2);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_infect_patients_UCI = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
@@ -3285,7 +3275,7 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("agent_receive_chair_state");
-	agent_receive_chair_state(stream2);
+	agent_receive_chair_state(stream3);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3299,7 +3289,7 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("agent_receive_bed_state");
-	agent_receive_bed_state(stream3);
+	agent_receive_bed_state(stream4);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3313,7 +3303,7 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("agent_receive_triage_response");
-	agent_receive_triage_response(stream4);
+	agent_receive_triage_response(stream5);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3327,41 +3317,13 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("doctor_manager_receive_doctor_petitions");
-	doctor_manager_receive_doctor_petitions(stream5);
+	doctor_manager_receive_doctor_petitions(stream6);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: doctor_manager_receive_doctor_petitions = %f (ms)\n", instrument_milliseconds);
-#endif
-	
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_start);
-#endif
-	
-    PROFILE_PUSH_RANGE("chair_admin_receive_free_chair");
-	chair_admin_receive_free_chair(stream6);
-    PROFILE_POP_RANGE();
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_stop);
-	cudaEventSynchronize(instrument_stop);
-	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: chair_admin_receive_free_chair = %f (ms)\n", instrument_milliseconds);
-#endif
-	
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_start);
-#endif
-	
-    PROFILE_PUSH_RANGE("uci_receive_free_bed");
-	uci_receive_free_bed(stream7);
-    PROFILE_POP_RANGE();
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_stop);
-	cudaEventSynchronize(instrument_stop);
-	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: uci_receive_free_bed = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -3545,22 +3507,8 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_receive_chair_response");
-	agent_receive_chair_response(stream1);
-    PROFILE_POP_RANGE();
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_stop);
-	cudaEventSynchronize(instrument_stop);
-	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_receive_chair_response = %f (ms)\n", instrument_milliseconds);
-#endif
-	
-#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
-	cudaEventRecord(instrument_start);
-#endif
-	
     PROFILE_PUSH_RANGE("agent_receive_bed_response");
-	agent_receive_bed_response(stream2);
+	agent_receive_bed_response(stream1);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3574,7 +3522,7 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("agent_receive_box_response");
-	agent_receive_box_response(stream3);
+	agent_receive_box_response(stream2);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3588,7 +3536,7 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("specialist_manager_receive_free_specialist");
-	specialist_manager_receive_free_specialist(stream4);
+	specialist_manager_receive_free_specialist(stream3);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
@@ -3602,13 +3550,44 @@ PROFILE_SCOPED_RANGE("singleIteration");
 #endif
 	
     PROFILE_PUSH_RANGE("triage_receive_free_box");
-	triage_receive_free_box(stream5);
+	triage_receive_free_box(stream4);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
 	printf("Instrumentation: triage_receive_free_box = %f (ms)\n", instrument_milliseconds);
+#endif
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("chair_admin_receive_free_chair");
+	chair_admin_receive_free_chair(stream5);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: chair_admin_receive_free_chair = %f (ms)\n", instrument_milliseconds);
+#endif
+	cudaDeviceSynchronize();
+  
+	/* Layer 10*/
+	
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_start);
+#endif
+	
+    PROFILE_PUSH_RANGE("agent_receive_chair_response");
+	agent_receive_chair_response(stream1);
+    PROFILE_POP_RANGE();
+#if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
+	cudaEventRecord(instrument_stop);
+	cudaEventSynchronize(instrument_stop);
+	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
+	printf("Instrumentation: agent_receive_chair_response = %f (ms)\n", instrument_milliseconds);
 #endif
 	cudaDeviceSynchronize();
   
@@ -3707,6 +3686,7 @@ float h_env_PROB_INFECT_CHAIR;
 float h_env_PROB_INFECT_BED;
 float h_env_PROB_VACCINE;
 float h_env_PROB_VACCINE_STAFF;
+float h_env_UCI_INFECTION_CHANCE;
 int h_env_FIRSTCHAIR_X;
 int h_env_FIRSTCHAIR_Y;
 int h_env_SPACE_BETWEEN;
@@ -4360,6 +4340,19 @@ void set_PROB_VACCINE_STAFF(float* h_PROB_VACCINE_STAFF){
 //constant getter
 const float* get_PROB_VACCINE_STAFF(){
     return &h_env_PROB_VACCINE_STAFF;
+}
+
+
+
+//constant setter
+void set_UCI_INFECTION_CHANCE(float* h_UCI_INFECTION_CHANCE){
+    gpuErrchk(cudaMemcpyToSymbol(UCI_INFECTION_CHANCE, h_UCI_INFECTION_CHANCE, sizeof(float)));
+    memcpy(&h_env_UCI_INFECTION_CHANCE, h_UCI_INFECTION_CHANCE,sizeof(float));
+}
+
+//constant getter
+const float* get_UCI_INFECTION_CHANCE(){
+    return &h_env_UCI_INFECTION_CHANCE;
 }
 
 
@@ -13943,7 +13936,7 @@ void agent_output_pedestrian_state(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int agent_infect_pedestrians_sm_size(int blockSize){
+int agent_infect_patients_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   //Continuous agent and message input is spatially partitioned
@@ -13955,10 +13948,10 @@ int agent_infect_pedestrians_sm_size(int blockSize){
 	return sm_size;
 }
 
-/** agent_infect_pedestrians
- * Agent function prototype for infect_pedestrians function of agent agent
+/** agent_infect_patients
+ * Agent function prototype for infect_patients function of agent agent
  */
-void agent_infect_pedestrians(cudaStream_t &stream){
+void agent_infect_patients(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -14001,9 +13994,9 @@ void agent_infect_pedestrians(cudaStream_t &stream){
 	gpuErrchkLaunch();
 
 	//APPLY FUNCTION FILTER
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, infect_pedestrians_function_filter, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, infect_patients_function_filter, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	infect_pedestrians_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	infect_patients_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
 	gpuErrchkLaunch();
 
 	//GRID AND BLOCK SIZE FOR COMPACT
@@ -14081,12 +14074,12 @@ void agent_infect_pedestrians(cudaStream_t &stream){
 	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_infect_pedestrians, agent_infect_pedestrians_sm_size, state_list_size);
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_infect_patients, agent_infect_patients_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
 	b.x = blockSize;
 	g.x = gridSize;
 	
-	sm_size = agent_infect_pedestrians_sm_size(blockSize);
+	sm_size = agent_infect_patients_sm_size(blockSize);
 	
 	
 	
@@ -14120,12 +14113,12 @@ void agent_infect_pedestrians(cudaStream_t &stream){
 
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (infect_pedestrians)
+	//MAIN XMACHINE FUNCTION CALL (infect_patients)
 	//Reallocate   : false
 	//Input        : pedestrian_state
 	//Output       : 
 	//Agent Output : 
-	GPUFLAME_infect_pedestrians<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_states, d_pedestrian_state_partition_matrix, d_rand48);
+	GPUFLAME_infect_patients<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_states, d_pedestrian_state_partition_matrix, d_rand48);
 	gpuErrchkLaunch();
 	
 	
@@ -14144,7 +14137,229 @@ void agent_infect_pedestrians(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of infect_pedestrians agents in state default will be exceeded moving working agents to next state in function infect_pedestrians\n");
+		printf("Error: Buffer size of infect_patients agents in state default will be exceeded moving working agents to next state in function infect_patients\n");
+      exit(EXIT_FAILURE);
+      }
+      
+  //append agents to next state list
+  cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, append_agent_Agents, no_sm, state_list_size);
+  gridSize = (state_list_size + blockSize - 1) / blockSize;
+  append_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents, h_xmachine_memory_agent_default_count, h_xmachine_memory_agent_count);
+  gpuErrchkLaunch();
+        
+	//update new state agent size
+	h_xmachine_memory_agent_default_count += h_xmachine_memory_agent_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+	
+	
+}
+
+
+
+	
+/* Shared memory size calculator for agent function */
+int agent_infect_patients_UCI_sm_size(int blockSize){
+	int sm_size;
+	sm_size = SM_START;
+  //Continuous agent and message input is spatially partitioned
+	sm_size += (blockSize * sizeof(xmachine_message_pedestrian_state));
+	
+	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
+	sm_size += (blockSize * PADDING);
+	
+	return sm_size;
+}
+
+/** agent_infect_patients_UCI
+ * Agent function prototype for infect_patients_UCI function of agent agent
+ */
+void agent_infect_patients_UCI(cudaStream_t &stream){
+
+    int sm_size;
+    int blockSize;
+    int minGridSize;
+    int gridSize;
+    int state_list_size;
+	dim3 g; //grid for agent func
+	dim3 b; //block for agent func
+
+	
+	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
+	
+	if (h_xmachine_memory_agent_default_count == 0)
+	{
+		return;
+	}
+	
+	
+	//SET SM size to 0 and save state list size for occupancy calculations
+	sm_size = SM_START;
+	state_list_size = h_xmachine_memory_agent_default_count;
+
+	
+
+	//******************************** AGENT FUNCTION CONDITION *********************
+	//CONTINUOUS AGENT FUNCTION AND THERE IS A FUNCTION CONDITION
+  	
+	//COPY CURRENT STATE COUNT TO WORKING COUNT (host and device)
+	h_xmachine_memory_agent_count = h_xmachine_memory_agent_default_count;
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//RESET SCAN INPUTS
+	//reset scan input for currentState
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_agent_scan_input, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents_default);
+	gpuErrchkLaunch();
+	//reset scan input for working lists
+	reset_agent_scan_input<<<gridSize, blockSize, 0, stream>>>(d_agents);
+	gpuErrchkLaunch();
+
+	//APPLY FUNCTION FILTER
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, infect_patients_UCI_function_filter, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	infect_patients_UCI_function_filter<<<gridSize, blockSize, 0, stream>>>(d_agents_default, d_agents);
+	gpuErrchkLaunch();
+
+	//GRID AND BLOCK SIZE FOR COMPACT
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_agent_Agents, no_sm, state_list_size); 
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	
+	//COMPACT CURRENT STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents_default->_scan_input,
+        d_agents_default->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_default->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_default->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_default_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_default_count = scan_last_sum;
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents_default, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_default_temp = d_agents_default;
+	d_agents_default = d_agents_swap;
+	d_agents_swap = agents_default_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_default_count, &h_xmachine_memory_agent_default_count, sizeof(int)));	
+		
+	//COMPACT WORKING STATE LIST
+    cub::DeviceScan::ExclusiveSum(
+        d_temp_scan_storage_agent, 
+        temp_scan_storage_bytes_agent, 
+        d_agents->_scan_input,
+        d_agents->_position,
+        h_xmachine_memory_agent_count, 
+        stream
+    );
+
+	//reset agent count
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	//Scatter into swap
+	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
+	gpuErrchkLaunch();
+	//update working agent count after the scatter
+	if (scan_last_included == 1)
+		h_xmachine_memory_agent_count = scan_last_sum+1;
+	else		
+		h_xmachine_memory_agent_count = scan_last_sum;
+    //use a temp pointer change working swap list with current state list
+	xmachine_memory_agent_list* agents_temp = d_agents;
+	d_agents = d_agents_swap;
+	d_agents_swap = agents_temp;
+	//update the device count
+	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_agent_count, &h_xmachine_memory_agent_count, sizeof(int)));	
+	
+	//CHECK WORKING LIST COUNT IS NOT EQUAL TO 0
+	if (h_xmachine_memory_agent_count == 0)
+	{
+		return;
+	}
+	
+	//Update the state list size for occupancy calculations
+	state_list_size = h_xmachine_memory_agent_count;
+	
+ 
+
+	//******************************** AGENT FUNCTION *******************************
+
+	
+	
+	//calculate the grid block size for main agent function
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_infect_patients_UCI, agent_infect_patients_UCI_sm_size, state_list_size);
+	gridSize = (state_list_size + blockSize - 1) / blockSize;
+	b.x = blockSize;
+	g.x = gridSize;
+	
+	sm_size = agent_infect_patients_UCI_sm_size(blockSize);
+	
+	
+	
+	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
+	//any agent with discrete or partitioned message input uses texture caching
+	size_t tex_xmachine_message_pedestrian_state_x_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_x_byte_offset, tex_xmachine_message_pedestrian_state_x, d_pedestrian_states->x, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_x_offset = (int)tex_xmachine_message_pedestrian_state_x_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_x_offset, &h_tex_xmachine_message_pedestrian_state_x_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_y_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_y_byte_offset, tex_xmachine_message_pedestrian_state_y, d_pedestrian_states->y, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_y_offset = (int)tex_xmachine_message_pedestrian_state_y_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_y_offset, &h_tex_xmachine_message_pedestrian_state_y_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_z_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_z_byte_offset, tex_xmachine_message_pedestrian_state_z, d_pedestrian_states->z, sizeof(float)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_z_offset = (int)tex_xmachine_message_pedestrian_state_z_byte_offset / sizeof(float);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_z_offset, &h_tex_xmachine_message_pedestrian_state_z_offset, sizeof(int)));
+	size_t tex_xmachine_message_pedestrian_state_estado_byte_offset;    
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_estado_byte_offset, tex_xmachine_message_pedestrian_state_estado, d_pedestrian_states->estado, sizeof(int)*xmachine_message_pedestrian_state_MAX));
+	h_tex_xmachine_message_pedestrian_state_estado_offset = (int)tex_xmachine_message_pedestrian_state_estado_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_estado_offset, &h_tex_xmachine_message_pedestrian_state_estado_offset, sizeof(int)));
+	//bind pbm start and end indices to textures
+	size_t tex_xmachine_message_pedestrian_state_pbm_start_byte_offset;
+	size_t tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset;
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_pbm_start_byte_offset, tex_xmachine_message_pedestrian_state_pbm_start, d_pedestrian_state_partition_matrix->start, sizeof(int)*xmachine_message_pedestrian_state_grid_size));
+	h_tex_xmachine_message_pedestrian_state_pbm_start_offset = (int)tex_xmachine_message_pedestrian_state_pbm_start_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_pbm_start_offset, &h_tex_xmachine_message_pedestrian_state_pbm_start_offset, sizeof(int)));
+	gpuErrchk( cudaBindTexture(&tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset, tex_xmachine_message_pedestrian_state_pbm_end_or_count, d_pedestrian_state_partition_matrix->end_or_count, sizeof(int)*xmachine_message_pedestrian_state_grid_size));
+  h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset = (int)tex_xmachine_message_pedestrian_state_pbm_end_or_count_byte_offset / sizeof(int);
+	gpuErrchk(cudaMemcpyToSymbol( d_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset, &h_tex_xmachine_message_pedestrian_state_pbm_end_or_count_offset, sizeof(int)));
+
+	
+	
+	//MAIN XMACHINE FUNCTION CALL (infect_patients_UCI)
+	//Reallocate   : false
+	//Input        : pedestrian_state
+	//Output       : 
+	//Agent Output : 
+	GPUFLAME_infect_patients_UCI<<<g, b, sm_size, stream>>>(d_agents, d_pedestrian_states, d_pedestrian_state_partition_matrix, d_rand48);
+	gpuErrchkLaunch();
+	
+	
+	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
+	//any agent with discrete or partitioned message input uses texture caching
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_x));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_y));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_z));
+	gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_estado));
+	//unbind pbm indices
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_pbm_start));
+    gpuErrchk( cudaUnbindTexture(tex_xmachine_message_pedestrian_state_pbm_end_or_count));
+    
+	
+	//************************ MOVE AGENTS TO NEXT STATE ****************************
+    
+	//check the working agents wont exceed the buffer size in the new state list
+	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
+		printf("Error: Buffer size of infect_patients_UCI agents in state default will be exceeded moving working agents to next state in function infect_patients_UCI\n");
       exit(EXIT_FAILURE);
       }
       
@@ -15470,8 +15685,8 @@ void agent_receive_check_in_response(cudaStream_t &stream){
 
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_chair_petition_count + h_xmachine_memory_agent_count > xmachine_message_chair_petition_MAX){
-		printf("Error: Buffer size of chair_petition message will be exceeded in function receive_check_in_response\n");
+	if (h_message_free_chair_count + h_xmachine_memory_agent_count > xmachine_message_free_chair_MAX){
+		printf("Error: Buffer size of free_chair message will be exceeded in function receive_check_in_response\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -15490,60 +15705,60 @@ void agent_receive_check_in_response(cudaStream_t &stream){
 	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
-	h_message_chair_petition_output_type = optional_message;
-	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_output_type, &h_message_chair_petition_output_type, sizeof(int)));
+	h_message_free_chair_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_free_chair_output_type, &h_message_free_chair_output_type, sizeof(int)));
 	//message is optional so reset the swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_chair_petition_swaps, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_free_chair_swaps, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_chair_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions); 
+	reset_free_chair_swaps<<<gridSize, blockSize, 0, stream>>>(d_free_chairs); 
 	gpuErrchkLaunch();
 	
 	
 	//MAIN XMACHINE FUNCTION CALL (receive_check_in_response)
 	//Reallocate   : false
 	//Input        : check_in_response
-	//Output       : chair_petition
+	//Output       : free_chair
 	//Agent Output : 
-	GPUFLAME_receive_check_in_response<<<g, b, sm_size, stream>>>(d_agents, d_check_in_responses, d_chair_petitions);
+	GPUFLAME_receive_check_in_response<<<g, b, sm_size, stream>>>(d_agents, d_check_in_responses, d_free_chairs);
 	gpuErrchkLaunch();
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
-	//chair_petition Message Type Prefix Sum
+	//free_chair Message Type Prefix Sum
 	
 	//swap output
-	xmachine_message_chair_petition_list* d_chair_petitions_scanswap_temp = d_chair_petitions;
-	d_chair_petitions = d_chair_petitions_swap;
-	d_chair_petitions_swap = d_chair_petitions_scanswap_temp;
+	xmachine_message_free_chair_list* d_free_chairs_scanswap_temp = d_free_chairs;
+	d_free_chairs = d_free_chairs_swap;
+	d_free_chairs_swap = d_free_chairs_scanswap_temp;
 	
     cub::DeviceScan::ExclusiveSum(
         d_temp_scan_storage_agent, 
         temp_scan_storage_bytes_agent, 
-        d_chair_petitions_swap->_scan_input,
-        d_chair_petitions_swap->_position,
+        d_free_chairs_swap->_scan_input,
+        d_free_chairs_swap->_position,
         h_xmachine_memory_agent_count, 
         stream
     );
 
 	//Scatter
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_chair_petition_messages, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_free_chair_messages, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_optional_chair_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions, d_chair_petitions_swap);
+	scatter_optional_free_chair_messages<<<gridSize, blockSize, 0, stream>>>(d_free_chairs, d_free_chairs_swap);
 	gpuErrchkLaunch();
 	
 	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_chair_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_chair_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_free_chairs_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_free_chairs_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	//If last item in prefix sum was 1 then increase its index to get the count
 	if (scan_last_included == 1){
-		h_message_chair_petition_count += scan_last_sum+1;
+		h_message_free_chair_count += scan_last_sum+1;
 	}else{
-		h_message_chair_petition_count += scan_last_sum;
+		h_message_free_chair_count += scan_last_sum;
 	}
     //Copy count to device
-	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_count, &h_message_chair_petition_count, sizeof(int)));	
+	gpuErrchk( cudaMemcpyToSymbol( d_message_free_chair_count, &h_message_free_chair_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
@@ -18844,8 +19059,8 @@ void agent_receive_triage_response(cudaStream_t &stream){
 
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
-	if (h_message_chair_petition_count + h_xmachine_memory_agent_count > xmachine_message_chair_petition_MAX){
-		printf("Error: Buffer size of chair_petition message will be exceeded in function receive_triage_response\n");
+	if (h_message_free_chair_count + h_xmachine_memory_agent_count > xmachine_message_free_chair_MAX){
+		printf("Error: Buffer size of free_chair message will be exceeded in function receive_triage_response\n");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -18864,60 +19079,60 @@ void agent_receive_triage_response(cudaStream_t &stream){
 	
 	//SET THE OUTPUT MESSAGE TYPE FOR CONTINUOUS AGENTS
 	//Set the message_type for non partitioned, spatially partitioned and On-Graph Partitioned message outputs
-	h_message_chair_petition_output_type = optional_message;
-	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_output_type, &h_message_chair_petition_output_type, sizeof(int)));
+	h_message_free_chair_output_type = optional_message;
+	gpuErrchk( cudaMemcpyToSymbol( d_message_free_chair_output_type, &h_message_free_chair_output_type, sizeof(int)));
 	//message is optional so reset the swap
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_chair_petition_swaps, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, reset_free_chair_swaps, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	reset_chair_petition_swaps<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions); 
+	reset_free_chair_swaps<<<gridSize, blockSize, 0, stream>>>(d_free_chairs); 
 	gpuErrchkLaunch();
 	
 	
 	//MAIN XMACHINE FUNCTION CALL (receive_triage_response)
 	//Reallocate   : false
 	//Input        : triage_response
-	//Output       : chair_petition
+	//Output       : free_chair
 	//Agent Output : 
-	GPUFLAME_receive_triage_response<<<g, b, sm_size, stream>>>(d_agents, d_triage_responses, d_chair_petitions);
+	GPUFLAME_receive_triage_response<<<g, b, sm_size, stream>>>(d_agents, d_triage_responses, d_free_chairs);
 	gpuErrchkLaunch();
 	
 	
 	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
 	
 	//CONTINUOUS AGENTS SCATTER NON PARTITIONED OPTIONAL OUTPUT MESSAGES
-	//chair_petition Message Type Prefix Sum
+	//free_chair Message Type Prefix Sum
 	
 	//swap output
-	xmachine_message_chair_petition_list* d_chair_petitions_scanswap_temp = d_chair_petitions;
-	d_chair_petitions = d_chair_petitions_swap;
-	d_chair_petitions_swap = d_chair_petitions_scanswap_temp;
+	xmachine_message_free_chair_list* d_free_chairs_scanswap_temp = d_free_chairs;
+	d_free_chairs = d_free_chairs_swap;
+	d_free_chairs_swap = d_free_chairs_scanswap_temp;
 	
     cub::DeviceScan::ExclusiveSum(
         d_temp_scan_storage_agent, 
         temp_scan_storage_bytes_agent, 
-        d_chair_petitions_swap->_scan_input,
-        d_chair_petitions_swap->_position,
+        d_free_chairs_swap->_scan_input,
+        d_free_chairs_swap->_position,
         h_xmachine_memory_agent_count, 
         stream
     );
 
 	//Scatter
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_chair_petition_messages, no_sm, state_list_size); 
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, scatter_optional_free_chair_messages, no_sm, state_list_size); 
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	scatter_optional_chair_petition_messages<<<gridSize, blockSize, 0, stream>>>(d_chair_petitions, d_chair_petitions_swap);
+	scatter_optional_free_chair_messages<<<gridSize, blockSize, 0, stream>>>(d_free_chairs, d_free_chairs_swap);
 	gpuErrchkLaunch();
 	
 	//UPDATE MESSAGE COUNTS FOR CONTINUOUS AGENTS WITH NON PARTITIONED MESSAGE OUTPUT 
-	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_chair_petitions_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
-	gpuErrchk( cudaMemcpy( &scan_last_included, &d_chair_petitions_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_free_chairs_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
+	gpuErrchk( cudaMemcpy( &scan_last_included, &d_free_chairs_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	//If last item in prefix sum was 1 then increase its index to get the count
 	if (scan_last_included == 1){
-		h_message_chair_petition_count += scan_last_sum+1;
+		h_message_free_chair_count += scan_last_sum+1;
 	}else{
-		h_message_chair_petition_count += scan_last_sum;
+		h_message_free_chair_count += scan_last_sum;
 	}
     //Copy count to device
-	gpuErrchk( cudaMemcpyToSymbol( d_message_chair_petition_count, &h_message_chair_petition_count, sizeof(int)));	
+	gpuErrchk( cudaMemcpyToSymbol( d_message_free_chair_count, &h_message_free_chair_count, sizeof(int)));	
 	
 	
 	//************************ MOVE AGENTS TO NEXT STATE ****************************
@@ -22077,114 +22292,6 @@ void uci_attend_bed_petitions(cudaStream_t &stream){
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_uci_defaultUci_count+h_xmachine_memory_uci_count > xmachine_memory_uci_MAX){
 		printf("Error: Buffer size of attend_bed_petitions agents in state defaultUci will be exceeded moving working agents to next state in function attend_bed_petitions\n");
-      exit(EXIT_FAILURE);
-      }
-      
-  //pointer swap the updated data
-  ucis_defaultUci_temp = d_ucis;
-  d_ucis = d_ucis_defaultUci;
-  d_ucis_defaultUci = ucis_defaultUci_temp;
-        
-	//update new state agent size
-	h_xmachine_memory_uci_defaultUci_count += h_xmachine_memory_uci_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_uci_defaultUci_count, &h_xmachine_memory_uci_defaultUci_count, sizeof(int)));	
-	
-	
-}
-
-
-
-	
-/* Shared memory size calculator for agent function */
-int uci_receive_free_bed_sm_size(int blockSize){
-	int sm_size;
-	sm_size = SM_START;
-  //Continuous agent and message input has no partitioning
-	sm_size += (blockSize * sizeof(xmachine_message_free_bed));
-	
-	//all continuous agent types require single 32bit word per thread offset (to avoid sm bank conflicts)
-	sm_size += (blockSize * PADDING);
-	
-	return sm_size;
-}
-
-/** uci_receive_free_bed
- * Agent function prototype for receive_free_bed function of uci agent
- */
-void uci_receive_free_bed(cudaStream_t &stream){
-
-    int sm_size;
-    int blockSize;
-    int minGridSize;
-    int gridSize;
-    int state_list_size;
-	dim3 g; //grid for agent func
-	dim3 b; //block for agent func
-
-	
-	//CHECK THE CURRENT STATE LIST COUNT IS NOT EQUAL TO 0
-	
-	if (h_xmachine_memory_uci_defaultUci_count == 0)
-	{
-		return;
-	}
-	
-	
-	//SET SM size to 0 and save state list size for occupancy calculations
-	sm_size = SM_START;
-	state_list_size = h_xmachine_memory_uci_defaultUci_count;
-
-	
-
-	//******************************** AGENT FUNCTION CONDITION *********************
-	//THERE IS NOT A FUNCTION CONDITION
-	//currentState maps to working list
-	xmachine_memory_uci_list* ucis_defaultUci_temp = d_ucis;
-	d_ucis = d_ucis_defaultUci;
-	d_ucis_defaultUci = ucis_defaultUci_temp;
-	//set working count to current state count
-	h_xmachine_memory_uci_count = h_xmachine_memory_uci_defaultUci_count;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_uci_count, &h_xmachine_memory_uci_count, sizeof(int)));	
-	//set current state count to 0
-	h_xmachine_memory_uci_defaultUci_count = 0;
-	gpuErrchk( cudaMemcpyToSymbol( d_xmachine_memory_uci_defaultUci_count, &h_xmachine_memory_uci_defaultUci_count, sizeof(int)));	
-	
- 
-
-	//******************************** AGENT FUNCTION *******************************
-
-	
-	
-	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_receive_free_bed, uci_receive_free_bed_sm_size, state_list_size);
-	gridSize = (state_list_size + blockSize - 1) / blockSize;
-	b.x = blockSize;
-	g.x = gridSize;
-	
-	sm_size = uci_receive_free_bed_sm_size(blockSize);
-	
-	
-	
-	//BIND APPROPRIATE MESSAGE INPUT VARIABLES TO TEXTURES (to make use of the texture cache)
-	
-	
-	//MAIN XMACHINE FUNCTION CALL (receive_free_bed)
-	//Reallocate   : false
-	//Input        : free_bed
-	//Output       : 
-	//Agent Output : 
-	GPUFLAME_receive_free_bed<<<g, b, sm_size, stream>>>(d_ucis, d_free_beds);
-	gpuErrchkLaunch();
-	
-	
-	//UNBIND MESSAGE INPUT VARIABLE TEXTURES
-	
-	
-	//************************ MOVE AGENTS TO NEXT STATE ****************************
-    
-	//check the working agents wont exceed the buffer size in the new state list
-	if (h_xmachine_memory_uci_defaultUci_count+h_xmachine_memory_uci_count > xmachine_memory_uci_MAX){
-		printf("Error: Buffer size of receive_free_bed agents in state defaultUci will be exceeded moving working agents to next state in function receive_free_bed\n");
       exit(EXIT_FAILURE);
       }
       
