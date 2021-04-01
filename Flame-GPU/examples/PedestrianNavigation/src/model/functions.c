@@ -780,20 +780,17 @@ __FLAME_GPU_FUNC__ int receive_chair_response(xmachine_memory_agent* agent, xmac
 	//printf("Soy %d y me trabé en el estado 25, tengo que ir a %d\n", agent->id, agent->specialist_no);
 	xmachine_message_chair_response* current_message = get_first_chair_response_message(chairResponseMessages);
 	while(current_message){
-		if(current_message->id == agent->id){
-			if(current_message->chair_no != -1){
-				agent->go_to_x = FIRSTCHAIR_X + (SPACE_BETWEEN * ((current_message->chair_no+7)%7));
-				agent->go_to_y = FIRSTCHAIR_Y - (SPACE_BETWEEN * int(current_message->chair_no/7));
-				agent->estado_movimiento++;
-				agent->chair_no = current_message->chair_no;
-				//printf("Soy %d y me voy a sentar en la silla %d, posX %d, posY %d\n\n",agent->id,current_message->chair_no,agent->go_to_x,agent->go_to_y);
+		if((current_message->id == agent->id) && (current_message->chair_no != -1)){
+			agent->go_to_x = FIRSTCHAIR_X + (SPACE_BETWEEN * ((current_message->chair_no+7)%7));
+			agent->go_to_y = FIRSTCHAIR_Y - (SPACE_BETWEEN * int(current_message->chair_no/7));
+			agent->estado_movimiento++;
+			agent->chair_no = current_message->chair_no;
+			//printf("Soy %d y me voy a sentar en la silla %d, posX %d, posY %d\n\n",agent->id,current_message->chair_no,agent->go_to_x,agent->go_to_y);
 			}else{
 				//printf("Me muero\n");
 				agent->estado_movimiento = 40;
 				agent->checkpoint = 5;
-				return 0;
 			}
-		}
 		current_message = get_next_chair_response_message(current_message, chairResponseMessages);
 	}
 
