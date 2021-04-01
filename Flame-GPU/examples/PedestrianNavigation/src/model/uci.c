@@ -68,6 +68,7 @@ __FLAME_GPU_FUNC__ int attend_bed_petitions(xmachine_memory_uci* agent, xmachine
                     //printf("Enviandole a %d que se retire\n",agent->bedArray[i].x);
                     add_bed_response_message(bedResponseMessages, agent->bedArray[i].x, -1);
                     agent->bedArray[i].x = 0;
+                    agent->bedArray[i].y = 0;
                 }
             }
         }
