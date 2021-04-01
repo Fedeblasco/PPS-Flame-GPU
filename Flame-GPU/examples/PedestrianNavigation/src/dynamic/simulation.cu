@@ -3700,6 +3700,42 @@ int h_env_TRIAGE_Y;
 int h_env_UCI_X;
 int h_env_UCI_Y;
 int h_env_NUMBER_OF_BEDS;
+float h_env_PROB_STAY_1;
+float h_env_PROB_STAY_2;
+float h_env_PROB_STAY_3;
+float h_env_PROB_STAY_4;
+float h_env_PROB_STAY_5;
+float h_env_PROB_STAY_6;
+float h_env_PROB_STAY_7;
+float h_env_PROB_STAY_8;
+float h_env_PROB_STAY_9;
+float h_env_PROB_STAY_10;
+float h_env_PROB_STAY_11;
+float h_env_PROB_STAY_12;
+float h_env_PROB_STAY_13;
+float h_env_PROB_STAY_14;
+float h_env_PROB_STAY_15;
+float h_env_PROB_STAY_16;
+float h_env_PROB_STAY_17;
+float h_env_PROB_STAY_18;
+float h_env_STAY_TIME_1;
+float h_env_STAY_TIME_2;
+float h_env_STAY_TIME_3;
+float h_env_STAY_TIME_4;
+float h_env_STAY_TIME_5;
+float h_env_STAY_TIME_6;
+float h_env_STAY_TIME_7;
+float h_env_STAY_TIME_8;
+float h_env_STAY_TIME_9;
+float h_env_STAY_TIME_10;
+float h_env_STAY_TIME_11;
+float h_env_STAY_TIME_12;
+float h_env_STAY_TIME_13;
+float h_env_STAY_TIME_14;
+float h_env_STAY_TIME_15;
+float h_env_STAY_TIME_16;
+float h_env_STAY_TIME_17;
+float h_env_STAY_TIME_18;
 int h_env_CHECKPOINT_1_X;
 int h_env_CHECKPOINT_1_Y;
 int h_env_CHECKPOINT_2_X;
@@ -4522,6 +4558,474 @@ void set_NUMBER_OF_BEDS(int* h_NUMBER_OF_BEDS){
 //constant getter
 const int* get_NUMBER_OF_BEDS(){
     return &h_env_NUMBER_OF_BEDS;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_1(float* h_PROB_STAY_1){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_1, h_PROB_STAY_1, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_1, h_PROB_STAY_1,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_1(){
+    return &h_env_PROB_STAY_1;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_2(float* h_PROB_STAY_2){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_2, h_PROB_STAY_2, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_2, h_PROB_STAY_2,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_2(){
+    return &h_env_PROB_STAY_2;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_3(float* h_PROB_STAY_3){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_3, h_PROB_STAY_3, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_3, h_PROB_STAY_3,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_3(){
+    return &h_env_PROB_STAY_3;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_4(float* h_PROB_STAY_4){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_4, h_PROB_STAY_4, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_4, h_PROB_STAY_4,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_4(){
+    return &h_env_PROB_STAY_4;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_5(float* h_PROB_STAY_5){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_5, h_PROB_STAY_5, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_5, h_PROB_STAY_5,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_5(){
+    return &h_env_PROB_STAY_5;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_6(float* h_PROB_STAY_6){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_6, h_PROB_STAY_6, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_6, h_PROB_STAY_6,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_6(){
+    return &h_env_PROB_STAY_6;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_7(float* h_PROB_STAY_7){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_7, h_PROB_STAY_7, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_7, h_PROB_STAY_7,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_7(){
+    return &h_env_PROB_STAY_7;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_8(float* h_PROB_STAY_8){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_8, h_PROB_STAY_8, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_8, h_PROB_STAY_8,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_8(){
+    return &h_env_PROB_STAY_8;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_9(float* h_PROB_STAY_9){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_9, h_PROB_STAY_9, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_9, h_PROB_STAY_9,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_9(){
+    return &h_env_PROB_STAY_9;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_10(float* h_PROB_STAY_10){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_10, h_PROB_STAY_10, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_10, h_PROB_STAY_10,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_10(){
+    return &h_env_PROB_STAY_10;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_11(float* h_PROB_STAY_11){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_11, h_PROB_STAY_11, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_11, h_PROB_STAY_11,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_11(){
+    return &h_env_PROB_STAY_11;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_12(float* h_PROB_STAY_12){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_12, h_PROB_STAY_12, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_12, h_PROB_STAY_12,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_12(){
+    return &h_env_PROB_STAY_12;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_13(float* h_PROB_STAY_13){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_13, h_PROB_STAY_13, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_13, h_PROB_STAY_13,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_13(){
+    return &h_env_PROB_STAY_13;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_14(float* h_PROB_STAY_14){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_14, h_PROB_STAY_14, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_14, h_PROB_STAY_14,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_14(){
+    return &h_env_PROB_STAY_14;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_15(float* h_PROB_STAY_15){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_15, h_PROB_STAY_15, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_15, h_PROB_STAY_15,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_15(){
+    return &h_env_PROB_STAY_15;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_16(float* h_PROB_STAY_16){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_16, h_PROB_STAY_16, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_16, h_PROB_STAY_16,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_16(){
+    return &h_env_PROB_STAY_16;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_17(float* h_PROB_STAY_17){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_17, h_PROB_STAY_17, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_17, h_PROB_STAY_17,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_17(){
+    return &h_env_PROB_STAY_17;
+}
+
+
+
+//constant setter
+void set_PROB_STAY_18(float* h_PROB_STAY_18){
+    gpuErrchk(cudaMemcpyToSymbol(PROB_STAY_18, h_PROB_STAY_18, sizeof(float)));
+    memcpy(&h_env_PROB_STAY_18, h_PROB_STAY_18,sizeof(float));
+}
+
+//constant getter
+const float* get_PROB_STAY_18(){
+    return &h_env_PROB_STAY_18;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_1(float* h_STAY_TIME_1){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_1, h_STAY_TIME_1, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_1, h_STAY_TIME_1,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_1(){
+    return &h_env_STAY_TIME_1;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_2(float* h_STAY_TIME_2){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_2, h_STAY_TIME_2, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_2, h_STAY_TIME_2,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_2(){
+    return &h_env_STAY_TIME_2;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_3(float* h_STAY_TIME_3){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_3, h_STAY_TIME_3, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_3, h_STAY_TIME_3,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_3(){
+    return &h_env_STAY_TIME_3;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_4(float* h_STAY_TIME_4){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_4, h_STAY_TIME_4, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_4, h_STAY_TIME_4,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_4(){
+    return &h_env_STAY_TIME_4;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_5(float* h_STAY_TIME_5){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_5, h_STAY_TIME_5, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_5, h_STAY_TIME_5,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_5(){
+    return &h_env_STAY_TIME_5;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_6(float* h_STAY_TIME_6){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_6, h_STAY_TIME_6, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_6, h_STAY_TIME_6,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_6(){
+    return &h_env_STAY_TIME_6;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_7(float* h_STAY_TIME_7){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_7, h_STAY_TIME_7, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_7, h_STAY_TIME_7,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_7(){
+    return &h_env_STAY_TIME_7;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_8(float* h_STAY_TIME_8){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_8, h_STAY_TIME_8, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_8, h_STAY_TIME_8,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_8(){
+    return &h_env_STAY_TIME_8;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_9(float* h_STAY_TIME_9){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_9, h_STAY_TIME_9, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_9, h_STAY_TIME_9,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_9(){
+    return &h_env_STAY_TIME_9;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_10(float* h_STAY_TIME_10){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_10, h_STAY_TIME_10, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_10, h_STAY_TIME_10,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_10(){
+    return &h_env_STAY_TIME_10;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_11(float* h_STAY_TIME_11){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_11, h_STAY_TIME_11, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_11, h_STAY_TIME_11,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_11(){
+    return &h_env_STAY_TIME_11;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_12(float* h_STAY_TIME_12){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_12, h_STAY_TIME_12, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_12, h_STAY_TIME_12,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_12(){
+    return &h_env_STAY_TIME_12;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_13(float* h_STAY_TIME_13){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_13, h_STAY_TIME_13, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_13, h_STAY_TIME_13,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_13(){
+    return &h_env_STAY_TIME_13;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_14(float* h_STAY_TIME_14){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_14, h_STAY_TIME_14, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_14, h_STAY_TIME_14,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_14(){
+    return &h_env_STAY_TIME_14;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_15(float* h_STAY_TIME_15){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_15, h_STAY_TIME_15, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_15, h_STAY_TIME_15,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_15(){
+    return &h_env_STAY_TIME_15;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_16(float* h_STAY_TIME_16){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_16, h_STAY_TIME_16, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_16, h_STAY_TIME_16,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_16(){
+    return &h_env_STAY_TIME_16;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_17(float* h_STAY_TIME_17){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_17, h_STAY_TIME_17, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_17, h_STAY_TIME_17,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_17(){
+    return &h_env_STAY_TIME_17;
+}
+
+
+
+//constant setter
+void set_STAY_TIME_18(float* h_STAY_TIME_18){
+    gpuErrchk(cudaMemcpyToSymbol(STAY_TIME_18, h_STAY_TIME_18, sizeof(float)));
+    memcpy(&h_env_STAY_TIME_18, h_STAY_TIME_18,sizeof(float));
+}
+
+//constant getter
+const float* get_STAY_TIME_18(){
+    return &h_env_STAY_TIME_18;
 }
 
 

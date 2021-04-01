@@ -470,6 +470,150 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_NUMBER_OF_BEDS()));
     fputs(data, file);
     fputs("</NUMBER_OF_BEDS>\n", file);
+    fputs("\t<PROB_STAY_1>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_1()));
+    fputs(data, file);
+    fputs("</PROB_STAY_1>\n", file);
+    fputs("\t<PROB_STAY_2>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_2()));
+    fputs(data, file);
+    fputs("</PROB_STAY_2>\n", file);
+    fputs("\t<PROB_STAY_3>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_3()));
+    fputs(data, file);
+    fputs("</PROB_STAY_3>\n", file);
+    fputs("\t<PROB_STAY_4>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_4()));
+    fputs(data, file);
+    fputs("</PROB_STAY_4>\n", file);
+    fputs("\t<PROB_STAY_5>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_5()));
+    fputs(data, file);
+    fputs("</PROB_STAY_5>\n", file);
+    fputs("\t<PROB_STAY_6>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_6()));
+    fputs(data, file);
+    fputs("</PROB_STAY_6>\n", file);
+    fputs("\t<PROB_STAY_7>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_7()));
+    fputs(data, file);
+    fputs("</PROB_STAY_7>\n", file);
+    fputs("\t<PROB_STAY_8>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_8()));
+    fputs(data, file);
+    fputs("</PROB_STAY_8>\n", file);
+    fputs("\t<PROB_STAY_9>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_9()));
+    fputs(data, file);
+    fputs("</PROB_STAY_9>\n", file);
+    fputs("\t<PROB_STAY_10>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_10()));
+    fputs(data, file);
+    fputs("</PROB_STAY_10>\n", file);
+    fputs("\t<PROB_STAY_11>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_11()));
+    fputs(data, file);
+    fputs("</PROB_STAY_11>\n", file);
+    fputs("\t<PROB_STAY_12>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_12()));
+    fputs(data, file);
+    fputs("</PROB_STAY_12>\n", file);
+    fputs("\t<PROB_STAY_13>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_13()));
+    fputs(data, file);
+    fputs("</PROB_STAY_13>\n", file);
+    fputs("\t<PROB_STAY_14>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_14()));
+    fputs(data, file);
+    fputs("</PROB_STAY_14>\n", file);
+    fputs("\t<PROB_STAY_15>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_15()));
+    fputs(data, file);
+    fputs("</PROB_STAY_15>\n", file);
+    fputs("\t<PROB_STAY_16>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_16()));
+    fputs(data, file);
+    fputs("</PROB_STAY_16>\n", file);
+    fputs("\t<PROB_STAY_17>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_17()));
+    fputs(data, file);
+    fputs("</PROB_STAY_17>\n", file);
+    fputs("\t<PROB_STAY_18>", file);
+    sprintf(data, "%f", (*get_PROB_STAY_18()));
+    fputs(data, file);
+    fputs("</PROB_STAY_18>\n", file);
+    fputs("\t<STAY_TIME_1>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_1()));
+    fputs(data, file);
+    fputs("</STAY_TIME_1>\n", file);
+    fputs("\t<STAY_TIME_2>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_2()));
+    fputs(data, file);
+    fputs("</STAY_TIME_2>\n", file);
+    fputs("\t<STAY_TIME_3>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_3()));
+    fputs(data, file);
+    fputs("</STAY_TIME_3>\n", file);
+    fputs("\t<STAY_TIME_4>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_4()));
+    fputs(data, file);
+    fputs("</STAY_TIME_4>\n", file);
+    fputs("\t<STAY_TIME_5>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_5()));
+    fputs(data, file);
+    fputs("</STAY_TIME_5>\n", file);
+    fputs("\t<STAY_TIME_6>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_6()));
+    fputs(data, file);
+    fputs("</STAY_TIME_6>\n", file);
+    fputs("\t<STAY_TIME_7>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_7()));
+    fputs(data, file);
+    fputs("</STAY_TIME_7>\n", file);
+    fputs("\t<STAY_TIME_8>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_8()));
+    fputs(data, file);
+    fputs("</STAY_TIME_8>\n", file);
+    fputs("\t<STAY_TIME_9>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_9()));
+    fputs(data, file);
+    fputs("</STAY_TIME_9>\n", file);
+    fputs("\t<STAY_TIME_10>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_10()));
+    fputs(data, file);
+    fputs("</STAY_TIME_10>\n", file);
+    fputs("\t<STAY_TIME_11>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_11()));
+    fputs(data, file);
+    fputs("</STAY_TIME_11>\n", file);
+    fputs("\t<STAY_TIME_12>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_12()));
+    fputs(data, file);
+    fputs("</STAY_TIME_12>\n", file);
+    fputs("\t<STAY_TIME_13>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_13()));
+    fputs(data, file);
+    fputs("</STAY_TIME_13>\n", file);
+    fputs("\t<STAY_TIME_14>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_14()));
+    fputs(data, file);
+    fputs("</STAY_TIME_14>\n", file);
+    fputs("\t<STAY_TIME_15>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_15()));
+    fputs(data, file);
+    fputs("</STAY_TIME_15>\n", file);
+    fputs("\t<STAY_TIME_16>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_16()));
+    fputs(data, file);
+    fputs("</STAY_TIME_16>\n", file);
+    fputs("\t<STAY_TIME_17>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_17()));
+    fputs(data, file);
+    fputs("</STAY_TIME_17>\n", file);
+    fputs("\t<STAY_TIME_18>", file);
+    sprintf(data, "%f", (*get_STAY_TIME_18()));
+    fputs(data, file);
+    fputs("</STAY_TIME_18>\n", file);
     fputs("\t<CHECKPOINT_1_X>", file);
     sprintf(data, "%d", (*get_CHECKPOINT_1_X()));
     fputs(data, file);
@@ -1515,6 +1659,78 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_NUMBER_OF_BEDS;
     
+    int in_env_PROB_STAY_1;
+    
+    int in_env_PROB_STAY_2;
+    
+    int in_env_PROB_STAY_3;
+    
+    int in_env_PROB_STAY_4;
+    
+    int in_env_PROB_STAY_5;
+    
+    int in_env_PROB_STAY_6;
+    
+    int in_env_PROB_STAY_7;
+    
+    int in_env_PROB_STAY_8;
+    
+    int in_env_PROB_STAY_9;
+    
+    int in_env_PROB_STAY_10;
+    
+    int in_env_PROB_STAY_11;
+    
+    int in_env_PROB_STAY_12;
+    
+    int in_env_PROB_STAY_13;
+    
+    int in_env_PROB_STAY_14;
+    
+    int in_env_PROB_STAY_15;
+    
+    int in_env_PROB_STAY_16;
+    
+    int in_env_PROB_STAY_17;
+    
+    int in_env_PROB_STAY_18;
+    
+    int in_env_STAY_TIME_1;
+    
+    int in_env_STAY_TIME_2;
+    
+    int in_env_STAY_TIME_3;
+    
+    int in_env_STAY_TIME_4;
+    
+    int in_env_STAY_TIME_5;
+    
+    int in_env_STAY_TIME_6;
+    
+    int in_env_STAY_TIME_7;
+    
+    int in_env_STAY_TIME_8;
+    
+    int in_env_STAY_TIME_9;
+    
+    int in_env_STAY_TIME_10;
+    
+    int in_env_STAY_TIME_11;
+    
+    int in_env_STAY_TIME_12;
+    
+    int in_env_STAY_TIME_13;
+    
+    int in_env_STAY_TIME_14;
+    
+    int in_env_STAY_TIME_15;
+    
+    int in_env_STAY_TIME_16;
+    
+    int in_env_STAY_TIME_17;
+    
+    int in_env_STAY_TIME_18;
+    
     int in_env_CHECKPOINT_1_X;
     
     int in_env_CHECKPOINT_1_Y;
@@ -1760,6 +1976,42 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int env_UCI_X;
     int env_UCI_Y;
     int env_NUMBER_OF_BEDS;
+    float env_PROB_STAY_1;
+    float env_PROB_STAY_2;
+    float env_PROB_STAY_3;
+    float env_PROB_STAY_4;
+    float env_PROB_STAY_5;
+    float env_PROB_STAY_6;
+    float env_PROB_STAY_7;
+    float env_PROB_STAY_8;
+    float env_PROB_STAY_9;
+    float env_PROB_STAY_10;
+    float env_PROB_STAY_11;
+    float env_PROB_STAY_12;
+    float env_PROB_STAY_13;
+    float env_PROB_STAY_14;
+    float env_PROB_STAY_15;
+    float env_PROB_STAY_16;
+    float env_PROB_STAY_17;
+    float env_PROB_STAY_18;
+    float env_STAY_TIME_1;
+    float env_STAY_TIME_2;
+    float env_STAY_TIME_3;
+    float env_STAY_TIME_4;
+    float env_STAY_TIME_5;
+    float env_STAY_TIME_6;
+    float env_STAY_TIME_7;
+    float env_STAY_TIME_8;
+    float env_STAY_TIME_9;
+    float env_STAY_TIME_10;
+    float env_STAY_TIME_11;
+    float env_STAY_TIME_12;
+    float env_STAY_TIME_13;
+    float env_STAY_TIME_14;
+    float env_STAY_TIME_15;
+    float env_STAY_TIME_16;
+    float env_STAY_TIME_17;
+    float env_STAY_TIME_18;
     int env_CHECKPOINT_1_X;
     int env_CHECKPOINT_1_Y;
     int env_CHECKPOINT_2_X;
@@ -1972,6 +2224,42 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_UCI_X = 0;
     in_env_UCI_Y = 0;
     in_env_NUMBER_OF_BEDS = 0;
+    in_env_PROB_STAY_1 = 0;
+    in_env_PROB_STAY_2 = 0;
+    in_env_PROB_STAY_3 = 0;
+    in_env_PROB_STAY_4 = 0;
+    in_env_PROB_STAY_5 = 0;
+    in_env_PROB_STAY_6 = 0;
+    in_env_PROB_STAY_7 = 0;
+    in_env_PROB_STAY_8 = 0;
+    in_env_PROB_STAY_9 = 0;
+    in_env_PROB_STAY_10 = 0;
+    in_env_PROB_STAY_11 = 0;
+    in_env_PROB_STAY_12 = 0;
+    in_env_PROB_STAY_13 = 0;
+    in_env_PROB_STAY_14 = 0;
+    in_env_PROB_STAY_15 = 0;
+    in_env_PROB_STAY_16 = 0;
+    in_env_PROB_STAY_17 = 0;
+    in_env_PROB_STAY_18 = 0;
+    in_env_STAY_TIME_1 = 0;
+    in_env_STAY_TIME_2 = 0;
+    in_env_STAY_TIME_3 = 0;
+    in_env_STAY_TIME_4 = 0;
+    in_env_STAY_TIME_5 = 0;
+    in_env_STAY_TIME_6 = 0;
+    in_env_STAY_TIME_7 = 0;
+    in_env_STAY_TIME_8 = 0;
+    in_env_STAY_TIME_9 = 0;
+    in_env_STAY_TIME_10 = 0;
+    in_env_STAY_TIME_11 = 0;
+    in_env_STAY_TIME_12 = 0;
+    in_env_STAY_TIME_13 = 0;
+    in_env_STAY_TIME_14 = 0;
+    in_env_STAY_TIME_15 = 0;
+    in_env_STAY_TIME_16 = 0;
+    in_env_STAY_TIME_17 = 0;
+    in_env_STAY_TIME_18 = 0;
     in_env_CHECKPOINT_1_X = 0;
     in_env_CHECKPOINT_1_Y = 0;
     in_env_CHECKPOINT_2_X = 0;
@@ -2422,6 +2710,42 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_UCI_X = 0;
     env_UCI_Y = 0;
     env_NUMBER_OF_BEDS = 0;
+    env_PROB_STAY_1 = 0;
+    env_PROB_STAY_2 = 0;
+    env_PROB_STAY_3 = 0;
+    env_PROB_STAY_4 = 0;
+    env_PROB_STAY_5 = 0;
+    env_PROB_STAY_6 = 0;
+    env_PROB_STAY_7 = 0;
+    env_PROB_STAY_8 = 0;
+    env_PROB_STAY_9 = 0;
+    env_PROB_STAY_10 = 0;
+    env_PROB_STAY_11 = 0;
+    env_PROB_STAY_12 = 0;
+    env_PROB_STAY_13 = 0;
+    env_PROB_STAY_14 = 0;
+    env_PROB_STAY_15 = 0;
+    env_PROB_STAY_16 = 0;
+    env_PROB_STAY_17 = 0;
+    env_PROB_STAY_18 = 0;
+    env_STAY_TIME_1 = 0;
+    env_STAY_TIME_2 = 0;
+    env_STAY_TIME_3 = 0;
+    env_STAY_TIME_4 = 0;
+    env_STAY_TIME_5 = 0;
+    env_STAY_TIME_6 = 0;
+    env_STAY_TIME_7 = 0;
+    env_STAY_TIME_8 = 0;
+    env_STAY_TIME_9 = 0;
+    env_STAY_TIME_10 = 0;
+    env_STAY_TIME_11 = 0;
+    env_STAY_TIME_12 = 0;
+    env_STAY_TIME_13 = 0;
+    env_STAY_TIME_14 = 0;
+    env_STAY_TIME_15 = 0;
+    env_STAY_TIME_16 = 0;
+    env_STAY_TIME_17 = 0;
+    env_STAY_TIME_18 = 0;
     env_CHECKPOINT_1_X = 0;
     env_CHECKPOINT_1_Y = 0;
     env_CHECKPOINT_2_X = 0;
@@ -3343,6 +3667,78 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/UCI_Y") == 0) in_env_UCI_Y = 0;
 			if(strcmp(buffer, "NUMBER_OF_BEDS") == 0) in_env_NUMBER_OF_BEDS = 1;
             if(strcmp(buffer, "/NUMBER_OF_BEDS") == 0) in_env_NUMBER_OF_BEDS = 0;
+			if(strcmp(buffer, "PROB_STAY_1") == 0) in_env_PROB_STAY_1 = 1;
+            if(strcmp(buffer, "/PROB_STAY_1") == 0) in_env_PROB_STAY_1 = 0;
+			if(strcmp(buffer, "PROB_STAY_2") == 0) in_env_PROB_STAY_2 = 1;
+            if(strcmp(buffer, "/PROB_STAY_2") == 0) in_env_PROB_STAY_2 = 0;
+			if(strcmp(buffer, "PROB_STAY_3") == 0) in_env_PROB_STAY_3 = 1;
+            if(strcmp(buffer, "/PROB_STAY_3") == 0) in_env_PROB_STAY_3 = 0;
+			if(strcmp(buffer, "PROB_STAY_4") == 0) in_env_PROB_STAY_4 = 1;
+            if(strcmp(buffer, "/PROB_STAY_4") == 0) in_env_PROB_STAY_4 = 0;
+			if(strcmp(buffer, "PROB_STAY_5") == 0) in_env_PROB_STAY_5 = 1;
+            if(strcmp(buffer, "/PROB_STAY_5") == 0) in_env_PROB_STAY_5 = 0;
+			if(strcmp(buffer, "PROB_STAY_6") == 0) in_env_PROB_STAY_6 = 1;
+            if(strcmp(buffer, "/PROB_STAY_6") == 0) in_env_PROB_STAY_6 = 0;
+			if(strcmp(buffer, "PROB_STAY_7") == 0) in_env_PROB_STAY_7 = 1;
+            if(strcmp(buffer, "/PROB_STAY_7") == 0) in_env_PROB_STAY_7 = 0;
+			if(strcmp(buffer, "PROB_STAY_8") == 0) in_env_PROB_STAY_8 = 1;
+            if(strcmp(buffer, "/PROB_STAY_8") == 0) in_env_PROB_STAY_8 = 0;
+			if(strcmp(buffer, "PROB_STAY_9") == 0) in_env_PROB_STAY_9 = 1;
+            if(strcmp(buffer, "/PROB_STAY_9") == 0) in_env_PROB_STAY_9 = 0;
+			if(strcmp(buffer, "PROB_STAY_10") == 0) in_env_PROB_STAY_10 = 1;
+            if(strcmp(buffer, "/PROB_STAY_10") == 0) in_env_PROB_STAY_10 = 0;
+			if(strcmp(buffer, "PROB_STAY_11") == 0) in_env_PROB_STAY_11 = 1;
+            if(strcmp(buffer, "/PROB_STAY_11") == 0) in_env_PROB_STAY_11 = 0;
+			if(strcmp(buffer, "PROB_STAY_12") == 0) in_env_PROB_STAY_12 = 1;
+            if(strcmp(buffer, "/PROB_STAY_12") == 0) in_env_PROB_STAY_12 = 0;
+			if(strcmp(buffer, "PROB_STAY_13") == 0) in_env_PROB_STAY_13 = 1;
+            if(strcmp(buffer, "/PROB_STAY_13") == 0) in_env_PROB_STAY_13 = 0;
+			if(strcmp(buffer, "PROB_STAY_14") == 0) in_env_PROB_STAY_14 = 1;
+            if(strcmp(buffer, "/PROB_STAY_14") == 0) in_env_PROB_STAY_14 = 0;
+			if(strcmp(buffer, "PROB_STAY_15") == 0) in_env_PROB_STAY_15 = 1;
+            if(strcmp(buffer, "/PROB_STAY_15") == 0) in_env_PROB_STAY_15 = 0;
+			if(strcmp(buffer, "PROB_STAY_16") == 0) in_env_PROB_STAY_16 = 1;
+            if(strcmp(buffer, "/PROB_STAY_16") == 0) in_env_PROB_STAY_16 = 0;
+			if(strcmp(buffer, "PROB_STAY_17") == 0) in_env_PROB_STAY_17 = 1;
+            if(strcmp(buffer, "/PROB_STAY_17") == 0) in_env_PROB_STAY_17 = 0;
+			if(strcmp(buffer, "PROB_STAY_18") == 0) in_env_PROB_STAY_18 = 1;
+            if(strcmp(buffer, "/PROB_STAY_18") == 0) in_env_PROB_STAY_18 = 0;
+			if(strcmp(buffer, "STAY_TIME_1") == 0) in_env_STAY_TIME_1 = 1;
+            if(strcmp(buffer, "/STAY_TIME_1") == 0) in_env_STAY_TIME_1 = 0;
+			if(strcmp(buffer, "STAY_TIME_2") == 0) in_env_STAY_TIME_2 = 1;
+            if(strcmp(buffer, "/STAY_TIME_2") == 0) in_env_STAY_TIME_2 = 0;
+			if(strcmp(buffer, "STAY_TIME_3") == 0) in_env_STAY_TIME_3 = 1;
+            if(strcmp(buffer, "/STAY_TIME_3") == 0) in_env_STAY_TIME_3 = 0;
+			if(strcmp(buffer, "STAY_TIME_4") == 0) in_env_STAY_TIME_4 = 1;
+            if(strcmp(buffer, "/STAY_TIME_4") == 0) in_env_STAY_TIME_4 = 0;
+			if(strcmp(buffer, "STAY_TIME_5") == 0) in_env_STAY_TIME_5 = 1;
+            if(strcmp(buffer, "/STAY_TIME_5") == 0) in_env_STAY_TIME_5 = 0;
+			if(strcmp(buffer, "STAY_TIME_6") == 0) in_env_STAY_TIME_6 = 1;
+            if(strcmp(buffer, "/STAY_TIME_6") == 0) in_env_STAY_TIME_6 = 0;
+			if(strcmp(buffer, "STAY_TIME_7") == 0) in_env_STAY_TIME_7 = 1;
+            if(strcmp(buffer, "/STAY_TIME_7") == 0) in_env_STAY_TIME_7 = 0;
+			if(strcmp(buffer, "STAY_TIME_8") == 0) in_env_STAY_TIME_8 = 1;
+            if(strcmp(buffer, "/STAY_TIME_8") == 0) in_env_STAY_TIME_8 = 0;
+			if(strcmp(buffer, "STAY_TIME_9") == 0) in_env_STAY_TIME_9 = 1;
+            if(strcmp(buffer, "/STAY_TIME_9") == 0) in_env_STAY_TIME_9 = 0;
+			if(strcmp(buffer, "STAY_TIME_10") == 0) in_env_STAY_TIME_10 = 1;
+            if(strcmp(buffer, "/STAY_TIME_10") == 0) in_env_STAY_TIME_10 = 0;
+			if(strcmp(buffer, "STAY_TIME_11") == 0) in_env_STAY_TIME_11 = 1;
+            if(strcmp(buffer, "/STAY_TIME_11") == 0) in_env_STAY_TIME_11 = 0;
+			if(strcmp(buffer, "STAY_TIME_12") == 0) in_env_STAY_TIME_12 = 1;
+            if(strcmp(buffer, "/STAY_TIME_12") == 0) in_env_STAY_TIME_12 = 0;
+			if(strcmp(buffer, "STAY_TIME_13") == 0) in_env_STAY_TIME_13 = 1;
+            if(strcmp(buffer, "/STAY_TIME_13") == 0) in_env_STAY_TIME_13 = 0;
+			if(strcmp(buffer, "STAY_TIME_14") == 0) in_env_STAY_TIME_14 = 1;
+            if(strcmp(buffer, "/STAY_TIME_14") == 0) in_env_STAY_TIME_14 = 0;
+			if(strcmp(buffer, "STAY_TIME_15") == 0) in_env_STAY_TIME_15 = 1;
+            if(strcmp(buffer, "/STAY_TIME_15") == 0) in_env_STAY_TIME_15 = 0;
+			if(strcmp(buffer, "STAY_TIME_16") == 0) in_env_STAY_TIME_16 = 1;
+            if(strcmp(buffer, "/STAY_TIME_16") == 0) in_env_STAY_TIME_16 = 0;
+			if(strcmp(buffer, "STAY_TIME_17") == 0) in_env_STAY_TIME_17 = 1;
+            if(strcmp(buffer, "/STAY_TIME_17") == 0) in_env_STAY_TIME_17 = 0;
+			if(strcmp(buffer, "STAY_TIME_18") == 0) in_env_STAY_TIME_18 = 1;
+            if(strcmp(buffer, "/STAY_TIME_18") == 0) in_env_STAY_TIME_18 = 0;
 			if(strcmp(buffer, "CHECKPOINT_1_X") == 0) in_env_CHECKPOINT_1_X = 1;
             if(strcmp(buffer, "/CHECKPOINT_1_X") == 0) in_env_CHECKPOINT_1_X = 0;
 			if(strcmp(buffer, "CHECKPOINT_1_Y") == 0) in_env_CHECKPOINT_1_Y = 1;
@@ -4160,6 +4556,258 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_NUMBER_OF_BEDS = (int) fpgu_strtol(buffer);
                     
                     set_NUMBER_OF_BEDS(&env_NUMBER_OF_BEDS);
+                  
+              }
+            if(in_env_PROB_STAY_1){
+              
+                    env_PROB_STAY_1 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_1(&env_PROB_STAY_1);
+                  
+              }
+            if(in_env_PROB_STAY_2){
+              
+                    env_PROB_STAY_2 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_2(&env_PROB_STAY_2);
+                  
+              }
+            if(in_env_PROB_STAY_3){
+              
+                    env_PROB_STAY_3 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_3(&env_PROB_STAY_3);
+                  
+              }
+            if(in_env_PROB_STAY_4){
+              
+                    env_PROB_STAY_4 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_4(&env_PROB_STAY_4);
+                  
+              }
+            if(in_env_PROB_STAY_5){
+              
+                    env_PROB_STAY_5 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_5(&env_PROB_STAY_5);
+                  
+              }
+            if(in_env_PROB_STAY_6){
+              
+                    env_PROB_STAY_6 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_6(&env_PROB_STAY_6);
+                  
+              }
+            if(in_env_PROB_STAY_7){
+              
+                    env_PROB_STAY_7 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_7(&env_PROB_STAY_7);
+                  
+              }
+            if(in_env_PROB_STAY_8){
+              
+                    env_PROB_STAY_8 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_8(&env_PROB_STAY_8);
+                  
+              }
+            if(in_env_PROB_STAY_9){
+              
+                    env_PROB_STAY_9 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_9(&env_PROB_STAY_9);
+                  
+              }
+            if(in_env_PROB_STAY_10){
+              
+                    env_PROB_STAY_10 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_10(&env_PROB_STAY_10);
+                  
+              }
+            if(in_env_PROB_STAY_11){
+              
+                    env_PROB_STAY_11 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_11(&env_PROB_STAY_11);
+                  
+              }
+            if(in_env_PROB_STAY_12){
+              
+                    env_PROB_STAY_12 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_12(&env_PROB_STAY_12);
+                  
+              }
+            if(in_env_PROB_STAY_13){
+              
+                    env_PROB_STAY_13 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_13(&env_PROB_STAY_13);
+                  
+              }
+            if(in_env_PROB_STAY_14){
+              
+                    env_PROB_STAY_14 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_14(&env_PROB_STAY_14);
+                  
+              }
+            if(in_env_PROB_STAY_15){
+              
+                    env_PROB_STAY_15 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_15(&env_PROB_STAY_15);
+                  
+              }
+            if(in_env_PROB_STAY_16){
+              
+                    env_PROB_STAY_16 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_16(&env_PROB_STAY_16);
+                  
+              }
+            if(in_env_PROB_STAY_17){
+              
+                    env_PROB_STAY_17 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_17(&env_PROB_STAY_17);
+                  
+              }
+            if(in_env_PROB_STAY_18){
+              
+                    env_PROB_STAY_18 = (float) fgpu_atof(buffer);
+                    
+                    set_PROB_STAY_18(&env_PROB_STAY_18);
+                  
+              }
+            if(in_env_STAY_TIME_1){
+              
+                    env_STAY_TIME_1 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_1(&env_STAY_TIME_1);
+                  
+              }
+            if(in_env_STAY_TIME_2){
+              
+                    env_STAY_TIME_2 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_2(&env_STAY_TIME_2);
+                  
+              }
+            if(in_env_STAY_TIME_3){
+              
+                    env_STAY_TIME_3 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_3(&env_STAY_TIME_3);
+                  
+              }
+            if(in_env_STAY_TIME_4){
+              
+                    env_STAY_TIME_4 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_4(&env_STAY_TIME_4);
+                  
+              }
+            if(in_env_STAY_TIME_5){
+              
+                    env_STAY_TIME_5 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_5(&env_STAY_TIME_5);
+                  
+              }
+            if(in_env_STAY_TIME_6){
+              
+                    env_STAY_TIME_6 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_6(&env_STAY_TIME_6);
+                  
+              }
+            if(in_env_STAY_TIME_7){
+              
+                    env_STAY_TIME_7 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_7(&env_STAY_TIME_7);
+                  
+              }
+            if(in_env_STAY_TIME_8){
+              
+                    env_STAY_TIME_8 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_8(&env_STAY_TIME_8);
+                  
+              }
+            if(in_env_STAY_TIME_9){
+              
+                    env_STAY_TIME_9 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_9(&env_STAY_TIME_9);
+                  
+              }
+            if(in_env_STAY_TIME_10){
+              
+                    env_STAY_TIME_10 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_10(&env_STAY_TIME_10);
+                  
+              }
+            if(in_env_STAY_TIME_11){
+              
+                    env_STAY_TIME_11 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_11(&env_STAY_TIME_11);
+                  
+              }
+            if(in_env_STAY_TIME_12){
+              
+                    env_STAY_TIME_12 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_12(&env_STAY_TIME_12);
+                  
+              }
+            if(in_env_STAY_TIME_13){
+              
+                    env_STAY_TIME_13 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_13(&env_STAY_TIME_13);
+                  
+              }
+            if(in_env_STAY_TIME_14){
+              
+                    env_STAY_TIME_14 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_14(&env_STAY_TIME_14);
+                  
+              }
+            if(in_env_STAY_TIME_15){
+              
+                    env_STAY_TIME_15 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_15(&env_STAY_TIME_15);
+                  
+              }
+            if(in_env_STAY_TIME_16){
+              
+                    env_STAY_TIME_16 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_16(&env_STAY_TIME_16);
+                  
+              }
+            if(in_env_STAY_TIME_17){
+              
+                    env_STAY_TIME_17 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_17(&env_STAY_TIME_17);
+                  
+              }
+            if(in_env_STAY_TIME_18){
+              
+                    env_STAY_TIME_18 = (float) fgpu_atof(buffer);
+                    
+                    set_STAY_TIME_18(&env_STAY_TIME_18);
                   
               }
             if(in_env_CHECKPOINT_1_X){

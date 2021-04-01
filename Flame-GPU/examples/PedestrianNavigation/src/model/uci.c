@@ -4,9 +4,10 @@ __FLAME_GPU_FUNC__ int determine_stay_time(RNG_rand48* rand48){
 	float random = rnd<CONTINUOUS>(rand48);
 	float acc = 0;
     float acctemp = 0;
-	float prob[] = {0.004748328,0.088623115,0.017333166,0.032968386,0.013086353,0.100335789,0.066380434,0.000017555,0.007899849,
-                    0.100224175,0.084432757,0.117953925,0.053206605,0.026187069,0.122177398,0.033379033,0.037753818,0.092694777};
-    float stay_time[] = {2.6,3.0,3.3,3.7,4.2,4.4,4.7,4.9,6.3,6.4,6.5,6.7,7.4,8.0,9.2,9.3,10.2,29.7};
+	float prob[] = {PROB_STAY_1, PROB_STAY_2, PROB_STAY_3, PROB_STAY_4, PROB_STAY_5, PROB_STAY_6, PROB_STAY_7, PROB_STAY_8, PROB_STAY_9,
+                         PROB_STAY_10, PROB_STAY_11, PROB_STAY_12, PROB_STAY_13, PROB_STAY_14, PROB_STAY_15, PROB_STAY_16, PROB_STAY_17, PROB_STAY_18};
+    float stay_time[] = {STAY_TIME_1, STAY_TIME_2, STAY_TIME_3, STAY_TIME_4, STAY_TIME_5, STAY_TIME_6, STAY_TIME_7, STAY_TIME_8, STAY_TIME_9,
+                         STAY_TIME_10, STAY_TIME_11, STAY_TIME_12, STAY_TIME_13, STAY_TIME_14, STAY_TIME_15, STAY_TIME_16, STAY_TIME_17, STAY_TIME_18};
 	for(int i = 0; i<18; i++){
 		acctemp = acc+prob[i];
 		if((acc < random) && (random <= acctemp)){

@@ -7563,6 +7563,78 @@ __constant__ int UCI_Y;
 
 __constant__ int NUMBER_OF_BEDS;
 
+__constant__ float PROB_STAY_1;
+
+__constant__ float PROB_STAY_2;
+
+__constant__ float PROB_STAY_3;
+
+__constant__ float PROB_STAY_4;
+
+__constant__ float PROB_STAY_5;
+
+__constant__ float PROB_STAY_6;
+
+__constant__ float PROB_STAY_7;
+
+__constant__ float PROB_STAY_8;
+
+__constant__ float PROB_STAY_9;
+
+__constant__ float PROB_STAY_10;
+
+__constant__ float PROB_STAY_11;
+
+__constant__ float PROB_STAY_12;
+
+__constant__ float PROB_STAY_13;
+
+__constant__ float PROB_STAY_14;
+
+__constant__ float PROB_STAY_15;
+
+__constant__ float PROB_STAY_16;
+
+__constant__ float PROB_STAY_17;
+
+__constant__ float PROB_STAY_18;
+
+__constant__ float STAY_TIME_1;
+
+__constant__ float STAY_TIME_2;
+
+__constant__ float STAY_TIME_3;
+
+__constant__ float STAY_TIME_4;
+
+__constant__ float STAY_TIME_5;
+
+__constant__ float STAY_TIME_6;
+
+__constant__ float STAY_TIME_7;
+
+__constant__ float STAY_TIME_8;
+
+__constant__ float STAY_TIME_9;
+
+__constant__ float STAY_TIME_10;
+
+__constant__ float STAY_TIME_11;
+
+__constant__ float STAY_TIME_12;
+
+__constant__ float STAY_TIME_13;
+
+__constant__ float STAY_TIME_14;
+
+__constant__ float STAY_TIME_15;
+
+__constant__ float STAY_TIME_16;
+
+__constant__ float STAY_TIME_17;
+
+__constant__ float STAY_TIME_18;
+
 __constant__ int CHECKPOINT_1_X;
 
 __constant__ int CHECKPOINT_1_Y;
@@ -8295,6 +8367,402 @@ extern const int* get_NUMBER_OF_BEDS();
 
 
 extern int h_env_NUMBER_OF_BEDS;
+
+/** set_PROB_STAY_1
+ * Sets the constant variable PROB_STAY_1 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_1 value to set the variable
+ */
+extern void set_PROB_STAY_1(float* h_PROB_STAY_1);
+
+extern const float* get_PROB_STAY_1();
+
+
+extern float h_env_PROB_STAY_1;
+
+/** set_PROB_STAY_2
+ * Sets the constant variable PROB_STAY_2 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_2 value to set the variable
+ */
+extern void set_PROB_STAY_2(float* h_PROB_STAY_2);
+
+extern const float* get_PROB_STAY_2();
+
+
+extern float h_env_PROB_STAY_2;
+
+/** set_PROB_STAY_3
+ * Sets the constant variable PROB_STAY_3 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_3 value to set the variable
+ */
+extern void set_PROB_STAY_3(float* h_PROB_STAY_3);
+
+extern const float* get_PROB_STAY_3();
+
+
+extern float h_env_PROB_STAY_3;
+
+/** set_PROB_STAY_4
+ * Sets the constant variable PROB_STAY_4 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_4 value to set the variable
+ */
+extern void set_PROB_STAY_4(float* h_PROB_STAY_4);
+
+extern const float* get_PROB_STAY_4();
+
+
+extern float h_env_PROB_STAY_4;
+
+/** set_PROB_STAY_5
+ * Sets the constant variable PROB_STAY_5 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_5 value to set the variable
+ */
+extern void set_PROB_STAY_5(float* h_PROB_STAY_5);
+
+extern const float* get_PROB_STAY_5();
+
+
+extern float h_env_PROB_STAY_5;
+
+/** set_PROB_STAY_6
+ * Sets the constant variable PROB_STAY_6 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_6 value to set the variable
+ */
+extern void set_PROB_STAY_6(float* h_PROB_STAY_6);
+
+extern const float* get_PROB_STAY_6();
+
+
+extern float h_env_PROB_STAY_6;
+
+/** set_PROB_STAY_7
+ * Sets the constant variable PROB_STAY_7 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_7 value to set the variable
+ */
+extern void set_PROB_STAY_7(float* h_PROB_STAY_7);
+
+extern const float* get_PROB_STAY_7();
+
+
+extern float h_env_PROB_STAY_7;
+
+/** set_PROB_STAY_8
+ * Sets the constant variable PROB_STAY_8 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_8 value to set the variable
+ */
+extern void set_PROB_STAY_8(float* h_PROB_STAY_8);
+
+extern const float* get_PROB_STAY_8();
+
+
+extern float h_env_PROB_STAY_8;
+
+/** set_PROB_STAY_9
+ * Sets the constant variable PROB_STAY_9 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_9 value to set the variable
+ */
+extern void set_PROB_STAY_9(float* h_PROB_STAY_9);
+
+extern const float* get_PROB_STAY_9();
+
+
+extern float h_env_PROB_STAY_9;
+
+/** set_PROB_STAY_10
+ * Sets the constant variable PROB_STAY_10 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_10 value to set the variable
+ */
+extern void set_PROB_STAY_10(float* h_PROB_STAY_10);
+
+extern const float* get_PROB_STAY_10();
+
+
+extern float h_env_PROB_STAY_10;
+
+/** set_PROB_STAY_11
+ * Sets the constant variable PROB_STAY_11 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_11 value to set the variable
+ */
+extern void set_PROB_STAY_11(float* h_PROB_STAY_11);
+
+extern const float* get_PROB_STAY_11();
+
+
+extern float h_env_PROB_STAY_11;
+
+/** set_PROB_STAY_12
+ * Sets the constant variable PROB_STAY_12 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_12 value to set the variable
+ */
+extern void set_PROB_STAY_12(float* h_PROB_STAY_12);
+
+extern const float* get_PROB_STAY_12();
+
+
+extern float h_env_PROB_STAY_12;
+
+/** set_PROB_STAY_13
+ * Sets the constant variable PROB_STAY_13 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_13 value to set the variable
+ */
+extern void set_PROB_STAY_13(float* h_PROB_STAY_13);
+
+extern const float* get_PROB_STAY_13();
+
+
+extern float h_env_PROB_STAY_13;
+
+/** set_PROB_STAY_14
+ * Sets the constant variable PROB_STAY_14 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_14 value to set the variable
+ */
+extern void set_PROB_STAY_14(float* h_PROB_STAY_14);
+
+extern const float* get_PROB_STAY_14();
+
+
+extern float h_env_PROB_STAY_14;
+
+/** set_PROB_STAY_15
+ * Sets the constant variable PROB_STAY_15 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_15 value to set the variable
+ */
+extern void set_PROB_STAY_15(float* h_PROB_STAY_15);
+
+extern const float* get_PROB_STAY_15();
+
+
+extern float h_env_PROB_STAY_15;
+
+/** set_PROB_STAY_16
+ * Sets the constant variable PROB_STAY_16 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_16 value to set the variable
+ */
+extern void set_PROB_STAY_16(float* h_PROB_STAY_16);
+
+extern const float* get_PROB_STAY_16();
+
+
+extern float h_env_PROB_STAY_16;
+
+/** set_PROB_STAY_17
+ * Sets the constant variable PROB_STAY_17 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_17 value to set the variable
+ */
+extern void set_PROB_STAY_17(float* h_PROB_STAY_17);
+
+extern const float* get_PROB_STAY_17();
+
+
+extern float h_env_PROB_STAY_17;
+
+/** set_PROB_STAY_18
+ * Sets the constant variable PROB_STAY_18 on the device which can then be used in the agent functions.
+ * @param h_PROB_STAY_18 value to set the variable
+ */
+extern void set_PROB_STAY_18(float* h_PROB_STAY_18);
+
+extern const float* get_PROB_STAY_18();
+
+
+extern float h_env_PROB_STAY_18;
+
+/** set_STAY_TIME_1
+ * Sets the constant variable STAY_TIME_1 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_1 value to set the variable
+ */
+extern void set_STAY_TIME_1(float* h_STAY_TIME_1);
+
+extern const float* get_STAY_TIME_1();
+
+
+extern float h_env_STAY_TIME_1;
+
+/** set_STAY_TIME_2
+ * Sets the constant variable STAY_TIME_2 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_2 value to set the variable
+ */
+extern void set_STAY_TIME_2(float* h_STAY_TIME_2);
+
+extern const float* get_STAY_TIME_2();
+
+
+extern float h_env_STAY_TIME_2;
+
+/** set_STAY_TIME_3
+ * Sets the constant variable STAY_TIME_3 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_3 value to set the variable
+ */
+extern void set_STAY_TIME_3(float* h_STAY_TIME_3);
+
+extern const float* get_STAY_TIME_3();
+
+
+extern float h_env_STAY_TIME_3;
+
+/** set_STAY_TIME_4
+ * Sets the constant variable STAY_TIME_4 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_4 value to set the variable
+ */
+extern void set_STAY_TIME_4(float* h_STAY_TIME_4);
+
+extern const float* get_STAY_TIME_4();
+
+
+extern float h_env_STAY_TIME_4;
+
+/** set_STAY_TIME_5
+ * Sets the constant variable STAY_TIME_5 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_5 value to set the variable
+ */
+extern void set_STAY_TIME_5(float* h_STAY_TIME_5);
+
+extern const float* get_STAY_TIME_5();
+
+
+extern float h_env_STAY_TIME_5;
+
+/** set_STAY_TIME_6
+ * Sets the constant variable STAY_TIME_6 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_6 value to set the variable
+ */
+extern void set_STAY_TIME_6(float* h_STAY_TIME_6);
+
+extern const float* get_STAY_TIME_6();
+
+
+extern float h_env_STAY_TIME_6;
+
+/** set_STAY_TIME_7
+ * Sets the constant variable STAY_TIME_7 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_7 value to set the variable
+ */
+extern void set_STAY_TIME_7(float* h_STAY_TIME_7);
+
+extern const float* get_STAY_TIME_7();
+
+
+extern float h_env_STAY_TIME_7;
+
+/** set_STAY_TIME_8
+ * Sets the constant variable STAY_TIME_8 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_8 value to set the variable
+ */
+extern void set_STAY_TIME_8(float* h_STAY_TIME_8);
+
+extern const float* get_STAY_TIME_8();
+
+
+extern float h_env_STAY_TIME_8;
+
+/** set_STAY_TIME_9
+ * Sets the constant variable STAY_TIME_9 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_9 value to set the variable
+ */
+extern void set_STAY_TIME_9(float* h_STAY_TIME_9);
+
+extern const float* get_STAY_TIME_9();
+
+
+extern float h_env_STAY_TIME_9;
+
+/** set_STAY_TIME_10
+ * Sets the constant variable STAY_TIME_10 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_10 value to set the variable
+ */
+extern void set_STAY_TIME_10(float* h_STAY_TIME_10);
+
+extern const float* get_STAY_TIME_10();
+
+
+extern float h_env_STAY_TIME_10;
+
+/** set_STAY_TIME_11
+ * Sets the constant variable STAY_TIME_11 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_11 value to set the variable
+ */
+extern void set_STAY_TIME_11(float* h_STAY_TIME_11);
+
+extern const float* get_STAY_TIME_11();
+
+
+extern float h_env_STAY_TIME_11;
+
+/** set_STAY_TIME_12
+ * Sets the constant variable STAY_TIME_12 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_12 value to set the variable
+ */
+extern void set_STAY_TIME_12(float* h_STAY_TIME_12);
+
+extern const float* get_STAY_TIME_12();
+
+
+extern float h_env_STAY_TIME_12;
+
+/** set_STAY_TIME_13
+ * Sets the constant variable STAY_TIME_13 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_13 value to set the variable
+ */
+extern void set_STAY_TIME_13(float* h_STAY_TIME_13);
+
+extern const float* get_STAY_TIME_13();
+
+
+extern float h_env_STAY_TIME_13;
+
+/** set_STAY_TIME_14
+ * Sets the constant variable STAY_TIME_14 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_14 value to set the variable
+ */
+extern void set_STAY_TIME_14(float* h_STAY_TIME_14);
+
+extern const float* get_STAY_TIME_14();
+
+
+extern float h_env_STAY_TIME_14;
+
+/** set_STAY_TIME_15
+ * Sets the constant variable STAY_TIME_15 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_15 value to set the variable
+ */
+extern void set_STAY_TIME_15(float* h_STAY_TIME_15);
+
+extern const float* get_STAY_TIME_15();
+
+
+extern float h_env_STAY_TIME_15;
+
+/** set_STAY_TIME_16
+ * Sets the constant variable STAY_TIME_16 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_16 value to set the variable
+ */
+extern void set_STAY_TIME_16(float* h_STAY_TIME_16);
+
+extern const float* get_STAY_TIME_16();
+
+
+extern float h_env_STAY_TIME_16;
+
+/** set_STAY_TIME_17
+ * Sets the constant variable STAY_TIME_17 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_17 value to set the variable
+ */
+extern void set_STAY_TIME_17(float* h_STAY_TIME_17);
+
+extern const float* get_STAY_TIME_17();
+
+
+extern float h_env_STAY_TIME_17;
+
+/** set_STAY_TIME_18
+ * Sets the constant variable STAY_TIME_18 on the device which can then be used in the agent functions.
+ * @param h_STAY_TIME_18 value to set the variable
+ */
+extern void set_STAY_TIME_18(float* h_STAY_TIME_18);
+
+extern const float* get_STAY_TIME_18();
+
+
+extern float h_env_STAY_TIME_18;
 
 /** set_CHECKPOINT_1_X
  * Sets the constant variable CHECKPOINT_1_X on the device which can then be used in the agent functions.
