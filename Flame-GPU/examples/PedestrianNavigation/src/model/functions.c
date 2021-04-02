@@ -560,7 +560,7 @@ __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
  * @param agent Pointer to an agent structre of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
 
  */
-__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessages){
+__FLAME_GPU_FUNC__ int pedestrians_main(xmachine_memory_agent* agent, xmachine_message_check_in_list* checkInMessages){
 
 	//glm::vec2 agent_steer = glm::vec2(agent->steer_x, agent->steer_y);
 

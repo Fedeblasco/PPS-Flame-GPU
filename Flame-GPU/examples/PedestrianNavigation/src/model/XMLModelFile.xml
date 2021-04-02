@@ -775,7 +775,7 @@
         </gpu:function>
 
         <gpu:function>
-          <name>move</name>
+          <name>pedestrians_main</name>
           <currentState>default</currentState>
           <nextState>default</nextState>
           <outputs>
@@ -3209,7 +3209,7 @@
         <name>receive_specialist_terminated</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
-        <name>move</name>
+        <name>pedestrians_main</name>
       </gpu:layerFunction>
       <gpu:layerFunction>
         <name>receive_doctor_response</name>

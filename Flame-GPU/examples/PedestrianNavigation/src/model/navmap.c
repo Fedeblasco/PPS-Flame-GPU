@@ -8,7 +8,7 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 
 	if (agent->exit_no > 0)
 	{
-		float random = rnd<DISCRETE_2D>(rand48);
+		float random = rnd<CONTINUOUS>(rand48);
 		bool emit_agent = false;
 
 		if ((agent->exit_no == 1)&&((random < EMMISION_RATE_EXIT1*TIME_SCALER)))
@@ -19,8 +19,8 @@ __FLAME_GPU_FUNC__ int generate_pedestrians(xmachine_memory_navmap* agent, xmach
 				float x = ((EXIT_X+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				float y = ((EXIT_Y+0.5f)/(d_message_navmap_cell_width/ENV_WIDTH))-ENV_MAX;
 				//int exit = getNewExitLocation(rand48);
-				float animate = rnd<DISCRETE_2D>(rand48);
-				float speed = (rnd<DISCRETE_2D>(rand48))*0.5f + 1.0f;
+				float animate = rnd<CONTINUOUS>(rand48);
+				float speed = (rnd<CONTINUOUS>(rand48))*0.5f + 1.0f;
 				
 				//Hago el random e imprimo
 				float rand = rnd<CONTINUOUS>(rand48);//Valor de 0 a 1

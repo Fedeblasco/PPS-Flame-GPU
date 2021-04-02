@@ -765,10 +765,10 @@ void agent_infect_patients(cudaStream_t &stream);
  */
 void agent_infect_patients_UCI(cudaStream_t &stream);
 
-/** agent_move
- * Agent function prototype for move function of agent agent
+/** agent_pedestrians_main
+ * Agent function prototype for pedestrians_main function of agent agent
  */
-void agent_move(cudaStream_t &stream);
+void agent_pedestrians_main(cudaStream_t &stream);
 
 /** agent_receive_chair_state
  * Agent function prototype for receive_chair_state function of agent agent
@@ -3375,14 +3375,14 @@ PROFILE_SCOPED_RANGE("singleIteration");
 	cudaEventRecord(instrument_start);
 #endif
 	
-    PROFILE_PUSH_RANGE("agent_move");
-	agent_move(stream4);
+    PROFILE_PUSH_RANGE("agent_pedestrians_main");
+	agent_pedestrians_main(stream4);
     PROFILE_POP_RANGE();
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
 	cudaEventRecord(instrument_stop);
 	cudaEventSynchronize(instrument_stop);
 	cudaEventElapsedTime(&instrument_milliseconds, instrument_start, instrument_stop);
-	printf("Instrumentation: agent_move = %f (ms)\n", instrument_milliseconds);
+	printf("Instrumentation: agent_pedestrians_main = %f (ms)\n", instrument_milliseconds);
 #endif
 	
 #if defined(INSTRUMENT_AGENT_FUNCTIONS) && INSTRUMENT_AGENT_FUNCTIONS
@@ -14870,17 +14870,17 @@ void agent_infect_patients_UCI(cudaStream_t &stream){
 
 	
 /* Shared memory size calculator for agent function */
-int agent_move_sm_size(int blockSize){
+int agent_pedestrians_main_sm_size(int blockSize){
 	int sm_size;
 	sm_size = SM_START;
   
 	return sm_size;
 }
 
-/** agent_move
- * Agent function prototype for move function of agent agent
+/** agent_pedestrians_main
+ * Agent function prototype for pedestrians_main function of agent agent
  */
-void agent_move(cudaStream_t &stream){
+void agent_pedestrians_main(cudaStream_t &stream){
 
     int sm_size;
     int blockSize;
@@ -14925,18 +14925,18 @@ void agent_move(cudaStream_t &stream){
 	
 	//CONTINUOUS AGENT CHECK FUNCTION OUTPUT BUFFERS FOR OUT OF BOUNDS
 	if (h_message_check_in_count + h_xmachine_memory_agent_count > xmachine_message_check_in_MAX){
-		printf("Error: Buffer size of check_in message will be exceeded in function move\n");
+		printf("Error: Buffer size of check_in message will be exceeded in function pedestrians_main\n");
 		exit(EXIT_FAILURE);
 	}
 	
 	
 	//calculate the grid block size for main agent function
-	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_move, agent_move_sm_size, state_list_size);
+	cudaOccupancyMaxPotentialBlockSizeVariableSMem( &minGridSize, &blockSize, GPUFLAME_pedestrians_main, agent_pedestrians_main_sm_size, state_list_size);
 	gridSize = (state_list_size + blockSize - 1) / blockSize;
 	b.x = blockSize;
 	g.x = gridSize;
 	
-	sm_size = agent_move_sm_size(blockSize);
+	sm_size = agent_pedestrians_main_sm_size(blockSize);
 	
 	
 	
@@ -14957,12 +14957,12 @@ void agent_move(cudaStream_t &stream){
 	gpuErrchkLaunch();
 	
 	
-	//MAIN XMACHINE FUNCTION CALL (move)
+	//MAIN XMACHINE FUNCTION CALL (pedestrians_main)
 	//Reallocate   : true
 	//Input        : 
 	//Output       : check_in
 	//Agent Output : 
-	GPUFLAME_move<<<g, b, sm_size, stream>>>(d_agents, d_check_ins);
+	GPUFLAME_pedestrians_main<<<g, b, sm_size, stream>>>(d_agents, d_check_ins);
 	gpuErrchkLaunch();
 	
 	
@@ -15017,9 +15017,9 @@ void agent_move(cudaStream_t &stream){
 	scatter_agent_Agents<<<gridSize, blockSize, 0, stream>>>(d_agents_swap, d_agents, 0, h_xmachine_memory_agent_count);
 	gpuErrchkLaunch();
 	//use a temp pointer to make swap default
-	xmachine_memory_agent_list* move_agents_temp = d_agents;
+	xmachine_memory_agent_list* pedestrians_main_agents_temp = d_agents;
 	d_agents = d_agents_swap;
-	d_agents_swap = move_agents_temp;
+	d_agents_swap = pedestrians_main_agents_temp;
 	//reset agent count
 	gpuErrchk( cudaMemcpy( &scan_last_sum, &d_agents_swap->_position[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
 	gpuErrchk( cudaMemcpy( &scan_last_included, &d_agents_swap->_scan_input[h_xmachine_memory_agent_count-1], sizeof(int), cudaMemcpyDeviceToHost));
@@ -15035,7 +15035,7 @@ void agent_move(cudaStream_t &stream){
     
 	//check the working agents wont exceed the buffer size in the new state list
 	if (h_xmachine_memory_agent_default_count+h_xmachine_memory_agent_count > xmachine_memory_agent_MAX){
-		printf("Error: Buffer size of move agents in state default will be exceeded moving working agents to next state in function move\n");
+		printf("Error: Buffer size of pedestrians_main agents in state default will be exceeded moving working agents to next state in function pedestrians_main\n");
       exit(EXIT_FAILURE);
       }
       

@@ -1730,11 +1730,11 @@ __FLAME_GPU_FUNC__ int infect_patients(xmachine_memory_agent* agent, xmachine_me
 __FLAME_GPU_FUNC__ int infect_patients_UCI(xmachine_memory_agent* agent, xmachine_message_pedestrian_state_list* pedestrian_state_messages, xmachine_message_pedestrian_state_PBM* partition_matrix, RNG_rand48* rand48);
 
 /**
- * move FLAMEGPU Agent Function
+ * pedestrians_main FLAMEGPU Agent Function
  * @param agent Pointer to an agent structure of type xmachine_memory_agent. This represents a single agent instance and can be modified directly.
  * @param check_in_messages Pointer to output message list of type xmachine_message_check_in_list. Must be passed as an argument to the add_check_in_message function ??.
  */
-__FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check_in_list* check_in_messages);
+__FLAME_GPU_FUNC__ int pedestrians_main(xmachine_memory_agent* agent, xmachine_message_check_in_list* check_in_messages);
 
 /**
  * receive_chair_state FLAMEGPU Agent Function

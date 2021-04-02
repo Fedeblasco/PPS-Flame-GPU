@@ -9215,7 +9215,7 @@ __global__ void GPUFLAME_infect_patients_UCI(xmachine_memory_agent_list* agents,
 /**
  *
  */
-__global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_message_check_in_list* check_in_messages){
+__global__ void GPUFLAME_pedestrians_main(xmachine_memory_agent_list* agents, xmachine_message_check_in_list* check_in_messages){
 	
 	//continuous agent: index is agent position in 1D agent list
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -9225,7 +9225,7 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
         return;
     
 
-	//SoA to AoS - xmachine_memory_move Coalesced memory read (arrays point to first item for agent index)
+	//SoA to AoS - xmachine_memory_pedestrians_main Coalesced memory read (arrays point to first item for agent index)
 	xmachine_memory_agent agent;
     
     // Thread bounds already checked, but the agent function will still execute. load default values?
@@ -9258,13 +9258,13 @@ __global__ void GPUFLAME_move(xmachine_memory_agent_list* agents, xmachine_messa
 	agent.vaccine = agents->vaccine[index];
 
 	//FLAME function call
-	int dead = !move(&agent, check_in_messages	);
+	int dead = !pedestrians_main(&agent, check_in_messages	);
 	
 
 	//continuous agent: set reallocation flag
 	agents->_scan_input[index]  = dead; 
 
-	//AoS to SoA - xmachine_memory_move Coalesced memory write (ignore arrays)
+	//AoS to SoA - xmachine_memory_pedestrians_main Coalesced memory write (ignore arrays)
 	agents->id[index] = agent.id;
 	agents->x[index] = agent.x;
 	agents->y[index] = agent.y;
