@@ -355,7 +355,7 @@ __FLAME_GPU_FUNC__ int infect_patients_UCI(xmachine_memory_agent* agent, xmachin
 	return 0;
 }
 
-__FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, int ir_y){
+__FLAME_GPU_FUNC__ int move_to(xmachine_memory_agent* agent, int ir_x, int ir_y){
 
 	int x = floor(((agent->x+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
 	int y = floor(((agent->y+ENV_MAX)/ENV_WIDTH)*d_message_navmap_cell_width);
@@ -411,9 +411,9 @@ __FLAME_GPU_FUNC__ int mover_a_destino(xmachine_memory_agent* agent, int ir_x, i
 		if (agent->y > 1.0f)
 			agent->y-=2.0f;
 
-		return 1;
+		return 0;
 	}
-	return 0; 
+	return 1; 
 }
 
 __FLAME_GPU_FUNC__ int go_to_doctor(xmachine_memory_agent* agent){
@@ -422,23 +422,23 @@ __FLAME_GPU_FUNC__ int go_to_doctor(xmachine_memory_agent* agent){
 		case 0:
 			//El que va al cuarto doctor se maneja distinto para que esquive la esquina
 			if(agent->go_to_y == (FIRSTDOCTOR_Y-(SPACE_BETWEEN_DOCTORS*3))){
-				if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
+				if(move_to(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y)){
 					agent->checkpoint++;
 				}
 			}else{
-				if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
+				if(move_to(agent,agent->go_to_x+13,agent->go_to_y)){
 					agent->checkpoint = 2;
 				}
 			}
 			break;
 		//Utilizado solo por el que va al cuarto doctor
 		case 1:
-			if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
+			if(move_to(agent,agent->go_to_x+13,agent->go_to_y)){
 					agent->checkpoint++;
 			}
 			break;
 		case 2:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+			if(move_to(agent,agent->go_to_x,agent->go_to_y)){
 				return 1;
 			}
 			break;
@@ -454,28 +454,28 @@ __FLAME_GPU_FUNC__ int go_to_specialist(xmachine_memory_agent* agent){
 		case 0:
 			//El que va al geriatrico se maneja distinto
 			if(agent->specialist_no == 5){
-				if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
+				if(move_to(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y)){
 					agent->checkpoint++;
 				}
 			}else{
-				if(mover_a_destino(agent,FIRSTSPECIALIST_X,FIRSTSPECIALIST_Y+13) == 0){
+				if(move_to(agent,FIRSTSPECIALIST_X,FIRSTSPECIALIST_Y+13)){
 					agent->checkpoint++;
 				}
 			}
 			break;
 		case 1:
 			if(agent->specialist_no == 5){
-				if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
+				if(move_to(agent,agent->go_to_x+13,agent->go_to_y)){
 					agent->checkpoint++;
 				}
 			}else{
-				if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+13) == 0){
+				if(move_to(agent,agent->go_to_x,agent->go_to_y+13)){
 					agent->checkpoint++;
 				}
 			}
 			break;
 		case 2:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+			if(move_to(agent,agent->go_to_x,agent->go_to_y)){
 				return 1;
 			}
 			break;
@@ -489,17 +489,17 @@ __FLAME_GPU_FUNC__ int go_to_UCI(xmachine_memory_agent* agent){
 	
 	switch(agent->checkpoint){
 		case 0:
-			if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
+			if(move_to(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y)){
 				agent->checkpoint++;
 			}
 			break;
 		case 1:
-			if(mover_a_destino(agent,CHECKPOINT_5_X,CHECKPOINT_5_Y) == 0){
+			if(move_to(agent,CHECKPOINT_5_X,CHECKPOINT_5_Y)){
 				agent->checkpoint++;
 			}
 			break;
 		case 2:
-			if(mover_a_destino(agent,UCI_X,UCI_Y) == 0){
+			if(move_to(agent,UCI_X,UCI_Y)){
 				return 1;
 			}
 			break;
@@ -514,37 +514,37 @@ __FLAME_GPU_FUNC__ int go_to_exit(xmachine_memory_agent* agent){
 	switch(agent->checkpoint){
 		case 0:
 			if(agent->specialist_no == 5 || agent->specialist_no == 6){
-				if(mover_a_destino(agent,CHECKPOINT_5_X,CHECKPOINT_5_Y) == 0){
+				if(move_to(agent,CHECKPOINT_5_X,CHECKPOINT_5_Y)){
 					agent->checkpoint = 3;
 				}
 			}else{
-				if(mover_a_destino(agent,agent->go_to_x+13,agent->go_to_y) == 0){
+				if(move_to(agent,agent->go_to_x+13,agent->go_to_y)){
 					agent->checkpoint = 4;
 				}
 			}
 			break;
 		case 1:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y+13) == 0){
+			if(move_to(agent,agent->go_to_x,agent->go_to_y+13)){
 				agent->checkpoint++;
 			}
 			break;
 		case 2:
-			if(mover_a_destino(agent,FIRSTSPECIALIST_X,FIRSTSPECIALIST_Y+13) == 0){
+			if(move_to(agent,FIRSTSPECIALIST_X,FIRSTSPECIALIST_Y+13)){
 				agent->checkpoint = 4;
 			}
 			break;
 		case 3:
-			if(mover_a_destino(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y) == 0){
+			if(move_to(agent,CHECKPOINT_4_X,CHECKPOINT_4_Y)){
 				agent->checkpoint++;
 			}
 			break;
 		case 4:
-			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
+			if(move_to(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y)){
 				agent->checkpoint++;
 			}
 			break;
 		case 5:
-			if(mover_a_destino(agent,EXIT_X,EXIT_Y) == 0){
+			if(move_to(agent,EXIT_X,EXIT_Y)){
 				return 1;
 			}
 			break;
@@ -582,74 +582,74 @@ __FLAME_GPU_FUNC__ int move(xmachine_memory_agent* agent, xmachine_message_check
 	}
 	switch(agent->estado_movimiento){
 		case 0:
-			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
+			if(move_to(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y)){
 				agent->estado_movimiento++;
 			}
 			break; 
 		case 3:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+			if(move_to(agent,agent->go_to_x,agent->go_to_y)){
 				add_check_in_message(checkInMessages, agent->id);
 				agent->estado_movimiento++;
 			}
 			break;
 		case 5:
-			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
+			if(move_to(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 6:
-			if(mover_a_destino(agent,CHECKPOINT_1_X,CHECKPOINT_1_Y) == 0){
+			if(move_to(agent,CHECKPOINT_1_X,CHECKPOINT_1_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 7:
-			if(mover_a_destino(agent,RECEPTIONIST_X,RECEPTIONIST_Y) == 0){
+			if(move_to(agent,RECEPTIONIST_X,RECEPTIONIST_Y)){
 				agent->estado_movimiento ++;
 				add_check_in_message(checkInMessages, agent->id);
 			}
 			break;
 		case 9:
-			if(mover_a_destino(agent,CHECKPOINT_1_X,CHECKPOINT_1_Y) == 0){
+			if(move_to(agent,CHECKPOINT_1_X,CHECKPOINT_1_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 10:
-			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
+			if(move_to(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 13:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+			if(move_to(agent,agent->go_to_x,agent->go_to_y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 16:
-			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
+			if(move_to(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 17:
-			if(mover_a_destino(agent,CHECKPOINT_2_X,CHECKPOINT_2_Y) == 0){
+			if(move_to(agent,CHECKPOINT_2_X,CHECKPOINT_2_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 18:
-			if(mover_a_destino(agent,TRIAGE_X,TRIAGE_Y) == 0){
+			if(move_to(agent,TRIAGE_X,TRIAGE_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 22:
-			if(mover_a_destino(agent,CHECKPOINT_2_X,CHECKPOINT_2_Y) == 0){
+			if(move_to(agent,CHECKPOINT_2_X,CHECKPOINT_2_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 23:
-			if(mover_a_destino(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y) == 0){
+			if(move_to(agent,CHECKPOINT_3_X,CHECKPOINT_3_Y)){
 				agent->estado_movimiento++;
 			}
 			break;
 		case 26:
-			if(mover_a_destino(agent,agent->go_to_x,agent->go_to_y) == 0){
+			if(move_to(agent,agent->go_to_x,agent->go_to_y)){
 				agent->estado_movimiento++;
 				//Temporal para probar
 				if(agent->specialist_no == 6){
