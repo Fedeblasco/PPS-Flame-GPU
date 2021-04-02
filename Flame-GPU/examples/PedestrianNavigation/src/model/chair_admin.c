@@ -15,7 +15,7 @@ __FLAME_GPU_FUNC__ int attend_chair_petitions(xmachine_memory_chair_admin* agent
 		for(int i=0;i<35;i++){
 			
 			if(index == -1){
-				int random = (rnd<DISCRETE_2D>(rand48))*35;
+				int random = (rnd<CONTINUOUS>(rand48))*35;
 				if((agent->chairArray[random] == 0) && (random < 35)){ //Se pone el random < 35 por la remota posibilidad devuelva 35
 					index = random;
 				}
