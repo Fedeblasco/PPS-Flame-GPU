@@ -7519,8 +7519,6 @@ __constant__ int EXIT_X;
 
 __constant__ int EXIT_Y;
 
-__constant__ float PROB_SNIFF;
-
 __constant__ float PROB_INFECT;
 
 __constant__ float PROB_SPAWN_SICK;
@@ -8125,17 +8123,6 @@ extern const int* get_EXIT_Y();
 
 
 extern int h_env_EXIT_Y;
-
-/** set_PROB_SNIFF
- * Sets the constant variable PROB_SNIFF on the device which can then be used in the agent functions.
- * @param h_PROB_SNIFF value to set the variable
- */
-extern void set_PROB_SNIFF(float* h_PROB_SNIFF);
-
-extern const float* get_PROB_SNIFF();
-
-
-extern float h_env_PROB_SNIFF;
 
 /** set_PROB_INFECT
  * Sets the constant variable PROB_INFECT on the device which can then be used in the agent functions.

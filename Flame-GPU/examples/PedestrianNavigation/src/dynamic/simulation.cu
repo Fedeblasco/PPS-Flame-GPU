@@ -3678,7 +3678,6 @@ int h_env_SECONDS_SICK;
 int h_env_CLEANING_PERIOD_SECONDS;
 int h_env_EXIT_X;
 int h_env_EXIT_Y;
-float h_env_PROB_SNIFF;
 float h_env_PROB_INFECT;
 float h_env_PROB_SPAWN_SICK;
 float h_env_PROB_INFECT_PERSONAL;
@@ -4272,19 +4271,6 @@ void set_EXIT_Y(int* h_EXIT_Y){
 //constant getter
 const int* get_EXIT_Y(){
     return &h_env_EXIT_Y;
-}
-
-
-
-//constant setter
-void set_PROB_SNIFF(float* h_PROB_SNIFF){
-    gpuErrchk(cudaMemcpyToSymbol(PROB_SNIFF, h_PROB_SNIFF, sizeof(float)));
-    memcpy(&h_env_PROB_SNIFF, h_PROB_SNIFF,sizeof(float));
-}
-
-//constant getter
-const float* get_PROB_SNIFF(){
-    return &h_env_PROB_SNIFF;
 }
 
 

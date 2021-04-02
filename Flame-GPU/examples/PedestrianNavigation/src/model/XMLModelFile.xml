@@ -166,10 +166,6 @@
 <!-- Probabilidades usadas para manejar la cantidad de enfermos -->	
       <gpu:variable>
         <type>float</type>
-        <name>PROB_SNIFF</name>
-      </gpu:variable>
-      <gpu:variable>
-        <type>float</type>
         <name>PROB_INFECT</name>
       </gpu:variable>
       <gpu:variable>

@@ -382,10 +382,6 @@ void saveIterationData(char* outputpath, int iteration_number, xmachine_memory_a
     sprintf(data, "%d", (*get_EXIT_Y()));
     fputs(data, file);
     fputs("</EXIT_Y>\n", file);
-    fputs("\t<PROB_SNIFF>", file);
-    sprintf(data, "%f", (*get_PROB_SNIFF()));
-    fputs(data, file);
-    fputs("</PROB_SNIFF>\n", file);
     fputs("\t<PROB_INFECT>", file);
     sprintf(data, "%f", (*get_PROB_INFECT()));
     fputs(data, file);
@@ -1615,8 +1611,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     
     int in_env_EXIT_Y;
     
-    int in_env_PROB_SNIFF;
-    
     int in_env_PROB_INFECT;
     
     int in_env_PROB_SPAWN_SICK;
@@ -1954,7 +1948,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     int env_CLEANING_PERIOD_SECONDS;
     int env_EXIT_X;
     int env_EXIT_Y;
-    float env_PROB_SNIFF;
     float env_PROB_INFECT;
     float env_PROB_SPAWN_SICK;
     float env_PROB_INFECT_PERSONAL;
@@ -2202,7 +2195,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     in_env_CLEANING_PERIOD_SECONDS = 0;
     in_env_EXIT_X = 0;
     in_env_EXIT_Y = 0;
-    in_env_PROB_SNIFF = 0;
     in_env_PROB_INFECT = 0;
     in_env_PROB_SPAWN_SICK = 0;
     in_env_PROB_INFECT_PERSONAL = 0;
@@ -2688,7 +2680,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
     env_CLEANING_PERIOD_SECONDS = 0;
     env_EXIT_X = 0;
     env_EXIT_Y = 0;
-    env_PROB_SNIFF = 0;
     env_PROB_INFECT = 0;
     env_PROB_SPAWN_SICK = 0;
     env_PROB_INFECT_PERSONAL = 0;
@@ -3623,8 +3614,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
             if(strcmp(buffer, "/EXIT_X") == 0) in_env_EXIT_X = 0;
 			if(strcmp(buffer, "EXIT_Y") == 0) in_env_EXIT_Y = 1;
             if(strcmp(buffer, "/EXIT_Y") == 0) in_env_EXIT_Y = 0;
-			if(strcmp(buffer, "PROB_SNIFF") == 0) in_env_PROB_SNIFF = 1;
-            if(strcmp(buffer, "/PROB_SNIFF") == 0) in_env_PROB_SNIFF = 0;
 			if(strcmp(buffer, "PROB_INFECT") == 0) in_env_PROB_INFECT = 1;
             if(strcmp(buffer, "/PROB_INFECT") == 0) in_env_PROB_INFECT = 0;
 			if(strcmp(buffer, "PROB_SPAWN_SICK") == 0) in_env_PROB_SPAWN_SICK = 1;
@@ -4402,13 +4391,6 @@ void readInitialStates(char* inputpath, xmachine_memory_agent_list* h_agents, in
                     env_EXIT_Y = (int) fpgu_strtol(buffer);
                     
                     set_EXIT_Y(&env_EXIT_Y);
-                  
-              }
-            if(in_env_PROB_SNIFF){
-              
-                    env_PROB_SNIFF = (float) fgpu_atof(buffer);
-                    
-                    set_PROB_SNIFF(&env_PROB_SNIFF);
                   
               }
             if(in_env_PROB_INFECT){
